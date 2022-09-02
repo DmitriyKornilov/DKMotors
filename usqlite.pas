@@ -1055,11 +1055,17 @@ function TSQLite.StoreListLoad(const ANameID: Integer;
 var
   OrderStr: String;
   WhereStr: String;
+  TestDates: TDateVector;
+  MotorNames, MotorNums: TStrVector;
+  i, n: Integer;
 begin
   Result:= False;
   ATestDates:= nil;
   AMotorNames:= nil;
   AMotorNums:= nil;
+  TestDates:= nil;
+  MotorNames:= nil;
+  MotorNums:= nil;
 
   WhereStr:= 'WHERE (t1.Fail=0) AND (t2.CargoID=0) ';
   if ANameID>0 then
@@ -1078,8 +1084,7 @@ begin
   QSetQuery(FQuery);
   QClose;
   QSetSQL(
-    'SELECT t1.TestDate, ' +
-           't2.MotorNum, t2.Series, t3.MotorName ' +
+    'SELECT t1.TestDate, t2.MotorNum, t3.MotorName ' +
     'FROM MOTORTEST t1 ' +
     'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
     'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
@@ -1093,14 +1098,36 @@ begin
     QFirst;
     while not QEOF do
     begin
-      VAppend(ATestDates, QFieldDT('TestDate'));
-      VAppend(AMotorNames, QFieldStr('MotorName'));
-      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(TestDates, QFieldDT('TestDate'));
+      VAppend(MotorNames, QFieldStr('MotorName'));
+      VAppend(MotorNums, QFieldStr('MotorNum'));
       QNext;
     end;
     Result:= True;
   end;
   QClose;
+
+  if not Result then Exit;
+
+  //записываем выходные вектора без возможных дублей (если норм тесты были несколько раз)
+  for i:= High(TestDates) downto 0 do
+  begin
+    n:= VIndexOf(AMotorNums, MotorNums[i]);
+    if (n>=0) and (MotorNames[i]=AMotorNames[n])  then //есть совпадение
+    begin
+      if TestDates[i]>ATestDates[n] then //записываем более позднюю дату испытаний
+        ATestDates[n]:= TestDates[i];
+    end
+    else begin //совпадений нет
+      VAppend(ATestDates, TestDates[i]);
+      VAppend(AMotorNames, MotorNames[i]);
+      VAppend(AMotorNums, MotorNums[i]);
+    end;
+  end;
+
+  VReverse(ATestDates);
+  VReverse(AMotorNames);
+  VReverse(AMotorNums);
 end;
 
 function TSQLite.StoreTotalLoad(const ANameID: Integer; out
@@ -1118,13 +1145,16 @@ begin
 
   QSetQuery(FQuery);
   QSetSQL(
-    'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
-    'FROM MOTORTEST t1 ' +
-    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-    'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
-    WhereStr +
-    'GROUP BY t2.NameID ' +
-    'ORDER BY t3.MotorName');
+    'SELECT COUNT(NameID) As MotorCount, MotorName ' +
+    'FROM ' +
+       '(SELECT DISTINCT t1.MotorID, t2.NameID, t3.MotorName ' +
+        'FROM MOTORTEST t1 ' +
+        'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+        'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+        WhereStr +
+       ')' +
+    'GROUP BY NameID ' +
+    'ORDER BY MotorName');
   if ANameID>0 then
     QParamInt('NameID', ANameID);
   QOpen;
