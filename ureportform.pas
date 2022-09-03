@@ -15,23 +15,27 @@ type
   { TReportForm }
 
   TReportForm = class(TForm)
-    OrderNumCheckBox: TCheckBox;
+    ChooseMotorNamesButton: TSpeedButton;
+    ChooseRecieverNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
+    DividerBevel4: TDividerBevel;
+    Label2: TLabel;
+    Label3: TLabel;
+    MotorNamesLabel: TLabel;
+    ReceiverNamesLabel: TLabel;
+    MotorNamesPanel: TPanel;
+    ReceiverNamesPanel: TPanel;
+    OrderNumCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     DividerBevel1: TDividerBevel;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
-    DividerBevel4: TDividerBevel;
-    DividerBevel5: TDividerBevel;
     ExportButton: TRxSpeedButton;
     Label1: TLabel;
     LogGrid: TsWorksheetGrid;
-    MotorNameComboBox: TComboBox;
-    ReceiverNameComboBox: TComboBox;
     Panel1: TPanel;
     Panel2: TPanel;
-    Panel6: TPanel;
     ReceiverPanel: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
@@ -39,6 +43,8 @@ type
     RadioButton4: TRadioButton;
     ReportPeriodPanel: TPanel;
     ToolPanel: TPanel;
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
+    procedure ChooseRecieverNamesButtonClick(Sender: TObject);
     procedure OrderNumCheckBoxChange(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
@@ -48,7 +54,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNameComboBoxChange(Sender: TObject);
+
     procedure RadioButton1Click(Sender: TObject);
     procedure RadioButton2Click(Sender: TObject);
     procedure RadioButton3Click(Sender: TObject);
@@ -60,6 +66,12 @@ type
     MotorTestSheet: TMotorTestSheet;
     ReportShipmentSheet: TReportShipmentSheet;
     ReportReclamationSheet: TReportReclamationSheet;
+
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
+
+    UsedReceiverIDs: TIntVector;
+    UsedReceiverNames: TStrVector;
 
     procedure ShowReport;
     procedure ShowBuildReport;
@@ -119,6 +131,23 @@ begin
   ShowReport;
 end;
 
+procedure TReportForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+   if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
+    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  ShowReport;
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+end;
+
+procedure TReportForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.EditKeyPickList(UsedReceiverIDs, UsedReceiverNames,
+    'Наименования грузополучателей',
+    'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then  ShowReport;
+  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
+  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
+end;
+
 procedure TReportForm.CloseButtonClick(Sender: TObject);
 begin
   Close;
@@ -128,9 +157,21 @@ procedure TReportForm.FormCreate(Sender: TObject);
 begin
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= FirstDayInMonth(Date);
-  SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs, False);
-  SQLite.ReceiverIDsAndNamesLoad(ReceiverNameComboBox, ReceiverIDs, False);
+
+  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
+                     UsedNameIDs, UsedNames, True, 'NameID');
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+
+  SQLite.KeyPickList('CARGORECEIVERS', 'ReceiverID', 'ReceiverName',
+                     UsedReceiverIDs, UsedReceiverNames, True, 'ReceiverName');
+  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
+  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
+
+
+
 end;
+
 
 procedure TReportForm.FormDestroy(Sender: TObject);
 begin
@@ -142,10 +183,7 @@ begin
   ShowReport;
 end;
 
-procedure TReportForm.MotorNameComboBoxChange(Sender: TObject);
-begin
-  ShowReport;
-end;
+
 
 procedure TReportForm.RadioButton1Click(Sender: TObject);
 begin
@@ -179,7 +217,8 @@ procedure TReportForm.ShowReport;
 begin
   ExportButton.Align:= alRight;
   DividerBevel2.Align:= alRight;
-  ReceiverPanel.Visible:= RadioButton3.Checked;
+  ReceiverPanel.Visible:= RadioButton3.Checked;//
+  ReceiverNamesPanel.Visible:= RadioButton3.Checked;
   OrderNumCheckBox.Visible:= not RadioButton3.Checked;
   DividerBevel2.Align:= alLeft;
   ExportButton.Align:= alLeft;
@@ -217,10 +256,10 @@ begin
   BD:= DateTimePicker2.Date;
   if BD>ED then Exit;
 
-  SQLite.BuildListLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
+  SQLite.BuildListLoad(BD, ED, UsedNameIDs,
                     OrderNumCheckBox.Checked, X, Y, Z,
                     BuildDates, MotorNames, MotorNums, RotorNums);
-  SQLite.BuildTotalLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
+  SQLite.BuildTotalLoad(BD, ED, UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts);
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
   MotorBuildSheet.DrawReport(BD, ED,
@@ -242,11 +281,11 @@ begin
   BD:= DateTimePicker2.Date;
   if BD>ED then Exit;
 
-  SQLite.TestListLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
+  SQLite.TestListLoad(BD, ED, UsedNameIDs,
               OrderNumCheckBox.Checked, X, TestResults, TestDates,
               MotorNames, MotorNums, TestNotes);
 
-  SQLite.TestTotalLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
+  SQLite.TestTotalLoad(BD, ED, UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts, TotalFailCounts);
   MotorTestSheet:= TMotorTestSheet.Create(LogGrid);
   MotorTestSheet.DrawReport(BD, ED,
@@ -273,17 +312,14 @@ begin
   BD:= DateTimePicker2.Date;
   if BD>ED then Exit;
 
-  SQLite.ShipmentTotalLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                         TotalMotorNames, TotalMotorCounts);
-  SQLite.ShipmentRecieversTotalLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                ReceiverIDs[ReceiverNameComboBox.ItemIndex],
+  SQLite.ShipmentTotalLoad(BD, ED, UsedNameIDs, TotalMotorNames, TotalMotorCounts);
+  SQLite.ShipmentRecieversTotalLoad(BD, ED, UsedNameIDs, UsedReceiverIDs,
                 RecieverNames, RecieverMotorNames, RecieverMotorCounts);
-  SQLite.ShipmentMotorListLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                ReceiverIDs[ReceiverNameComboBox.ItemIndex],
+  SQLite.ShipmentMotorListLoad(BD, ED, UsedNameIDs, UsedReceiverIDs,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);
 
   ReportShipmentSheet:= TReportShipmentSheet.Create(LogGrid);
-  ReportShipmentSheet.DrawReport(ReceiverNameComboBox.ItemIndex>0,
+  ReportShipmentSheet.DrawReport(Length(UsedReceiverIDs)=1,
                 BD, ED, TotalMotorNames, TotalMotorCounts,
                 RecieverNames, RecieverMotorNames, RecieverMotorCounts,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);
@@ -309,17 +345,13 @@ begin
   BD:= DateTimePicker2.Date;
   if BD>ED then Exit;
 
-  SQLite.ReclamationTotalLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                         TotalMotorNames, TotalMotorCounts);
-  SQLite.ReclamationPlacesLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                         PlaceNames, PlaceMotorCounts);
-  SQLite.ReclamationDefectsLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                         DefectNames, DefectMotorCounts);
-  SQLite.ReclamationReasonsLoad(BD, ED, NameIDs[MotorNameComboBox.ItemIndex],
-                         ReasonNames, ReasonMotorCounts);
+  SQLite.ReclamationTotalLoad(BD, ED, UsedNameIDs, TotalMotorNames, TotalMotorCounts);
+  SQLite.ReclamationPlacesLoad(BD, ED, UsedNameIDs, PlaceNames, PlaceMotorCounts);
+  SQLite.ReclamationDefectsLoad(BD, ED, UsedNameIDs, DefectNames, DefectMotorCounts);
+  SQLite.ReclamationReasonsLoad(BD, ED, UsedNameIDs, ReasonNames, ReasonMotorCounts);
 
   ReportReclamationSheet:= TReportReclamationSheet.Create(LogGrid);
-  ReportReclamationSheet.DrawReport(MotorNameComboBox.ItemIndex>0,
+  ReportReclamationSheet.DrawReport(Length(UsedNameIDs)=1,
                 BD, ED, TotalMotorNames, TotalMotorCounts,
                 PlaceNames, PlaceMotorCounts,
                 DefectNames, DefectMotorCounts,

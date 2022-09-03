@@ -20,7 +20,7 @@ type
     function MonthAndDatesForLogLoad(const ATableName, AFieldName: String;
        const AYear: Word; out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
     function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
-       const ABeginDate, AEndDate: TDate; const ANameID: Integer;
+       const ABeginDate, AEndDate: TDate; const ANameIDs: TIntVector;
        out ANames: TStrVector; out ACounts: TIntVector): Boolean;
   public
     //справочники
@@ -52,12 +52,12 @@ type
 
     //сборка
     function BuildListLoad(const ABeginDate, AEndDate: TDate;
-               const ANameID: Integer; const ANeedOrderByNumber: Boolean;
+               const AUsedNameIDs: TIntVector; const ANeedOrderByNumber: Boolean;
                out AMotorIDs, ANameIDs, AOldMotors: TIntVector;
                out ABuildDates: TDateVector;
                out AMotorNames, AMotorNums, ARotorNums: TStrVector): Boolean;
     function BuildTotalLoad(const ABeginDate, AEndDate: TDate;
-               const ANameID: Integer;
+               const ANameIDs: TIntVector;
                out AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
     function IsDuplicateMotorNumber(const ADate: TDate;
                const ANameID: Integer; const AMotorNum: String): Boolean;
@@ -69,7 +69,7 @@ type
                           const AMotorNum, ARotorNum: String);
 
     //испытания
-    function TestBeforeListLoad(const ANameID: Integer;
+    function TestBeforeListLoad(const ANameIDs: TIntVector;
                           const ANeedOrderByNumber: Boolean;
                           out ABuildDates: TDateVector;
                           out AMotorNames, AMotorNums, ATotalMotorNames: TStrVector;
@@ -78,12 +78,12 @@ type
                           out ATestFails: TIntMatrix;
                           out ATestNotes: TStrMatrix): Boolean;
     function TestListLoad(const ABeginBuildDate, AEndBuildDate: TDate;
-               const ANameID: Integer; const ANeedOrderByNumber: Boolean;
+               const ANameIDs: TIntVector; const ANeedOrderByNumber: Boolean;
                out ATestIDs, ATestResults: TIntVector;
                out ATestDates: TDateVector;
                out AMotorNames, AMotorNums, ATestNotes: TStrVector): Boolean;
     function TestTotalLoad(const ABeginBuildDate, AEndBuildDate: TDate;
-                const ANameID: Integer;
+                const ANameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts, AFailCounts: TIntVector): Boolean;
     function TestChooseListLoad(const ANameID: Integer;
@@ -95,32 +95,34 @@ type
                            const ATestNotes: TStrVector): Boolean;
 
     //склад
-    function StoreListLoad(const ANameID: Integer;
+    function StoreListLoad(const ANameIDs: TIntVector;
                     const ANeedOrderByNumber, ANeedOrderByName: Boolean;
                     out ATestDates: TDateVector;
                     out AMotorNames, AMotorNums: TStrVector): Boolean;
-    function StoreTotalLoad(const ANameID: Integer;
+    function StoreTotalLoad(const ANameIDs: TIntVector;
                              out AMotorNames: TStrVector;
                              out AMotorCounts: TIntVector): Boolean;
 
     //отгрузки
-    function ShipmentListLoad(const AYear: Word; out AMonths: TStrVector;
+    function ShipmentListLoad(const AReceiverIDs: TIntVector;
+                             const AYear: Word; out AMonths: TStrVector;
                           out AShipments: TStrMatrix;
                           out ACargoIDs: TIntMatrix): Boolean;
     function ShipmentMotorListLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID, AReceiverID: Integer;
+                const ANameIDs, AReceiverIDs: TIntVector;
                 out ASendDates: TDateVector;
                 out AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
     function ShipmentTotalLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID: Integer;
+                const ANameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
     function ShipmentRecieversTotalLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID, AReceiverID: Integer;
+                const ANameIDs, AReceiverIDs: TIntVector;
                 out AReceiverNames: TStrVector;
                 out AMotorNames: TStrMatrix;
                 out AMotorCounts: TIntMatrix): Boolean;
-    function CargoListLoad(const ABeginDate, AEndDate: TDate;
+    function CargoListLoad(const AReceiverIDs: TIntVector;
+                         const ABeginDate, AEndDate: TDate;
                          out ACargoIDs: TIntVector;
                          out ASendDates: TDateVector;
                          out AReceiverNames: TStrVector): Boolean;
@@ -179,19 +181,19 @@ type
                           ADefectID, AReasonID, AOpinion, APassport: Integer;
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
     function ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID: Integer;
+                const ANameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
     function ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID: Integer;
+                const ANameIDs: TIntVector;
                 out APlaceNames: TStrVector;
                 out APlaceMotorCounts: TIntVector): Boolean;
     function ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID: Integer;
+                const ANameIDs: TIntVector;
                 out ADefectNames: TStrVector;
                 out ADefectMotorCounts: TIntVector): Boolean;
     function ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameID: Integer;
+                const ANameIDs: TIntVector;
                 out AReasonNames: TStrVector;
                 out AReasonMotorCounts: TIntVector): Boolean;
 
@@ -294,7 +296,8 @@ end;
 
 function TSQLite.ReclamationReportLoad(const ATableName, AIDFieldName,
   ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out ANames: TStrVector; out ACounts: TIntVector): Boolean;
+  const ANameIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector
+  ): Boolean;
 var
   WhereStr, IDFieldName, NameFieldName: String;
 begin
@@ -306,8 +309,8 @@ begin
   NameFieldName:= SqlEsc(ANameFieldName);
 
   WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -320,8 +323,8 @@ begin
     'ORDER BY t3.' + NameFieldName);
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -514,7 +517,7 @@ begin
 end;
 
 function TSQLite.BuildListLoad(const ABeginDate, AEndDate: TDate;
-                  const ANameID: Integer;
+                  const AUsedNameIDs: TIntVector;
                   const ANeedOrderByNumber: Boolean;
                   out AMotorIDs, ANameIDs, AOldMotors: TIntVector;
                   out ABuildDates: TDateVector;
@@ -538,8 +541,8 @@ begin
       'INNER JOIN MOTORNAMES t2 ON (t1.NameID=t2.NameID) ';
 
   WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
+  if not VIsNil(AUsedNameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(AUsedNameIDs));
 
   if ANeedOrderByNumber then
     OrderStr:= 'ORDER BY t1.MotorNum, t1.BuildDate'
@@ -553,8 +556,8 @@ begin
   QSetSQL(S);
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(AUsedNameIDs) then
+    QParamsInt(AUsedNameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -576,7 +579,7 @@ begin
 end;
 
 function TSQLite.BuildTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out AMotorNames: TStrVector; out
+  const ANameIDs: TIntVector; out AMotorNames: TStrVector; out
   AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
@@ -586,8 +589,10 @@ begin
   AMotorCounts:= nil;
 
   WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
+  //if ANameID>0 then
+  //  WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -599,8 +604,10 @@ begin
     'ORDER BY t2.MotorName');
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
+  //if ANameID>0 then
+  //  QParamInt('NameID', ANameID);
   QOpen;
   if not QIsEmpty then
   begin
@@ -691,7 +698,7 @@ begin
   end;
 end;
 
-function TSQLite.TestBeforeListLoad(const ANameID: Integer;
+function TSQLite.TestBeforeListLoad(const ANameIDs: TIntVector;
   const ANeedOrderByNumber: Boolean; out ABuildDates: TDateVector; out
   AMotorNames, AMotorNums, ATotalMotorNames: TStrVector; out
   ATotalMotorCounts: TIntVector; out ATestDates: TDateMatrix; out
@@ -717,8 +724,8 @@ begin
 
   WhereStr:= 'WHERE (t1.OldMotor=0) AND ((t3.Fail IS NULL) OR ' +
                    '(t1.MotorID NOT IN (SELECT MotorID FROM MOTORTEST WHERE Fail=0))) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + 'AND (t1.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -734,8 +741,8 @@ begin
     'ORDER BY MotorName '
   );
 
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -765,8 +772,8 @@ begin
     'LEFT OUTER JOIN MOTORTEST t3 ON (t1.MotorID=t3.MotorID) ' +
     WhereStr +
     OrderStr);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -814,7 +821,7 @@ begin
 end;
 
 function TSQLite.TestListLoad(const ABeginBuildDate, AEndBuildDate: TDate;
-  const ANameID: Integer; const ANeedOrderByNumber: Boolean; out ATestIDs,
+  const ANameIDs: TIntVector; const ANeedOrderByNumber: Boolean; out ATestIDs,
   ATestResults: TIntVector; out ATestDates: TDateVector; out AMotorNames,
   AMotorNums, ATestNotes: TStrVector): Boolean;
 var
@@ -830,8 +837,8 @@ begin
   ATestNotes:= nil;
 
   WhereStr:= 'WHERE (t1.TestDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   if ANeedOrderByNumber then
     OrderStr:= 'ORDER BY t2.MotorNum, t1.TestDate, t1.Fail DESC'
@@ -849,8 +856,8 @@ begin
     OrderStr);
   QParamDT('BD', ABeginBuildDate);
   QParamDT('ED', AEndBuildDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -871,7 +878,7 @@ begin
 end;
 
 function TSQLite.TestTotalLoad(const ABeginBuildDate, AEndBuildDate: TDate;
-  const ANameID: Integer; out AMotorNames: TStrVector; out AMotorCounts,
+  const ANameIDs: TIntVector; out AMotorNames: TStrVector; out AMotorCounts,
   AFailCounts: TIntVector): Boolean;
 var
   n: Integer;
@@ -883,8 +890,8 @@ begin
   AFailCounts:= nil;
 
   WhereStr:= 'WHERE (t1.TestDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -897,8 +904,8 @@ begin
     'ORDER BY t3.MotorName');
   QParamDT('BD', ABeginBuildDate);
   QParamDT('ED', AEndBuildDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -916,8 +923,8 @@ begin
   VDim(AFailCounts, Length(AMotorNames), 0);
 
   WhereStr:= 'WHERE (t1.TestDate BETWEEN :BD AND :ED) AND (t1.Fail=1) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   QSetSQL(
     'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
@@ -928,8 +935,8 @@ begin
     'GROUP BY t2.NameID');
   QParamDT('BD', ABeginBuildDate);
   QParamDT('ED', AEndBuildDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -1049,7 +1056,7 @@ begin
   end;
 end;
 
-function TSQLite.StoreListLoad(const ANameID: Integer;
+function TSQLite.StoreListLoad(const ANameIDs: TIntVector;
   const ANeedOrderByNumber, ANeedOrderByName: Boolean; out
   ATestDates: TDateVector; out AMotorNames, AMotorNums: TStrVector): Boolean;
 var
@@ -1068,8 +1075,8 @@ begin
   MotorNums:= nil;
 
   WhereStr:= 'WHERE (t1.Fail=0) AND (t2.CargoID=0) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   OrderStr:= 'ORDER BY ';
   if ANeedOrderByNumber or ANeedOrderByName then
@@ -1090,8 +1097,8 @@ begin
     'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
     WhereStr +
     OrderStr);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -1130,7 +1137,7 @@ begin
   VReverse(AMotorNums);
 end;
 
-function TSQLite.StoreTotalLoad(const ANameID: Integer; out
+function TSQLite.StoreTotalLoad(const ANameIDs: TIntVector; out
   AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
@@ -1140,8 +1147,8 @@ begin
   AMotorCounts:= nil;
 
   WhereStr:= 'WHERE (t1.Fail=0) AND (t2.CargoID=0) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -1155,8 +1162,8 @@ begin
        ')' +
     'GROUP BY NameID ' +
     'ORDER BY MotorName');
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -1172,8 +1179,9 @@ begin
   QClose;
 end;
 
-function TSQLite.ShipmentListLoad(const AYear: Word; out AMonths: TStrVector;
-  out AShipments: TStrMatrix; out ACargoIDs: TIntMatrix): Boolean;
+function TSQLite.ShipmentListLoad(const AReceiverIDs: TIntVector;
+  const AYear: Word; out AMonths: TStrVector; out AShipments: TStrMatrix; out
+  ACargoIDs: TIntMatrix): Boolean;
 var
   i,j: Integer;
   S: String;
@@ -1192,7 +1200,7 @@ begin
     Shipments:= nil;
     BD:= FirstDayInMonth(i, AYear);
     ED:= LastDayInMonth(i, AYear);
-    CargoListLoad(BD, ED, CargoIDs, SendDates, ReceiverNames);
+    CargoListLoad(AReceiverIDs, BD, ED, CargoIDs, SendDates, ReceiverNames);
     if not VIsNil(SendDates) then
     begin
       for j:= 0 to High(SendDates) do
@@ -1211,7 +1219,7 @@ begin
 end;
 
 function TSQLite.ShipmentMotorListLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID, AReceiverID: Integer; out ASendDates: TDateVector; out
+  const ANameIDs, AReceiverIDs: TIntVector; out ASendDates: TDateVector; out
   AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
 var
   WhereStr: String;
@@ -1223,10 +1231,10 @@ begin
   AReceiverNames:= nil;
 
   WhereStr:= 'WHERE (t1.CargoID>0) AND (t2.SendDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
-  if AReceiverID>0 then
-    WhereStr:= WhereStr + ' AND (t2.ReceiverID = :ReceiverID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs), 'NameID');
+  if not VIsNil(AReceiverIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','ReceiverID', Length(AReceiverIDs), 'ReceiverID');
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -1239,10 +1247,10 @@ begin
     'ORDER BY t2.SendDate, t4.MotorName, t1.MotorNum');
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
-  if AReceiverID>0 then
-    QParamInt('ReceiverID', AReceiverID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs, 'NameID');
+  if not VIsNil(AReceiverIDs) then
+    QParamsInt(AReceiverIDs, 'ReceiverID');
   QOpen;
   if not QIsEmpty then
   begin
@@ -1261,7 +1269,7 @@ begin
 end;
 
 function TSQLite.ShipmentTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out AMotorNames: TStrVector; out
+  const ANameIDs: TIntVector; out AMotorNames: TStrVector; out
   AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
@@ -1271,8 +1279,8 @@ begin
   AMotorCounts:= nil;
 
   WhereStr:= 'WHERE (t1.CargoID>0) AND (t2.SendDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -1285,8 +1293,8 @@ begin
     'ORDER BY t3.MotorName');
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -1303,7 +1311,7 @@ begin
 end;
 
 function TSQLite.ShipmentRecieversTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID, AReceiverID: Integer; out AReceiverNames: TStrVector; out
+  const ANameIDs, AReceiverIDs: TIntVector; out AReceiverNames: TStrVector; out
   AMotorNames: TStrMatrix; out AMotorCounts: TIntMatrix): Boolean;
 var
   WhereStr: String;
@@ -1314,11 +1322,10 @@ var
   procedure GetReceiverNames;
   begin
     WhereStr:= 'WHERE (t1.CargoID>0) AND (t2.SendDate BETWEEN :BD AND :ED) ';
-    if ANameID>0 then
-      WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
-    if AReceiverID>0 then
-      WhereStr:= WhereStr + ' AND (t2.ReceiverID = :ReceiverID) ';
-
+    if not VIsNil(ANameIDs) then
+      WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs), 'NameID');
+    if not VIsNil(AReceiverIDs) then
+      WhereStr:= WhereStr + 'AND' + SqlIN('t2','ReceiverID', Length(AReceiverIDs), 'ReceiverID');
 
     QSetSQL(
       'SELECT DISTINCT t2.ReceiverID, t3.ReceiverName ' +
@@ -1329,10 +1336,11 @@ var
       'ORDER BY t3.ReceiverName');
     QParamDT('BD', ABeginDate);
     QParamDT('ED', AEndDate);
-    if ANameID>0 then
-      QParamInt('NameID', ANameID);
-    if AReceiverID>0 then
-      QParamInt('ReceiverID', AReceiverID);
+
+    if not VIsNil(ANameIDs) then
+      QParamsInt(ANameIDs, 'NameID');
+    if not VIsNil(AReceiverIDs) then
+      QParamsInt(AReceiverIDs, 'ReceiverID');
     QOpen;
     if not QIsEmpty then
     begin
@@ -1353,8 +1361,8 @@ var
     MotorCounts:= nil;
     MotorNames:= nil;
     WhereStr:= 'WHERE (ReceiverID=:ReceiverID) AND (t3.SendDate BETWEEN :BD AND :ED) ';
-    if ANameID>0 then
-      WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
+    if not VIsNil(ANameIDs) then
+      WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
     QSetSQL(
       'SELECT COUNT(t1.NameID) As MotorCount, t2.MotorName ' +
       'FROM MOTORLIST t1 ' +
@@ -1366,8 +1374,8 @@ var
     QParamInt('ReceiverID', ID);
     QParamDT('BD', ABeginDate);
     QParamDT('ED', AEndDate);
-    if ANameID>0 then
-      QParamInt('NameID', ANameID);
+    if not VIsNil(ANameIDs) then
+      QParamsInt(ANameIDs);
     QOpen;
     if not QIsEmpty then
     begin
@@ -1408,14 +1416,20 @@ begin
   end;
 end;
 
-function TSQLite.CargoListLoad(const ABeginDate, AEndDate: TDate; out
-  ACargoIDs: TIntVector; out ASendDates: TDateVector; out
-  AReceiverNames: TStrVector): Boolean;
+function TSQLite.CargoListLoad(const AReceiverIDs: TIntVector;
+  const ABeginDate, AEndDate: TDate; out ACargoIDs: TIntVector; out
+  ASendDates: TDateVector; out AReceiverNames: TStrVector): Boolean;
+var
+  WhereStr: String;
 begin
   Result:= False;
   ACargoIDs:= nil;
   ASendDates:= nil;
   AReceiverNames:= nil;
+
+  WhereStr:= 'WHERE (t1.SendDate >= :BeginDate) AND (t1.SendDate <= :EndDate) ';
+  if not VIsNil(AReceiverIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','ReceiverID', Length(AReceiverIDs));
 
   QSetQuery(FQuery);
   QClose;
@@ -1423,10 +1437,12 @@ begin
     'SELECT t1.CargoID, t1.SendDate, t2.ReceiverName ' +
     'FROM CARGOLIST t1 ' +
     'INNER JOIN CARGORECEIVERS t2 ON (t1.ReceiverID=t2.ReceiverID) ' +
-    'WHERE (t1.SendDate >= :BeginDate) AND (t1.SendDate <= :EndDate) ' +
+    WhereStr +
     'ORDER BY t1.SendDate DESC');
   QParamDT('BeginDate', ABeginDate);
   QParamDT('EndDate', AEndDate);
+  if not VIsNil(AReceiverIDs) then
+    QParamsInt(AReceiverIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -2059,7 +2075,7 @@ begin
 end;
 
 function TSQLite.ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out AMotorNames: TStrVector; out
+  const ANameIDs: TIntVector; out AMotorNames: TStrVector; out
   AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
@@ -2069,8 +2085,8 @@ begin
   AMotorCounts:= nil;
 
   WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
-  if ANameID>0 then
-    WhereStr:= WhereStr + ' AND (t2.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -2083,8 +2099,8 @@ begin
     'ORDER BY t3.MotorName');
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
   QOpen;
   if not QIsEmpty then
   begin
@@ -2101,29 +2117,29 @@ begin
 end;
 
 function TSQLite.ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out APlaceNames: TStrVector; out
+  const ANameIDs: TIntVector; out APlaceNames: TStrVector; out
   APlaceMotorCounts: TIntVector): Boolean;
 begin
   Result:= ReclamationReportLoad('RECLAMATIONPLACES',
-             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameID,
+             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameIDs,
              APlaceNames, APlaceMotorCounts);
 end;
 
 function TSQLite.ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out ADefectNames: TStrVector; out
+  const ANameIDs: TIntVector; out ADefectNames: TStrVector; out
   ADefectMotorCounts: TIntVector): Boolean;
 begin
   Result:= ReclamationReportLoad('RECLAMATIONDEFECTS',
-             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameID,
+             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameIDs,
              ADefectNames, ADefectMotorCounts);
 end;
 
 function TSQLite.ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; out AReasonNames: TStrVector; out
+  const ANameIDs: TIntVector; out AReasonNames: TStrVector; out
   AReasonMotorCounts: TIntVector): Boolean;
 begin
   Result:= ReclamationReportLoad('RECLAMATIONREASONS',
-             'ReasonID', 'ReasonName', ABeginDate, AEndDate, ANameID,
+             'ReasonID', 'ReasonName', ABeginDate, AEndDate, ANameIDs,
              AReasonNames, AReasonMotorCounts);
 end;
 

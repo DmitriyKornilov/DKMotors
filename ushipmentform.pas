@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTUtils, USQLite,
+  Spin, StdCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTUtils, USQLite,
   SheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid, DK_Dialogs,
   DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, fpstypes;
 
@@ -16,23 +16,28 @@ type
 
   TShipmentForm = class(TForm)
     AddButton: TSpeedButton;
-    LogGrid: TsWorksheetGrid;
+    ChooseRecieverNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
+    DividerBevel4: TDividerBevel;
+    Label3: TLabel;
+    LogGrid: TsWorksheetGrid;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
     DividerBevel3: TDividerBevel;
-    DividerBevel4: TDividerBevel;
     EditButton: TSpeedButton;
     EditButtonPanel: TPanel;
     ExportButton: TRxSpeedButton;
     Panel1: TPanel;
     Panel2: TPanel;
+    ReceiverNamesLabel: TLabel;
+    ReceiverNamesPanel: TPanel;
     RxSpeedButton5: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
+    procedure ChooseRecieverNamesButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -56,6 +61,9 @@ type
     Months: TStrVector;
     Shipments: TStrMatrix;
     CargoIDs: TIntMatrix;
+
+    UsedReceiverIDs: TIntVector;
+    UsedReceiverNames: TStrVector;
 
     SelectedIndex1, SelectedIndex2: Integer;
     SelectedNode: PVirtualNode;
@@ -97,6 +105,15 @@ begin
   OpenCargoEditForm(1);
 end;
 
+procedure TShipmentForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.EditKeyPickList(UsedReceiverIDs, UsedReceiverNames,
+    'Наименования грузополучателей',
+    'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then  OpenShipmentList(0);
+  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
+  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
+end;
+
 procedure TShipmentForm.CloseButtonClick(Sender: TObject);
 begin
   Close;
@@ -134,6 +151,12 @@ begin
   SelectedIndex1:= -1;
   SelectedIndex2:= -1;
   CargoSheet:= TCargoSheet.Create(LogGrid);
+
+  SQLite.KeyPickList('CARGORECEIVERS', 'ReceiverID', 'ReceiverName',
+                     UsedReceiverIDs, UsedReceiverNames, True, 'ReceiverName');
+  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
+  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
+
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -152,7 +175,7 @@ begin
   if SQLite.EditList('Грузополучатели',
     'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then
   begin
-    SQLite.ShipmentListLoad(SpinEdit1.Value, Months, Shipments, CargoIDs);
+    SQLite.ShipmentListLoad(UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs);
     OpenShipment;
   end;
 end;
@@ -216,7 +239,7 @@ var
 begin
   VT.Clear;
   UnselectNode;
-  if not SQLite.ShipmentListLoad(SpinEdit1.Value, Months, Shipments, CargoIDs) then Exit;
+  if not SQLite.ShipmentListLoad(UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs) then Exit;
   VSTLoad(VT, Shipments, 0);
 
   if MIndexOf(CargoIDs, ACargoID, I1, I2) then

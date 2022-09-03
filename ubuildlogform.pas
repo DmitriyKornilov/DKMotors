@@ -18,27 +18,29 @@ type
   TBuildLogForm = class(TForm)
     AddButton: TSpeedButton;
     CheckBox1: TCheckBox;
+    ChooseMotorNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
     DelButton: TSpeedButton;
-    DividerBevel5: TDividerBevel;
+    DividerBevel4: TDividerBevel;
     EditButton: TSpeedButton;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
     EditButtonPanel: TPanel;
     DividerBevel1: TDividerBevel;
-    DividerBevel4: TDividerBevel;
+    Label1: TLabel;
     LogGrid: TsWorksheetGrid;
-    MotorNameComboBox: TComboBox;
     MotorNamesButton: TRxSpeedButton;
+    MotorNamesLabel: TLabel;
+    MotorNamesPanel: TPanel;
     Panel1: TPanel;
     Panel2: TPanel;
-    Panel6: TPanel;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -48,7 +50,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure MotorNameComboBoxChange(Sender: TObject);
+
     procedure MotorNamesButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTDrawText(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
@@ -70,8 +72,11 @@ type
 
     MotorBuildSheet: TMotorBuildSheet;
 
-    MotorIDs, NameIDs, OldMotors, ViewNameIDs: TIntVector;
+    MotorIDs, NameIDs, OldMotors: TIntVector;
     MotorNames, MotorNums, RotorNums: TStrVector;
+
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
 
     SelectedIndex: Integer;
     procedure SelectionClear;
@@ -110,7 +115,12 @@ begin
   SelectedIndex1:= -1;
   SelectedIndex2:= -1;
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
-  SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, ViewNameIDs, False);
+
+  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
+                     UsedNameIDs, UsedNames, True, 'NameID');
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -138,10 +148,7 @@ begin
   end;
 end;
 
-procedure TBuildLogForm.MotorNameComboBoxChange(Sender: TObject);
-begin
-  OpenMotorsList;
-end;
+
 
 procedure TBuildLogForm.MotorNamesButtonClick(Sender: TObject);
 begin
@@ -277,7 +284,7 @@ begin
 
   SQLite.BuildListLoad(Dates[SelectedIndex1, SelectedIndex2],
                     Dates[SelectedIndex1, SelectedIndex2],
-                    ViewNameIDs[MotorNameComboBox.ItemIndex],//0 {все наименования},
+                    UsedNameIDs,
                     CheckBox1.Checked, MotorIDs, NameIDs, OldMotors,
                     Tmp, MotorNames, MotorNums, RotorNums);
 
@@ -325,6 +332,14 @@ end;
 procedure TBuildLogForm.CheckBox1Change(Sender: TObject);
 begin
   OpenMotorsList;
+end;
+
+procedure TBuildLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
+    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  OpenMotorsList;
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 end;
 
 procedure TBuildLogForm.AddButtonClick(Sender: TObject);

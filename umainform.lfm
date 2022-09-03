@@ -177,13 +177,14 @@ object MainForm: TMainForm
     end
     object RxSpeedButton1: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 0
+      Left = 6
       Height = 36
       Top = 0
       Width = 99
       Align = alLeft
       AllowAllUp = True
       AutoSize = True
+      BorderSpacing.Left = 6
       Caption = 'Сборка'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -326,7 +327,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton2: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 313
+      Left = 319
       Height = 36
       Top = 0
       Width = 109
@@ -475,7 +476,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton3: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 422
+      Left = 428
       Height = 36
       Top = 0
       Width = 132
@@ -784,7 +785,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton4: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 225
+      Left = 231
       Height = 36
       Top = 0
       Width = 88
@@ -933,7 +934,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton5: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 99
+      Left = 105
       Height = 36
       Top = 0
       Width = 126
@@ -1082,7 +1083,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton9: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 554
+      Left = 560
       Height = 36
       Top = 0
       Width = 98

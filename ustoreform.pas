@@ -16,27 +16,30 @@ type
   TStoreForm = class(TForm)
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
+    ChooseMotorNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
     DividerBevel4: TDividerBevel;
     DividerBevel7: TDividerBevel;
-    DividerBevel8: TDividerBevel;
     ExportButton: TRxSpeedButton;
-    MotorNameComboBox: TComboBox;
+    Label1: TLabel;
+    MotorNamesLabel: TLabel;
+    MotorNamesPanel: TPanel;
     Panel2: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
     Panel1: TPanel;
     ReportGrid: TsWorksheetGrid;
     procedure CheckBox1Click(Sender: TObject);
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNameComboBoxChange(Sender: TObject);
+
   private
-    NameIDs: TIntVector;
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
     StoreSheet: TStoreSheet;
     procedure DataOpen;
     procedure ExportSheet;
@@ -73,6 +76,15 @@ begin
   DataOpen;
 end;
 
+procedure TStoreForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
+    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  DataOpen;
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+  Checkbox2.Visible:= Length(UsedNameIDs)>1;
+end;
+
 procedure TStoreForm.ExportButtonClick(Sender: TObject);
 begin
   ExportSheet;
@@ -81,7 +93,12 @@ end;
 procedure TStoreForm.FormCreate(Sender: TObject);
 begin
   StoreSheet:= TStoreSheet.Create(ReportGrid);
-  SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs, False);
+
+  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
+                     UsedNameIDs, UsedNames, True, 'NameID');
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+  Checkbox2.Visible:= Length(UsedNameIDs)>1;
 end;
 
 procedure TStoreForm.FormDestroy(Sender: TObject);
@@ -94,12 +111,6 @@ begin
   DataOpen;
 end;
 
-procedure TStoreForm.MotorNameComboBoxChange(Sender: TObject);
-begin
-  Checkbox2.Visible:= MotorNameComboBox.ItemIndex=0;
-  DataOpen;
-end;
-
 procedure TStoreForm.DataOpen;
 var
   TotalMotorNames, MotorNames, MotorNums: TStrVector;
@@ -109,10 +120,10 @@ begin
   Screen.Cursor:= crHourGlass;
   try
 
-    SQLite.StoreListLoad(NameIDs[MotorNameComboBox.ItemIndex],
+    SQLite.StoreListLoad(UsedNameIDs,
                        Checkbox1.Checked, Checkbox2.Checked,
                        TestDates, MotorNames, MotorNums);
-    SQLite.StoreTotalLoad(NameIDs[MotorNameComboBox.ItemIndex],
+    SQLite.StoreTotalLoad(UsedNameIDs,
                         TotalMotorNames, TotalMotorCounts);
     StoreSheet.Draw(TestDates, MotorNames, MotorNums,
                     TotalMotorNames, TotalMotorCounts);

@@ -17,7 +17,9 @@ type
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
     ChooseMotorNamesButton: TSpeedButton;
+    CloseButton: TSpeedButton;
     DefectListButton: TRxSpeedButton;
+    DividerBevel4: TDividerBevel;
     DividerBevel8: TDividerBevel;
     FactoryListButton: TRxSpeedButton;
     Label1: TLabel;
@@ -30,8 +32,6 @@ type
     DividerBevel5: TDividerBevel;
     DividerBevel7: TDividerBevel;
     EditButton: TSpeedButton;
-    CloseButton: TSpeedButton;
-    DividerBevel4: TDividerBevel;
     DividerBevel6: TDividerBevel;
     ExportButton: TRxSpeedButton;
     Panel1: TPanel;
@@ -70,7 +70,7 @@ type
     ReclamationSheet: TReclamationSheet;
 
     RecDates, BuildDates, ArrivalDates, SendingDates: TDateVector;
-    RecIDs, MotorIDs, Mileages, Opinions, ReasonColors, NameIDs, Passports: TIntVector;
+    RecIDs, MotorIDs, Mileages, Opinions, ReasonColors, Passports: TIntVector;
     PlaceNames, FactoryNames, Departures: TStrVector;
     DefectNames, ReasonNames, RecNotes: TStrVector;
     MotorNames, MotorNums: TStrVector;
@@ -134,6 +134,7 @@ begin
   SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
                      UsedNameIDs, UsedNames, True, 'NameID');
   MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 
   SpinEdit1.Value:= YearOfDate(Date);
 end;
@@ -316,6 +317,7 @@ begin
   if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
     'MOTORNAMES', 'NameID', 'MotorName', False, True) then  DataOpen;
   MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 end;
 
 procedure TReclamationForm.ExportButtonClick(Sender: TObject);

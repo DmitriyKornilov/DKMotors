@@ -19,21 +19,22 @@ type
     AddButton: TSpeedButton;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
+    ChooseMotorNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
     DelButton: TSpeedButton;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
-    DividerBevel5: TDividerBevel;
+    DividerBevel4: TDividerBevel;
     EditButtonPanel: TPanel;
     DividerBevel1: TDividerBevel;
-    DividerBevel4: TDividerBevel;
+    Label1: TLabel;
     LogGrid: TsWorksheetGrid;
-    MotorNameComboBox: TComboBox;
+    MotorNamesLabel: TLabel;
+    MotorNamesPanel: TPanel;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
-    Panel6: TPanel;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
@@ -43,6 +44,7 @@ type
     procedure AddButtonClick(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
 
@@ -50,7 +52,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNameComboBoxChange(Sender: TObject);
+
 
     procedure SpinEdit1Change(Sender: TObject);
     procedure TestGridMouseDown(Sender: TObject; Button: TMouseButton;
@@ -72,11 +74,13 @@ type
     SelectedIndex1, SelectedIndex2: Integer;
     SelectedNode: PVirtualNode;
 
-    TestIDs, TestResults, ViewNameIDs: TIntVector;
+    TestIDs, TestResults: TIntVector;
     MotorNames, MotorNums, TestNotes: TStrVector;
-    //TestDates: TDateVector;
 
     SelectedIndex: Integer;
+
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
 
     BeforeTestSheet: TBeforeTestSheet;
     MotorTestSheet: TMotorTestSheet;
@@ -117,7 +121,7 @@ var
 begin
   Screen.Cursor:= crHourGlass;
   try
-    SQLite.TestBeforeListLoad(ViewNameIDs[MotorNameComboBox.ItemIndex],
+    SQLite.TestBeforeListLoad(UsedNameIDs,
                          Checkbox1.Checked, BuildDates, MNames, MNums,
                          TotalMNames, TotalMCounts,
                          BTestDates, BTestFails, BTestNotes);
@@ -141,7 +145,12 @@ begin
   SelectedIndex:= -1;
   SelectedIndex1:= -1;
   SelectedIndex2:= -1;
-  SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, ViewNameIDs, False);
+
+  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
+                     UsedNameIDs, UsedNames, True, 'NameID');
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+
   SpinEdit1.Value:= YearOfDate(Date);
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
   MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
@@ -156,12 +165,6 @@ end;
 procedure TTestLogForm.FormShow(Sender: TObject);
 begin
   OpenDatesList(Date);
-  OpenBeforeTestList;
-end;
-
-procedure TTestLogForm.MotorNameComboBoxChange(Sender: TObject);
-begin
-  OpenTestsList;
   OpenBeforeTestList;
 end;
 
@@ -306,12 +309,12 @@ begin
 
   SQLite.TestListLoad(Dates[SelectedIndex1, SelectedIndex2],
                     Dates[SelectedIndex1, SelectedIndex2],
-                    ViewNameIDs[MotorNameComboBox.ItemIndex],//0 {все наименования},
+                    UsedNameIDs,
                     CheckBox1.Checked, TestIDs, TestResults, X,
                     MotorNames, MotorNums, TestNotes);
   SQLite.TestTotalLoad(Dates[SelectedIndex1, SelectedIndex2],
                      Dates[SelectedIndex1, SelectedIndex2],
-                     ViewNameIDs[MotorNameComboBox.ItemIndex],//0 {все наименования},
+                     UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts, TotalFailCounts);
   MotorTestSheet.Draw(Dates[SelectedIndex1, SelectedIndex2],
                       MotorNames, MotorNums, TestNotes, TestResults,
@@ -341,6 +344,18 @@ procedure TTestLogForm.CheckBox2Change(Sender: TObject);
 begin
   Panel4.Visible:= CheckBox2.Checked;
   Splitter2.Visible:= CheckBox2.Checked;
+end;
+
+procedure TTestLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
+    'MOTORNAMES', 'NameID', 'MotorName', False, True) then
+  begin
+    OpenTestsList;
+    OpenBeforeTestList;
+  end;
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 end;
 
 procedure TTestLogForm.AddButtonClick(Sender: TObject);
