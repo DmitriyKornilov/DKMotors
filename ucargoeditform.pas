@@ -152,7 +152,7 @@ begin
   if VIsNil(ViewMotorIDs) then Exit;
   if Key=VK_RETURN then
   begin
-    VSTTable.SelectIndex(0);
+    VSTTable.Select(0);
     AddButton.Enabled:= True;
     SeriesEdit.Text:= ViewSeries[VSTTable.SelectedIndex];
     SeriesEdit.SetFocus;

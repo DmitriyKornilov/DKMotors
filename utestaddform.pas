@@ -131,7 +131,7 @@ begin
   begin
     if not VSTTable.IsSelected then
     begin
-      VSTTable.SelectIndex(0);
+      VSTTable.Select(0);
       AddButton.Enabled:= True;
     end
     else AddTest;

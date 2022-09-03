@@ -78,7 +78,7 @@ procedure TMotorListForm.FormCreate(Sender: TObject);
 begin
 
   VSTTable:= TVSTTable.Create(VT1);
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED; //$00FBDEBB
   //VSTTable.SelectedFont.Style:= [fsBold];
   VSTTable.HeaderFont.Style:= [fsBold];
   VSTTable.AddColumn('Дата сборки', 150);

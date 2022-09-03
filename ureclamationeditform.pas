@@ -296,7 +296,7 @@ begin
   PassportCheckBox.Checked:= Passport=1;
 
   MotorNumEdit.Text:= MotorNum;
-  VSTTable.SelectIndex(VIndexOf(MotorIDs, MotorID));
+  VSTTable.Select(VIndexOf(MotorIDs, MotorID));
 end;
 
 end.

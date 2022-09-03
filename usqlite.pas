@@ -155,7 +155,7 @@ type
                           ADefectNames, AReasonNames,
                           ARecNotes: TStrVector): Boolean;
     function ReclamationListLoad(const ABeginDate, AEndDate: TDate;
-          const ANameID: Integer; const ANumberLike: String;
+          const ANameIDs: TIntVector; const ANumberLike: String;
           out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
           out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
           out APlaceNames, AFactoryNames, ADepartures,
@@ -1798,7 +1798,7 @@ begin
 end;
 
 function TSQLite.ReclamationListLoad(const ABeginDate, AEndDate: TDate;
-  const ANameID: Integer; const ANumberLike: String; out ARecDates,
+  const ANameIDs: TIntVector; const ANumberLike: String; out ARecDates,
   ABuildDates, AArrivalDates, ASendingDates: TDateVector; out ARecIDs,
   AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector; out
   APlaceNames, AFactoryNames, ADepartures, ADefectNames, AReasonNames,
@@ -1832,8 +1832,8 @@ begin
   else
     WhereStr:= 'WHERE (UPPER(t6.MotorNum) LIKE :NumberLike) ';
 
-  if ANameID>0 then
-    WhereStr:= WhereStr + 'AND (t6.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t6','NameID', Length(ANameIDs));
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -1860,8 +1860,8 @@ begin
   else
     QParamStr('NumberLike', ANumberLike+'%');
 
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
 
   QOpen;
   if not QIsEmpty then
@@ -1892,6 +1892,7 @@ begin
     Result:= True;
   end;
   QClose;
+
 end;
 
 function TSQLite.ReclamationChooseListLoad(const ANameID: Integer;

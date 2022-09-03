@@ -16,13 +16,14 @@ type
 
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
+    ChooseMotorNamesButton: TSpeedButton;
     DefectListButton: TRxSpeedButton;
     DividerBevel8: TDividerBevel;
-    DividerBevel9: TDividerBevel;
     FactoryListButton: TRxSpeedButton;
+    Label1: TLabel;
     Label2: TLabel;
+    MotorNamesLabel: TLabel;
     LogGrid: TsWorksheetGrid;
-    MotorNameComboBox: TComboBox;
     MotorNumEdit: TEditButton;
     Panel4: TPanel;
     DelButton: TSpeedButton;
@@ -34,15 +35,16 @@ type
     DividerBevel6: TDividerBevel;
     ExportButton: TRxSpeedButton;
     Panel1: TPanel;
-    Panel2: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
+    MotorNamesPanel: TPanel;
     Panel7: TPanel;
     PlaceListButton: TRxSpeedButton;
     ReasonListButton: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     TopToolsPanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -54,7 +56,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure MotorNameComboBoxChange(Sender: TObject);
+
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure PlaceListButtonClick(Sender: TObject);
@@ -72,6 +74,9 @@ type
     PlaceNames, FactoryNames, Departures: TStrVector;
     DefectNames, ReasonNames, RecNotes: TStrVector;
     MotorNames, MotorNums: TStrVector;
+
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
 
     procedure ExportSheet;
 
@@ -125,7 +130,11 @@ procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
   SelectedIndex:= -1;
   ReclamationSheet:= TReclamationSheet.Create(LogGrid);
-  SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs, False);
+
+  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
+                     UsedNameIDs, UsedNames, True, 'NameID');
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
+
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -151,11 +160,6 @@ begin
     LogGrid.MouseToCell(X,Y,C{%H-},R{%H-});
     SelectLine(R);
   end;
-end;
-
-procedure TReclamationForm.MotorNameComboBoxChange(Sender: TObject);
-begin
-  DataOpen;
 end;
 
 procedure TReclamationForm.MotorNumEditButtonClick(Sender: TObject);
@@ -240,7 +244,7 @@ begin
     EndDate:= LastDayInYear(SpinEdit1.Value);
 
     SQLite.ReclamationListLoad(BeginDate, EndDate,
-                        NameIDs[MotorNameComboBox.ItemIndex],
+                        UsedNameIDs,
                         STrim(MotorNumEdit.Text),
                         RecDates, BuildDates, ArrivalDates, SendingDates,
                         RecIDs, MotorIDs, Mileages, Opinions,
@@ -248,7 +252,6 @@ begin
                         PlaceNames, FactoryNames, Departures,
                         DefectNames, ReasonNames, RecNotes,
                         MotorNames, MotorNums);
-
 
     ReclamationSheet.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
                           Mileages, Opinions, ReasonColors, Passports,
@@ -306,6 +309,13 @@ end;
 procedure TReclamationForm.AddButtonClick(Sender: TObject);
 begin
   ReclamationEditFormOpen(1);
+end;
+
+procedure TReclamationForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
+    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  DataOpen;
+  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
 end;
 
 procedure TReclamationForm.ExportButtonClick(Sender: TObject);
