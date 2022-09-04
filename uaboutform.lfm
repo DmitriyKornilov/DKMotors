@@ -1,11 +1,11 @@
 object AboutForm: TAboutForm
   Left = 685
-  Height = 320
+  Height = 400
   Top = 270
   Width = 799
   BorderStyle = bsSizeToolWin
   Caption = 'О программе'
-  ClientHeight = 320
+  ClientHeight = 400
   ClientWidth = 799
   DesignTimePPI = 120
   OnShow = FormShow
@@ -481,7 +481,7 @@ object AboutForm: TAboutForm
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 199
-    Height = 261
+    Height = 341
     Top = 53
     Width = 594
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -494,6 +494,9 @@ object AboutForm: TAboutForm
       'Учет производства, поставок и рекламационных случаев '
       'электродвигателей ООО "Электрожелдормаш"'
       ''
+      'Проект:'
+      '     https://github.com/DmitriyKornilov/DKMotors'
+      ''
       'Разработчик: '
       '     Дмитрий Корнилов (dakor2017@yandex.ru)'
       ''
@@ -501,8 +504,8 @@ object AboutForm: TAboutForm
       '     Free Pascal Compiler v3.2.2 (www.freepascal.org)'
       '     Lazarus IDE v2.2.2 (www.lazarus-ide.org)'
       ''
-      'PNG-файлы пиктограмм получены с flaticon.com, '
-      'подробности в png\Icon_attributes.pdf'
+      'PNG-файлы пиктограмм получены с flaticon.com,  подробности '
+      'https://github.com/DmitriyKornilov/DKMotors/blob/main/png/Icon_attributes.pdf'
       ''
       '      '
       ''

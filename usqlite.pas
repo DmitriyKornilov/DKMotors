@@ -198,18 +198,6 @@ type
                 out AExistsNameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
-    //function ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
-    //            const ANameIDs: TIntVector;
-    //            out APlaceNames: TStrVector;
-    //            out APlaceMotorCounts: TIntVector): Boolean;
-    //function ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
-    //            const ANameIDs: TIntVector;
-    //            out ADefectNames: TStrVector;
-    //            out ADefectMotorCounts: TIntVector): Boolean;
-    //function ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
-    //            const ANameIDs: TIntVector;
-    //            out AReasonNames: TStrVector;
-    //            out AReasonMotorCounts: TIntVector): Boolean;
 
     function ReclamationTotalWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs, AReasonIDs: TIntVector;
@@ -2340,33 +2328,6 @@ begin
   end;
   QClose;
 end;
-
-//function TSQLite.ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
-//  const ANameIDs: TIntVector; out APlaceNames: TStrVector; out
-//  APlaceMotorCounts: TIntVector): Boolean;
-//begin
-//  Result:= ReclamationReportLoad('RECLAMATIONPLACES',
-//             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameIDs,
-//             APlaceNames, APlaceMotorCounts);
-//end;
-//
-//function TSQLite.ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
-//  const ANameIDs: TIntVector; out ADefectNames: TStrVector; out
-//  ADefectMotorCounts: TIntVector): Boolean;
-//begin
-//  Result:= ReclamationReportLoad('RECLAMATIONDEFECTS',
-//             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameIDs,
-//             ADefectNames, ADefectMotorCounts);
-//end;
-//
-//function TSQLite.ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
-//  const ANameIDs: TIntVector; out AReasonNames: TStrVector; out
-//  AReasonMotorCounts: TIntVector): Boolean;
-//begin
-//  Result:= ReclamationReportLoad('RECLAMATIONREASONS',
-//             'ReasonID', 'ReasonName', ABeginDate, AEndDate, ANameIDs,
-//             AReasonNames, AReasonMotorCounts);
-//end;
 
 function TSQLite.ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs, AReasonIDs: TIntVector;

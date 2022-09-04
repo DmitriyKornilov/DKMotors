@@ -107,11 +107,15 @@ end;
 procedure TReportForm.ExportButtonClick(Sender: TObject);
 var
   Exporter: TGridExporter;
+  PageOrientation: TsPageOrientation;
 begin
   Exporter:= TGridExporter.Create(LogGrid);
   try
     //Exporter.SheetName:= 'Отчет';
-    Exporter.PageSettings(spoPortrait, pfWidth);
+    PageOrientation:= spoPortrait;
+    if RadioButton4.Checked then
+      PageOrientation:= spoLandscape;
+    Exporter.PageSettings(PageOrientation, pfWidth);
     Exporter.Save('Выполнено!');
   finally
     FreeAndNil(Exporter);
@@ -334,9 +338,6 @@ var
   DefectNames: TStrVector;
   DefectMotorCounts: TIntVector;
   DefectReasonCounts: TIntMatrix;
-
-  //ReasonNames: TStrVector;
-  //ReasonMotorCounts: TIntVector;
 begin
   ED:= DateTimePicker1.Date;
   BD:= DateTimePicker2.Date;
@@ -352,10 +353,6 @@ begin
   SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, UsedNameIDs, TitleReasonIDs,
                    PlaceNames, PlaceMotorCounts, PlaceReasonCounts);
 
-  //SQLite.ReclamationDefectsLoad(BD, ED, UsedNameIDs, DefectNames, DefectMotorCounts);
-  //SQLite.ReclamationPlacesLoad(BD, ED, UsedNameIDs, PlaceNames, PlaceMotorCounts);
-
-  //SQLite.ReclamationReasonsLoad(BD, ED, UsedNameIDs, ReasonNames, ReasonMotorCounts);
 
   ReportReclamationSheet:= TReportReclamationSheet.Create(LogGrid, Length(TitleReasonNames));
   ReportReclamationSheet.DrawReport(Length(UsedNameIDs)=1,

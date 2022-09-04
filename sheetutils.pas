@@ -334,6 +334,8 @@ var
     R:= R + 1;
     for i:= 0 to High(ATitleReasonNames) do
       FWriter.WriteText(R, 3+i, ATitleReasonNames[i], cbtOuter, True, True);
+    FWriter.DrawBorders(R-1, 1, R, 1, cbtOuter);
+    FWriter.DrawBorders(R-1, 2, R, 2, cbtOuter);
 
     FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
     for i:= 0 to High(ANameValues) do
