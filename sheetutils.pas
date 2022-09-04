@@ -102,18 +102,20 @@ type
     FFontName: String;
     FFontSize: Single;
   public
-    constructor Create(const AGrid: TsWorksheetGrid);
+    constructor Create(const AGrid: TsWorksheetGrid; const AReasonsCount: Integer);
     destructor  Destroy; override;
     procedure DrawReport(const ASingleMotorName: Boolean;
                    const ABeginDate, AEndDate: TDate;
                    const ATotalMotorNames: TStrVector;
                    const ATotalMotorCount: TIntVector;
+                   const ATitleReasonNames: TStrVector;
+                   const ATotalMotorReasonCounts: TIntMatrix;
                    const APlaceNames: TStrVector;
                    const APlaceMotorCount: TIntVector;
+                   const APlaceReasonCounts: TIntMatrix;
                    const ADefectNames: TStrVector;
                    const ADefectMotorCounts: TIntVector;
-                   const AReasonNames: TStrVector;
-                   const AReasonMotorCounts: TIntVector);
+                   const ADefectReasonCounts: TIntMatrix);
 
   end;
 
@@ -261,7 +263,8 @@ implementation
 
 { TReportReclamationSheet }
 
-constructor TReportReclamationSheet.Create(const AGrid: TsWorksheetGrid);
+constructor TReportReclamationSheet.Create(const AGrid: TsWorksheetGrid;
+                                           const AReasonsCount: Integer);
 var
   ColWidths: TIntVector;
 begin
@@ -277,8 +280,12 @@ begin
 
   ColWidths:= VCreateInt([
     300, // Наименование двигателя
-    300  // Количество
+    200  // Количество
   ]);
+
+  if AReasonsCount>0 then
+    VReDim(ColWidths, Length(ColWidths) + AReasonsCount, 230);
+
   FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
 
 end;
@@ -290,20 +297,26 @@ begin
 end;
 
 procedure TReportReclamationSheet.DrawReport(const ASingleMotorName: Boolean;
-  const ABeginDate, AEndDate: TDate; const ATotalMotorNames: TStrVector;
-  const ATotalMotorCount: TIntVector; const APlaceNames: TStrVector;
-  const APlaceMotorCount: TIntVector; const ADefectNames: TStrVector;
-  const ADefectMotorCounts: TIntVector; const AReasonNames: TStrVector;
-  const AReasonMotorCounts: TIntVector);
+   const ABeginDate, AEndDate: TDate; const ATotalMotorNames: TStrVector;
+   const ATotalMotorCount: TIntVector;
+   const ATitleReasonNames: TStrVector;
+   const ATotalMotorReasonCounts: TIntMatrix;
+   const APlaceNames: TStrVector;
+   const APlaceMotorCount: TIntVector;
+   const APlaceReasonCounts: TIntMatrix;
+   const ADefectNames: TStrVector;
+   const ADefectMotorCounts: TIntVector;
+   const ADefectReasonCounts: TIntMatrix);
 var
   S: String;
   R: Integer;
 
   procedure DrawPart(const APartName, AFirstColName: String;
     const ANameValues: TStrVector; const ACountValues: TIntVector;
+    const AReasonCountValues: TIntMatrix;
     const AResumeNeed: Boolean);
   var
-    i: Integer;
+    i, j: Integer;
   begin
     R:= R + 1;
     FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
@@ -315,8 +328,13 @@ var
     R:= R + 1;
     FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
     FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 1, AFirstColName, cbtOuter, True, True);
-    FWriter.WriteText(R, 2, 'Количество случаев', cbtOuter, True, True);
+    FWriter.WriteText(R, 1, R+1, 1, AFirstColName, cbtOuter, True, True);
+    FWriter.WriteText(R, 2, R+1, 2, 'Количество случаев', cbtOuter, True, True);
+    FWriter.WriteText(R, 3, R, 3+High(ATitleReasonNames), 'В том числе по причине', cbtOuter, True, True);
+    R:= R + 1;
+    for i:= 0 to High(ATitleReasonNames) do
+      FWriter.WriteText(R, 3+i, ATitleReasonNames[i], cbtOuter, True, True);
+
     FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
     for i:= 0 to High(ANameValues) do
     begin
@@ -325,6 +343,8 @@ var
       FWriter.WriteText(R, 1, ANameValues[i], cbtOuter, True, True);
       FWriter.SetAlignment(haCenter, vaCenter);
       FWriter.WriteNumber(R, 2, ACountValues[i], cbtOuter);
+      for j:= 0 to High(ATitleReasonNames) do
+        FWriter.WriteNumber(R, 3+j, AReasonCountValues[j, i], cbtOuter);
     end;
     if AResumeNeed then
     begin
@@ -334,6 +354,8 @@ var
       FWriter.WriteText(R, 1, 'ИТОГО', cbtOuter, True, True);
       FWriter.SetAlignment(haCenter, vaCenter);
       FWriter.WriteNumber(R, 2, VSum(ACountValues), cbtOuter);
+      for i:= 0 to High(ATitleReasonNames) do
+        FWriter.WriteNumber(R, 3+i, VSum(AReasonCountValues[i]), cbtOuter);
     end;
   end;
 
@@ -357,17 +379,14 @@ begin
   FWriter.SetAlignment(haCenter, vaCenter);
   FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
 
-  DrawPart('Всего случаев', 'Электродвигатель',
-           ATotalMotorNames, ATotalMotorCount, not ASingleMotorName);
-
-  DrawPart('Распределение по предприятиям', 'Предприятие',
-           APlaceNames, APlaceMotorCount, False);
+  DrawPart('Общее количество рекламационных случаев', 'Электродвигатель', ATotalMotorNames, ATotalMotorCount,
+            ATotalMotorReasonCounts, not ASingleMotorName);
 
   DrawPart('Распределение по неисправным элементам', 'Неисправный элемент',
-           ADefectNames, ADefectMotorCounts, False);
+           ADefectNames, ADefectMotorCounts, ADefectReasonCounts,  False);
 
-  DrawPart('Распределение по причинам возникновения неисправности', 'Причина',
-           AReasonNames, AReasonMotorCounts, False);
+  DrawPart('Распределение по предприятиям', 'Предприятие',
+           APlaceNames, APlaceMotorCount, APlaceReasonCounts, False);
 
 
 

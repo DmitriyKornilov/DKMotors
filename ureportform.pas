@@ -322,31 +322,47 @@ var
   BD, ED: TDate;
   TotalMotorNames: TStrVector;
   TotalMotorCounts: TIntVector;
+  TotalMotorReasonCounts: TIntMatrix;
+
+  TitleReasonIDs: TIntVector;
+  TitleReasonNames: TStrVector;
 
   PlaceNames: TStrVector;
   PlaceMotorCounts: TIntVector;
+  PlaceReasonCounts: TIntMatrix;
 
   DefectNames: TStrVector;
   DefectMotorCounts: TIntVector;
+  DefectReasonCounts: TIntMatrix;
 
-  ReasonNames: TStrVector;
-  ReasonMotorCounts: TIntVector;
+  //ReasonNames: TStrVector;
+  //ReasonMotorCounts: TIntVector;
 begin
   ED:= DateTimePicker1.Date;
   BD:= DateTimePicker2.Date;
   if BD>ED then Exit;
 
-  SQLite.ReclamationTotalLoad(BD, ED, UsedNameIDs, TotalMotorNames, TotalMotorCounts);
-  SQLite.ReclamationPlacesLoad(BD, ED, UsedNameIDs, PlaceNames, PlaceMotorCounts);
-  SQLite.ReclamationDefectsLoad(BD, ED, UsedNameIDs, DefectNames, DefectMotorCounts);
-  SQLite.ReclamationReasonsLoad(BD, ED, UsedNameIDs, ReasonNames, ReasonMotorCounts);
+  SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
+                     TitleReasonIDs, TitleReasonNames, True {TODO: не указано тоже нужно учесть!});
 
-  ReportReclamationSheet:= TReportReclamationSheet.Create(LogGrid);
+  SQLite.ReclamationTotalWithReasonsLoad(BD, ED, UsedNameIDs, TitleReasonIDs,
+                   TotalMotorNames, TotalMotorCounts, TotalMotorReasonCounts);
+  SQLite.ReclamationDefectsWithReasonsLoad(BD, ED, UsedNameIDs, TitleReasonIDs,
+                   DefectNames, DefectMotorCounts, DefectReasonCounts);
+  SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, UsedNameIDs, TitleReasonIDs,
+                   PlaceNames, PlaceMotorCounts, PlaceReasonCounts);
+
+  //SQLite.ReclamationDefectsLoad(BD, ED, UsedNameIDs, DefectNames, DefectMotorCounts);
+  //SQLite.ReclamationPlacesLoad(BD, ED, UsedNameIDs, PlaceNames, PlaceMotorCounts);
+
+  //SQLite.ReclamationReasonsLoad(BD, ED, UsedNameIDs, ReasonNames, ReasonMotorCounts);
+
+  ReportReclamationSheet:= TReportReclamationSheet.Create(LogGrid, Length(TitleReasonNames));
   ReportReclamationSheet.DrawReport(Length(UsedNameIDs)=1,
                 BD, ED, TotalMotorNames, TotalMotorCounts,
-                PlaceNames, PlaceMotorCounts,
-                DefectNames, DefectMotorCounts,
-                ReasonNames, ReasonMotorCounts);
+                TitleReasonNames, TotalMotorReasonCounts,
+                PlaceNames, PlaceMotorCounts, PlaceReasonCounts,
+                DefectNames, DefectMotorCounts, DefectReasonCounts);
 end;
 
 

@@ -25,7 +25,10 @@ type
        const AYear: Word; out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
     function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
        const ABeginDate, AEndDate: TDate; const ANameIDs: TIntVector;
-       out ANames: TStrVector; out ACounts: TIntVector): Boolean;
+       out AExistsIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector): Boolean;
+    function ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName, ANameFieldName: String; const ABeginDate, AEndDate: TDate;
+       const ANameIDs, AReasonIDs: TIntVector;
+       out ANames: TStrVector; out ATotalCounts: TIntVector; out AReasonCounts: TIntMatrix): Boolean;
   public
     //справочники
     procedure NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
@@ -192,20 +195,37 @@ type
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
     function ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs: TIntVector;
+                out AExistsNameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
-    function ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs: TIntVector;
-                out APlaceNames: TStrVector;
-                out APlaceMotorCounts: TIntVector): Boolean;
-    function ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs: TIntVector;
+    //function ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
+    //            const ANameIDs: TIntVector;
+    //            out APlaceNames: TStrVector;
+    //            out APlaceMotorCounts: TIntVector): Boolean;
+    //function ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
+    //            const ANameIDs: TIntVector;
+    //            out ADefectNames: TStrVector;
+    //            out ADefectMotorCounts: TIntVector): Boolean;
+    //function ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
+    //            const ANameIDs: TIntVector;
+    //            out AReasonNames: TStrVector;
+    //            out AReasonMotorCounts: TIntVector): Boolean;
+
+    function ReclamationTotalWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                const ANameIDs, AReasonIDs: TIntVector;
+                out AMotorNames: TStrVector;
+                out AMotorTotalCounts: TIntVector;
+                out AMotorReasonCounts: TIntMatrix): Boolean;
+    function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                const ANameIDs, AReasonIDs: TIntVector;
                 out ADefectNames: TStrVector;
-                out ADefectMotorCounts: TIntVector): Boolean;
-    function ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs: TIntVector;
-                out AReasonNames: TStrVector;
-                out AReasonMotorCounts: TIntVector): Boolean;
+                out ADefectMotorCounts: TIntVector;
+                out AMotorReasonCounts: TIntMatrix): Boolean;
+    function ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                const ANameIDs, AReasonIDs: TIntVector;
+                out APlaceNames: TStrVector;
+                out APlaceMotorCounts: TIntVector;
+                out AMotorReasonCounts: TIntMatrix): Boolean;
 
   end;
 
@@ -356,19 +376,93 @@ begin
   Result:= not VIsNil(AMonths);
 end;
 
+function TSQLite.ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName,
+  ANameFieldName: String; const ABeginDate, AEndDate: TDate;
+  const ANameIDs, AReasonIDs: TIntVector;
+  out ANames: TStrVector; out ATotalCounts: TIntVector; out AReasonCounts: TIntMatrix): Boolean;
+var
+  i: Integer;
+  ExistsIDs, ReasonCounts: TIntVector;
+
+  procedure GetDataForReason(const AReasonID: Integer; out ACounts: TIntVector);
+  var
+    KeyFieldName, PickFieldName: String;
+    n: Integer;
+  begin
+    ACounts:= nil;
+    VDim(ACounts, Length(ExistsIDs), 0);
+
+    KeyFieldName:= SqlEsc(AIDFieldName, False);
+    PickFieldName:= SqlEsc(ANameFieldName, False);
+
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT COUNT(t1.' + KeyFieldName + ') As MotorCount, t1.' + KeyFieldName + ', t3.' + PickFieldName + ' ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + KeyFieldName + '=t3.' + KeyFieldName + ') ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND (t1.ReasonID = :ReasonID) AND ' +
+      SqlIN('t2','NameID', Length(ANameIDs), 'NameID') + 'AND' +
+      SqlIN('t1',AIDFieldName, Length(ExistsIDs), AIDFieldName) +
+      'GROUP BY t1.' + KeyFieldName + ' ' +
+      'ORDER BY t3.' + PickFieldName);
+    QParamDT('BD', ABeginDate);
+    QParamDT('ED', AEndDate);
+    QParamInt('ReasonID', AReasonID);
+    QParamsInt(ANameIDs, 'NameID');
+    QParamsInt(ExistsIDs, AIDFieldName);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        n:= VIndexOf(ExistsIDs, QFieldInt(AIDFieldName));
+        if n>=0 then
+          ACounts[n]:= QFieldInt('MotorCount');
+        QNext;
+      end;
+    end;
+    QClose;
+  end;
+
+begin
+  Result:= False;
+  ANames:= nil;
+  ATotalCounts:= nil;
+  AReasonCounts:= nil;
+
+  ReclamationReportLoad(ATableName, AIDFieldName, ANameFieldName,
+                        ABeginDate, AEndDate, ANameIDs, ExistsIDs,
+                        ANames, ATotalCounts);
+
+
+  if VIsNil(AReasonIDs) or VIsNil(ExistsIDs) then Exit;
+
+  for i:=0 to High(AReasonIDs) do
+  begin
+    GetDataForReason(AReasonIDs[i], ReasonCounts);
+    MAppend(AReasonCounts, ReasonCounts);
+  end;
+
+  Result:= True;
+end;
+
+
 function TSQLite.ReclamationReportLoad(const ATableName, AIDFieldName,
   ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector
-  ): Boolean;
+  const ANameIDs: TIntVector; out AExistsIDs: TIntVector;
+  out ANames: TStrVector; out ACounts: TIntVector): Boolean;
 var
-  WhereStr, IDFieldName, NameFieldName: String;
+  WhereStr, KeyFieldName, PickFieldName: String;
 begin
   Result:= False;
   ANames:= nil;
   ACounts:= nil;
+  AExistsIDs:= nil;
 
-  IDFieldName:= SqlEsc(AIDFieldName);
-  NameFieldName:= SqlEsc(ANameFieldName);
+  KeyFieldName:= SqlEsc(AIDFieldName, False);
+  PickFieldName:= SqlEsc(ANameFieldName, False);
 
   WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
@@ -376,13 +470,13 @@ begin
 
   QSetQuery(FQuery);
   QSetSQL(
-    'SELECT COUNT(t1.' + IDFieldName + ') As MotorCount, t3.' + NameFieldName + ' ' +
+    'SELECT COUNT(t1.' + KeyFieldName + ') AS MotorCount, t1.' + KeyFieldName + ', t3.' + PickFieldName + ' ' +
     'FROM RECLAMATIONS t1 ' +
     'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-    'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + IDFieldName + '=t3.' + IDFieldName + ') ' +
+    'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + KeyFieldName + '=t3.' + KeyFieldName + ') ' +
     WhereStr +
-    'GROUP BY t1.' + IDFieldName + ' ' +
-    'ORDER BY t3.' + NameFieldName);
+    'GROUP BY t1.' + KeyFieldName + ' ' +
+    'ORDER BY t3.' + PickFieldName);
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
   if not VIsNil(ANameIDs) then
@@ -393,6 +487,7 @@ begin
     QFirst;
     while not QEOF do
     begin
+      VAppend(AExistsIDs, QFieldInt(AIDFieldName));
       VAppend(ACounts, QFieldInt('MotorCount'));
       VAppend(ANames, QFieldStr(ANameFieldName));
       QNext;
@@ -2136,15 +2231,82 @@ begin
   QClose;
 end;
 
+function TSQLite.ReclamationTotalWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                const ANameIDs, AReasonIDs: TIntVector;
+                out AMotorNames: TStrVector;
+                out AMotorTotalCounts: TIntVector;
+                out AMotorReasonCounts: TIntMatrix): Boolean;
+var
+  i: Integer;
+  ExistsNameIDs, MotorReasonCounts: TIntVector;
+
+  procedure GetDataForReason(const AReasonID: Integer; out ACounts: TIntVector);
+  var
+    n: Integer;
+  begin
+    ACounts:= nil;
+    VDim(ACounts, Length(ExistsNameIDs), 0);
+
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND (t1.ReasonID = :ReasonID) AND ' +
+      SqlIN('t2','NameID', Length(ExistsNameIDs)) +
+      'GROUP BY t2.NameID ' +
+      'ORDER BY t3.MotorName');
+    QParamDT('BD', ABeginDate);
+    QParamDT('ED', AEndDate);
+    QParamInt('ReasonID', AReasonID);
+    QParamsInt(ExistsNameIDs);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        n:= VIndexOf(ExistsNameIDs, QFieldInt('NameID'));
+        if n>=0 then
+          ACounts[n]:= QFieldInt('MotorCount');
+        QNext;
+      end;
+    end;
+    QClose;
+  end;
+
+begin
+  Result:= False;
+  AMotorNames:= nil;
+  AMotorTotalCounts:= nil;
+  AMotorReasonCounts:= nil;
+
+  ReclamationTotalLoad(ABeginDate, AEndDate, ANameIDs, ExistsNameIDs,
+                       AMotorNames, AMotorTotalCounts);
+
+
+  if VIsNil(AReasonIDs) or VIsNil(ExistsNameIDs) then Exit;
+
+  for i:=0 to High(AReasonIDs) do
+  begin
+    GetDataForReason(AReasonIDs[i], MotorReasonCounts);
+    MAppend(AMotorReasonCounts, MotorReasonCounts);
+  end;
+
+  Result:= True;
+end;
+
 function TSQLite.ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out AMotorNames: TStrVector; out
-  AMotorCounts: TIntVector): Boolean;
+  const ANameIDs: TIntVector; out AExistsNameIDs: TIntVector;
+  out AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
 begin
   Result:= False;
   AMotorNames:= nil;
   AMotorCounts:= nil;
+  AExistsNameIDs:= nil;
 
   WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
@@ -2152,7 +2314,7 @@ begin
 
   QSetQuery(FQuery);
   QSetSQL(
-    'SELECT COUNT(t2.NameID) As MotorCount, t3.MotorName ' +
+    'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
     'FROM RECLAMATIONS t1 ' +
     'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
     'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
@@ -2169,6 +2331,7 @@ begin
     QFirst;
     while not QEOF do
     begin
+      VAppend(AExistsNameIDs, QFieldInt('NameID'));
       VAppend(AMotorCounts, QFieldInt('MotorCount'));
       VAppend(AMotorNames, QFieldStr('MotorName'));
       QNext;
@@ -2178,31 +2341,52 @@ begin
   QClose;
 end;
 
-function TSQLite.ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out APlaceNames: TStrVector; out
-  APlaceMotorCounts: TIntVector): Boolean;
+//function TSQLite.ReclamationPlacesLoad(const ABeginDate, AEndDate: TDate;
+//  const ANameIDs: TIntVector; out APlaceNames: TStrVector; out
+//  APlaceMotorCounts: TIntVector): Boolean;
+//begin
+//  Result:= ReclamationReportLoad('RECLAMATIONPLACES',
+//             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameIDs,
+//             APlaceNames, APlaceMotorCounts);
+//end;
+//
+//function TSQLite.ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
+//  const ANameIDs: TIntVector; out ADefectNames: TStrVector; out
+//  ADefectMotorCounts: TIntVector): Boolean;
+//begin
+//  Result:= ReclamationReportLoad('RECLAMATIONDEFECTS',
+//             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameIDs,
+//             ADefectNames, ADefectMotorCounts);
+//end;
+//
+//function TSQLite.ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
+//  const ANameIDs: TIntVector; out AReasonNames: TStrVector; out
+//  AReasonMotorCounts: TIntVector): Boolean;
+//begin
+//  Result:= ReclamationReportLoad('RECLAMATIONREASONS',
+//             'ReasonID', 'ReasonName', ABeginDate, AEndDate, ANameIDs,
+//             AReasonNames, AReasonMotorCounts);
+//end;
+
+function TSQLite.ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                const ANameIDs, AReasonIDs: TIntVector;
+                out ADefectNames: TStrVector;
+                out ADefectMotorCounts: TIntVector;
+                out AMotorReasonCounts: TIntMatrix): Boolean;
 begin
-  Result:= ReclamationReportLoad('RECLAMATIONPLACES',
-             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameIDs,
-             APlaceNames, APlaceMotorCounts);
+  Result:= ReclamationReportWithReasonsLoad('RECLAMATIONDEFECTS',
+             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameIDs, AReasonIDs,
+             ADefectNames, ADefectMotorCounts, AMotorReasonCounts);
 end;
 
-function TSQLite.ReclamationDefectsLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out ADefectNames: TStrVector; out
-  ADefectMotorCounts: TIntVector): Boolean;
+function TSQLite.ReclamationPlacesWithReasonsLoad(const ABeginDate,
+  AEndDate: TDate; const ANameIDs, AReasonIDs: TIntVector; out
+  APlaceNames: TStrVector; out APlaceMotorCounts: TIntVector; out
+  AMotorReasonCounts: TIntMatrix): Boolean;
 begin
-  Result:= ReclamationReportLoad('RECLAMATIONDEFECTS',
-             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameIDs,
-             ADefectNames, ADefectMotorCounts);
-end;
-
-function TSQLite.ReclamationReasonsLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out AReasonNames: TStrVector; out
-  AReasonMotorCounts: TIntVector): Boolean;
-begin
-  Result:= ReclamationReportLoad('RECLAMATIONREASONS',
-             'ReasonID', 'ReasonName', ABeginDate, AEndDate, ANameIDs,
-             AReasonNames, AReasonMotorCounts);
+  Result:= ReclamationReportWithReasonsLoad('RECLAMATIONPLACES',
+             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameIDs, AReasonIDs,
+             APlaceNames, APlaceMotorCounts, AMotorReasonCounts);
 end;
 
 
