@@ -47,13 +47,10 @@ type
     procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
-
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-
-
     procedure SpinEdit1Change(Sender: TObject);
     procedure TestGridMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -146,14 +143,20 @@ begin
   SelectedIndex1:= -1;
   SelectedIndex2:= -1;
 
-  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
-                     UsedNameIDs, UsedNames, True, 'NameID');
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
 
   SpinEdit1.Value:= YearOfDate(Date);
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
   MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
+end;
+
+procedure TTestLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+  begin
+    OpenTestsList;
+    OpenBeforeTestList;
+  end;
 end;
 
 procedure TTestLogForm.FormDestroy(Sender: TObject);
@@ -344,18 +347,6 @@ procedure TTestLogForm.CheckBox2Change(Sender: TObject);
 begin
   Panel4.Visible:= CheckBox2.Checked;
   Splitter2.Visible:= CheckBox2.Checked;
-end;
-
-procedure TTestLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
-    'MOTORNAMES', 'NameID', 'MotorName', False, True) then
-  begin
-    OpenTestsList;
-    OpenBeforeTestList;
-  end;
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 end;
 
 procedure TTestLogForm.AddButtonClick(Sender: TObject);

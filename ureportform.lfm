@@ -1,7 +1,7 @@
 object ReportForm: TReportForm
-  Left = 308
+  Left = 47
   Height = 370
-  Top = 355
+  Top = 203
   Width = 1728
   Align = alClient
   BorderStyle = bsNone
@@ -199,7 +199,7 @@ object ReportForm: TReportForm
     object DividerBevel2: TDividerBevel
       AnchorSideLeft.Control = OrderNumCheckBox
       AnchorSideLeft.Side = asrBottom
-      Left = 1183
+      Left = 1034
       Height = 36
       Top = 0
       Width = 20
@@ -213,7 +213,7 @@ object ReportForm: TReportForm
       AnchorSideLeft.Control = DividerBevel2
       AnchorSideLeft.Side = asrBottom
       Cursor = crHandPoint
-      Left = 1203
+      Left = 1054
       Height = 36
       Top = 0
       Width = 112
@@ -358,13 +358,14 @@ object ReportForm: TReportForm
       ParentFont = False
     end
     object OrderNumCheckBox: TCheckBox
-      AnchorSideLeft.Control = ReceiverPanel
+      AnchorSideLeft.Control = NumberListPanel
       AnchorSideLeft.Side = asrBottom
-      Left = 988
+      Left = 839
       Height = 36
       Top = 0
       Width = 195
       Align = alLeft
+      BorderSpacing.Left = 6
       Caption = 'Упорядочить по номеру'
       OnChange = OrderNumCheckBoxChange
       TabOrder = 2
@@ -380,17 +381,32 @@ object ReportForm: TReportForm
       Orientation = trVertical
       ParentFont = False
     end
-    object ReceiverPanel: TPanel
+    object NumberListPanel: TPanel
       AnchorSideLeft.Control = DividerBevel3
       AnchorSideLeft.Side = asrBottom
       Left = 664
       Height = 36
       Top = 0
-      Width = 324
+      Width = 169
       Align = alLeft
+      AutoSize = True
       BevelOuter = bvNone
+      ClientHeight = 36
+      ClientWidth = 169
       TabOrder = 3
       Visible = False
+      object NumberListCheckBox: TCheckBox
+        AnchorSideLeft.Control = NumberListPanel
+        AnchorSideTop.Control = NumberListPanel
+        AnchorSideTop.Side = asrCenter
+        Left = 0
+        Height = 24
+        Top = 6
+        Width = 169
+        Caption = 'Пономерной список'
+        OnChange = NumberListCheckBoxChange
+        TabOrder = 0
+      end
     end
   end
   object Panel1: TPanel
@@ -986,7 +1002,7 @@ object ReportForm: TReportForm
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 12
-      BorderSpacing.Right = 6
+      BorderSpacing.Right = 35
       Caption = 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ'
       Font.Color = clNavy
       ParentColor = False

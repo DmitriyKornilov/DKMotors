@@ -15,6 +15,7 @@ type
   { TReportForm }
 
   TReportForm = class(TForm)
+    NumberListCheckBox: TCheckBox;
     ChooseMotorNamesButton: TSpeedButton;
     ChooseRecieverNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
@@ -36,7 +37,7 @@ type
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
-    ReceiverPanel: TPanel;
+    NumberListPanel: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     RadioButton3: TRadioButton;
@@ -45,6 +46,7 @@ type
     ToolPanel: TPanel;
     procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ChooseRecieverNamesButtonClick(Sender: TObject);
+    procedure NumberListCheckBoxChange(Sender: TObject);
     procedure OrderNumCheckBoxChange(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
@@ -61,7 +63,7 @@ type
     procedure RadioButton4Click(Sender: TObject);
 
   private
-    NameIDs, ReceiverIDs: TIntVector;
+
     MotorBuildSheet: TMotorBuildSheet;
     MotorTestSheet: TMotorTestSheet;
     ReportShipmentSheet: TReportShipmentSheet;
@@ -131,23 +133,6 @@ begin
   ShowReport;
 end;
 
-procedure TReportForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-   if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
-    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  ShowReport;
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
-end;
-
-procedure TReportForm.ChooseRecieverNamesButtonClick(Sender: TObject);
-begin
-  if SQLite.EditKeyPickList(UsedReceiverIDs, UsedReceiverNames,
-    'Наименования грузополучателей',
-    'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then  ShowReport;
-  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
-  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
-end;
-
 procedure TReportForm.CloseButtonClick(Sender: TObject);
 begin
   Close;
@@ -157,21 +142,26 @@ procedure TReportForm.FormCreate(Sender: TObject);
 begin
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= FirstDayInMonth(Date);
-
-  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
-                     UsedNameIDs, UsedNames, True, 'NameID');
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
-
-  SQLite.KeyPickList('CARGORECEIVERS', 'ReceiverID', 'ReceiverName',
-                     UsedReceiverIDs, UsedReceiverNames, True, 'ReceiverName');
-  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
-  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
-
-
-
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
+  SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
 end;
 
+procedure TReportForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+    ShowReport;
+end;
+
+procedure TReportForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True, UsedReceiverIDs, UsedReceiverNames) then
+    ShowReport;
+end;
+
+procedure TReportForm.NumberListCheckBoxChange(Sender: TObject);
+begin
+  ShowReport;
+end;
 
 procedure TReportForm.FormDestroy(Sender: TObject);
 begin
@@ -182,8 +172,6 @@ procedure TReportForm.FormShow(Sender: TObject);
 begin
   ShowReport;
 end;
-
-
 
 procedure TReportForm.RadioButton1Click(Sender: TObject);
 begin
@@ -215,11 +203,13 @@ end;
 
 procedure TReportForm.ShowReport;
 begin
+  DividerBevel2.Visible:= not RadioButton4.Checked;
   ExportButton.Align:= alRight;
   DividerBevel2.Align:= alRight;
-  ReceiverPanel.Visible:= RadioButton3.Checked;//
+  NumberListPanel.Visible:= not RadioButton4.Checked;
   ReceiverNamesPanel.Visible:= RadioButton3.Checked;
-  OrderNumCheckBox.Visible:= not RadioButton3.Checked;
+  OrderNumCheckBox.Visible:= (RadioButton1.Checked or RadioButton2.Checked) and
+                             NumberListCheckBox.Checked;
   DividerBevel2.Align:= alLeft;
   ExportButton.Align:= alLeft;
 
@@ -262,7 +252,7 @@ begin
   SQLite.BuildTotalLoad(BD, ED, UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts);
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
-  MotorBuildSheet.DrawReport(BD, ED,
+  MotorBuildSheet.DrawReport(BD, ED, NumberListCheckBox.Checked,
                              BuildDates, MotorNames, MotorNums, RotorNums,
                              TotalMotorNames, TotalMotorCounts);
 end;
@@ -288,7 +278,7 @@ begin
   SQLite.TestTotalLoad(BD, ED, UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts, TotalFailCounts);
   MotorTestSheet:= TMotorTestSheet.Create(LogGrid);
-  MotorTestSheet.DrawReport(BD, ED,
+  MotorTestSheet.DrawReport(BD, ED, NumberListCheckBox.Checked,
                         TestDates, MotorNames, MotorNums,
                         TestNotes, TestResults,
                         TotalMotorNames, TotalMotorCounts, TotalFailCounts);
@@ -320,6 +310,7 @@ begin
 
   ReportShipmentSheet:= TReportShipmentSheet.Create(LogGrid);
   ReportShipmentSheet.DrawReport(Length(UsedReceiverIDs)=1,
+                NumberListCheckBox.Checked,
                 BD, ED, TotalMotorNames, TotalMotorCounts,
                 RecieverNames, RecieverMotorNames, RecieverMotorCounts,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);

@@ -17,6 +17,10 @@ type
     procedure IDsAndNamesLoad(AComboBox: TComboBox; out ANameIDs: TIntVector;
        const ATableName, AKeyFieldName, APickFieldName, AOrderFieldName: String;
        const AKeyValueNotZero: Boolean; const AZeroKeyPick: String = '');
+    function IDsAndNamesSelectedLoad(ALabel: TLabel; const ANeedEdit: Boolean;
+       var AKeyValues: TIntVector; var APickValues: TStrVector;
+       const ACaption, ATableName, AKeyFieldName, APickFieldName, AOrderFieldName: String;
+       const AKeyValueNotZero: Boolean; const AAllKeyPick: String = ''): Boolean;
     function MonthAndDatesForLogLoad(const ATableName, AFieldName: String;
        const AYear: Word; out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
     function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
@@ -28,7 +32,12 @@ type
                   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
     procedure ReceiverIDsAndNamesLoad(AComboBox: TComboBox;
                   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
-
+    function NameIDsAndMotorNamesSelectedLoad(ALabel: TLabel;
+                  const ANeedEdit: Boolean;
+                  var ANameIDs: TIntVector; var AMotorNames: TStrVector): Boolean;
+    function ReceiverIDsAndNamesSelectedLoad(ALabel: TLabel;
+                  const ANeedEdit: Boolean;
+                  var AReceiverIDs: TIntVector; var AReceiverNames: TStrVector): Boolean;
 
     //дерево месяцы-даты для журналов учета
     function MonthAndDatesForBuildLogLoad(const AYear: Word;
@@ -37,7 +46,8 @@ type
                   out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
 
     //список двигателей
-    function MotorListLoad(const ABuildYear, ANameID, AShippedType: Integer;
+    function MotorListLoad(const ABuildYear, AShippedType: Integer;
+                         const ANameIDs: TIntVector;
                          const ANumberLike: String;
                          const ANeedOrderByNumber: Boolean;
                          out AMotorIDs: TIntVector;
@@ -206,6 +216,58 @@ implementation
 
 { TSQLite }
 
+function TSQLite.IDsAndNamesSelectedLoad(ALabel: TLabel;
+  const ANeedEdit: Boolean; var AKeyValues: TIntVector;
+  var APickValues: TStrVector; const ACaption, ATableName, AKeyFieldName,
+  APickFieldName, AOrderFieldName: String; const AKeyValueNotZero: Boolean;
+  const AAllKeyPick: String): Boolean;
+var
+  IsAllChecked: Boolean;
+  S: String;
+begin
+  S:= EmptyStr;
+  if ANeedEdit then
+  begin
+    Result:= EditKeyPickList(AKeyValues, APickValues, IsAllChecked,
+                    ACaption, ATableName, AKeyFieldName, APickFieldName,
+                    AOrderFieldName=APickFieldName, AKeyValueNotZero);
+    if IsAllChecked then
+      S:= AAllKeyPick;
+  end
+  else begin
+    KeyPickList(ATableName, AKeyFieldName, APickFieldName,
+                AKeyValues, APickValues, AKeyValueNotZero, AOrderFieldName);
+    S:= AAllKeyPick;
+    Result:= True;
+  end;
+
+  if S=EmptyStr then
+    S:= VVectorToStr(APickValues, ', ');
+  ALabel.Caption:= S;
+  ALabel.ShowHint:= True;
+  ALabel.Hint:= ALabel.Caption;
+end;
+
+function TSQLite.NameIDsAndMotorNamesSelectedLoad(ALabel: TLabel;
+  const ANeedEdit: Boolean; var ANameIDs: TIntVector;
+  var AMotorNames: TStrVector): Boolean;
+begin
+  Result:= IDsAndNamesSelectedLoad(ALabel, ANeedEdit, ANameIDs, AMotorNames,
+                          'Наименования электродвигателей',
+                          'MOTORNAMES', 'NameID', 'MotorName', 'NameID',
+                          True, 'ВСЕ НАИМЕНОВАНИЯ');
+end;
+
+function TSQLite.ReceiverIDsAndNamesSelectedLoad(ALabel: TLabel;
+  const ANeedEdit: Boolean; var AReceiverIDs: TIntVector;
+  var AReceiverNames: TStrVector): Boolean;
+begin
+  Result:= IDsAndNamesSelectedLoad(ALabel, ANeedEdit, AReceiverIDs, AReceiverNames,
+                          'Грузополучатели',
+                          'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', 'ReceiverName',
+                          True, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ');
+end;
+
 
 procedure TSQLite.IDsAndNamesLoad(AComboBox: TComboBox; out ANameIDs: TIntVector;
    const ATableName, AKeyFieldName, APickFieldName, AOrderFieldName: String;
@@ -352,8 +414,8 @@ begin
   Result:= MonthAndDatesForLogLoad('MOTORTEST', 'TestDate', AYear, AMonths, ADates);
 end;
 
-function TSQLite.MotorListLoad(const ABuildYear, ANameID,
-  AShippedType: Integer; const ANumberLike: String;
+function TSQLite.MotorListLoad(const ABuildYear, AShippedType: Integer;
+  const ANameIDs: TIntVector; const ANumberLike: String;
   const ANeedOrderByNumber: Boolean; out AMotorIDs: TIntVector; out
   ABuildDates, AMotorNames, AMotorNums, AShippings: TStrVector): Boolean;
 var
@@ -381,8 +443,8 @@ begin
   else
     WhereStr:= 'WHERE (UPPER(t1.MotorNum) LIKE :NumberLike) ';
 
-  if ANameID>0 then
-    WhereStr:= WhereStr + 'AND (t1.NameID = :NameID) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
 
   if AShippedType=1 then
     WhereStr:= WhereStr + 'AND (t1.CargoID > 0) '
@@ -408,8 +470,8 @@ begin
   else
     QParamStr('NumberLike', ANumberLike+'%');
 
-  if ANameID>0 then
-    QParamInt('NameID', ANameID);
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
 
   QOpen;
   if not QIsEmpty then

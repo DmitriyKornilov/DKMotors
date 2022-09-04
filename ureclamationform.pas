@@ -56,12 +56,9 @@ type
     procedure FormShow(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure PlaceListButtonClick(Sender: TObject);
-
-
     procedure DefectListButtonClick(Sender: TObject);
     procedure ReasonListButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
@@ -88,8 +85,6 @@ type
     procedure DelRaclamation;
 
     procedure ReclamationEditFormOpen(const AEditType: Byte);
-
-
   public
 
   end;
@@ -131,12 +126,15 @@ begin
   SelectedIndex:= -1;
   ReclamationSheet:= TReclamationSheet.Create(LogGrid);
 
-  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
-                     UsedNameIDs, UsedNames, True, 'NameID');
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
 
   SpinEdit1.Value:= YearOfDate(Date);
+end;
+
+procedure TReclamationForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+    DataOpen;
 end;
 
 procedure TReclamationForm.FormDestroy(Sender: TObject);
@@ -310,14 +308,6 @@ end;
 procedure TReclamationForm.AddButtonClick(Sender: TObject);
 begin
   ReclamationEditFormOpen(1);
-end;
-
-procedure TReclamationForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
-    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  DataOpen;
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 end;
 
 procedure TReclamationForm.ExportButtonClick(Sender: TObject);

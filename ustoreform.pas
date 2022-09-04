@@ -76,15 +76,6 @@ begin
   DataOpen;
 end;
 
-procedure TStoreForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
-    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  DataOpen;
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
-  Checkbox2.Visible:= Length(UsedNameIDs)>1;
-end;
-
 procedure TStoreForm.ExportButtonClick(Sender: TObject);
 begin
   ExportSheet;
@@ -94,10 +85,15 @@ procedure TStoreForm.FormCreate(Sender: TObject);
 begin
   StoreSheet:= TStoreSheet.Create(ReportGrid);
 
-  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
-                     UsedNameIDs, UsedNames, True, 'NameID');
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
+
+  Checkbox2.Visible:= Length(UsedNameIDs)>1;
+end;
+
+procedure TStoreForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+ if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+    DataOpen;
   Checkbox2.Visible:= Length(UsedNameIDs)>1;
 end;
 
@@ -146,8 +142,6 @@ begin
     FreeAndNil(Exporter);
   end;
 end;
-
-
 
 end.
 

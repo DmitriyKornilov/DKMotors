@@ -105,15 +105,6 @@ begin
   OpenCargoEditForm(1);
 end;
 
-procedure TShipmentForm.ChooseRecieverNamesButtonClick(Sender: TObject);
-begin
-  if SQLite.EditKeyPickList(UsedReceiverIDs, UsedReceiverNames,
-    'Наименования грузополучателей',
-    'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then  OpenShipmentList(0);
-  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
-  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
-end;
-
 procedure TShipmentForm.CloseButtonClick(Sender: TObject);
 begin
   Close;
@@ -152,12 +143,15 @@ begin
   SelectedIndex2:= -1;
   CargoSheet:= TCargoSheet.Create(LogGrid);
 
-  SQLite.KeyPickList('CARGORECEIVERS', 'ReceiverID', 'ReceiverName',
-                     UsedReceiverIDs, UsedReceiverNames, True, 'ReceiverName');
-  ReceiverNamesLabel.Caption:= VVectorToStr(UsedReceiverNames, ', ');
-  ReceiverNamesLabel.Hint:= ReceiverNamesLabel.Caption;
+  SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
 
   SpinEdit1.Value:= YearOfDate(Date);
+end;
+
+procedure TShipmentForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True, UsedReceiverIDs, UsedReceiverNames) then
+    OpenShipmentList(0);
 end;
 
 procedure TShipmentForm.FormDestroy(Sender: TObject);

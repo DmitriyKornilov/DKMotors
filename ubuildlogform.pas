@@ -50,7 +50,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-
     procedure MotorNamesButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTDrawText(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
@@ -116,12 +115,15 @@ begin
   SelectedIndex2:= -1;
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
 
-  SQLite.KeyPickList('MOTORNAMES', 'NameID', 'MotorName',
-                     UsedNameIDs, UsedNames, True, 'NameID');
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
 
   SpinEdit1.Value:= YearOfDate(Date);
+end;
+
+procedure TBuildLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+    OpenMotorsList;
 end;
 
 procedure TBuildLogForm.FormDestroy(Sender: TObject);
@@ -147,8 +149,6 @@ begin
     SelectLine(R);
   end;
 end;
-
-
 
 procedure TBuildLogForm.MotorNamesButtonClick(Sender: TObject);
 begin
@@ -332,14 +332,6 @@ end;
 procedure TBuildLogForm.CheckBox1Change(Sender: TObject);
 begin
   OpenMotorsList;
-end;
-
-procedure TBuildLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  if SQLite.EditKeyPickList(UsedNameIDs, UsedNames, 'Наименования электродвигателей',
-    'MOTORNAMES', 'NameID', 'MotorName', False, True) then  OpenMotorsList;
-  MotorNamesLabel.Caption:= VVectorToStr(UsedNames, ', ');
-  MotorNamesLabel.Hint:= MotorNamesLabel.Caption;
 end;
 
 procedure TBuildLogForm.AddButtonClick(Sender: TObject);

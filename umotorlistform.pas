@@ -18,16 +18,19 @@ type
   TMotorListForm = class(TForm)
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
+    ChooseMotorNamesButton: TSpeedButton;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
     DividerBevel4: TDividerBevel;
     DividerBevel5: TDividerBevel;
     DividerBevel7: TDividerBevel;
     InfoGrid: TsWorksheetGrid;
+    Label3: TLabel;
+    MotorNamesLabel: TLabel;
+    MotorNamesPanel: TPanel;
     MotorNumEdit: TEditButton;
     ExportButton: TRxSpeedButton;
     Label2: TLabel;
-    MotorNameComboBox: TComboBox;
     MotorShippedComboBox: TComboBox;
     Panel2: TPanel;
     Panel3: TPanel;
@@ -39,27 +42,26 @@ type
     VT1: TVirtualStringTree;
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorShippedComboBoxChange(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VT1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-
   private
-
-
     VSTTable: TVSTTable;
     MotorInfoSheet: TMotorInfoSheet;
-    MotorIDs, NameIDs: TIntVector;
+    MotorIDs: TIntVector;
+
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
 
     procedure MotorListOpen;
     procedure InfoOpen;
-
   public
 
   end;
@@ -76,10 +78,8 @@ implementation
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
 begin
-
   VSTTable:= TVSTTable.Create(VT1);
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED; //$00FBDEBB
-  //VSTTable.SelectedFont.Style:= [fsBold];
+  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTable.HeaderFont.Style:= [fsBold];
   VSTTable.AddColumn('Дата сборки', 150);
   VSTTable.AddColumn('Наименование', 300);
@@ -90,21 +90,22 @@ begin
 
   MotorInfoSheet:= TMotorInfoSheet.Create(InfoGrid);
 
-  //LoadMotorNamesList(MotorNameComboBox, NameIDs);
-  SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs, False);
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
+
   SpinEdit1.Value:= YearOfDate(Date);
   MotorListOpen;
+end;
+
+procedure TMotorListForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+ if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+    MotorListOpen;
 end;
 
 procedure TMotorListForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTTable) then FreeAndNil(VSTTable);
   if Assigned(MotorInfoSheet) then FreeAndNil(MotorInfoSheet);
-end;
-
-procedure TMotorListForm.MotorNameComboBoxChange(Sender: TObject);
-begin
-  MotorListOpen;
 end;
 
 procedure TMotorListForm.MotorNumEditButtonClick(Sender: TObject);
@@ -148,8 +149,7 @@ begin
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
     SQLite.MotorListLoad(SpinEdit1.Value,
-                        NameIDs[MotorNameComboBox.ItemIndex],
-                        MotorShippedComboBox.ItemIndex,
+                        MotorShippedComboBox.ItemIndex, UsedNameIDs,
                         MotorNumberLike, Checkbox1.Checked,
                         MotorIDs, ABuildDates,
                         AMotorNames, AMotorNums, AShippings);
@@ -174,7 +174,6 @@ var
   TestResults, Mileages, Opinions: TIntVector;
   TestNotes, PlaceNames, FactoryNames, Departures,
   DefectNames, ReasonNames, RecNotes: TStrVector;
-
 begin
   if VIsNil(MotorIDs) then Exit;
   if not VSTTable.IsSelected then Exit;
@@ -193,8 +192,6 @@ begin
                       RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
                       Departures, DefectNames, ReasonNames, RecNotes);
 end;
-
-
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
@@ -234,7 +231,6 @@ begin
     FreeAndNil(Exporter);
   end;
 end;
-
 
 end.
 
