@@ -1,7 +1,6 @@
 unit UBuildLogForm;
 
 {$mode ObjFPC}{$H+}
-
 interface
 
 uses
@@ -49,18 +48,18 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNamesButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTDrawText(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; const CellText: String;
-      const CellRect: TRect; var DefaultDraw: Boolean);
+      Node: PVirtualNode; {%H-}Column: TColumnIndex; const {%H-}CellText: String;
+      const {%H-}CellRect: TRect; var {%H-}DefaultDraw: Boolean);
     procedure VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-    procedure VTInitNode(Sender: TBaseVirtualTree; ParentNode,
-      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+      {%H-}Column: TColumnIndex; {%H-}TextType: TVSTTextType; var CellText: String);
+    procedure VTInitNode(Sender: TBaseVirtualTree; {%H-}ParentNode,
+      Node: PVirtualNode; var {%H-}InitialStates: TVirtualNodeInitStates);
     procedure VTMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      {%H-}Shift: TShiftState; X, Y: Integer);
   private
     Months: TStrVector;
     Dates: TDateMatrix;

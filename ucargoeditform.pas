@@ -50,19 +50,16 @@ type
     procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+      {%H-}Shift: TShiftState);
     procedure ReceiverNameComboBoxChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
     procedure SeriesEditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
-    procedure VT1MouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      {%H-}Shift: TShiftState);
+    procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     NameIDs: TIntVector;
-    MotorNames: TStrVector;
-
     ReceiverIDs: TIntVector;
-    ReceiverNames: TStrVector;
 
     ViewMotorIDs: TIntVector;
     ViewMotorNums, ViewBuildDates, ViewSeries: TStrVector;
