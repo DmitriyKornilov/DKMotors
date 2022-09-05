@@ -1,41 +1,41 @@
 object ReportForm: TReportForm
-  Left = 47
-  Height = 370
-  Top = 203
-  Width = 1728
+  Left = 357
+  Height = 296
+  Top = 206
+  Width = 1382
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ReportForm'
-  ClientHeight = 370
-  ClientWidth = 1728
-  DesignTimePPI = 120
+  ClientHeight = 296
+  ClientWidth = 1382
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '2.2.0.4'
   object ToolPanel: TPanel
+    AnchorSideTop.Control = ReceiverNamesPanel
     Left = 0
-    Height = 40
-    Top = 80
-    Width = 1728
+    Height = 32
+    Top = 64
+    Width = 1382
     Align = alTop
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1724
-    Constraints.MaxHeight = 40
+    ClientHeight = 28
+    ClientWidth = 1378
+    Constraints.MaxHeight = 32
     TabOrder = 0
     object ReportPeriodPanel: TPanel
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 222
+      Width = 178
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 222
+      ClientHeight = 28
+      ClientWidth = 178
       ParentFont = False
       TabOrder = 0
       object DateTimePicker1: TDateTimePicker
@@ -43,16 +43,16 @@ object ReportForm: TReportForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = ReportPeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 123
-        Height = 28
-        Top = 4
-        Width = 99
+        Left = 99
+        Height = 23
+        Top = 3
+        Width = 79
         CenturyFrom = 1941
         MaxDate = 2958465
         MinDate = -53780
         ParentFont = False
         TabOrder = 0
-        BorderSpacing.Left = 6
+        BorderSpacing.Left = 5
         TrailingSeparator = False
         TextForNullDate = 'NULL'
         LeadingZeros = True
@@ -71,16 +71,16 @@ object ReportForm: TReportForm
         AnchorSideLeft.Control = ReportPeriodPanel
         AnchorSideTop.Control = ReportPeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 6
-        Height = 28
-        Top = 4
-        Width = 99
+        Left = 5
+        Height = 23
+        Top = 3
+        Width = 79
         CenturyFrom = 1941
         MaxDate = 2958465
         MinDate = -53780
         ParentFont = False
         TabOrder = 1
-        BorderSpacing.Left = 6
+        BorderSpacing.Left = 5
         TrailingSeparator = False
         TextForNullDate = 'NULL'
         LeadingZeros = True
@@ -100,38 +100,37 @@ object ReportForm: TReportForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = DateTimePicker2
         AnchorSideTop.Side = asrCenter
-        Left = 111
-        Height = 20
-        Top = 8
-        Width = 6
-        BorderSpacing.Left = 6
+        Left = 89
+        Height = 15
+        Top = 7
+        Width = 5
+        BorderSpacing.Left = 5
         Caption = '-'
         Font.Style = [fsBold]
-        ParentColor = False
         ParentFont = False
       end
     end
     object Panel2: TPanel
-      Left = 242
-      Height = 36
+      Left = 193
+      Height = 28
       Top = 0
-      Width = 402
+      Width = 323
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 402
+      ClientHeight = 28
+      ClientWidth = 323
       ParentFont = False
       TabOrder = 1
       object RadioButton1: TRadioButton
         AnchorSideLeft.Control = Panel2
         AnchorSideTop.Control = Panel2
         AnchorSideTop.Side = asrCenter
-        Left = 8
-        Height = 24
-        Top = 6
-        Width = 75
-        BorderSpacing.Left = 8
+        Left = 6
+        Height = 19
+        Top = 5
+        Width = 61
+        BorderSpacing.Left = 6
         Caption = 'Сборка'
         Checked = True
         OnClick = RadioButton1Click
@@ -144,11 +143,11 @@ object ReportForm: TReportForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = RadioButton1
         AnchorSideTop.Side = asrCenter
-        Left = 91
-        Height = 24
-        Top = 6
-        Width = 102
-        BorderSpacing.Left = 8
+        Left = 73
+        Height = 19
+        Top = 5
+        Width = 82
+        BorderSpacing.Left = 6
         Caption = 'Испытания'
         OnClick = RadioButton2Click
         ParentFont = False
@@ -159,11 +158,11 @@ object ReportForm: TReportForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = RadioButton1
         AnchorSideTop.Side = asrCenter
-        Left = 201
-        Height = 24
-        Top = 6
-        Width = 85
-        BorderSpacing.Left = 8
+        Left = 161
+        Height = 19
+        Top = 5
+        Width = 69
+        BorderSpacing.Left = 6
         Caption = 'Отгрузка'
         OnClick = RadioButton3Click
         ParentFont = False
@@ -174,11 +173,11 @@ object ReportForm: TReportForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = RadioButton1
         AnchorSideTop.Side = asrCenter
-        Left = 294
-        Height = 24
-        Top = 6
-        Width = 108
-        BorderSpacing.Left = 8
+        Left = 236
+        Height = 19
+        Top = 5
+        Width = 87
+        BorderSpacing.Left = 6
         Caption = 'Рекламация'
         OnClick = RadioButton4Click
         ParentFont = False
@@ -186,10 +185,10 @@ object ReportForm: TReportForm
       end
     end
     object DividerBevel1: TDividerBevel
-      Left = 222
-      Height = 36
+      Left = 178
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Caption = 'DividerBevel1'
       Align = alLeft
       Font.Style = [fsBold]
@@ -199,10 +198,10 @@ object ReportForm: TReportForm
     object DividerBevel2: TDividerBevel
       AnchorSideLeft.Control = OrderNumCheckBox
       AnchorSideLeft.Side = asrBottom
-      Left = 1034
-      Height = 36
+      Left = 825
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Caption = 'DividerBevel2'
       Align = alLeft
       Font.Style = [fsBold]
@@ -213,10 +212,10 @@ object ReportForm: TReportForm
       AnchorSideLeft.Control = DividerBevel2
       AnchorSideLeft.Side = asrBottom
       Cursor = crHandPoint
-      Left = 1054
-      Height = 36
+      Left = 840
+      Height = 28
       Top = 0
-      Width = 112
+      Width = 101
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -360,21 +359,21 @@ object ReportForm: TReportForm
     object OrderNumCheckBox: TCheckBox
       AnchorSideLeft.Control = NumberListPanel
       AnchorSideLeft.Side = asrBottom
-      Left = 839
-      Height = 36
+      Left = 671
+      Height = 28
       Top = 0
-      Width = 195
+      Width = 154
       Align = alLeft
-      BorderSpacing.Left = 6
+      BorderSpacing.Left = 5
       Caption = 'Упорядочить по номеру'
       OnChange = OrderNumCheckBoxChange
       TabOrder = 2
     end
     object DividerBevel3: TDividerBevel
-      Left = 644
-      Height = 36
+      Left = 516
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Caption = 'DividerBevel3'
       Align = alLeft
       Font.Style = [fsBold]
@@ -384,15 +383,15 @@ object ReportForm: TReportForm
     object NumberListPanel: TPanel
       AnchorSideLeft.Control = DividerBevel3
       AnchorSideLeft.Side = asrBottom
-      Left = 664
-      Height = 36
+      Left = 531
+      Height = 28
       Top = 0
-      Width = 169
+      Width = 135
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 169
+      ClientHeight = 28
+      ClientWidth = 135
       TabOrder = 3
       Visible = False
       object NumberListCheckBox: TCheckBox
@@ -400,9 +399,9 @@ object ReportForm: TReportForm
         AnchorSideTop.Control = NumberListPanel
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 24
-        Top = 6
-        Width = 169
+        Height = 19
+        Top = 5
+        Width = 135
         Caption = 'Пономерной список'
         OnChange = NumberListCheckBoxChange
         TabOrder = 0
@@ -410,22 +409,23 @@ object ReportForm: TReportForm
     end
   end
   object Panel1: TPanel
-    Left = 6
-    Height = 238
-    Top = 126
-    Width = 1716
+    AnchorSideTop.Control = ToolPanel
+    Left = 5
+    Height = 190
+    Top = 101
+    Width = 1372
     Align = alClient
-    BorderSpacing.Around = 6
+    BorderSpacing.Around = 5
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 234
-    ClientWidth = 1712
+    ClientHeight = 186
+    ClientWidth = 1368
     TabOrder = 1
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 234
+      Height = 186
       Top = 0
-      Width = 1712
+      Width = 1368
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear
@@ -458,29 +458,30 @@ object ReportForm: TReportForm
     end
   end
   object MotorNamesPanel: TPanel
+    AnchorSideTop.Control = Owner
     Left = 0
-    Height = 40
+    Height = 32
     Top = 0
-    Width = 1728
+    Width = 1382
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1724
-    Constraints.MaxHeight = 40
-    Constraints.MinHeight = 40
+    ClientHeight = 28
+    ClientWidth = 1378
+    Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 2
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 6
-      Height = 36
+      Left = 5
+      Height = 28
       Top = 0
-      Width = 40
+      Width = 32
       Align = alLeft
       AutoSize = True
-      BorderSpacing.Left = 6
-      Constraints.MinWidth = 40
+      BorderSpacing.Left = 5
+      Constraints.MinWidth = 32
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -623,13 +624,12 @@ object ReportForm: TReportForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 52
-      Height = 20
-      Top = 8
-      Width = 129
-      BorderSpacing.Left = 6
+      Left = 42
+      Height = 15
+      Top = 7
+      Width = 103
+      BorderSpacing.Left = 5
       Caption = 'Электродвигатели:'
-      ParentColor = False
     end
     object MotorNamesLabel: TLabel
       AnchorSideLeft.Control = Label2
@@ -637,27 +637,26 @@ object ReportForm: TReportForm
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = DividerBevel4
-      Left = 187
-      Height = 20
-      Top = 8
-      Width = 1481
+      Left = 150
+      Height = 16
+      Top = 6
+      Width = 1178
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
-      BorderSpacing.Left = 6
-      BorderSpacing.Right = 6
+      BorderSpacing.Left = 5
+      BorderSpacing.Right = 5
       Caption = 'ВСЕ НАИМЕНОВАНИЯ'
       Font.Color = clNavy
-      ParentColor = False
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 1674
-      Height = 36
+      Left = 1333
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alRight
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -665,8 +664,8 @@ object ReportForm: TReportForm
     end
     object CloseButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1694
-      Height = 36
+      Left = 1348
+      Height = 28
       Hint = 'Закрыть'
       Top = 0
       Width = 30
@@ -816,30 +815,31 @@ object ReportForm: TReportForm
     end
   end
   object ReceiverNamesPanel: TPanel
+    AnchorSideTop.Control = MotorNamesPanel
     Left = 0
-    Height = 40
-    Top = 40
-    Width = 1728
+    Height = 32
+    Top = 32
+    Width = 1382
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1724
-    Constraints.MaxHeight = 40
-    Constraints.MinHeight = 40
+    ClientHeight = 28
+    ClientWidth = 1378
+    Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 3
     Visible = False
     object ChooseRecieverNamesButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 6
-      Height = 36
+      Left = 5
+      Height = 28
       Top = 0
-      Width = 40
+      Width = 32
       Align = alLeft
       AutoSize = True
-      BorderSpacing.Left = 6
-      Constraints.MinWidth = 40
+      BorderSpacing.Left = 5
+      Constraints.MinWidth = 32
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -982,30 +982,28 @@ object ReportForm: TReportForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = ReceiverNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 52
-      Height = 20
-      Top = 8
-      Width = 122
-      BorderSpacing.Left = 6
+      Left = 42
+      Height = 15
+      Top = 7
+      Width = 99
+      BorderSpacing.Left = 5
       Caption = 'Грузополучатели:'
-      ParentColor = False
     end
     object ReceiverNamesLabel: TLabel
       AnchorSideLeft.Control = Label3
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = ReceiverNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 186
-      Height = 20
-      Top = 8
-      Width = 1482
+      Left = 151
+      Height = 16
+      Top = 6
+      Width = 1182
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
-      BorderSpacing.Left = 12
-      BorderSpacing.Right = 35
+      BorderSpacing.Left = 10
+      BorderSpacing.Right = 28
       Caption = 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ'
       Font.Color = clNavy
-      ParentColor = False
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
