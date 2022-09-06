@@ -249,6 +249,8 @@ begin
     Result:= True;
   end;
 
+  if not Result then Exit;
+
   if S=EmptyStr then
     S:= VVectorToStr(APickValues, ', ');
   ALabel.Caption:= S;
