@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
-  DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTUtils,
+  DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables,
   DK_Dialogs, DK_Const, UTestAddForm, fpspreadsheetgrid,
   SheetUtils;
 
@@ -53,23 +53,14 @@ type
     procedure FormShow(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure TestGridMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure VTDrawText(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; const CellText: String;
-      const CellRect: TRect; var DefaultDraw: Boolean);
-    procedure VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-    procedure VTInitNode(Sender: TBaseVirtualTree; ParentNode,
-      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure VTMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure VTClick(Sender: TObject);
   private
     Months: TStrVector;
     Dates: TDateMatrix;
     StrDates: TStrMatrix;
 
-    SelectedIndex1, SelectedIndex2: Integer;
-    SelectedNode: PVirtualNode;
+    VST: TVSTCategoryRadioButtonTable;
 
     TestIDs, TestResults: TIntVector;
     MotorNames, MotorNums, TestNotes: TStrVector;
@@ -88,9 +79,6 @@ type
     procedure OpenBeforeTestList;
     procedure OpenDatesList(const ASelectDate: TDate);
     procedure OpenTestsList;
-
-    procedure UnselectNode;
-    procedure SelectNode(Node: PVirtualNode);
 
   public
 
@@ -140,8 +128,13 @@ end;
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
   SelectedIndex:= -1;
-  SelectedIndex1:= -1;
-  SelectedIndex2:= -1;
+
+  VST:= TVSTCategoryRadioButtonTable.Create(VT);
+  VST.SelectedFont.Style:= [fsBold];
+  VST.CanRightMouseButtonUnselect:= False;
+  VST.HeaderVisible:= False;
+  VST.GridLinesVisible:= False;
+  VST.AddColumn('Dates');
 
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
 
@@ -163,6 +156,7 @@ procedure TTestLogForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(BeforeTestSheet) then FreeAndNil(BeforeTestSheet);
   if Assigned(MotorTestSheet) then FreeAndNil(MotorTestSheet);
+  if Assigned(VST) then FreeAndNil(VST);
 end;
 
 procedure TTestLogForm.FormShow(Sender: TObject);
@@ -190,52 +184,10 @@ begin
   end;
 end;
 
-procedure TTestLogForm.VTDrawText(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-  const CellText: String; const CellRect: TRect; var DefaultDraw: Boolean);
-var
-  i,j: Integer;
+procedure TTestLogForm.VTClick(Sender: TObject);
 begin
-  if VT.GetNodeLevel(Node)=1 then
-  begin
-    i:= (Node^.Parent)^.Index;
-    j:= Node^.Index;
-    if (SelectedIndex1=i) and (SelectedIndex2=j) then
-      TargetCanvas.Font.Style:= [fsBold];
-  end;
-end;
-
-procedure TTestLogForm.VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-begin
-  VSTGetText(Node, CellText, VT, Months, StrDates);
-end;
-
-procedure TTestLogForm.VTInitNode(Sender: TBaseVirtualTree; ParentNode,
-  Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-var
-  Level: Integer;
-begin
-  Level := VT.GetNodeLevel(Node);
-  if Level=1 then
-    Node^.CheckType:= ctRadioButton;
-end;
-
-procedure TTestLogForm.VTMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  Node: PVirtualNode;
-  Level: Integer;
-begin
-  if Button<>mbLeft then Exit;
-  Node:= VT.GetNodeAt(X, Y);
-  if not Assigned(Node) then Exit;
-  Level:= VT.GetNodeLevel(Node);
-  if Level=1 then
-  begin
-    UnselectNode;
-    SelectNode(Node);
-  end;
+  if VST.IsSelected then
+    OpenTestsList;
 end;
 
 procedure TTestLogForm.SelectionClear;
@@ -263,42 +215,29 @@ begin
   end;
 end;
 
-procedure TTestLogForm.UnselectNode;
-begin
-  if SelectedIndex1>=0 then
-    SelectedNode^.CheckState:= csUnCheckedNormal;
-  SelectedIndex1:= -1;
-  SelectedIndex2:= -1;
-  SelectedNode:= nil;
-  VT.Refresh;
-  SelectionClear;
-end;
-
-procedure TTestLogForm.SelectNode(Node: PVirtualNode);
-begin
-  SelectedIndex1:= (Node^.Parent)^.Index;
-  SelectedIndex2:= Node^.Index;
-  SelectedNode:= Node;
-  SelectedNode^.CheckState:= csCheckedNormal;
-  VT.Refresh;
-  OpenTestsList;
-end;
-
 procedure TTestLogForm.OpenDatesList(const ASelectDate: TDate);
 var
   I1, I2: Integer;
 begin
   TestGrid.Clear;
-  VT.Clear;
-  UnselectNode;
+  VST.ValuesClear;
+
   if not SQLite.MonthAndDatesForTestLogLoad(SpinEdit1.Value, Months, Dates) then Exit;
   StrDates:= MFormatDateTime('dd.mm.yyyy', Dates);
-  VSTLoad(VT, StrDates, 0);
+  VST.SetCategories(Months);
+  VST.SetColumn('Dates', StrDates, taLeftJustify);
+  VST.Draw;
 
   if MIndexOf(Dates, ASelectDate, I1, I2) then
-    SelectNode(VSTShowNode(VT, I1, I2))
-  else
-    SelectNode(VT.GetNext(VT.GetNext(VT.RootNode)));
+  begin
+    VST.Select(I1, I2);
+    VST.Show(I1, I2);
+  end
+  else begin
+    VST.Select(0, 0);
+    VST.Show(0, 0);
+  end;
+  OpenTestsList;
 end;
 
 procedure TTestLogForm.OpenTestsList;
@@ -306,21 +245,19 @@ var
   TotalMotorNames: TStrVector;
   TotalMotorCounts, TotalFailCounts: TIntVector;
   X: TDateVector;
+  D: TDate;
 begin
   SelectionClear;
-  if (SelectedIndex1<0) or (SelectedIndex2<0) then Exit;
+  if not VST.IsSelected then Exit;
 
-  SQLite.TestListLoad(Dates[SelectedIndex1, SelectedIndex2],
-                    Dates[SelectedIndex1, SelectedIndex2],
-                    UsedNameIDs,
+  D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
+
+  SQLite.TestListLoad(D,D, UsedNameIDs,
                     CheckBox1.Checked, TestIDs, TestResults, X,
                     MotorNames, MotorNums, TestNotes);
-  SQLite.TestTotalLoad(Dates[SelectedIndex1, SelectedIndex2],
-                     Dates[SelectedIndex1, SelectedIndex2],
-                     UsedNameIDs,
-                     TotalMotorNames, TotalMotorCounts, TotalFailCounts);
-  MotorTestSheet.Draw(Dates[SelectedIndex1, SelectedIndex2],
-                      MotorNames, MotorNums, TestNotes, TestResults,
+  SQLite.TestTotalLoad(D,D, UsedNameIDs, TotalMotorNames,
+                       TotalMotorCounts, TotalFailCounts);
+  MotorTestSheet.Draw(D, MotorNames, MotorNums, TestNotes, TestResults,
                       TotalMotorCounts, TotalFailCounts);
 end;
 
@@ -333,7 +270,7 @@ procedure TTestLogForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить результаты испытаний?') then Exit;
   SQLite.Delete('MOTORTEST', 'TestID', TestIDs[SelectedIndex]);
-  OpenDatesList(Dates[SelectedIndex1, SelectedIndex2]);
+  OpenDatesList(Dates[VST.SelectedIndex1, VST.SelectedIndex2]);
   OpenBeforeTestList;
 end;
 
@@ -356,8 +293,8 @@ var
 begin
   TestAddForm:= TTestAddForm.Create(TestLogForm);
   try
-    if (SelectedIndex1>=0) and (SelectedIndex2>=0) then
-      TestAddForm.DateTimePicker1.Date:= Dates[SelectedIndex1, SelectedIndex2]
+    if VST.IsSelected then
+      TestAddForm.DateTimePicker1.Date:= Dates[VST.SelectedIndex1, VST.SelectedIndex2]
     else
       TestAddForm.DateTimePicker1.Date:= Date;
     TestAddForm.ShowModal;

@@ -6,7 +6,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
-  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTUtils,
+  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables,
   DK_Dialogs, DK_Const, UBuildAddForm, UBuildEditForm,
   SheetUtils, fpspreadsheetgrid;
 
@@ -51,22 +51,14 @@ type
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNamesButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure VTDrawText(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; {%H-}Column: TColumnIndex; const {%H-}CellText: String;
-      const {%H-}CellRect: TRect; var {%H-}DefaultDraw: Boolean);
-    procedure VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      {%H-}Column: TColumnIndex; {%H-}TextType: TVSTTextType; var CellText: String);
-    procedure VTInitNode(Sender: TBaseVirtualTree; {%H-}ParentNode,
-      Node: PVirtualNode; var {%H-}InitialStates: TVirtualNodeInitStates);
-    procedure VTMouseDown(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure VTClick(Sender: TObject);
+
   private
     Months: TStrVector;
     Dates: TDateMatrix;
     StrDates: TStrMatrix;
 
-    SelectedIndex1, SelectedIndex2: Integer;
-    SelectedNode: PVirtualNode;
+    VST: TVSTCategoryRadioButtonTable;
 
     MotorBuildSheet: TMotorBuildSheet;
 
@@ -83,8 +75,6 @@ type
     procedure OpenDatesList(const ASelectDate: TDate);
     procedure OpenMotorsList;
 
-    procedure UnselectNode;
-    procedure SelectNode(Node: PVirtualNode);
   public
 
   end;
@@ -110,9 +100,15 @@ end;
 procedure TBuildLogForm.FormCreate(Sender: TObject);
 begin
   SelectedIndex:= -1;
-  SelectedIndex1:= -1;
-  SelectedIndex2:= -1;
+
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
+
+  VST:= TVSTCategoryRadioButtonTable.Create(VT);
+  VST.SelectedFont.Style:= [fsBold];
+  VST.CanRightMouseButtonUnselect:= False;
+  VST.HeaderVisible:= False;
+  VST.GridLinesVisible:= False;
+  VST.AddColumn('Dates');
 
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
 
@@ -128,6 +124,7 @@ end;
 procedure TBuildLogForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(MotorBuildSheet) then FreeAndNil(MotorBuildSheet);
+  if Assigned(VST) then FreeAndNil(VST);
 end;
 
 procedure TBuildLogForm.FormShow(Sender: TObject);
@@ -161,52 +158,10 @@ begin
   OpenDatesList(LastDayInYear(SpinEdit1.Value));
 end;
 
-procedure TBuildLogForm.VTDrawText(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-  const CellText: String; const CellRect: TRect; var DefaultDraw: Boolean);
-var
-  i,j: Integer;
+procedure TBuildLogForm.VTClick(Sender: TObject);
 begin
-  if VT.GetNodeLevel(Node)=1 then
-  begin
-    i:= (Node^.Parent)^.Index;
-    j:= Node^.Index;
-    if (SelectedIndex1=i) and (SelectedIndex2=j) then
-      TargetCanvas.Font.Style:= [fsBold];
-  end;
-end;
-
-procedure TBuildLogForm.VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-begin
-  VSTGetText(Node, CellText, VT, Months, StrDates);
-end;
-
-procedure TBuildLogForm.VTInitNode(Sender: TBaseVirtualTree; ParentNode,
-  Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-var
-  Level: Integer;
-begin
-  Level := VT.GetNodeLevel(Node);
-  if Level=1 then
-    Node^.CheckType:= ctRadioButton;
-end;
-
-procedure TBuildLogForm.VTMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  Node: PVirtualNode;
-  Level: Integer;
-begin
-  if Button<>mbLeft then Exit;
-  Node:= VT.GetNodeAt(X, Y);
-  if not Assigned(Node) then Exit;
-  Level:= VT.GetNodeLevel(Node);
-  if Level=1 then
-  begin
-    UnselectNode;
-    SelectNode(Node);
-  end;
+  if VST.IsSelected then
+    OpenMotorsList;
 end;
 
 procedure TBuildLogForm.SelectionClear;
@@ -236,59 +191,46 @@ begin
   end;
 end;
 
-procedure TBuildLogForm.UnselectNode;
-begin
-  if SelectedIndex1>=0 then
-    SelectedNode^.CheckState:= csUnCheckedNormal;
-  SelectedIndex1:= -1;
-  SelectedIndex2:= -1;
-  SelectedNode:= nil;
-  VT.Refresh;
-  SelectionClear;
-end;
-
-procedure TBuildLogForm.SelectNode(Node: PVirtualNode);
-begin
-  SelectedIndex1:= (Node^.Parent)^.Index;
-  SelectedIndex2:= Node^.Index;
-  SelectedNode:= Node;
-  SelectedNode^.CheckState:= csCheckedNormal;
-  VT.Refresh;
-  OpenMotorsList;
-end;
-
 procedure TBuildLogForm.OpenDatesList(const ASelectDate: TDate);
 var
   I1, I2: Integer;
 begin
-  VT.Clear;
-  UnselectNode;
+  LogGrid.Clear;
+  VST.ValuesClear;
 
   if not SQLite.MonthAndDatesForBuildLogLoad(SpinEdit1.Value, Months, Dates) then Exit;
 
   StrDates:= MFormatDateTime('dd.mm.yyyy', Dates);
-  VSTLoad(VT, StrDates, 0);
+  VST.SetCategories(Months);
+  VST.SetColumn('Dates', StrDates, taLeftJustify);
+  VST.Draw;
+
   if MIndexOf(Dates, ASelectDate, I1, I2) then
-    SelectNode(VSTShowNode(VT, I1, I2))
-  else
-    SelectNode(VT.GetNext(VT.GetNext(VT.RootNode)));
+  begin
+    VST.Select(I1, I2);
+    VST.Show(I1, I2);
+  end
+  else begin
+    VST.Select(0, 0);
+    VST.Show(0, 0);
+  end;
+  OpenMotorsList;
 end;
 
 procedure TBuildLogForm.OpenMotorsList;
 var
   Tmp: TDateVector;
+  D: TDate;
 begin
   SelectionClear;
-  if (SelectedIndex1<0) or (SelectedIndex2<0) then Exit;
+  if not VST.IsSelected then Exit;
 
-  SQLite.BuildListLoad(Dates[SelectedIndex1, SelectedIndex2],
-                    Dates[SelectedIndex1, SelectedIndex2],
-                    UsedNameIDs,
+  D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
+  SQLite.BuildListLoad(D, D, UsedNameIDs,
                     CheckBox1.Checked, MotorIDs, NameIDs, OldMotors,
                     Tmp, MotorNames, MotorNums, RotorNums);
 
-  MotorBuildSheet.Draw(Dates[SelectedIndex1, SelectedIndex2],
-                    MotorNames, MotorNums, RotorNums);
+  MotorBuildSheet.Draw(D, MotorNames, MotorNums, RotorNums);
 end;
 
 procedure TBuildLogForm.CloseButtonClick(Sender: TObject);
@@ -304,7 +246,8 @@ begin
                   MotorNums[SelectedIndex] +
                  '?') then Exit;
   SQLite.Delete('MOTORLIST', 'MotorID', MotorIDs[SelectedIndex]);
-  OpenDatesList(Dates[SelectedIndex1, SelectedIndex2]);
+
+  OpenDatesList(Dates[VST.SelectedIndex1, VST.SelectedIndex2]);
 end;
 
 procedure TBuildLogForm.EditButtonClick(Sender: TObject);
@@ -314,7 +257,7 @@ var
 begin
   BuildEditForm:= TBuildEditForm.Create(BuildLogForm);
   try
-    BuildEditForm.DateTimePicker1.Date:= Dates[SelectedIndex1, SelectedIndex2];
+    BuildEditForm.DateTimePicker1.Date:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
     BuildEditForm.MotorID:= MotorIDs[SelectedIndex];
     BuildEditForm.OldNameID:= NameIDs[SelectedIndex];
     BuildEditForm.MotorNumEdit.Text:= MotorNums[SelectedIndex];
@@ -340,8 +283,8 @@ var
 begin
   BuildAddForm:= TBuildAddForm.Create(BuildLogForm);
   try
-    if (SelectedIndex1>=0) and (SelectedIndex2>=0) then
-      BuildAddForm.DateTimePicker1.Date:= Dates[SelectedIndex1, SelectedIndex2]
+    if VST.IsSelected then
+      BuildAddForm.DateTimePicker1.Date:= Dates[VST.SelectedIndex1, VST.SelectedIndex2]
     else
       BuildAddForm.DateTimePicker1.Date:= Date;
     BuildAddForm.ShowModal;

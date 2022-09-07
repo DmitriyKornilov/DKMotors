@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, StdCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTUtils, USQLite,
+  Spin, StdCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables, USQLite,
   SheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid, DK_Dialogs,
   DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, fpstypes;
 
@@ -48,15 +48,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure VTDrawText(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; const CellText: String;
-      const CellRect: TRect; var DefaultDraw: Boolean);
-    procedure VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-    procedure VTInitNode(Sender: TBaseVirtualTree; ParentNode,
-      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure VTMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure VTClick(Sender: TObject);
   private
     Months: TStrVector;
     Shipments: TStrMatrix;
@@ -65,8 +57,7 @@ type
     UsedReceiverIDs: TIntVector;
     UsedReceiverNames: TStrVector;
 
-    SelectedIndex1, SelectedIndex2: Integer;
-    SelectedNode: PVirtualNode;
+    VST: TVSTCategoryRadioButtonTable;
 
     CargoSheet: TCargoSheet;
 
@@ -74,9 +65,7 @@ type
     function OpenShipment: Boolean;
 
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
-
-    procedure UnselectNode;
-    procedure SelectNode(Node: PVirtualNode);
+    procedure SetButtonsEnabled(const AEnabled: Boolean);
   public
 
   end;
@@ -113,8 +102,8 @@ end;
 procedure TShipmentForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить отгрузку ' +  SYMBOL_BREAK +
-                  Shipments[SelectedIndex1, SelectedIndex2] + '?') then Exit;
-  SQLite.Delete('CARGOLIST', 'CargoID', CargoIDs[SelectedIndex1, SelectedIndex2]);
+                  Shipments[VST.SelectedIndex1, VST.SelectedIndex2] + '?') then Exit;
+  SQLite.Delete('CARGOLIST', 'CargoID', CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2]);
   OpenShipmentList(0);
 end;
 
@@ -139,8 +128,13 @@ end;
 
 procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
-  SelectedIndex1:= -1;
-  SelectedIndex2:= -1;
+  VST:= TVSTCategoryRadioButtonTable.Create(VT);
+  VST.SelectedFont.Style:= [fsBold];
+  VST.CanRightMouseButtonUnselect:= False;
+  VST.HeaderVisible:= False;
+  VST.GridLinesVisible:= False;
+  VST.AddColumn('Shipments');
+
   CargoSheet:= TCargoSheet.Create(LogGrid);
 
   SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
@@ -157,6 +151,7 @@ end;
 procedure TShipmentForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(CargoSheet) then FReeAndNil(CargoSheet);
+  if Assigned(VST) then FReeAndNil(VST);
 end;
 
 procedure TShipmentForm.FormShow(Sender: TObject);
@@ -179,67 +174,35 @@ begin
   OpenShipmentList(0);
 end;
 
-procedure TShipmentForm.VTDrawText(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-  const CellText: String; const CellRect: TRect; var DefaultDraw: Boolean);
-var
-  i,j: Integer;
+procedure TShipmentForm.VTClick(Sender: TObject);
 begin
-  if VT.GetNodeLevel(Node)=1 then
-  begin
-    i:= (Node^.Parent)^.Index;
-    j:= Node^.Index;
-    if (SelectedIndex1=i) and (SelectedIndex2=j) then
-      TargetCanvas.Font.Style:= [fsBold];
-  end;
-end;
-
-procedure TShipmentForm.VTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-begin
-  VSTGetText(Node, CellText, VT, Months, Shipments);
-end;
-
-procedure TShipmentForm.VTInitNode(Sender: TBaseVirtualTree; ParentNode,
-  Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-var
-  Level: Integer;
-begin
-  Level := VT.GetNodeLevel(Node);
-  if Level=1 then
-    Node^.CheckType:= ctRadioButton;
-end;
-
-procedure TShipmentForm.VTMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  Node: PVirtualNode;
-  Level: Integer;
-begin
-  if Button<>mbLeft then Exit;
-  Node:= VT.GetNodeAt(X, Y);
-  if not Assigned(Node) then Exit;
-  Level:= VT.GetNodeLevel(Node);
-  if Level=1 then
-  begin
-    UnselectNode;
-    SelectNode(Node);
-  end;
+  if VST.IsSelected then
+    OpenShipment;
 end;
 
 procedure TShipmentForm.OpenShipmentList(const ACargoID: Integer);
 var
   I1, I2: Integer;
 begin
-  VT.Clear;
-  UnselectNode;
+  LogGrid.Clear;
+  VST.ValuesClear;
+  SetButtonsEnabled(False);
   if not SQLite.ShipmentListLoad(UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs) then Exit;
-  VSTLoad(VT, Shipments, 0);
+  VST.SetCategories(Months);
+  VST.SetColumn('Shipments', Shipments, taLeftJustify);
+  VST.Draw;
 
   if MIndexOf(CargoIDs, ACargoID, I1, I2) then
-    SelectNode(VSTShowNode(VT, I1, I2))
-  else //выделение первой отгрузки по списку
-    SelectNode(VT.GetNext(VT.GetNext(VT.RootNode)));
+  begin
+    VST.Select(I1, I2);
+    VST.Show(I1, I2);
+  end
+  else begin
+    VST.Select(0, 0);
+    VST.Show(0, 0);
+  end;
+  SetButtonsEnabled(True);
+  OpenShipment;
 end;
 
 function TShipmentForm.OpenShipment: Boolean;
@@ -250,7 +213,7 @@ var
   MotorCounts: TIntVector;
   MotorNums, Series: TStrMatrix;
 begin
-  Result:= SQLite.CargoLoad(CargoIDs[SelectedIndex1, SelectedIndex2],
+  Result:= SQLite.CargoLoad(CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2],
              SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
   CargoSheet.Draw(
              SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
@@ -266,7 +229,7 @@ begin
   try
     CargoEditForm.CargoID:= 0;
     if AEditMode=2 then
-      CargoEditForm.CargoID:= CargoIDs[SelectedIndex1, SelectedIndex2];
+      CargoEditForm.CargoID:= CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2];
     CargoEditForm.ShowModal;
     ID:= CargoEditForm.CargoID;
   finally
@@ -275,28 +238,9 @@ begin
   OpenShipmentList(ID);
 end;
 
-procedure TShipmentForm.UnselectNode;
+procedure TShipmentForm.SetButtonsEnabled(const AEnabled: Boolean);
 begin
-  if SelectedIndex1>=0 then
-    SelectedNode^.CheckState:= csUnCheckedNormal;
-  SelectedIndex1:= -1;
-  SelectedIndex2:= -1;
-  SelectedNode:= nil;
-  VT.Refresh;
-  LogGrid.Clear;
-  DelButton.Enabled:= False;
-  EditButton.Enabled:= DelButton.Enabled;
-  ExportButton.Enabled:= DelButton.Enabled;
-end;
-
-procedure TShipmentForm.SelectNode(Node: PVirtualNode);
-begin
-  SelectedIndex1:= (Node^.Parent)^.Index;
-  SelectedIndex2:= Node^.Index;
-  SelectedNode:= Node;
-  SelectedNode^.CheckState:= csCheckedNormal;
-  VT.Refresh;
-  DelButton.Enabled:= OpenShipment;
+  DelButton.Enabled:= AEnabled;
   EditButton.Enabled:= DelButton.Enabled;
   ExportButton.Enabled:= DelButton.Enabled;
 end;
