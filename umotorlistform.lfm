@@ -1,7 +1,7 @@
 object MotorListForm: TMotorListForm
-  Left = 338
+  Left = 98
   Height = 745
-  Top = 214
+  Top = 187
   Width = 1755
   Align = alClient
   BorderStyle = bsNone

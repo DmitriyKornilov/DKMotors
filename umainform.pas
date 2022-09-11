@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  DividerBevel, DK_LCLStrRus, rxctrls,
+  DividerBevel, DK_LCLStrRus, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, USQLite, SheetUtils;
 
@@ -70,6 +70,7 @@ implementation
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  USQLite3ListForm.ImageList:= ImageListEdit24;
   SQLite:= TSQLite.Create;
   SQLite.SetEditListSettings(COLOR_BACKGROUND_SELECTED, clWindowText);
   DBConnect;
