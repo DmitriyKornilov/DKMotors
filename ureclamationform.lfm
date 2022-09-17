@@ -1,13 +1,13 @@
 object ReclamationForm: TReclamationForm
-  Left = 350
-  Height = 489
-  Top = 159
-  Width = 1551
+  Left = 265
+  Height = 278
+  Top = 178
+  Width = 1434
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ReclamationForm'
-  ClientHeight = 489
-  ClientWidth = 1551
+  ClientHeight = 278
+  ClientWidth = 1434
   DesignTimePPI = 120
   OnClose = FormClose
   OnCreate = FormCreate
@@ -15,23 +15,26 @@ object ReclamationForm: TReclamationForm
   OnShow = FormShow
   LCLVersion = '2.2.2.0'
   object TopToolsPanel: TPanel
-    Left = 0
+    Left = 3
     Height = 40
-    Top = 40
-    Width = 1551
+    Top = 43
+    Width = 1428
     Align = alTop
     AutoSize = True
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1547
+    ClientWidth = 1424
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1296
+      Left = 1291
       Height = 36
       Top = 0
       Width = 112
@@ -178,26 +181,26 @@ object ReclamationForm: TReclamationForm
       Left = 0
       Height = 36
       Top = 0
-      Width = 94
+      Width = 89
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 36
-      ClientWidth = 94
+      ClientWidth = 89
       ParentFont = False
       TabOrder = 0
       object SpinEdit1: TSpinEdit
         AnchorSideLeft.Control = Panel1
         AnchorSideTop.Control = Panel1
         AnchorSideTop.Side = asrCenter
-        Left = 6
+        Left = 1
         Height = 28
         Top = 4
         Width = 88
         Align = alCustom
         Alignment = taCenter
         AutoSelect = False
-        BorderSpacing.Left = 6
+        BorderSpacing.Left = 1
         Constraints.MinWidth = 88
         EditorEnabled = False
         MaxValue = 2999
@@ -209,7 +212,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object DividerBevel6: TDividerBevel
-      Left = 513
+      Left = 508
       Height = 36
       Top = 0
       Width = 20
@@ -219,7 +222,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object DividerBevel7: TDividerBevel
-      Left = 1276
+      Left = 1271
       Height = 36
       Top = 0
       Width = 20
@@ -229,7 +232,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object Panel3: TPanel
-      Left = 114
+      Left = 109
       Height = 36
       Top = 0
       Width = 140
@@ -692,7 +695,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel5: TPanel
-      Left = 533
+      Left = 528
       Height = 36
       Top = 0
       Width = 743
@@ -769,7 +772,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object DividerBevel8: TDividerBevel
-      Left = 94
+      Left = 89
       Height = 36
       Top = 0
       Width = 20
@@ -779,7 +782,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object Panel7: TPanel
-      Left = 254
+      Left = 249
       Height = 36
       Top = 0
       Width = 259
@@ -825,23 +828,25 @@ object ReclamationForm: TReclamationForm
     end
   end
   object Panel4: TPanel
-    Left = 6
-    Height = 397
+    Left = 3
+    Height = 189
     Top = 86
-    Width = 1539
+    Width = 1428
     Align = alClient
-    BorderSpacing.Around = 6
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel4'
-    ClientHeight = 393
-    ClientWidth = 1535
+    ClientHeight = 185
+    ClientWidth = 1424
     TabOrder = 1
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 393
+      Height = 185
       Top = 0
-      Width = 1535
+      Width = 1424
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear
@@ -875,28 +880,30 @@ object ReclamationForm: TReclamationForm
     end
   end
   object MotorNamesPanel: TPanel
-    Left = 0
+    Left = 3
     Height = 40
     Top = 0
-    Width = 1551
+    Width = 1428
     Align = alTop
     AutoSize = True
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1547
+    ClientWidth = 1424
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 2
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 6
+      Left = 0
       Height = 36
       Top = 0
       Width = 40
       Align = alLeft
       AutoSize = True
-      BorderSpacing.Left = 6
       Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -1040,7 +1047,7 @@ object ReclamationForm: TReclamationForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 52
+      Left = 46
       Height = 20
       Top = 8
       Width = 129
@@ -1054,10 +1061,10 @@ object ReclamationForm: TReclamationForm
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = DividerBevel4
-      Left = 187
+      Left = 181
       Height = 20
       Top = 8
-      Width = 1304
+      Width = 1177
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 6
@@ -1071,14 +1078,15 @@ object ReclamationForm: TReclamationForm
     end
     object CloseButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1517
+      Left = 1384
       Height = 36
       Hint = 'Закрыть'
       Top = 0
-      Width = 30
+      Width = 40
       Align = alRight
       AutoSize = True
-      Flat = True
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -1214,7 +1222,7 @@ object ReclamationForm: TReclamationForm
       Images = MainForm.ImageListCategory24
       ImageIndex = 14
       Layout = blGlyphRight
-      Margin = 3
+      Margin = 5
       OnClick = CloseButtonClick
       ShowHint = True
       ParentFont = False
@@ -1222,7 +1230,7 @@ object ReclamationForm: TReclamationForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 1497
+      Left = 1364
       Height = 36
       Top = 0
       Width = 20

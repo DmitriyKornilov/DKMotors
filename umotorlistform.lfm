@@ -1,31 +1,33 @@
 object MotorListForm: TMotorListForm
-  Left = 98
-  Height = 745
-  Top = 187
-  Width = 1755
+  Left = 409
+  Height = 617
+  Top = 146
+  Width = 1279
   Align = alClient
   BorderStyle = bsNone
   Caption = 'MotorListForm'
-  ClientHeight = 745
-  ClientWidth = 1755
+  ClientHeight = 617
+  ClientWidth = 1279
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.2.2.0'
   object Panel3: TPanel
-    Left = 0
+    Left = 3
     Height = 40
-    Top = 40
-    Width = 1755
+    Top = 43
+    Width = 1273
     Align = alTop
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1751
+    ClientWidth = 1269
     Constraints.MaxHeight = 40
     TabOrder = 0
     object Panel6: TPanel
-      Left = 96
+      Left = 91
       Height = 36
       Top = 0
       Width = 266
@@ -61,7 +63,7 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel2: TDividerBevel
-      Left = 362
+      Left = 357
       Height = 36
       Top = 0
       Width = 20
@@ -71,7 +73,7 @@ object MotorListForm: TMotorListForm
       ParentFont = False
     end
     object Panel7: TPanel
-      Left = 382
+      Left = 377
       Height = 36
       Top = 0
       Width = 257
@@ -115,7 +117,7 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel3: TDividerBevel
-      Left = 639
+      Left = 634
       Height = 36
       Top = 0
       Width = 20
@@ -125,7 +127,7 @@ object MotorListForm: TMotorListForm
       ParentFont = False
     end
     object Panel5: TPanel
-      Left = 659
+      Left = 654
       Height = 36
       Top = 0
       Width = 195
@@ -150,7 +152,7 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel7: TDividerBevel
-      Left = 1073
+      Left = 1068
       Height = 36
       Top = 0
       Width = 20
@@ -161,7 +163,7 @@ object MotorListForm: TMotorListForm
     end
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1093
+      Left = 1088
       Height = 36
       Top = 0
       Width = 115
@@ -307,7 +309,7 @@ object MotorListForm: TMotorListForm
       ParentFont = False
     end
     object CheckBox2: TCheckBox
-      Left = 874
+      Left = 869
       Height = 36
       Top = 0
       Width = 199
@@ -319,7 +321,7 @@ object MotorListForm: TMotorListForm
       TabOrder = 3
     end
     object DividerBevel5: TDividerBevel
-      Left = 854
+      Left = 849
       Height = 36
       Top = 0
       Width = 20
@@ -329,13 +331,13 @@ object MotorListForm: TMotorListForm
       ParentFont = False
     end
     object SpinEdit1: TSpinEdit
-      Left = 6
+      Left = 1
       Height = 30
       Top = 4
       Width = 70
       Align = alLeft
       Alignment = taCenter
-      BorderSpacing.Left = 6
+      BorderSpacing.Left = 1
       BorderSpacing.Top = 4
       BorderSpacing.Bottom = 2
       MinValue = 2010
@@ -344,7 +346,7 @@ object MotorListForm: TMotorListForm
       Value = 2022
     end
     object DividerBevel4: TDividerBevel
-      Left = 76
+      Left = 71
       Height = 36
       Top = 0
       Width = 20
@@ -355,24 +357,24 @@ object MotorListForm: TMotorListForm
     end
   end
   object Panel2: TPanel
-    Left = 6
+    Left = 3
     Height = 398
-    Top = 341
-    Width = 1743
+    Top = 216
+    Width = 1273
     Align = alBottom
-    BorderSpacing.Left = 6
-    BorderSpacing.Right = 6
-    BorderSpacing.Bottom = 6
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 394
-    ClientWidth = 1739
+    ClientWidth = 1269
     TabOrder = 1
     object InfoGrid: TsWorksheetGrid
       Left = 0
       Height = 394
       Top = 0
-      Width = 1739
+      Width = 1269
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
@@ -408,22 +410,22 @@ object MotorListForm: TMotorListForm
     Cursor = crVSplit
     Left = 0
     Height = 6
-    Top = 335
-    Width = 1755
+    Top = 210
+    Width = 1279
     Align = alBottom
     ResizeAnchor = akBottom
     ResizeStyle = rsLine
   end
   object VT1: TVirtualStringTree
     AnchorSideBottom.Control = Splitter2
-    Left = 6
-    Height = 249
+    Left = 3
+    Height = 124
     Top = 86
-    Width = 1743
+    Width = 1273
     Align = alClient
-    BorderSpacing.Left = 6
-    BorderSpacing.Top = 6
-    BorderSpacing.Right = 6
+    BorderSpacing.Left = 3
+    BorderSpacing.Top = 3
+    BorderSpacing.Right = 3
     DefaultText = 'Node'
     Header.AutoSizeIndex = 0
     Header.Columns = <>
@@ -432,28 +434,30 @@ object MotorListForm: TMotorListForm
     OnMouseUp = VT1MouseUp
   end
   object MotorNamesPanel: TPanel
-    Left = 0
+    Left = 3
     Height = 40
     Top = 0
-    Width = 1755
+    Width = 1273
     Align = alTop
     AutoSize = True
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1751
+    ClientWidth = 1269
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 4
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 6
+      Left = 0
       Height = 36
       Top = 0
       Width = 40
       Align = alLeft
       AutoSize = True
-      BorderSpacing.Left = 6
       Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -597,7 +601,7 @@ object MotorListForm: TMotorListForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 52
+      Left = 46
       Height = 20
       Top = 8
       Width = 129
@@ -612,10 +616,10 @@ object MotorListForm: TMotorListForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = MotorNamesPanel
       AnchorSideRight.Side = asrBottom
-      Left = 187
+      Left = 181
       Height = 20
       Top = 8
-      Width = 1558
+      Width = 1082
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 6

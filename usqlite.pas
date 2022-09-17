@@ -14,13 +14,6 @@ type
 
   TSQLite = class (TSQLite3)
   private
-    procedure IDsAndNamesLoad(AComboBox: TComboBox; out ANameIDs: TIntVector;
-       const ATableName, AKeyFieldName, APickFieldName, AOrderFieldName: String;
-       const AKeyValueNotZero: Boolean; const AZeroKeyPick: String = '');
-    function IDsAndNamesSelectedLoad(ALabel: TLabel; const ANeedEdit: Boolean;
-       var AKeyValues: TIntVector; var APickValues: TStrVector;
-       const ACaption, ATableName, AKeyFieldName, APickFieldName, AOrderFieldName: String;
-       const AKeyValueNotZero: Boolean; const AAllKeyPick: String = ''): Boolean;
     function MonthAndDatesForLogLoad(const ATableName, AFieldName: String;
        const AYear: Word; out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
     function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
@@ -224,88 +217,34 @@ implementation
 
 { TSQLite }
 
-function TSQLite.IDsAndNamesSelectedLoad(ALabel: TLabel;
-  const ANeedEdit: Boolean; var AKeyValues: TIntVector;
-  var APickValues: TStrVector; const ACaption, ATableName, AKeyFieldName,
-  APickFieldName, AOrderFieldName: String; const AKeyValueNotZero: Boolean;
-  const AAllKeyPick: String): Boolean;
-var
-  IsAllChecked: Boolean;
-  S: String;
-begin
-  S:= EmptyStr;
-  if ANeedEdit then
-  begin
-    Result:= EditKeyPickList(AKeyValues, APickValues, IsAllChecked,
-                    ACaption, ATableName, AKeyFieldName, APickFieldName,
-                    AOrderFieldName=APickFieldName, AKeyValueNotZero);
-    if IsAllChecked then
-      S:= AAllKeyPick;
-  end
-  else begin
-    KeyPickList(ATableName, AKeyFieldName, APickFieldName,
-                AKeyValues, APickValues, AKeyValueNotZero, AOrderFieldName);
-    S:= AAllKeyPick;
-    Result:= True;
-  end;
-
-  if not Result then Exit;
-
-  if S=EmptyStr then
-    S:= VVectorToStr(APickValues, ', ');
-  ALabel.Caption:= S;
-  ALabel.ShowHint:= True;
-  ALabel.Hint:= ALabel.Caption;
-end;
 
 function TSQLite.NameIDsAndMotorNamesSelectedLoad(ALabel: TLabel;
   const ANeedEdit: Boolean; var ANameIDs: TIntVector;
   var AMotorNames: TStrVector): Boolean;
 begin
-  Result:= IDsAndNamesSelectedLoad(ALabel, ANeedEdit, ANameIDs, AMotorNames,
+  Result:= LoadIDsAndNamesSelected(ALabel, ANeedEdit, ANameIDs, AMotorNames,
                           'Наименования электродвигателей',
                           'MOTORNAMES', 'NameID', 'MotorName', 'NameID',
-                          True, 'ВСЕ НАИМЕНОВАНИЯ');
+                          True, 'ВСЕ НАИМЕНОВАНИЯ', False);
 end;
 
 function TSQLite.ReceiverIDsAndNamesSelectedLoad(ALabel: TLabel;
   const ANeedEdit: Boolean; var AReceiverIDs: TIntVector;
   var AReceiverNames: TStrVector): Boolean;
 begin
-  Result:= IDsAndNamesSelectedLoad(ALabel, ANeedEdit, AReceiverIDs, AReceiverNames,
+  Result:= LoadIDsAndNamesSelected(ALabel, ANeedEdit, AReceiverIDs, AReceiverNames,
                           'Грузополучатели',
                           'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', 'ReceiverName',
-                          True, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ');
+                          True, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ', False);
 end;
 
 
-procedure TSQLite.IDsAndNamesLoad(AComboBox: TComboBox; out ANameIDs: TIntVector;
-   const ATableName, AKeyFieldName, APickFieldName, AOrderFieldName: String;
-   const AKeyValueNotZero: Boolean; const AZeroKeyPick: String = '');
 
-var
-  MN: TStrVector;
-  Ind: Integer;
-begin
-  KeyPickList(ATableName, AKeyFieldName, APickFieldName,
-              ANameIDs, MN, AKeyValueNotZero, AOrderFieldName);
-  if VIsNil(ANameIDs) then Exit;
-
-  if not AKeyValueNotZero then
-  begin
-    Ind:= VIndexOf(ANameIDs, 0);
-    if Ind>=0 then
-      MN[Ind]:= AZeroKeyPick;
-  end;
-
-  VToStrings(MN, AComboBox.Items);
-  AComboBox.ItemIndex:= 0;
-end;
 
 procedure TSQLite.NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
 begin
-  IDsAndNamesLoad(AComboBox, AIDs,
+  LoadIDsAndNames(AComboBox, AIDs,
                   'MOTORNAMES', 'NameID', 'MotorName', 'NameID',
                   AKeyValueNotZero, 'ВСЕ НАИМЕНОВАНИЯ');
 end;
@@ -313,7 +252,7 @@ end;
 procedure TSQLite.ReceiverIDsAndNamesLoad(AComboBox: TComboBox;
   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
 begin
-  IDsAndNamesLoad(AComboBox, AIDs,
+  LoadIDsAndNames(AComboBox, AIDs,
                   'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', 'ReceiverName',
                   AKeyValueNotZero, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ');
 end;

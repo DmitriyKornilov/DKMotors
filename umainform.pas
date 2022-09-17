@@ -16,7 +16,7 @@ type
 
   TMainForm = class(TForm)
     DividerBevel4: TDividerBevel;
-    ExitButton: TSpeedButton;
+    ExitButton: TRxSpeedButton;
     ImageListEdit24: TImageList;
     ImageListCategory24: TImageList;
     ImageList16: TImageList;

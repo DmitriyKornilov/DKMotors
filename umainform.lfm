@@ -12,47 +12,28 @@ object MainForm: TMainForm
   LCLVersion = '2.2.2.0'
   WindowState = wsMaximized
   object Panel2: TPanel
-    Left = 0
+    Left = 3
     Height = 40
-    Top = 0
-    Width = 987
+    Top = 3
+    Width = 981
     Align = alTop
+    BorderSpacing.Around = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 983
+    ClientWidth = 977
     Constraints.MaxHeight = 40
     ParentFont = False
     TabOrder = 0
-    object ExitButton: TSpeedButton
-      Cursor = crHandPoint
-      Left = 953
-      Height = 36
-      Hint = 'Выйти'
-      Top = 0
-      Width = 30
-      Align = alRight
-      AutoSize = True
-      Flat = True
-      Images = ImageListCategory24
-      ImageIndex = 13
-      Layout = blGlyphRight
-      Margin = 3
-      OnClick = ExitButtonClick
-      ShowHint = True
-      ParentFont = False
-      ParentShowHint = False
-    end
     object RxSpeedButton1: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 6
+      Left = 0
       Height = 36
       Top = 0
       Width = 99
       Align = alLeft
       AllowAllUp = True
       AutoSize = True
-      BorderSpacing.Left = 6
       Caption = 'Сборка'
       GroupIndex = 1
       Images = ImageListCategory24
@@ -63,7 +44,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton2: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 319
+      Left = 313
       Height = 36
       Top = 0
       Width = 109
@@ -80,7 +61,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton3: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 428
+      Left = 422
       Height = 36
       Top = 0
       Width = 132
@@ -97,7 +78,7 @@ object MainForm: TMainForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 933
+      Left = 917
       Height = 36
       Top = 0
       Width = 20
@@ -108,24 +89,24 @@ object MainForm: TMainForm
     end
     object RxSpeedButton7: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 889
+      Left = 877
       Height = 36
       Top = 0
-      Width = 44
+      Width = 40
       Align = alRight
       AllowAllUp = True
       AutoSize = True
-      Constraints.MinWidth = 38
-      Flat = True
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
       Images = ImageListCategory24
       ImageIndex = 15
-      Margin = 10
+      Margin = 5
       OnClick = RxSpeedButton7Click
       ParentFont = False
     end
     object RxSpeedButton4: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 231
+      Left = 225
       Height = 36
       Top = 0
       Width = 88
@@ -142,7 +123,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton5: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 105
+      Left = 99
       Height = 36
       Top = 0
       Width = 126
@@ -159,7 +140,7 @@ object MainForm: TMainForm
     end
     object RxSpeedButton9: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 560
+      Left = 554
       Height = 36
       Top = 0
       Width = 98
@@ -174,11 +155,31 @@ object MainForm: TMainForm
       OnClick = RxSpeedButton9Click
       ParentFont = False
     end
+    object ExitButton: TRxSpeedButton
+      Cursor = crHandPoint
+      Left = 937
+      Height = 36
+      Hint = 'Выход'
+      Top = 0
+      Width = 40
+      Align = alRight
+      AllowAllUp = True
+      AutoSize = True
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
+      Images = ImageListCategory24
+      ImageIndex = 13
+      Margin = 5
+      OnClick = ExitButtonClick
+      ShowHint = True
+      ParentFont = False
+      ParentShowHint = False
+    end
   end
   object MainPanel: TPanel
     Left = 0
-    Height = 359
-    Top = 40
+    Height = 353
+    Top = 46
     Width = 987
     Align = alClient
     BevelOuter = bvNone

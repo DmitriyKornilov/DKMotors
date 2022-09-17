@@ -1,13 +1,13 @@
 object StoreForm: TStoreForm
   Left = 437
-  Height = 548
+  Height = 275
   Top = 192
-  Width = 1059
+  Width = 741
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StoreForm'
-  ClientHeight = 548
-  ClientWidth = 1059
+  ClientHeight = 275
+  ClientWidth = 741
   DesignTimePPI = 120
   OnClose = FormClose
   OnCreate = FormCreate
@@ -15,16 +15,19 @@ object StoreForm: TStoreForm
   OnShow = FormShow
   LCLVersion = '2.2.2.0'
   object Panel1: TPanel
-    Left = 0
+    Left = 3
     Height = 40
-    Top = 40
-    Width = 1059
+    Top = 43
+    Width = 735
     Align = alTop
     AutoSize = True
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1055
+    ClientWidth = 731
     Constraints.MaxHeight = 40
     ParentFont = False
     TabOrder = 0
@@ -175,26 +178,26 @@ object StoreForm: TStoreForm
       ParentFont = False
     end
     object Panel5: TPanel
-      Left = 6
+      Left = 0
       Height = 36
       Top = 0
-      Width = 468
+      Width = 474
       Align = alLeft
       AutoSize = True
-      BorderSpacing.Left = 6
       BevelOuter = bvNone
       ClientHeight = 36
-      ClientWidth = 468
+      ClientWidth = 474
       ParentFont = False
       TabOrder = 0
       object CheckBox1: TCheckBox
         AnchorSideLeft.Control = Panel5
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 0
+        Left = 6
         Height = 24
         Top = 6
         Width = 195
+        BorderSpacing.Left = 6
         Caption = 'Упорядочить по номеру'
         OnClick = CheckBox1Click
         ParentFont = False
@@ -205,7 +208,7 @@ object StoreForm: TStoreForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 203
+        Left = 209
         Height = 24
         Top = 6
         Width = 265
@@ -228,23 +231,25 @@ object StoreForm: TStoreForm
     end
   end
   object Panel2: TPanel
-    Left = 6
-    Height = 456
+    Left = 3
+    Height = 186
     Top = 86
-    Width = 1047
+    Width = 735
     Align = alClient
-    BorderSpacing.Around = 6
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel2'
-    ClientHeight = 452
-    ClientWidth = 1043
+    ClientHeight = 182
+    ClientWidth = 731
     TabOrder = 1
     object ReportGrid: TsWorksheetGrid
       Left = 0
-      Height = 452
+      Height = 182
       Top = 0
-      Width = 1043
+      Width = 731
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear
@@ -277,28 +282,30 @@ object StoreForm: TStoreForm
     end
   end
   object MotorNamesPanel: TPanel
-    Left = 0
+    Left = 3
     Height = 40
     Top = 0
-    Width = 1059
+    Width = 735
     Align = alTop
     AutoSize = True
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1055
+    ClientWidth = 731
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 2
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 6
+      Left = 0
       Height = 36
       Top = 0
       Width = 40
       Align = alLeft
       AutoSize = True
-      BorderSpacing.Left = 6
       Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -442,7 +449,7 @@ object StoreForm: TStoreForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 52
+      Left = 46
       Height = 20
       Top = 8
       Width = 129
@@ -456,10 +463,10 @@ object StoreForm: TStoreForm
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = DividerBevel4
-      Left = 187
+      Left = 181
       Height = 20
       Top = 8
-      Width = 812
+      Width = 484
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 6
@@ -473,7 +480,7 @@ object StoreForm: TStoreForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 1005
+      Left = 671
       Height = 36
       Top = 0
       Width = 20
@@ -484,14 +491,15 @@ object StoreForm: TStoreForm
     end
     object CloseButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1025
+      Left = 691
       Height = 36
       Hint = 'Закрыть'
       Top = 0
-      Width = 30
+      Width = 40
       Align = alRight
       AutoSize = True
-      Flat = True
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -627,7 +635,7 @@ object StoreForm: TStoreForm
       Images = MainForm.ImageListCategory24
       ImageIndex = 14
       Layout = blGlyphRight
-      Margin = 3
+      Margin = 5
       OnClick = CloseButtonClick
       ShowHint = True
       ParentFont = False
