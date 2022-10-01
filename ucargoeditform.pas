@@ -55,6 +55,8 @@ type
       {%H-}Shift: TShiftState);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    procedure VT2Exit(Sender: TObject);
+    procedure VT2KeyUp(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
     procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
@@ -82,7 +84,7 @@ type
     procedure LoadMotors;
     procedure LoadCargo;
 
-    procedure ShowCargoList;
+    procedure ShowCargoList(const ANeedSelect: Boolean);
   public
     CargoID: Integer;
   end;
@@ -210,6 +212,19 @@ begin
     SeriesEdit.Text:= EmptyStr;
 end;
 
+procedure TCargoEditForm.VT2Exit(Sender: TObject);
+begin
+  VSTCargoTable.UnSelect;
+  DelButton.Enabled:= False;
+end;
+
+procedure TCargoEditForm.VT2KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key=VK_DELETE then
+    DelMotor;
+end;
+
 procedure TCargoEditForm.VT2MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -279,7 +294,7 @@ begin
   VAppend(MotorNames, MotorNameComboBox.Text);
   VAppend(MotorNums, ViewMotorNums[VSTViewTable.SelectedIndex]);
 
-  ShowCargoList;
+  ShowCargoList(False);
 
   MotorNumEdit.Text:= EmptyStr;
   AddButton.Enabled:= False;
@@ -288,29 +303,45 @@ end;
 
 procedure TCargoEditForm.DelMotor;
 var
-  i: Integer;
+  Ind: Integer;
 begin
   if not VSTCargoTable.IsSelected then Exit;
-  i:= VSTCargoTable.SelectedIndex;
+  Ind:= VSTCargoTable.SelectedIndex;
 
-  VDel(MotorIDs, i);
-  VDel(Series, i);
-  VDel(MotorNames, i);
-  VDel(MotorNums, i);
-  ShowCargoList;
+  VDel(MotorIDs, Ind);
+  VDel(Series, Ind);
+  VDel(MotorNames, Ind);
+  VDel(MotorNums, Ind);
+  ShowCargoList(True);
 end;
 
-procedure TCargoEditForm.ShowCargoList;
+procedure TCargoEditForm.ShowCargoList(const ANeedSelect: Boolean);
+var
+  Ind, LastInd: Integer;
 begin
+  Ind:= -1;
+  if VSTCargoTable.IsSelected then
+    Ind:= VSTCargoTable.SelectedIndex;
+
   VSTCargoTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorNames))));
   VSTCargoTable.SetColumn('Наименование', MotorNames, taLeftJustify);
   VSTCargoTable.SetColumn('Номер', MotorNums);
   VSTCargoTable.SetColumn('Партия', Series);
   VSTCargoTable.Draw;
-  if not VIsNil(MotorNames) then
-    VSTCargoTable.Show(High(MotorNames));
 
-  DelButton.Enabled:= False;
+  if not VIsNil(MotorNames) then
+  begin
+    LastInd:= High(MotorNames);
+    if (Ind<0) or (Ind>LastInd) then
+      Ind:= LastInd;
+
+    if ANeedSelect then
+      VSTCargoTable.Select(Ind)
+    else
+      VSTCargoTable.Show(LastInd);
+  end;
+
+  DelButton.Enabled:= VSTCargoTable.IsSelected;
 end;
 
 procedure TCargoEditForm.LoadMotors;
@@ -360,7 +391,7 @@ begin
 
   WritedMotorIDs:= VCut(MotorIDs);
 
-  ShowCargoList;
+  ShowCargoList(False);
 end;
 
 

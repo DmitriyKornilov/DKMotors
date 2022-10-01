@@ -890,6 +890,8 @@ object CargoEditForm: TCargoEditForm
     Header.Columns = <>
     Header.MainColumn = -1
     TabOrder = 3
+    OnExit = VT2Exit
+    OnKeyUp = VT2KeyUp
     OnMouseUp = VT2MouseUp
   end
 end

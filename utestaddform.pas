@@ -50,6 +50,8 @@ type
     procedure SaveButtonClick(Sender: TObject);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    procedure VT2Exit(Sender: TObject);
+    procedure VT2KeyUp(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
     procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
@@ -71,7 +73,7 @@ type
     procedure AddTest;
     procedure DelTest;
 
-    procedure ShowTestList;
+    procedure ShowTestList(const ANeedSelect: Boolean);
 
     procedure LoadMotors;
 
@@ -168,6 +170,19 @@ begin
   AddButton.Enabled:= VSTViewTable.IsSelected;
 end;
 
+procedure TTestAddForm.VT2Exit(Sender: TObject);
+begin
+  VSTTestTable.UnSelect;
+  DelButton.Enabled:= False;
+end;
+
+procedure TTestAddForm.VT2KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key=VK_DELETE then
+    DelTest;
+end;
+
 procedure TTestAddForm.VT2MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -234,7 +249,7 @@ begin
     VAppend(TestResultsStr, 'норма')
   else
     VAppend(TestResultsStr, 'брак');
-  ShowTestList;
+  ShowTestList(False);
 
   MotorNumEdit.Text:= EmptyStr;
   Memo1.Lines.Clear;
@@ -258,21 +273,41 @@ begin
   VDel(TestMotorNames, i);
   VDel(TestMotorNums, i);
   VDel(TestResultsStr, i);
-  ShowTestList;
+  ShowTestList(True);
 end;
 
-procedure TTestAddForm.ShowTestList;
+procedure TTestAddForm.ShowTestList(const ANeedSelect: Boolean);
+var
+  Ind, LastInd: Integer;
 begin
+  Ind:= -1;
+  if VSTTestTable.IsSelected then
+    Ind:= VSTTestTable.SelectedIndex;
+
   VSTTestTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(TestMotorNames))));
   VSTTestTable.SetColumn('Наименование', TestMotorNames, taLeftJustify);
   VSTTestTable.SetColumn('Номер', TestMotorNums);
   VSTTestTable.SetColumn('Результат', TestResultsStr);
   VSTTestTable.SetColumn('Примечание', TestNotes, taLeftJustify);
   VSTTestTable.Draw;
-  if not VIsNil(TestMotorNames) then
-    VSTTestTable.Show(High(TestMotorNames));
 
-  DelButton.Enabled:= False;
+  //if not VIsNil(TestMotorNames) then
+  //  VSTTestTable.Show(High(TestMotorNames));
+  //DelButton.Enabled:= False;
+
+  if not VIsNil(TestMotorNames) then
+  begin
+    LastInd:= High(TestMotorNames);
+    if (Ind<0) or (Ind>LastInd) then
+      Ind:= LastInd;
+
+    if ANeedSelect then
+      VSTTestTable.Select(Ind)
+    else
+      VSTTestTable.Show(LastInd);
+  end;
+
+  DelButton.Enabled:= VSTTestTable.IsSelected;
 end;
 
 procedure TTestAddForm.LoadMotors;

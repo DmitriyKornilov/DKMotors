@@ -50,8 +50,8 @@ type
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorShippedComboBoxChange(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure VT1MouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     VSTTable: TVSTTable;
     MotorInfoSheet: TMotorInfoSheet;
