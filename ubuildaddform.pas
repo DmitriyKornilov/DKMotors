@@ -41,14 +41,14 @@ type
     procedure FormShow(Sender: TObject);
     procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+      {%H-}Shift: TShiftState);
     procedure RotorNumEditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+      {%H-}Shift: TShiftState);
     procedure SaveButtonClick(Sender: TObject);
     procedure VT2Exit(Sender: TObject);
-    procedure VT2KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure VT2MouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure VT2KeyUp(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
+    procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     NameIDs, OldMotors: TIntVector;
 
