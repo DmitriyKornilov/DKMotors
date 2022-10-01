@@ -5,7 +5,7 @@ unit USQLite;
 interface
 
 uses
-  Classes, SysUtils, StdCtrls, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
+  Classes, SysUtils, StdCtrls, DateUtils, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
   DK_Vector, DK_Matrix, DK_StrUtils;
 
 type
@@ -102,10 +102,12 @@ type
 
     //склад
     function StoreListLoad(const ANameIDs: TIntVector;
+                    const ADeltaDays: Integer;
                     const ANeedOrderByNumber, ANeedOrderByName: Boolean;
                     out ATestDates: TDateVector;
                     out AMotorNames, AMotorNums: TStrVector): Boolean;
     function StoreTotalLoad(const ANameIDs: TIntVector;
+                            const ADeltaDays: Integer;
                              out AMotorNames: TStrVector;
                              out AMotorCounts: TIntVector): Boolean;
 
@@ -1142,7 +1144,7 @@ begin
   end;
 end;
 
-function TSQLite.StoreListLoad(const ANameIDs: TIntVector;
+function TSQLite.StoreListLoad(const ANameIDs: TIntVector; const ADeltaDays: Integer;
   const ANeedOrderByNumber, ANeedOrderByName: Boolean; out
   ATestDates: TDateVector; out AMotorNames, AMotorNums: TStrVector): Boolean;
 var
@@ -1151,6 +1153,7 @@ var
   TestDates: TDateVector;
   MotorNames, MotorNums: TStrVector;
   i, n: Integer;
+
 begin
   Result:= False;
   ATestDates:= nil;
@@ -1161,6 +1164,8 @@ begin
   MotorNums:= nil;
 
   WhereStr:= 'WHERE (t1.Fail=0) AND (t2.CargoID=0) ';
+  if ADeltaDays>0 then
+    WhereStr:= WhereStr + 'AND (TestDate<=:BoundaryDate) ';
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
@@ -1183,6 +1188,8 @@ begin
     'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
     WhereStr +
     OrderStr);
+  if ADeltaDays>0 then
+    QParamDT('BoundaryDate', IncDay(Date, -ADeltaDays));
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
   QOpen;
@@ -1223,8 +1230,9 @@ begin
   VReverse(AMotorNums);
 end;
 
-function TSQLite.StoreTotalLoad(const ANameIDs: TIntVector; out
-  AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
+function TSQLite.StoreTotalLoad(const ANameIDs: TIntVector;
+  const ADeltaDays: Integer;
+  out AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
 begin
@@ -1233,6 +1241,8 @@ begin
   AMotorCounts:= nil;
 
   WhereStr:= 'WHERE (t1.Fail=0) AND (t2.CargoID=0) ';
+  if ADeltaDays>0 then
+    WhereStr:= WhereStr + 'AND (TestDate<=:BoundaryDate) ';
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
@@ -1248,6 +1258,8 @@ begin
        ')' +
     'GROUP BY NameID ' +
     'ORDER BY MotorName');
+  if ADeltaDays>0 then
+    QParamDT('BoundaryDate', IncDay(Date, -ADeltaDays));
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
   QOpen;

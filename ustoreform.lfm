@@ -2,12 +2,12 @@ object StoreForm: TStoreForm
   Left = 437
   Height = 275
   Top = 192
-  Width = 741
+  Width = 1148
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StoreForm'
   ClientHeight = 275
-  ClientWidth = 741
+  ClientWidth = 1148
   DesignTimePPI = 120
   OnClose = FormClose
   OnCreate = FormCreate
@@ -18,7 +18,7 @@ object StoreForm: TStoreForm
     Left = 3
     Height = 40
     Top = 43
-    Width = 735
+    Width = 1142
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 3
@@ -27,13 +27,13 @@ object StoreForm: TStoreForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 731
+    ClientWidth = 1138
     Constraints.MaxHeight = 40
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 494
+      Left = 785
       Height = 36
       Top = 0
       Width = 112
@@ -181,12 +181,12 @@ object StoreForm: TStoreForm
       Left = 0
       Height = 36
       Top = 0
-      Width = 474
+      Width = 765
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 36
-      ClientWidth = 474
+      ClientWidth = 765
       ParentFont = False
       TabOrder = 0
       object CheckBox1: TCheckBox
@@ -214,13 +214,62 @@ object StoreForm: TStoreForm
         Width = 265
         BorderSpacing.Left = 8
         Caption = 'Сгруппировать по наименованию'
-        OnClick = CheckBox1Click
+        OnClick = CheckBox2Click
         ParentFont = False
         TabOrder = 1
       end
+      object CheckBox3: TCheckBox
+        AnchorSideLeft.Control = CheckBox2
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel5
+        AnchorSideTop.Side = asrCenter
+        Left = 482
+        Height = 24
+        Top = 6
+        Width = 168
+        BorderSpacing.Left = 8
+        Caption = 'Хранящиеся дольше'
+        OnClick = CheckBox3Click
+        ParentFont = False
+        TabOrder = 2
+      end
+      object SpinEdit1: TSpinEdit
+        AnchorSideLeft.Control = CheckBox3
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel5
+        AnchorSideTop.Side = asrCenter
+        Left = 656
+        Height = 28
+        Top = 4
+        Width = 63
+        BorderSpacing.Left = 6
+        Enabled = False
+        MaxValue = 10000
+        MinValue = 2
+        OnChange = SpinEdit1Change
+        TabOrder = 3
+        Value = 45
+      end
+      object Label2: TLabel
+        AnchorSideLeft.Control = SpinEdit1
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel5
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Control = Panel5
+        AnchorSideRight.Side = asrBottom
+        Left = 725
+        Height = 20
+        Top = 8
+        Width = 34
+        Anchors = [akTop, akLeft, akRight]
+        BorderSpacing.Left = 6
+        BorderSpacing.Right = 6
+        Caption = 'дней'
+        ParentColor = False
+      end
     end
     object DividerBevel7: TDividerBevel
-      Left = 474
+      Left = 765
       Height = 36
       Top = 0
       Width = 20
@@ -234,7 +283,7 @@ object StoreForm: TStoreForm
     Left = 3
     Height = 186
     Top = 86
-    Width = 735
+    Width = 1142
     Align = alClient
     BorderSpacing.Left = 3
     BorderSpacing.Right = 3
@@ -243,13 +292,13 @@ object StoreForm: TStoreForm
     BorderStyle = bsSingle
     Caption = 'Panel2'
     ClientHeight = 182
-    ClientWidth = 731
+    ClientWidth = 1138
     TabOrder = 1
     object ReportGrid: TsWorksheetGrid
       Left = 0
       Height = 182
       Top = 0
-      Width = 731
+      Width = 1138
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear
@@ -285,7 +334,7 @@ object StoreForm: TStoreForm
     Left = 3
     Height = 40
     Top = 0
-    Width = 735
+    Width = 1142
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 3
@@ -294,7 +343,7 @@ object StoreForm: TStoreForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 731
+    ClientWidth = 1138
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 2
@@ -466,7 +515,7 @@ object StoreForm: TStoreForm
       Left = 181
       Height = 20
       Top = 8
-      Width = 484
+      Width = 891
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 6
@@ -480,7 +529,7 @@ object StoreForm: TStoreForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 671
+      Left = 1078
       Height = 36
       Top = 0
       Width = 20
@@ -491,7 +540,7 @@ object StoreForm: TStoreForm
     end
     object CloseButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 691
+      Left = 1098
       Height = 36
       Top = 0
       Width = 40

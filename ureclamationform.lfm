@@ -1,7 +1,7 @@
 object ReclamationForm: TReclamationForm
-  Left = 212
+  Left = 249
   Height = 278
-  Top = 142
+  Top = 271
   Width = 1434
   Align = alClient
   BorderStyle = bsNone
@@ -15,19 +15,19 @@ object ReclamationForm: TReclamationForm
   OnShow = FormShow
   LCLVersion = '2.2.2.0'
   object TopToolsPanel: TPanel
-    Left = 2
+    Left = 3
     Height = 40
-    Top = 42
-    Width = 1430
+    Top = 43
+    Width = 1428
     Align = alTop
     AutoSize = True
-    BorderSpacing.Left = 2
-    BorderSpacing.Right = 2
-    BorderSpacing.Bottom = 2
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1426
+    ClientWidth = 1424
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     ParentFont = False
@@ -828,25 +828,25 @@ object ReclamationForm: TReclamationForm
     end
   end
   object Panel4: TPanel
-    Left = 2
-    Height = 192
-    Top = 84
-    Width = 1430
+    Left = 3
+    Height = 189
+    Top = 86
+    Width = 1428
     Align = alClient
-    BorderSpacing.Left = 2
-    BorderSpacing.Right = 2
-    BorderSpacing.Bottom = 2
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel4'
-    ClientHeight = 188
-    ClientWidth = 1426
+    ClientHeight = 185
+    ClientWidth = 1424
     TabOrder = 1
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 188
+      Height = 185
       Top = 0
-      Width = 1426
+      Width = 1424
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear
@@ -880,19 +880,19 @@ object ReclamationForm: TReclamationForm
     end
   end
   object MotorNamesPanel: TPanel
-    Left = 2
+    Left = 3
     Height = 40
     Top = 0
-    Width = 1430
+    Width = 1428
     Align = alTop
     AutoSize = True
-    BorderSpacing.Left = 2
-    BorderSpacing.Right = 2
-    BorderSpacing.Bottom = 2
+    BorderSpacing.Left = 3
+    BorderSpacing.Right = 3
+    BorderSpacing.Bottom = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1426
+    ClientWidth = 1424
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 2
@@ -1064,7 +1064,7 @@ object ReclamationForm: TReclamationForm
       Left = 181
       Height = 20
       Top = 8
-      Width = 1179
+      Width = 1177
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 6
@@ -1078,7 +1078,7 @@ object ReclamationForm: TReclamationForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 1366
+      Left = 1364
       Height = 36
       Top = 0
       Width = 20
@@ -1089,7 +1089,7 @@ object ReclamationForm: TReclamationForm
     end
     object CloseButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1386
+      Left = 1384
       Height = 36
       Top = 0
       Width = 40

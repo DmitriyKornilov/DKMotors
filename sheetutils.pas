@@ -165,7 +165,8 @@ type
   public
     constructor Create(const AGrid: TsWorksheetGrid);
     destructor  Destroy; override;
-    procedure Draw(const ATestDates: TDateVector;
+    procedure Draw(const ADeltaDays: Integer;
+                   const ATestDates: TDateVector;
                    const AMotorNames, AMotorNums{, ASeries}: TStrVector;
                    const ATotalMotorNames: TStrVector;
                    const ATotalMotorCounts: TIntVector);
@@ -1004,7 +1005,8 @@ begin
   inherited Destroy;
 end;
 
-procedure TStoreSheet.Draw(const ATestDates: TDateVector;
+procedure TStoreSheet.Draw(const ADeltaDays: Integer;
+       const ATestDates: TDateVector;
        const AMotorNames, AMotorNums{, ASeries}: TStrVector;
        const ATotalMotorNames: TStrVector;
        const ATotalMotorCounts: TIntVector);
@@ -1020,6 +1022,11 @@ begin
 
   S:= 'Отчет по наличию электродвигателей на складе на ' +
       FormatDateTime('dd.mm.yyyy', Date);
+  if ADeltaDays>0 then
+    S:= S + ', хранящихся дольше ' + IntToStr(ADeltaDays) +
+            ' дней (сданы ' +
+            FormatDateTime('dd.mm.yyyy', IncDay(Date,-ADeltaDays)) +
+            ' и ранее)';
 
   //Заголовок отчета
   R:= 1;
