@@ -18,7 +18,6 @@ type
     AddButton: TSpeedButton;
     CheckBox1: TCheckBox;
     ChooseMotorNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
     DelButton: TSpeedButton;
     DividerBevel4: TDividerBevel;
     EditButton: TSpeedButton;
@@ -26,6 +25,7 @@ type
     DividerBevel3: TDividerBevel;
     EditButtonPanel: TPanel;
     DividerBevel1: TDividerBevel;
+    CloseButton: TSpeedButton;
     Label1: TLabel;
     LogGrid: TsWorksheetGrid;
     MotorNamesButton: TRxSpeedButton;

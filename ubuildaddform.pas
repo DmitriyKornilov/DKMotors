@@ -141,7 +141,6 @@ begin
     Exit;
   end;
 
-  //MotorsAdd(DateTimePicker1.Date, MotorNameIDs, OldMotors, MotorNums, RotorNums);
   SQLite.MotorsInBuildLogWrite(DateTimePicker1.Date, MotorNameIDs, OldMotors,
                                MotorNums, RotorNums);
 

@@ -15,10 +15,10 @@ type
   { TReportForm }
 
   TReportForm = class(TForm)
+    CloseButton: TSpeedButton;
     NumberListCheckBox: TCheckBox;
     ChooseMotorNamesButton: TSpeedButton;
     ChooseRecieverNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
     DividerBevel4: TDividerBevel;
     Label2: TLabel;
     Label3: TLabel;

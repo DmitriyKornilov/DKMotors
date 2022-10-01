@@ -15,8 +15,8 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    ExitButton: TSpeedButton;
     DividerBevel4: TDividerBevel;
-    ExitButton: TRxSpeedButton;
     ImageListEdit24: TImageList;
     ImageListCategory24: TImageList;
     ImageList16: TImageList;
@@ -27,8 +27,9 @@ type
     RxSpeedButton3: TRxSpeedButton;
     RxSpeedButton4: TRxSpeedButton;
     RxSpeedButton5: TRxSpeedButton;
-    RxSpeedButton7: TRxSpeedButton;
     RxSpeedButton9: TRxSpeedButton;
+    AboutButton: TSpeedButton;
+    procedure AboutButtonClick(Sender: TObject);
     procedure ExitButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -36,7 +37,6 @@ type
     procedure RxSpeedButton2Click(Sender: TObject);
     procedure RxSpeedButton3Click(Sender: TObject);
     procedure RxSpeedButton5Click(Sender: TObject);
-    procedure RxSpeedButton7Click(Sender: TObject);
     procedure RxSpeedButton9Click(Sender: TObject);
   private
     procedure DBConnect;
@@ -89,6 +89,15 @@ begin
   Close;
 end;
 
+procedure TMainForm.AboutButtonClick(Sender: TObject);
+var
+  AboutForm: TAboutForm;
+begin
+  AboutForm:= TAboutForm.Create(MainForm);
+  AboutForm.ShowModal;
+  FreeAndNil(AboutForm);
+end;
+
 procedure TMainForm.RxSpeedButton1Click(Sender: TObject);
 begin
   Choose;
@@ -107,15 +116,6 @@ end;
 procedure TMainForm.RxSpeedButton5Click(Sender: TObject);
 begin
   Choose;
-end;
-
-procedure TMainForm.RxSpeedButton7Click(Sender: TObject);
-var
-  AboutForm: TAboutForm;
-begin
-  AboutForm:= TAboutForm.Create(MainForm);
-  AboutForm.ShowModal;
-  FreeAndNil(AboutForm);
 end;
 
 procedure TMainForm.RxSpeedButton9Click(Sender: TObject);

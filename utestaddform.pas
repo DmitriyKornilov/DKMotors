@@ -47,10 +47,11 @@ type
     procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+      {%H-}Shift: TShiftState);
     procedure RadioButton2Click(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
-    procedure VT1Click(Sender: TObject);
+    procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     NameIDs: TIntVector;
     CanFormClose: Boolean;
@@ -158,7 +159,8 @@ begin
   ModalResult:= mrOK;
 end;
 
-procedure TTestAddForm.VT1Click(Sender: TObject);
+procedure TTestAddForm.VT1MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 begin
   AddButton.Enabled:= VSTTable.IsSelected;
 end;
@@ -214,7 +216,7 @@ begin
   VAppend(TestResults, x);
   VAppend(TestNotes, Note);
 
-  s:= MotorNameComboBox.Text + ' № ' + STrim(MotorNumEdit.Text);
+  s:= MotorNameComboBox.Text + ' № ' + ViewMotorNums[VSTTable.SelectedIndex];
   if x=0 then
     s:= s + ' -  норма'
   else

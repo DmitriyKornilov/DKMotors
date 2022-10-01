@@ -1,41 +1,40 @@
 object MotorListForm: TMotorListForm
-  Left = 409
-  Height = 617
-  Top = 146
-  Width = 1279
+  Left = 327
+  Height = 494
+  Top = 117
+  Width = 1023
   Align = alClient
   BorderStyle = bsNone
   Caption = 'MotorListForm'
-  ClientHeight = 617
-  ClientWidth = 1279
-  DesignTimePPI = 120
+  ClientHeight = 494
+  ClientWidth = 1023
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.2.2.0'
   object Panel3: TPanel
-    Left = 3
-    Height = 40
-    Top = 43
-    Width = 1273
+    Left = 2
+    Height = 32
+    Top = 34
+    Width = 1019
     Align = alTop
-    BorderSpacing.Left = 3
-    BorderSpacing.Right = 3
+    BorderSpacing.Left = 2
+    BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1269
-    Constraints.MaxHeight = 40
+    ClientHeight = 28
+    ClientWidth = 1015
+    Constraints.MaxHeight = 32
     TabOrder = 0
     object Panel6: TPanel
-      Left = 91
-      Height = 36
+      Left = 72
+      Height = 28
       Top = 0
-      Width = 266
+      Width = 213
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 266
+      ClientHeight = 28
+      ClientWidth = 213
       TabOrder = 0
       object MotorShippedComboBox: TComboBox
         AnchorSideLeft.Side = asrBottom
@@ -43,12 +42,12 @@ object MotorListForm: TMotorListForm
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 28
-        Top = 4
-        Width = 266
-        BorderSpacing.Top = 12
+        Height = 23
+        Top = 3
+        Width = 213
+        BorderSpacing.Top = 10
         DropDownCount = 15
-        ItemHeight = 20
+        ItemHeight = 15
         ItemIndex = 0
         Items.Strings = (
           'отгруженные и неотгруженные'
@@ -63,34 +62,34 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel2: TDividerBevel
-      Left = 357
-      Height = 36
+      Left = 285
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
       ParentFont = False
     end
     object Panel7: TPanel
-      Left = 377
-      Height = 36
+      Left = 300
+      Height = 28
       Top = 0
-      Width = 257
+      Width = 205
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 257
+      ClientHeight = 28
+      ClientWidth = 205
       TabOrder = 1
       object Label2: TLabel
         AnchorSideLeft.Control = Panel7
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 20
-        Top = 8
-        Width = 122
+        Height = 15
+        Top = 7
+        Width = 97
         Caption = 'Поиск по номеру'
         ParentColor = False
       end
@@ -99,13 +98,13 @@ object MotorListForm: TMotorListForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
-        Left = 128
-        Height = 28
-        Top = 4
-        Width = 129
-        BorderSpacing.Left = 6
+        Left = 102
+        Height = 23
+        Top = 3
+        Width = 103
+        BorderSpacing.Left = 5
         ButtonCursor = crHandPoint
-        ButtonWidth = 29
+        ButtonWidth = 23
         Images = MainForm.ImageList16
         ImageIndex = 0
         MaxLength = 0
@@ -117,25 +116,25 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel3: TDividerBevel
-      Left = 634
-      Height = 36
+      Left = 505
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
       ParentFont = False
     end
     object Panel5: TPanel
-      Left = 654
-      Height = 36
+      Left = 520
+      Height = 28
       Top = 0
-      Width = 195
+      Width = 154
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 195
+      ClientHeight = 28
+      ClientWidth = 154
       ParentFont = False
       TabOrder = 2
       object CheckBox1: TCheckBox
@@ -143,19 +142,19 @@ object MotorListForm: TMotorListForm
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 24
-        Top = 6
-        Width = 195
+        Height = 19
+        Top = 5
+        Width = 154
         Caption = 'Упорядочить по номеру'
         OnChange = CheckBox1Change
         TabOrder = 0
       end
     end
     object DividerBevel7: TDividerBevel
-      Left = 1068
-      Height = 36
+      Left = 846
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -163,13 +162,13 @@ object MotorListForm: TMotorListForm
     end
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1088
-      Height = 36
+      Left = 861
+      Height = 28
       Top = 0
-      Width = 115
+      Width = 101
       Align = alLeft
       AutoSize = True
-      Constraints.MinWidth = 115
+      Constraints.MinWidth = 92
       Caption = 'Экспорт'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -309,10 +308,10 @@ object MotorListForm: TMotorListForm
       ParentFont = False
     end
     object CheckBox2: TCheckBox
-      Left = 869
-      Height = 36
+      Left = 689
+      Height = 28
       Top = 0
-      Width = 199
+      Width = 157
       Align = alLeft
       Caption = 'Подробная информация'
       Checked = True
@@ -321,10 +320,10 @@ object MotorListForm: TMotorListForm
       TabOrder = 3
     end
     object DividerBevel5: TDividerBevel
-      Left = 849
-      Height = 36
+      Left = 674
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -332,13 +331,13 @@ object MotorListForm: TMotorListForm
     end
     object SpinEdit1: TSpinEdit
       Left = 1
-      Height = 30
-      Top = 4
-      Width = 70
+      Height = 23
+      Top = 3
+      Width = 56
       Align = alLeft
       Alignment = taCenter
       BorderSpacing.Left = 1
-      BorderSpacing.Top = 4
+      BorderSpacing.Top = 3
       BorderSpacing.Bottom = 2
       MinValue = 2010
       OnChange = SpinEdit1Change
@@ -346,10 +345,10 @@ object MotorListForm: TMotorListForm
       Value = 2022
     end
     object DividerBevel4: TDividerBevel
-      Left = 71
-      Height = 36
+      Left = 57
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -357,24 +356,24 @@ object MotorListForm: TMotorListForm
     end
   end
   object Panel2: TPanel
-    Left = 3
-    Height = 398
-    Top = 216
-    Width = 1273
+    Left = 2
+    Height = 318
+    Top = 174
+    Width = 1019
     Align = alBottom
-    BorderSpacing.Left = 3
-    BorderSpacing.Right = 3
-    BorderSpacing.Bottom = 3
+    BorderSpacing.Left = 2
+    BorderSpacing.Right = 2
+    BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 394
-    ClientWidth = 1269
+    ClientHeight = 314
+    ClientWidth = 1015
     TabOrder = 1
     object InfoGrid: TsWorksheetGrid
       Left = 0
-      Height = 394
+      Height = 314
       Top = 0
-      Width = 1269
+      Width = 1015
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
@@ -409,23 +408,23 @@ object MotorListForm: TMotorListForm
     AnchorSideBottom.Control = Panel2
     Cursor = crVSplit
     Left = 0
-    Height = 6
-    Top = 210
-    Width = 1279
+    Height = 5
+    Top = 169
+    Width = 1023
     Align = alBottom
     ResizeAnchor = akBottom
     ResizeStyle = rsLine
   end
   object VT1: TVirtualStringTree
     AnchorSideBottom.Control = Splitter2
-    Left = 3
-    Height = 124
-    Top = 86
-    Width = 1273
+    Left = 2
+    Height = 101
+    Top = 68
+    Width = 1019
     Align = alClient
-    BorderSpacing.Left = 3
-    BorderSpacing.Top = 3
-    BorderSpacing.Right = 3
+    BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
+    BorderSpacing.Right = 2
     DefaultText = 'Node'
     Header.AutoSizeIndex = 0
     Header.Columns = <>
@@ -434,31 +433,31 @@ object MotorListForm: TMotorListForm
     OnMouseUp = VT1MouseUp
   end
   object MotorNamesPanel: TPanel
-    Left = 3
-    Height = 40
+    Left = 2
+    Height = 32
     Top = 0
-    Width = 1273
+    Width = 1019
     Align = alTop
     AutoSize = True
-    BorderSpacing.Left = 3
-    BorderSpacing.Right = 3
-    BorderSpacing.Bottom = 3
+    BorderSpacing.Left = 2
+    BorderSpacing.Right = 2
+    BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1269
-    Constraints.MaxHeight = 40
-    Constraints.MinHeight = 40
+    ClientHeight = 28
+    ClientWidth = 1015
+    Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 4
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 40
+      Width = 32
       Align = alLeft
       AutoSize = True
-      Constraints.MinWidth = 40
+      Constraints.MinWidth = 32
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -601,11 +600,11 @@ object MotorListForm: TMotorListForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 46
-      Height = 20
-      Top = 8
-      Width = 129
-      BorderSpacing.Left = 6
+      Left = 37
+      Height = 15
+      Top = 7
+      Width = 103
+      BorderSpacing.Left = 5
       Caption = 'Электродвигатели:'
       ParentColor = False
     end
@@ -616,14 +615,14 @@ object MotorListForm: TMotorListForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = MotorNamesPanel
       AnchorSideRight.Side = asrBottom
-      Left = 181
-      Height = 20
-      Top = 8
-      Width = 1082
+      Left = 145
+      Height = 16
+      Top = 6
+      Width = 865
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
-      BorderSpacing.Left = 6
-      BorderSpacing.Right = 6
+      BorderSpacing.Left = 5
+      BorderSpacing.Right = 5
       Caption = 'ВСЕ НАИМЕНОВАНИЯ'
       Font.Color = clNavy
       ParentColor = False

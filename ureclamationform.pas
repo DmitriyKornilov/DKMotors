@@ -187,7 +187,7 @@ end;
 
 procedure TReclamationForm.DefectListButtonClick(Sender: TObject);
 begin
-  if SQLite.EditList('Заводы',
+  if SQLite.EditList('Неисправные элементы',
     'RECLAMATIONDEFECTS', 'DefectID', 'DefectName', True, True) then
       DataOpen;
 end;

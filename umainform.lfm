@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 428
+  Left = 342
   Height = 399
-  Top = 229
+  Top = 183
   Width = 987
   Caption = 'Учет производства и поставок электродвигателей ООО "Электрожелдормаш"'
   ClientHeight = 399
@@ -12,17 +12,18 @@ object MainForm: TMainForm
   LCLVersion = '2.2.2.0'
   WindowState = wsMaximized
   object Panel2: TPanel
-    Left = 3
+    Left = 2
     Height = 40
-    Top = 3
-    Width = 981
+    Top = 2
+    Width = 983
     Align = alTop
-    BorderSpacing.Around = 3
+    BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 977
+    ClientWidth = 979
     Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
     object RxSpeedButton1: TRxSpeedButton
@@ -78,30 +79,13 @@ object MainForm: TMainForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 917
+      Left = 919
       Height = 36
       Top = 0
       Width = 20
       Align = alRight
       Font.Style = [fsBold]
       Orientation = trVertical
-      ParentFont = False
-    end
-    object RxSpeedButton7: TRxSpeedButton
-      Cursor = crHandPoint
-      Left = 877
-      Height = 36
-      Top = 0
-      Width = 40
-      Align = alRight
-      AllowAllUp = True
-      AutoSize = True
-      Constraints.MaxWidth = 40
-      Constraints.MinWidth = 40
-      Images = ImageListCategory24
-      ImageIndex = 15
-      Margin = 5
-      OnClick = RxSpeedButton7Click
       ParentFont = False
     end
     object RxSpeedButton4: TRxSpeedButton
@@ -155,31 +139,37 @@ object MainForm: TMainForm
       OnClick = RxSpeedButton9Click
       ParentFont = False
     end
-    object ExitButton: TRxSpeedButton
+    object AboutButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 937
+      Left = 879
       Height = 36
-      Hint = 'Выход'
       Top = 0
       Width = 40
       Align = alRight
-      AllowAllUp = True
-      AutoSize = True
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
+      Images = ImageListCategory24
+      ImageIndex = 15
+      OnClick = AboutButtonClick
+    end
+    object ExitButton: TSpeedButton
+      Cursor = crHandPoint
+      Left = 939
+      Height = 36
+      Top = 0
+      Width = 40
+      Align = alRight
       Constraints.MaxWidth = 40
       Constraints.MinWidth = 40
       Images = ImageListCategory24
       ImageIndex = 13
-      Margin = 5
       OnClick = ExitButtonClick
-      ShowHint = True
-      ParentFont = False
-      ParentShowHint = False
     end
   end
   object MainPanel: TPanel
     Left = 0
-    Height = 353
-    Top = 46
+    Height = 355
+    Top = 44
     Width = 987
     Align = alClient
     BevelOuter = bvNone
@@ -188,7 +178,7 @@ object MainForm: TMainForm
   end
   object ImageList16: TImageList
     Left = 144
-    Top = 192
+    Top = 193
     Bitmap = {
       4C7A0100000010000000100000007D0000000000000078DAA593410A80300C04
       977E487CAB9E05FFE4C10F7810FC83B2C882149316B6904B92D9266D02F09402
