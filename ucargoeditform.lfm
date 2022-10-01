@@ -538,15 +538,6 @@ object CargoEditForm: TCargoEditForm
       OnMouseUp = VT1MouseUp
     end
   end
-  object Splitter1: TSplitter
-    Cursor = crVSplit
-    Left = 0
-    Height = 6
-    Top = 367
-    Width = 605
-    Align = alTop
-    ResizeAnchor = akTop
-  end
   object ButtonPanel: TPanel
     Left = 8
     Height = 58
@@ -560,7 +551,7 @@ object CargoEditForm: TCargoEditForm
     BevelOuter = bvNone
     ClientHeight = 58
     ClientWidth = 589
-    TabOrder = 2
+    TabOrder = 1
     object CancelButton: TSpeedButton
       AnchorSideTop.Control = DividerBevel1
       AnchorSideTop.Side = asrBottom
@@ -877,19 +868,19 @@ object CargoEditForm: TCargoEditForm
   end
   object VT2: TVirtualStringTree
     Left = 8
-    Height = 257
-    Top = 388
+    Height = 272
+    Top = 373
     Width = 589
     Align = alClient
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 8
-    BorderSpacing.Top = 15
+    BorderSpacing.Top = 6
     BorderSpacing.Right = 8
     DefaultText = 'Node'
     Header.AutoSizeIndex = 0
     Header.Columns = <>
     Header.MainColumn = -1
-    TabOrder = 3
+    TabOrder = 2
     OnExit = VT2Exit
     OnKeyUp = VT2KeyUp
     OnMouseUp = VT2MouseUp

@@ -32,7 +32,6 @@ type
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     SaveButton: TSpeedButton;
-    Splitter1: TSplitter;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
@@ -261,18 +260,18 @@ end;
 
 procedure TTestAddForm.DelTest;
 var
-  i: Integer;
+  Ind: Integer;
 begin
   if not VSTTestTable.IsSelected then Exit;
-  i:= VSTTestTable.SelectedIndex;
+  Ind:= VSTTestTable.SelectedIndex;
 
-  VDel(TestMotorIDs, i);
-  VDel(TestResults, i);
-  VDel(TestNotes, i);
+  VDel(TestMotorIDs, Ind);
+  VDel(TestResults, Ind);
+  VDel(TestNotes, Ind);
 
-  VDel(TestMotorNames, i);
-  VDel(TestMotorNums, i);
-  VDel(TestResultsStr, i);
+  VDel(TestMotorNames, Ind);
+  VDel(TestMotorNums, Ind);
+  VDel(TestResultsStr, Ind);
   ShowTestList(True);
 end;
 
@@ -290,10 +289,6 @@ begin
   VSTTestTable.SetColumn('Результат', TestResultsStr);
   VSTTestTable.SetColumn('Примечание', TestNotes, taLeftJustify);
   VSTTestTable.Draw;
-
-  //if not VIsNil(TestMotorNames) then
-  //  VSTTestTable.Show(High(TestMotorNames));
-  //DelButton.Enabled:= False;
 
   if not VIsNil(TestMotorNames) then
   begin

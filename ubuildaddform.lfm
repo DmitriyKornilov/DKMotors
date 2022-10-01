@@ -9,6 +9,7 @@ object BuildAddForm: TBuildAddForm
   DesignTimePPI = 120
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.2.2.0'
@@ -507,30 +508,6 @@ object BuildAddForm: TBuildAddForm
         TabOrder = 4
       end
     end
-    object Splitter1: TSplitter
-      Cursor = crVSplit
-      Left = 0
-      Height = 6
-      Top = 238
-      Width = 610
-      Align = alTop
-      ResizeAnchor = akTop
-      ResizeStyle = rsLine
-    end
-    object ListBox1: TListBox
-      Left = 8
-      Height = 354
-      Top = 244
-      Width = 594
-      Align = alClient
-      BorderSpacing.Left = 8
-      BorderSpacing.Right = 8
-      ItemHeight = 0
-      OnClick = ListBox1Click
-      OnExit = ListBox1Exit
-      ParentFont = False
-      TabOrder = 2
-    end
     object ButtonPanel: TPanel
       Left = 8
       Height = 58
@@ -544,7 +521,7 @@ object BuildAddForm: TBuildAddForm
       BevelOuter = bvNone
       ClientHeight = 58
       ClientWidth = 594
-      TabOrder = 3
+      TabOrder = 1
       object CancelButton: TSpeedButton
         AnchorSideTop.Control = DividerBevel1
         AnchorSideTop.Side = asrBottom
@@ -858,6 +835,25 @@ object BuildAddForm: TBuildAddForm
         Font.Style = [fsBold]
         ParentFont = False
       end
+    end
+    object VT2: TVirtualStringTree
+      Left = 8
+      Height = 354
+      Top = 244
+      Width = 594
+      Align = alClient
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 8
+      BorderSpacing.Top = 6
+      BorderSpacing.Right = 8
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
+      TabOrder = 2
+      OnExit = VT2Exit
+      OnKeyUp = VT2KeyUp
+      OnMouseUp = VT2MouseUp
     end
   end
 end

@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  Buttons, DateTimePicker, DividerBevel, DK_Vector, USQLite,
-  DK_Dialogs, DK_StrUtils, DK_Const, LCLType;
+  Buttons, DateTimePicker, DividerBevel, DK_Vector, USQLite, SheetUtils,
+  DK_Dialogs, DK_StrUtils, DK_Const, LCLType, VirtualTrees, DK_VSTTables;
 
 type
 
@@ -24,7 +24,6 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
-    ListBox1: TListBox;
     MotorNameComboBox: TComboBox;
     MotorNumEdit: TEdit;
     Panel1: TPanel;
@@ -32,31 +31,38 @@ type
     ButtonPanel: TPanel;
     RotorNumEdit: TEdit;
     AddButton: TSpeedButton;
-    Splitter1: TSplitter;
+    VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure ListBox1Click(Sender: TObject);
-    procedure ListBox1Exit(Sender: TObject);
     procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure RotorNumEditKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure SaveButtonClick(Sender: TObject);
+    procedure VT2Exit(Sender: TObject);
+    procedure VT2KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure VT2MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     NameIDs, OldMotors: TIntVector;
 
     MotorNameIDs: TIntVector;
-    MotorNums, RotorNums: TstrVector;
+    MotorNums, RotorNums, MotorNames: TStrVector;
     CanFormClose: Boolean;
 
+    VSTTable: TVSTTable;
+
     procedure LoadMotorNames;
-    procedure WriteMotor;
-    procedure DeleteMotor;
+    procedure AddMotor;
+    procedure DelMotor;
+
+    procedure ShowBuildList(const ANeedSelect: Boolean);
   end;
 
 var
@@ -69,22 +75,26 @@ implementation
 procedure TBuildAddForm.FormCreate(Sender: TObject);
 begin
   LoadMotorNames;
+  VSTTable:= TVSTTable.Create(VT2);
   CanFormClose:= True;
+end;
+
+procedure TBuildAddForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(VSTTable);
 end;
 
 procedure TBuildAddForm.FormShow(Sender: TObject);
 begin
+  VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
+  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTTable.AddColumn('№ п/п', 60);
+  VSTTable.AddColumn('Наименование', 220);
+  VSTTable.AddColumn('Номер', 100);
+  VSTTable.AddColumn('Ротор');
+  VSTTable.CanSelect:= True;
+  VSTTable.Draw;
   DateTimePicker1.SetFocus;
-end;
-
-procedure TBuildAddForm.ListBox1Click(Sender: TObject);
-begin
-  DelButton.Enabled:= ListBox1.ItemIndex>=0;
-end;
-
-procedure TBuildAddForm.ListBox1Exit(Sender: TObject);
-begin
-  DelButton.Enabled:= ListBox1.ItemIndex>=0;
 end;
 
 procedure TBuildAddForm.MotorNameComboBoxChange(Sender: TObject);
@@ -100,7 +110,7 @@ end;
 
 procedure TBuildAddForm.AddButtonClick(Sender: TObject);
 begin
-  WriteMotor;
+  AddMotor;
 end;
 
 procedure TBuildAddForm.CancelButtonClick(Sender: TObject);
@@ -111,7 +121,7 @@ end;
 
 procedure TBuildAddForm.DelButtonClick(Sender: TObject);
 begin
-  DeleteMotor;
+  DelMotor;
 end;
 
 procedure TBuildAddForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -122,7 +132,7 @@ end;
 procedure TBuildAddForm.RotorNumEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key=VK_RETURN then WriteMotor;
+  if Key=VK_RETURN then AddMotor;
 end;
 
 procedure TBuildAddForm.SaveButtonClick(Sender: TObject);
@@ -148,6 +158,25 @@ begin
   ModalResult:= mrOK;
 end;
 
+procedure TBuildAddForm.VT2Exit(Sender: TObject);
+begin
+  VSTTable.UnSelect;
+  DelButton.Enabled:= False;
+end;
+
+procedure TBuildAddForm.VT2KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key=VK_DELETE then
+    DelMotor;
+end;
+
+procedure TBuildAddForm.VT2MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  DelButton.Enabled:= VSTTable.IsSelected;
+end;
+
 procedure TBuildAddForm.LoadMotorNames;
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
@@ -158,7 +187,7 @@ begin
     ShowInfo('Отсутствует список наименований двигателей!');
 end;
 
-procedure TBuildAddForm.WriteMotor;
+procedure TBuildAddForm.AddMotor;
 var
   s1,s2: String;
   n: Integer;
@@ -204,35 +233,60 @@ begin
 
   s2:= STrim(RotorNumEdit.Text);
 
+  VAppend(MotorNames, MotorNameComboBox.Text);
   VAppend(MotorNums, s1);
   VAppend(RotorNums, s2);
   VAppend(OldMotors, Ord(OldMotorCheckBox.Checked));
   VAppend(MotorNameIDs, NameIDs[MotorNameComboBox.ItemIndex]);
-  s1:= MotorNameComboBox.Text + ' № ' + s1;
-  if s2<>EmptyStr then
-    s1:= s1 + ' (ротор №' + s2 + ')';
-  if OldMotorCheckBox.Checked then
-    S1:= s1 + ' - ' + OldMotorCheckBox.Caption;
-  ListBox1.Items.Add(s1);
-  ListBox1.ItemIndex:= ListBox1.Count-1;
-  DelButton.Enabled:= True;
+
+  ShowBuildList(False);
 
   CancelWrite;
 end;
 
-procedure TBuildAddForm.DeleteMotor;
+procedure TBuildAddForm.DelMotor;
 var
-  i: Integer;
+  Ind: Integer;
 begin
-  i:= ListBox1.ItemIndex;
-  VDel(MotorNums, i);
-  VDel(RotorNums, i);
-  VDel(OldMotors, i);
-  VDel(MotorNameIDs, i);
-  ListBox1.Items.Delete(i);
-  if ListBox1.Items.Count>0 then
-    ListBox1.ItemIndex:= ListBox1.Items.Count-1;
-  DelButton.Enabled:= ListBox1.Items.Count>0;
+  if not VSTTable.IsSelected then Exit;
+  Ind:= VSTTable.SelectedIndex;
+  VDel(MotorNames, Ind);
+  VDel(MotorNums, Ind);
+  VDel(RotorNums, Ind);
+  VDel(OldMotors, Ind);
+  VDel(MotorNameIDs, Ind);
+  ShowBuildList(True);
+end;
+
+procedure TBuildAddForm.ShowBuildList(const ANeedSelect: Boolean);
+var
+  Ind, LastInd: Integer;
+begin
+  Ind:= -1;
+  if VSTTable.IsSelected then
+    Ind:= VSTTable.SelectedIndex;
+
+  VSTTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorNames))));
+  VSTTable.SetColumn('Наименование', MotorNames, taLeftJustify);
+  VSTTable.SetColumn('Номер', MotorNums);
+  VSTTable.SetColumn('Ротор', RotorNums);
+
+  VSTTable.Draw;
+
+  if not VIsNil(MotorNames) then
+  begin
+    LastInd:= High(MotorNames);
+    if (Ind<0) or (Ind>LastInd) then
+      Ind:= LastInd;
+
+    if ANeedSelect then
+      VSTTable.Select(Ind)
+    else
+      VSTTable.Show(LastInd);
+  end;
+
+  DelButton.Enabled:= VSTTable.IsSelected;
+
 end;
 
 end.

@@ -32,7 +32,6 @@ type
     ReceiverNameComboBox: TComboBox;
     MotorNumEdit: TEdit;
     Panel2: TPanel;
-    Splitter1: TSplitter;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
