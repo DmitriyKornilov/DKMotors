@@ -25,7 +25,6 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
-    ListBox1: TListBox;
     Memo1: TMemo;
     MotorNameComboBox: TComboBox;
     MotorNumEdit: TEdit;
@@ -35,6 +34,7 @@ type
     SaveButton: TSpeedButton;
     Splitter1: TSplitter;
     VT1: TVirtualStringTree;
+    VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
@@ -42,8 +42,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure ListBox1Click(Sender: TObject);
-    procedure ListBox1Exit(Sender: TObject);
     procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
@@ -52,15 +50,18 @@ type
     procedure SaveButtonClick(Sender: TObject);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     NameIDs: TIntVector;
     CanFormClose: Boolean;
 
-    VSTTable: TVSTTable;
+    VSTViewTable, VSTTestTable: TVSTTable;
 
     TestMotorIDs: TIntVector;
     TestResults: TIntVector;
     TestNotes: TStrVector;
+    TestMotorNames, TestMotorNums, TestResultsStr: TStrVector;
 
     ViewMotorIDs: TIntVector;
     ViewBuildDates, ViewMotorNums, ViewTests: TStrVector;
@@ -69,6 +70,8 @@ type
 
     procedure AddTest;
     procedure DelTest;
+
+    procedure ShowTestList;
 
     procedure LoadMotors;
 
@@ -93,25 +96,25 @@ end;
 
 procedure TTestAddForm.FormShow(Sender: TObject);
 begin
-  VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTTable.AddColumn('Дата сборки', 100);
-  VSTTable.AddColumn('Номер', 100);
-  VSTTable.AddColumn('Испытания',50);
-  VSTTable.CanSelect:= True;
-  VSTTable.Draw;
+  VSTViewTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
+  VSTViewTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTViewTable.AddColumn('Дата сборки', 100);
+  VSTViewTable.AddColumn('Номер', 100);
+  VSTViewTable.AddColumn('Испытания',50);
+  VSTViewTable.CanSelect:= True;
+  VSTViewTable.Draw;
+
+  VSTTestTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
+  VSTTestTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTTestTable.AddColumn('№ п/п', 60);
+  VSTTestTable.AddColumn('Наименование', 220);
+  VSTTestTable.AddColumn('Номер', 100);
+  VSTTestTable.AddColumn('Результат', 100);
+  VSTTestTable.AddColumn('Примечание');
+  VSTTestTable.CanSelect:= True;
+  VSTTestTable.Draw;
 
   DateTimePicker1.SetFocus;
-end;
-
-procedure TTestAddForm.ListBox1Click(Sender: TObject);
-begin
-  DelButton.Enabled:= ListBox1.ItemIndex>=0;
-end;
-
-procedure TTestAddForm.ListBox1Exit(Sender: TObject);
-begin
-  DelButton.Enabled:= ListBox1.ItemIndex>=0;
 end;
 
 procedure TTestAddForm.MotorNameComboBoxChange(Sender: TObject);
@@ -130,9 +133,9 @@ begin
   if VIsNil(ViewMotorIDs) then Exit;
   if Key=VK_RETURN then
   begin
-    if not VSTTable.IsSelected then
+    if not VSTViewTable.IsSelected then
     begin
-      VSTTable.Select(0);
+      VSTViewTable.Select(0);
       AddButton.Enabled:= True;
     end
     else AddTest;
@@ -162,7 +165,13 @@ end;
 procedure TTestAddForm.VT1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  AddButton.Enabled:= VSTTable.IsSelected;
+  AddButton.Enabled:= VSTViewTable.IsSelected;
+end;
+
+procedure TTestAddForm.VT2MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  DelButton.Enabled:= VSTTestTable.IsSelected;
 end;
 
 procedure TTestAddForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -193,46 +202,45 @@ begin
   TestResults:= nil;
   TestNotes:= nil;
 
-  VSTTable:= TVSTTable.Create(VT1);
+  VSTViewTable:= TVSTTable.Create(VT1);
+  VSTTestTable:= TVSTTable.Create(VT2);
+
   CanFormClose:= True;
 end;
 
 procedure TTestAddForm.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(VSTTable);
+  FreeAndNil(VSTViewTable);
+  FreeAndNil(VSTTestTable);
 end;
 
 procedure TTestAddForm.AddTest;
 var
   x: Integer;
-  s, Note: String;
+  Note: String;
 begin
-  if not VSTTable.IsSelected then Exit;
+  if not VSTViewTable.IsSelected then Exit;
 
   x:= Ord(RadioButton2.Checked);
   Note:= STrim(Memo1.Text);
 
-  VAppend(TestMotorIDs, ViewMotorIDs[VSTTable.SelectedIndex]);
+  VAppend(TestMotorIDs, ViewMotorIDs[VSTViewTable.SelectedIndex]);
   VAppend(TestResults, x);
   VAppend(TestNotes, Note);
 
-  s:= MotorNameComboBox.Text + ' № ' + ViewMotorNums[VSTTable.SelectedIndex];
+  VAppend(TestMotorNames, MotorNameComboBox.Text);
+  VAppend(TestMotorNums, ViewMotorNums[VSTViewTable.SelectedIndex]);
   if x=0 then
-    s:= s + ' -  норма'
+    VAppend(TestResultsStr, 'норма')
   else
-    s:= s + ' -  брак';
-  if Note<>EmptyStr then
-    s:= s + ' (' + Note + ')';
-
-  ListBox1.Items.Add(s);
-  ListBox1.ItemIndex:= ListBox1.Items.Count-1;
+    VAppend(TestResultsStr, 'брак');
+  ShowTestList;
 
   MotorNumEdit.Text:= EmptyStr;
   Memo1.Lines.Clear;
 
   RadioButton1.Checked:= True;
   AddButton.Enabled:= False;
-  DelButton.Enabled:= True;
   MotorNumEdit.SetFocus;
 end;
 
@@ -240,14 +248,31 @@ procedure TTestAddForm.DelTest;
 var
   i: Integer;
 begin
-  i:= ListBox1.ItemIndex;
+  if not VSTTestTable.IsSelected then Exit;
+  i:= VSTTestTable.SelectedIndex;
+
   VDel(TestMotorIDs, i);
   VDel(TestResults, i);
   VDel(TestNotes, i);
-  ListBox1.Items.Delete(i);
-  if ListBox1.Items.Count>0 then
-    ListBox1.ItemIndex:= ListBox1.Items.Count-1;
-  DelButton.Enabled:= ListBox1.Items.Count>0;
+
+  VDel(TestMotorNames, i);
+  VDel(TestMotorNums, i);
+  VDel(TestResultsStr, i);
+  ShowTestList;
+end;
+
+procedure TTestAddForm.ShowTestList;
+begin
+  VSTTestTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(TestMotorNames))));
+  VSTTestTable.SetColumn('Наименование', TestMotorNames, taLeftJustify);
+  VSTTestTable.SetColumn('Номер', TestMotorNums);
+  VSTTestTable.SetColumn('Результат', TestResultsStr);
+  VSTTestTable.SetColumn('Примечание', TestNotes, taLeftJustify);
+  VSTTestTable.Draw;
+  if not VIsNil(TestMotorNames) then
+    VSTTestTable.Show(High(TestMotorNames));
+
+  DelButton.Enabled:= False;
 end;
 
 procedure TTestAddForm.LoadMotors;
@@ -261,11 +286,11 @@ begin
   SQLite.TestChooseListLoad(NameIDs[MotorNameComboBox.ItemIndex], MotorNumberLike,
                       ViewMotorIDs, ViewMotorNums, ViewBuildDates, ViewTests);
 
-  VSTTable.ValuesClear;
-  VSTTable.SetColumn('Дата сборки', ViewBuildDates);
-  VSTTable.SetColumn('Номер', ViewMotorNums);
-  VSTTable.SetColumn('Испытания', ViewTests, taLeftJustify);
-  VSTTable.Draw;
+  VSTViewTable.ValuesClear;
+  VSTViewTable.SetColumn('Дата сборки', ViewBuildDates);
+  VSTViewTable.SetColumn('Номер', ViewMotorNums);
+  VSTViewTable.SetColumn('Испытания', ViewTests, taLeftJustify);
+  VSTViewTable.Draw;
 end;
 
 end.

@@ -1064,7 +1064,7 @@ begin
   QSetSQL(
     'SELECT MotorID, BuildDate, MotorNum ' +
     'FROM MOTORLIST ' +
-    'WHERE (NameID = :NameID) AND ' +
+    'WHERE (NameID = :NameID) AND (OldMotor=0) AND ' +
           '(UPPER(MotorNum) LIKE :NumberLike)');
   QParamInt('NameID', ANameID);
   QParamStr('NumberLike', ANumberLike+'%');
@@ -1564,7 +1564,7 @@ begin
   QSetSQL(
     'SELECT MotorID, BuildDate, MotorNum, Series ' +
     'FROM MOTORLIST ' +
-    'WHERE (NameID = :NameID) AND (CargoID=0) AND ' +
+    'WHERE (NameID = :NameID) AND (CargoID=0) AND (OldMotor=0) AND ' +
           '(UPPER(MotorNum) LIKE :NumberLike)');
   QParamInt('NameID', ANameID);
   QParamStr('NumberLike', ANumberLike+'%');

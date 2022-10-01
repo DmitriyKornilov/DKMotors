@@ -15,12 +15,12 @@ object TestAddForm: TTestAddForm
   object Panel2: TPanel
     Left = 8
     Height = 452
-    Top = 8
+    Top = 6
     Width = 666
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 8
-    BorderSpacing.Top = 8
+    BorderSpacing.Top = 6
     BorderSpacing.Right = 8
     BevelOuter = bvNone
     BorderStyle = bsSingle
@@ -553,24 +553,10 @@ object TestAddForm: TTestAddForm
     Cursor = crVSplit
     Left = 0
     Height = 6
-    Top = 460
+    Top = 458
     Width = 682
     Align = alTop
     ResizeAnchor = akTop
-  end
-  object ListBox1: TListBox
-    Left = 8
-    Height = 258
-    Top = 466
-    Width = 666
-    Align = alClient
-    BorderSpacing.Left = 8
-    BorderSpacing.Right = 8
-    ItemHeight = 0
-    OnClick = ListBox1Click
-    OnExit = ListBox1Exit
-    ParentFont = False
-    TabOrder = 2
   end
   object ButtonPanel: TPanel
     Left = 8
@@ -585,7 +571,7 @@ object TestAddForm: TTestAddForm
     BevelOuter = bvNone
     ClientHeight = 58
     ClientWidth = 666
-    TabOrder = 3
+    TabOrder = 2
     object CancelButton: TSpeedButton
       AnchorSideTop.Control = DividerBevel1
       AnchorSideTop.Side = asrBottom
@@ -899,5 +885,23 @@ object TestAddForm: TTestAddForm
       Font.Style = [fsBold]
       ParentFont = False
     end
+  end
+  object VT2: TVirtualStringTree
+    AnchorSideLeft.Control = Owner
+    AnchorSideRight.Control = Owner
+    Left = 8
+    Height = 260
+    Top = 464
+    Width = 666
+    Align = alClient
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 8
+    BorderSpacing.Right = 8
+    DefaultText = 'Node'
+    Header.AutoSizeIndex = 0
+    Header.Columns = <>
+    Header.MainColumn = -1
+    TabOrder = 3
+    OnMouseUp = VT2MouseUp
   end
 end

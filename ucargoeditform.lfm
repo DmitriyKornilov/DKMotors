@@ -547,20 +547,6 @@ object CargoEditForm: TCargoEditForm
     Align = alTop
     ResizeAnchor = akTop
   end
-  object ListBox1: TListBox
-    Left = 8
-    Height = 272
-    Top = 373
-    Width = 589
-    Align = alClient
-    BorderSpacing.Left = 8
-    BorderSpacing.Right = 8
-    ItemHeight = 0
-    OnClick = ListBox1Click
-    OnExit = ListBox1Exit
-    ParentFont = False
-    TabOrder = 2
-  end
   object ButtonPanel: TPanel
     Left = 8
     Height = 58
@@ -574,7 +560,7 @@ object CargoEditForm: TCargoEditForm
     BevelOuter = bvNone
     ClientHeight = 58
     ClientWidth = 589
-    TabOrder = 3
+    TabOrder = 2
     object CancelButton: TSpeedButton
       AnchorSideTop.Control = DividerBevel1
       AnchorSideTop.Side = asrBottom
@@ -888,5 +874,22 @@ object CargoEditForm: TCargoEditForm
       Font.Style = [fsBold]
       ParentFont = False
     end
+  end
+  object VT2: TVirtualStringTree
+    Left = 8
+    Height = 257
+    Top = 388
+    Width = 589
+    Align = alClient
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 8
+    BorderSpacing.Top = 15
+    BorderSpacing.Right = 8
+    DefaultText = 'Node'
+    Header.AutoSizeIndex = 0
+    Header.Columns = <>
+    Header.MainColumn = -1
+    TabOrder = 3
+    OnMouseUp = VT2MouseUp
   end
 end

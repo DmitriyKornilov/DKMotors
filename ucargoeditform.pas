@@ -28,13 +28,13 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    ListBox1: TListBox;
     MotorNameComboBox: TComboBox;
     ReceiverNameComboBox: TComboBox;
     MotorNumEdit: TEdit;
     Panel2: TPanel;
     Splitter1: TSplitter;
     VT1: TVirtualStringTree;
+    VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
 
@@ -45,8 +45,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure ListBox1Click(Sender: TObject);
-    procedure ListBox1Exit(Sender: TObject);
     procedure MotorNameComboBoxChange(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
@@ -57,6 +55,8 @@ type
       {%H-}Shift: TShiftState);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     NameIDs: TIntVector;
     ReceiverIDs: TIntVector;
@@ -65,13 +65,13 @@ type
     ViewMotorNums, ViewBuildDates, ViewSeries: TStrVector;
 
     MotorIDs: TIntVector;
-    Series: TStrVector;
+    Series, MotorNames, MotorNums: TStrVector;
 
     WritedMotorIDs: TIntVector;
 
     CanFormClose: Boolean;
 
-    VSTTable: TVSTTable;
+    VSTViewTable, VSTCargoTable: TVSTTable;
 
     procedure LoadMotorNames;
     procedure LoadReceiverNames;
@@ -81,6 +81,8 @@ type
 
     procedure LoadMotors;
     procedure LoadCargo;
+
+    procedure ShowCargoList;
   public
     CargoID: Integer;
   end;
@@ -110,27 +112,26 @@ end;
 
 procedure TCargoEditForm.FormShow(Sender: TObject);
 begin
+  VSTViewTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
+  VSTViewTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTViewTable.AddColumn('Дата сборки', 100);
+  VSTViewTable.AddColumn('Номер', 100);
+  VSTViewTable.AddColumn('Партия',50);
+  VSTViewTable.CanSelect:= True;
+  VSTViewTable.Draw;
+
+  VSTCargoTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
+  VSTCargoTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTCargoTable.AddColumn('№ п/п', 60);
+  VSTCargoTable.AddColumn('Наименование', 220);
+  VSTCargoTable.AddColumn('Номер', 100);
+  VSTCargoTable.AddColumn('Партия');
+  VSTCargoTable.CanSelect:= True;
+  VSTCargoTable.Draw;
+
   if CargoID>0 then LoadCargo;
 
-  VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTTable.AddColumn('Дата сборки', 100);
-  VSTTable.AddColumn('Номер', 100);
-  VSTTable.AddColumn('Партия',50);
-  VSTTable.CanSelect:= True;
-  VSTTable.Draw;
-
   DateTimePicker1.SetFocus;
-end;
-
-procedure TCargoEditForm.ListBox1Click(Sender: TObject);
-begin
-  DelButton.Enabled:= ListBox1.ItemIndex>=0;
-end;
-
-procedure TCargoEditForm.ListBox1Exit(Sender: TObject);
-begin
-  DelButton.Enabled:= ListBox1.ItemIndex>=0;
 end;
 
 procedure TCargoEditForm.MotorNameComboBoxChange(Sender: TObject);
@@ -149,9 +150,9 @@ begin
   if VIsNil(ViewMotorIDs) then Exit;
   if Key=VK_RETURN then
   begin
-    VSTTable.Select(0);
+    VSTViewTable.Select(0);
     AddButton.Enabled:= True;
-    SeriesEdit.Text:= ViewSeries[VSTTable.SelectedIndex];
+    SeriesEdit.Text:= ViewSeries[VSTViewTable.SelectedIndex];
     SeriesEdit.SetFocus;
   end;
 end;
@@ -195,23 +196,30 @@ end;
 procedure TCargoEditForm.SeriesEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if not VSTTable.IsSelected then Exit;
+  if not VSTViewTable.IsSelected then Exit;
   if Key=VK_RETURN then AddMotor;
 end;
 
 procedure TCargoEditForm.VT1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  AddButton.Enabled:= VSTTable.IsSelected;
-  if VSTTable.IsSelected then
-    SeriesEdit.Text:= ViewSeries[VSTTable.SelectedIndex]
+  AddButton.Enabled:= VSTViewTable.IsSelected;
+  if VSTViewTable.IsSelected then
+    SeriesEdit.Text:= ViewSeries[VSTViewTable.SelectedIndex]
   else
     SeriesEdit.Text:= EmptyStr;
 end;
 
+procedure TCargoEditForm.VT2MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  DelButton.Enabled:= VSTCargoTable.IsSelected;
+end;
+
 procedure TCargoEditForm.FormCreate(Sender: TObject);
 begin
-  VSTTable:= TVSTTable.Create(VT1);
+  VSTViewTable:= TVSTTable.Create(VT1);
+  VSTCargoTable:= TVSTTable.Create(VT2);
   DateTimePicker1.Date:= Date;
   LoadMotorNames;
   LoadReceiverNames;
@@ -220,7 +228,8 @@ end;
 
 procedure TCargoEditForm.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(VSTTable)
+  FreeAndNil(VSTViewTable);
+  FreeAndNil(VSTCargoTable);
 end;
 
 procedure TCargoEditForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -251,12 +260,12 @@ end;
 
 procedure TCargoEditForm.AddMotor;
 var
-  S, MotorSeries: String;
+  MotorSeries: String;
   MotorID: Integer;
 begin
-  if not VSTTable.IsSelected then Exit;
+  if not VSTViewTable.IsSelected then Exit;
 
-  MotorID:= ViewMotorIDs[VSTTable.SelectedIndex];
+  MotorID:= ViewMotorIDs[VSTViewTable.SelectedIndex];
   VAppend(MotorIDs, MotorID);
 
   MotorSeries:= STrim(SeriesEdit.Text);
@@ -267,13 +276,10 @@ begin
   end;
 
   VAppend(Series, MotorSeries);
-  S:= MotorNameComboBox.Text + '   №   ' +
-      ViewMotorNums[VSTTable.SelectedIndex] +
-      '   (партия № ' + MotorSeries + ')';
+  VAppend(MotorNames, MotorNameComboBox.Text);
+  VAppend(MotorNums, ViewMotorNums[VSTViewTable.SelectedIndex]);
 
-  ListBox1.Items.Add(S);
-  ListBox1.ItemIndex:= ListBox1.Items.Count-1;
-  DelButton.Enabled:= True;
+  ShowCargoList;
 
   MotorNumEdit.Text:= EmptyStr;
   AddButton.Enabled:= False;
@@ -284,13 +290,27 @@ procedure TCargoEditForm.DelMotor;
 var
   i: Integer;
 begin
-  i:= ListBox1.ItemIndex;
+  if not VSTCargoTable.IsSelected then Exit;
+  i:= VSTCargoTable.SelectedIndex;
+
   VDel(MotorIDs, i);
   VDel(Series, i);
-  ListBox1.Items.Delete(i);
-  if ListBox1.Items.Count>0 then
-    ListBox1.ItemIndex:= ListBox1.Items.Count-1;
-  DelButton.Enabled:= ListBox1.Items.Count>0;
+  VDel(MotorNames, i);
+  VDel(MotorNums, i);
+  ShowCargoList;
+end;
+
+procedure TCargoEditForm.ShowCargoList;
+begin
+  VSTCargoTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorNames))));
+  VSTCargoTable.SetColumn('Наименование', MotorNames, taLeftJustify);
+  VSTCargoTable.SetColumn('Номер', MotorNums);
+  VSTCargoTable.SetColumn('Партия', Series);
+  VSTCargoTable.Draw;
+  if not VIsNil(MotorNames) then
+    VSTCargoTable.Show(High(MotorNames));
+
+  DelButton.Enabled:= False;
 end;
 
 procedure TCargoEditForm.LoadMotors;
@@ -320,37 +340,30 @@ begin
     end;
   end;
 
-  VSTTable.ValuesClear;
-  VSTTable.SetColumn('Дата сборки', ViewBuildDates);
-  VSTTable.SetColumn('Номер', ViewMotorNums);
-  VSTTable.SetColumn('Партия', ViewSeries{, taLeftJustify});
-  VSTTable.Draw;
+  VSTViewTable.ValuesClear;
+  VSTViewTable.SetColumn('Дата сборки', ViewBuildDates);
+  VSTViewTable.SetColumn('Номер', ViewMotorNums);
+  VSTViewTable.SetColumn('Партия', ViewSeries{, taLeftJustify});
+  VSTViewTable.Draw;
 end;
 
 procedure TCargoEditForm.LoadCargo;
 var
-  MNames, MNums: TStrVector;
   i: Integer;
   D: TDate;
-  S: String;
 begin
   if not SQLite.CargoMotorListLoad(CargoID,i, D, MotorIDs,
-                                   MNames, MNums, Series) then Exit;
+                                   MotorNames, MotorNums, Series) then Exit;
 
   DateTimePicker1.Date:= D;
   ReceiverNameComboBox.ItemIndex:= VIndexOf(ReceiverIDs, i);
 
   WritedMotorIDs:= VCut(MotorIDs);
 
-  for i:= 0 to High(MotorIDs) do
-  begin
-    S:= MNames[i] + '   №   ' + MNums[i] + '   (партия № ' + Series[i] + ')';
-    ListBox1.Items.Add(S);
-  end;
-  if ListBox1.Items.Count>0 then
-    ListBox1.ItemIndex:= ListBox1.Items.Count-1;
-  DelButton.Enabled:= ListBox1.Items.Count>0;
+  ShowCargoList;
 end;
+
+
 
 end.
 
