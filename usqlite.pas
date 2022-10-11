@@ -166,6 +166,7 @@ type
                           ARecNotes: TStrVector): Boolean;
     function ReclamationListLoad(const ABeginDate, AEndDate: TDate;
           const ANameIDs: TIntVector; const ANumberLike: String;
+          const ARepairMotorsOnly: Boolean;
           out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
           out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
           out APlaceNames, AFactoryNames, ADepartures,
@@ -1912,10 +1913,11 @@ begin
 end;
 
 function TSQLite.ReclamationListLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; const ANumberLike: String; out ARecDates,
-  ABuildDates, AArrivalDates, ASendingDates: TDateVector; out ARecIDs,
-  AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector; out
-  APlaceNames, AFactoryNames, ADepartures, ADefectNames, AReasonNames,
+  const ANameIDs: TIntVector; const ANumberLike: String;
+  const ARepairMotorsOnly: Boolean;
+  out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
+  out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
+  out APlaceNames, AFactoryNames, ADepartures, ADefectNames, AReasonNames,
   ARecNotes, AMotorNames, AMotorNums: TStrVector): Boolean;
 var
   WhereStr: String;
@@ -1941,10 +1943,18 @@ begin
   ASendingDates:= nil;
   APassports:= nil;
 
-  if ANumberLike=EmptyStr then
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) '
+
+  if ARepairMotorsOnly then
+    WhereStr:= 'WHERE ((t1.ArrivalDate>0) AND (t1.SendingDate=0)) '
   else
-    WhereStr:= 'WHERE (UPPER(t6.MotorNum) LIKE :NumberLike) ';
+    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
+
+  if ANumberLike<>EmptyStr then
+    WhereStr:= WhereStr +  'AND (UPPER(t6.MotorNum) LIKE :NumberLike) ';
+  //if ANumberLike=EmptyStr then
+  //  WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) '
+  //else
+  //  WhereStr:= 'WHERE (UPPER(t6.MotorNum) LIKE :NumberLike) ';
 
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t6','NameID', Length(ANameIDs));
@@ -1966,13 +1976,22 @@ begin
     WhereStr +
     'ORDER BY t1.RecDate');
 
-  if ANumberLike=EmptyStr then
+  if not ARepairMotorsOnly then
   begin
     QParamDT('BD', ABeginDate);
     QParamDT('ED', AEndDate);
-  end
-  else
+  end;
+
+  if ANumberLike<>EmptyStr then
     QParamStr('NumberLike', ANumberLike+'%');
+
+  //if ANumberLike=EmptyStr then
+  //begin
+  //  QParamDT('BD', ABeginDate);
+  //  QParamDT('ED', AEndDate);
+  //end
+  //else
+  //  QParamStr('NumberLike', ANumberLike+'%');
 
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
@@ -2099,17 +2118,29 @@ function TSQLite.ReclamationUpdate(const ARecDate, AArrivalDate,
   ASendingDate: TDate; const ARecID, AMotorID, AMileage, APlaceID, AFactoryID,
   ADefectID, AReasonID, AOpinion, APassport: Integer; const ADeparture,
   ARecNote: String): Boolean;
+var
+  S: String;
 begin
   Result:= False;
   QSetQuery(FQuery);
   try
-    QSetSQL('UPDATE RECLAMATIONS ' +
-            'SET RecDate=:RecDate, MotorID=:MotorID, Mileage=:Mileage, ' +
-                'PlaceID=:PlaceID, FactoryID=:FactoryID, ' +
-                'Departure=:Departure, DefectID=:DefectID, ' +
-                'ReasonID=:ReasonID, Opinion=:Opinion, RecNote=:RecNote, ' +
-                'ArrivalDate=:ArrivalDate, SendingDate=:SendingDate, Passport=:Passport ' +
-            'WHERE RecID = :RecID');
+    S:= 'UPDATE RECLAMATIONS ' +
+        'SET RecDate=:RecDate, MotorID=:MotorID, Mileage=:Mileage, ' +
+            'PlaceID=:PlaceID, FactoryID=:FactoryID, ' +
+            'Departure=:Departure, DefectID=:DefectID, ' +
+            'ReasonID=:ReasonID, Opinion=:Opinion, RecNote=:RecNote, ' +
+            'Passport=:Passport, ';
+    if AArrivalDate>0 then
+      S:= S + 'ArrivalDate=:ArrivalDate, '
+    else
+      S:= S + 'ArrivalDate=0, ';
+    if ASendingDate>0 then
+      S:= S + 'SendingDate=:SendingDate '
+    else
+      S:= S + 'SendingDate=0 ';
+    S:= S + 'WHERE RecID = :RecID';
+
+    QSetSQL(S);
     QParamInt('RecID', ARecID);
     QParamDT('RecDate', ARecDate);
     QParamInt('MotorID', AMotorID);
@@ -2121,8 +2152,10 @@ begin
     QParamInt('ReasonID', AReasonID);
     QParamInt('Opinion', AOpinion);
     QParamStr('RecNote', ARecNote);
-    QParamDT('ArrivalDate', AArrivalDate);
-    QParamDT('SendingDate', ASendingDate);
+    if AArrivalDate>0 then
+      QParamDT('ArrivalDate', AArrivalDate);
+    if ASendingDate>0 then
+      QParamDT('SendingDate', ASendingDate);
     QParamInt('Passport', APassport);
     QExec;
     QCommit;

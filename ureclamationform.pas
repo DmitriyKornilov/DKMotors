@@ -16,17 +16,20 @@ type
 
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
+    MotorRepairCheckBox: TCheckBox;
     ChooseMotorNamesButton: TSpeedButton;
     CloseButton: TSpeedButton;
     DefectListButton: TRxSpeedButton;
     DividerBevel4: TDividerBevel;
     DividerBevel8: TDividerBevel;
+    DividerBevel9: TDividerBevel;
     FactoryListButton: TRxSpeedButton;
     Label1: TLabel;
     Label2: TLabel;
     MotorNamesLabel: TLabel;
     LogGrid: TsWorksheetGrid;
     MotorNumEdit: TEditButton;
+    Panel2: TPanel;
     Panel4: TPanel;
     DelButton: TSpeedButton;
     DividerBevel5: TDividerBevel;
@@ -58,6 +61,7 @@ type
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
+    procedure MotorRepairCheckBoxChange(Sender: TObject);
     procedure PlaceListButtonClick(Sender: TObject);
     procedure DefectListButtonClick(Sender: TObject);
     procedure ReasonListButtonClick(Sender: TObject);
@@ -171,6 +175,12 @@ begin
   DataOpen;
 end;
 
+procedure TReclamationForm.MotorRepairCheckBoxChange(Sender: TObject);
+begin
+  SpinEdit1.Enabled:= not MotorRepairCheckBox.Checked;
+  DataOpen;
+end;
+
 procedure TReclamationForm.PlaceListButtonClick(Sender: TObject);
 begin
   if SQLite.EditList('Предприятия (депо)',
@@ -245,6 +255,7 @@ begin
     SQLite.ReclamationListLoad(BeginDate, EndDate,
                         UsedNameIDs,
                         STrim(MotorNumEdit.Text),
+                        MotorRepairCheckBox.Checked,
                         RecDates, BuildDates, ArrivalDates, SendingDates,
                         RecIDs, MotorIDs, Mileages, Opinions,
                         ReasonColors, Passports,

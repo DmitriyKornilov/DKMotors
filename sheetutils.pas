@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid,
   DK_Vector, DK_Matrix, DK_Fonts, Grids, Graphics, DK_SheetConst, DK_Const,
-  DateUtils{, Forms};
+  DateUtils, DK_DateUtils;
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;
@@ -1551,6 +1551,7 @@ begin
   FWriter.WriteText(R, 14, 'Прибыл в ремонт', cbtOuter, True, True);
   FWriter.WriteText(R, 15, 'Наличие паспорта', cbtOuter, True, True);
   FWriter.WriteText(R, 16, 'Убыл из ремонта', cbtOuter, True, True);
+  FWriter.WriteText(R, 17, 'Срок, дней', cbtOuter, True, True);
 
 end;
 
@@ -1586,7 +1587,8 @@ begin
     450, // Примечание
     70,  //Прибыл в ремонт
     60,  // Наличие паспорта
-    70   // Убыл из ремонта
+    70,   // Убыл из ремонта
+    50   //Срок
   ]);
 
   FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
@@ -1601,8 +1603,9 @@ end;
 
 procedure TReclamationSheet.DrawLine(const AIndex: Integer; const ASelected: Boolean);
 var
-  R: Integer;
+  R, NumDays: Integer;
   S: String;
+  D: TDate;
 begin
   R:= 2 + AIndex;
 
@@ -1663,8 +1666,16 @@ begin
   else
     FWriter.WriteDate(R, 16, SendingDates[AIndex], cbtOuter);
 
-
-
+  if ArrivalDates[AIndex]=0 then
+    FWriter.WriteText(R, 17, EmptyStr, cbtOuter, True, True)
+  else begin
+    if SendingDates[AIndex]>0 then
+      D:= SendingDates[AIndex]
+    else
+      D:= Date;
+    NumDays:= DaysBetweenDates(ArrivalDates[AIndex], D) + 1;
+    FWriter.WriteNumber(R, 17, NumDays, cbtOuter);
+  end;
 
 end;
 
@@ -1704,7 +1715,7 @@ begin
     for i:= 0 to High(RecDates) do
       DrawLine(i, False);
     FWriter.SetBackgroundClear;
-    for i:= 1 to 16 do
+    for i:= 1 to 17 do
       FWriter.WriteText(2+Length(RecDates), i, EmptyStr, cbtTop);
 
     FWriter.SetFrozenRows(1);
