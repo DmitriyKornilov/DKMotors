@@ -1,7 +1,7 @@
 object StoreForm: TStoreForm
-  Left = 437
+  Left = 487
   Height = 275
-  Top = 192
+  Top = 321
   Width = 1148
   Align = alClient
   BorderStyle = bsNone

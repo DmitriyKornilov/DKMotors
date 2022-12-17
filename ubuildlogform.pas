@@ -205,7 +205,7 @@ begin
   VST.SetColumn('Dates', StrDates, taLeftJustify);
   VST.Draw;
 
-  if MIndexOf(Dates, ASelectDate, I1, I2) then
+  if MIndexOfDate(Dates, ASelectDate, I1, I2) then
   begin
     VST.Select(I1, I2);
     VST.Show(I1, I2);
