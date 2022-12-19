@@ -927,6 +927,7 @@ object ReclamationForm: TReclamationForm
     Constraints.MaxHeight = 32
     Constraints.MinHeight = 32
     TabOrder = 2
+    OnClick = MotorNamesPanelClick
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
       Left = 0
@@ -1085,6 +1086,7 @@ object ReclamationForm: TReclamationForm
       BorderSpacing.Left = 5
       Caption = 'Электродвигатели:'
       ParentColor = False
+      OnClick = Label1Click
     end
     object MotorNamesLabel: TLabel
       AnchorSideLeft.Control = Label1
@@ -1106,6 +1108,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
+      OnClick = MotorNamesLabelClick
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom

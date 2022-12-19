@@ -46,6 +46,10 @@ type
     ToolPanel: TPanel;
     procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ChooseRecieverNamesButtonClick(Sender: TObject);
+    procedure Label2Click(Sender: TObject);
+    procedure Label3Click(Sender: TObject);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
     procedure NumberListCheckBoxChange(Sender: TObject);
     procedure OrderNumCheckBoxChange(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
@@ -61,6 +65,8 @@ type
     procedure RadioButton2Click(Sender: TObject);
     procedure RadioButton3Click(Sender: TObject);
     procedure RadioButton4Click(Sender: TObject);
+    procedure ReceiverNamesLabelClick(Sender: TObject);
+    procedure ReceiverNamesPanelClick(Sender: TObject);
 
   private
 
@@ -82,6 +88,9 @@ type
     procedure ShowReclamationReport;
 
     procedure FreeSheets;
+
+    procedure ChangeUsedMotorList;
+    procedure ChangeUsedReceiverList;
   public
 
   end;
@@ -152,14 +161,44 @@ end;
 
 procedure TReportForm.ChooseMotorNamesButtonClick(Sender: TObject);
 begin
+  ChangeUsedMotorList;
+end;
+
+procedure TReportForm.ChangeUsedMotorList;
+begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
     ShowReport;
 end;
 
 procedure TReportForm.ChooseRecieverNamesButtonClick(Sender: TObject);
 begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TReportForm.ChangeUsedReceiverList;
+begin
   if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True, UsedReceiverIDs, UsedReceiverNames) then
     ShowReport;
+end;
+
+procedure TReportForm.Label2Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TReportForm.Label3Click(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TReportForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TReportForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TReportForm.NumberListCheckBoxChange(Sender: TObject);
@@ -195,6 +234,16 @@ end;
 procedure TReportForm.RadioButton4Click(Sender: TObject);
 begin
   ShowReport;
+end;
+
+procedure TReportForm.ReceiverNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TReportForm.ReceiverNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
 end;
 
 procedure TReportForm.FreeSheets;

@@ -10,7 +10,7 @@ object MotorListForm: TMotorListForm
   ClientWidth = 1023
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '2.2.4.0'
   object Panel3: TPanel
     Left = 2
     Height = 32
@@ -449,6 +449,7 @@ object MotorListForm: TMotorListForm
     Constraints.MaxHeight = 32
     Constraints.MinHeight = 32
     TabOrder = 4
+    OnClick = MotorNamesPanelClick
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
       Left = 0
@@ -607,6 +608,7 @@ object MotorListForm: TMotorListForm
       BorderSpacing.Left = 5
       Caption = 'Электродвигатели:'
       ParentColor = False
+      OnClick = Label3Click
     end
     object MotorNamesLabel: TLabel
       AnchorSideLeft.Control = Label3
@@ -629,6 +631,7 @@ object MotorListForm: TMotorListForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
+      OnClick = MotorNamesLabelClick
     end
   end
 end

@@ -51,6 +51,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label1Click(Sender: TObject);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure TestGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
@@ -80,6 +83,7 @@ type
     procedure OpenDatesList(const ASelectDate: TDate);
     procedure OpenTestsList;
 
+    procedure ChangeUsedMotorList;
   public
 
   end;
@@ -131,7 +135,7 @@ begin
 
   VST:= TVSTCategoryRadioButtonTable.Create(VT);
   VST.SelectedFont.Style:= [fsBold];
-  VST.CanRightMouseButtonUnselect:= False;
+  VST.CanUnselect:= False;
   VST.HeaderVisible:= False;
   VST.GridLinesVisible:= False;
   VST.AddColumn('Dates');
@@ -144,6 +148,11 @@ begin
 end;
 
 procedure TTestLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TTestLogForm.ChangeUsedMotorList;
 begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
   begin
@@ -163,6 +172,21 @@ procedure TTestLogForm.FormShow(Sender: TObject);
 begin
   OpenDatesList(Date);
   OpenBeforeTestList;
+end;
+
+procedure TTestLogForm.Label1Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TTestLogForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TTestLogForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TTestLogForm.SpinEdit1Change(Sender: TObject);

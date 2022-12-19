@@ -47,9 +47,12 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label1Click(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNamesButtonClick(Sender: TObject);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTClick(Sender: TObject);
 
@@ -74,7 +77,7 @@ type
 
     procedure OpenDatesList(const ASelectDate: TDate);
     procedure OpenMotorsList;
-
+    procedure ChangeUsedMotorList;
   public
 
   end;
@@ -105,7 +108,7 @@ begin
 
   VST:= TVSTCategoryRadioButtonTable.Create(VT);
   VST.SelectedFont.Style:= [fsBold];
-  VST.CanRightMouseButtonUnselect:= False;
+  VST.CanUnselect:= False;
   VST.HeaderVisible:= False;
   VST.GridLinesVisible:= False;
   VST.AddColumn('Dates');
@@ -116,6 +119,11 @@ begin
 end;
 
 procedure TBuildLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TBuildLogForm.ChangeUsedMotorList;
 begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
     OpenMotorsList;
@@ -130,6 +138,11 @@ end;
 procedure TBuildLogForm.FormShow(Sender: TObject);
 begin
   OpenDatesList(Date);
+end;
+
+procedure TBuildLogForm.Label1Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TBuildLogForm.LogGridMouseDown(Sender: TObject; Button: TMouseButton;
@@ -151,6 +164,16 @@ begin
   if SQLite.EditList('Наименования электродвигателей',
     'MOTORNAMES', 'NameID', 'MotorName', False, True) then
       OpenMotorsList;
+end;
+
+procedure TBuildLogForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TBuildLogForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TBuildLogForm.SpinEdit1Change(Sender: TObject);
@@ -232,6 +255,8 @@ begin
 
   MotorBuildSheet.Draw(D, MotorNames, MotorNums, RotorNums);
 end;
+
+
 
 procedure TBuildLogForm.CloseButtonClick(Sender: TObject);
 begin

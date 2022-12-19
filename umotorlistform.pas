@@ -46,6 +46,9 @@ type
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Label3Click(Sender: TObject);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorShippedComboBoxChange(Sender: TObject);
@@ -62,6 +65,8 @@ type
 
     procedure MotorListOpen;
     procedure InfoOpen;
+
+    procedure ChangeUsedMotorList;
   public
 
   end;
@@ -98,7 +103,12 @@ end;
 
 procedure TMotorListForm.ChooseMotorNamesButtonClick(Sender: TObject);
 begin
- if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+  ChangeUsedMotorList;
+end;
+
+procedure TMotorListForm.ChangeUsedMotorList;
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
     MotorListOpen;
 end;
 
@@ -106,6 +116,21 @@ procedure TMotorListForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTTable) then FreeAndNil(VSTTable);
   if Assigned(MotorInfoSheet) then FreeAndNil(MotorInfoSheet);
+end;
+
+procedure TMotorListForm.Label3Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TMotorListForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TMotorListForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TMotorListForm.MotorNumEditButtonClick(Sender: TObject);

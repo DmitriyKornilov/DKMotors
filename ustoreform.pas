@@ -41,6 +41,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label1Click(Sender: TObject);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
 
   private
@@ -49,7 +52,7 @@ type
     StoreSheet: TStoreSheet;
     procedure DataOpen;
     procedure ExportSheet;
-
+    procedure ChangeUsedMotorList;
   public
 
   end;
@@ -109,7 +112,12 @@ end;
 
 procedure TStoreForm.ChooseMotorNamesButtonClick(Sender: TObject);
 begin
- if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
+  ChangeUsedMotorList;
+end;
+
+procedure TStoreForm.ChangeUsedMotorList;
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
     DataOpen;
   Checkbox2.Visible:= Length(UsedNameIDs)<>1;
 end;
@@ -122,6 +130,21 @@ end;
 procedure TStoreForm.FormShow(Sender: TObject);
 begin
   DataOpen;
+end;
+
+procedure TStoreForm.Label1Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TStoreForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TStoreForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TStoreForm.SpinEdit1Change(Sender: TObject);

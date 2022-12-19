@@ -57,8 +57,11 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label1Click(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorRepairCheckBoxChange(Sender: TObject);
@@ -89,6 +92,8 @@ type
     procedure DelRaclamation;
 
     procedure ReclamationEditFormOpen(const AEditType: Byte);
+
+    procedure ChangeUsedMotorList;
   public
 
   end;
@@ -137,6 +142,11 @@ end;
 
 procedure TReclamationForm.ChooseMotorNamesButtonClick(Sender: TObject);
 begin
+  ChangeUsedMotorList;
+end;
+
+procedure TReclamationForm.ChangeUsedMotorList;
+begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
     DataOpen;
 end;
@@ -151,6 +161,11 @@ begin
   DataOpen;
 end;
 
+procedure TReclamationForm.Label1Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
 procedure TReclamationForm.LogGridMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
@@ -163,6 +178,16 @@ begin
     LogGrid.MouseToCell(X,Y,C{%H-},R{%H-});
     SelectLine(R);
   end;
+end;
+
+procedure TReclamationForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TReclamationForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
 end;
 
 procedure TReclamationForm.MotorNumEditButtonClick(Sender: TObject);

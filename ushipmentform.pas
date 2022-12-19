@@ -46,6 +46,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label3Click(Sender: TObject);
+    procedure ReceiverNamesLabelClick(Sender: TObject);
+    procedure ReceiverNamesPanelClick(Sender: TObject);
     procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTClick(Sender: TObject);
@@ -66,6 +69,8 @@ type
 
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
     procedure SetButtonsEnabled(const AEnabled: Boolean);
+
+    procedure ChangeUsedReceiverList;
   public
 
   end;
@@ -130,7 +135,7 @@ procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
   VST:= TVSTCategoryRadioButtonTable.Create(VT);
   VST.SelectedFont.Style:= [fsBold];
-  VST.CanRightMouseButtonUnselect:= False;
+  VST.CanUnselect:= False;
   VST.HeaderVisible:= False;
   VST.GridLinesVisible:= False;
   VST.AddColumn('Shipments');
@@ -143,6 +148,11 @@ begin
 end;
 
 procedure TShipmentForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TShipmentForm.ChangeUsedReceiverList;
 begin
   if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True, UsedReceiverIDs, UsedReceiverNames) then
     OpenShipmentList(0);
@@ -157,6 +167,21 @@ end;
 procedure TShipmentForm.FormShow(Sender: TObject);
 begin
   OpenShipmentList(0);
+end;
+
+procedure TShipmentForm.Label3Click(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TShipmentForm.ReceiverNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TShipmentForm.ReceiverNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
 end;
 
 procedure TShipmentForm.RxSpeedButton5Click(Sender: TObject);
