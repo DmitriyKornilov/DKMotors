@@ -191,6 +191,13 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="USQLite"/>
       </Unit>
+      <Unit>
+        <Filename Value="ustatisticform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="StatisticForm"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UStatisticForm"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

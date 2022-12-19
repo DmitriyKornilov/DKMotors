@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   DividerBevel, DK_LCLStrRus, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
-  UTestLogForm, UMotorListForm, UReportForm, USQLite, SheetUtils;
+  UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, USQLite, SheetUtils;
 
 type
 
@@ -23,6 +23,7 @@ type
     MainPanel: TPanel;
     Panel2: TPanel;
     RxSpeedButton1: TRxSpeedButton;
+    RxSpeedButton10: TRxSpeedButton;
     RxSpeedButton2: TRxSpeedButton;
     RxSpeedButton3: TRxSpeedButton;
     RxSpeedButton4: TRxSpeedButton;
@@ -33,6 +34,7 @@ type
     procedure ExitButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure RxSpeedButton10Click(Sender: TObject);
     procedure RxSpeedButton1Click(Sender: TObject);
     procedure RxSpeedButton2Click(Sender: TObject);
     procedure RxSpeedButton3Click(Sender: TObject);
@@ -50,6 +52,7 @@ type
     procedure StoreFormOpen;
     procedure MotorListFormOpen;
     procedure ReportFormOpen;
+    procedure StatisticFormOpen;
   public
     BuildLogForm: TBuildLogForm;
     TestLogForm: TTestLogForm;
@@ -58,6 +61,7 @@ type
     StoreForm: TStoreForm;
     MotorListForm: TMotorListForm;
     ReportForm: TReportForm;
+    StatisticForm: TStatisticForm;
   end;
 
 var
@@ -123,6 +127,11 @@ begin
   Choose;
 end;
 
+procedure TMainForm.RxSpeedButton10Click(Sender: TObject);
+begin
+  Choose;
+end;
+
 procedure TMainForm.DBConnect;
 var
   ProgPath, DBName, DDLName: String;
@@ -139,12 +148,13 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     FreeForms;
-    if RxSpeedButton1.Down then BuildLogFormOpen
-    else if RxSpeedButton2.Down then ShipmentFormOpen
-    else if RxSpeedButton3.Down then ReclamationFormOpen
-    else if RxSpeedButton4.Down then StoreFormOpen
-    else if RxSpeedButton5.Down then TestFormOpen
-    else if RxSpeedButton9.Down then ReportFormOpen;
+    if RxSpeedButton1.Down       then BuildLogFormOpen
+    else if RxSpeedButton2.Down  then ShipmentFormOpen
+    else if RxSpeedButton3.Down  then ReclamationFormOpen
+    else if RxSpeedButton4.Down  then StoreFormOpen
+    else if RxSpeedButton5.Down  then TestFormOpen
+    else if RxSpeedButton9.Down  then ReportFormOpen
+    else if RxSpeedButton10.Down then StatisticFormOpen;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -158,6 +168,7 @@ begin
   if Assigned(ReclamationForm) then FreeAndNil(ReclamationForm);
   if Assigned(StoreForm) then FreeAndNil(StoreForm);
   if Assigned(ReportForm) then FreeAndNil(ReportForm);
+  if Assigned(StatisticForm) then FreeAndNil(StatisticForm);
 end;
 
 procedure TMainForm.SetFormPosition(AForm: TForm);
@@ -215,6 +226,13 @@ begin
   ReportForm:= TReportForm.Create(MainForm);
   SetFormPosition(TForm(ReportForm));
   ReportForm.Show;
+end;
+
+procedure TMainForm.StatisticFormOpen;
+begin
+  StatisticForm:= TStatisticForm.Create(MainForm);
+  SetFormPosition(TForm(StatisticForm));
+  StatisticForm.Show;
 end;
 
 

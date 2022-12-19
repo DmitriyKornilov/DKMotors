@@ -13,7 +13,7 @@ uses
   Forms, UMainForm, rxnew, lazcontrols, datetimectrls, UReclamationForm,
   UBuildAddForm, SheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
-  UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite;
+  UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm;
 
 {$R *.res}
 
