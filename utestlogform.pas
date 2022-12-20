@@ -19,18 +19,12 @@ type
     AddButton: TSpeedButton;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
-    ChooseMotorNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
     DelButton: TSpeedButton;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
-    DividerBevel4: TDividerBevel;
     EditButtonPanel: TPanel;
     DividerBevel1: TDividerBevel;
-    Label1: TLabel;
     LogGrid: TsWorksheetGrid;
-    MotorNamesLabel: TLabel;
-    MotorNamesPanel: TPanel;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
@@ -44,16 +38,10 @@ type
     procedure AddButtonClick(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
-    procedure ChooseMotorNamesButtonClick(Sender: TObject);
-    procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Label1Click(Sender: TObject);
-    procedure MotorNamesLabelClick(Sender: TObject);
-    procedure MotorNamesPanelClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure TestGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
@@ -70,9 +58,6 @@ type
 
     SelectedIndex: Integer;
 
-    UsedNameIDs: TIntVector;
-    UsedNames: TStrVector;
-
     BeforeTestSheet: TBeforeTestSheet;
     MotorTestSheet: TMotorTestSheet;
 
@@ -83,9 +68,8 @@ type
     procedure OpenDatesList(const ASelectDate: TDate);
     procedure OpenTestsList;
 
-    procedure ChangeUsedMotorList;
   public
-
+    procedure ShowTestLog;
   end;
 
 var
@@ -110,7 +94,7 @@ var
 begin
   Screen.Cursor:= crHourGlass;
   try
-    SQLite.TestBeforeListLoad(UsedNameIDs,
+    SQLite.TestBeforeListLoad(MainForm.UsedNameIDs,
                          Checkbox1.Checked, BuildDates, MNames, MNums,
                          TotalMNames, TotalMCounts,
                          BTestDates, BTestFails, BTestNotes);
@@ -122,15 +106,10 @@ begin
   end;
 end;
 
-procedure TTestLogForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-begin
-  MainForm.RxSpeedButton5.Down:= False;
-  MainForm.TestLogForm:= nil;
-  CloseAction:= caFree;
-end;
-
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
+  MainForm.SetNamesPanelsVisible(True, False);
+
   SelectedIndex:= -1;
 
   VST:= TVSTCategoryRadioButtonTable.Create(VT);
@@ -140,25 +119,15 @@ begin
   VST.GridLinesVisible:= False;
   VST.AddColumn('Dates');
 
-  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
-
   SpinEdit1.Value:= YearOfDate(Date);
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
   MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
 end;
 
-procedure TTestLogForm.ChooseMotorNamesButtonClick(Sender: TObject);
+procedure TTestLogForm.ShowTestLog;
 begin
-  ChangeUsedMotorList;
-end;
-
-procedure TTestLogForm.ChangeUsedMotorList;
-begin
-  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
-  begin
-    OpenTestsList;
-    OpenBeforeTestList;
-  end;
+  OpenTestsList;
+  OpenBeforeTestList;
 end;
 
 procedure TTestLogForm.FormDestroy(Sender: TObject);
@@ -172,21 +141,6 @@ procedure TTestLogForm.FormShow(Sender: TObject);
 begin
   OpenDatesList(Date);
   OpenBeforeTestList;
-end;
-
-procedure TTestLogForm.Label1Click(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TTestLogForm.MotorNamesLabelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TTestLogForm.MotorNamesPanelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
 end;
 
 procedure TTestLogForm.SpinEdit1Change(Sender: TObject);
@@ -276,18 +230,13 @@ begin
 
   D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
 
-  SQLite.TestListLoad(D,D, UsedNameIDs,
+  SQLite.TestListLoad(D,D, MainForm.UsedNameIDs,
                     CheckBox1.Checked, TestIDs, TestResults, X,
                     MotorNames, MotorNums, TestNotes);
-  SQLite.TestTotalLoad(D,D, UsedNameIDs, TotalMotorNames,
+  SQLite.TestTotalLoad(D,D, MainForm.UsedNameIDs, TotalMotorNames,
                        TotalMotorCounts, TotalFailCounts);
   MotorTestSheet.Draw(D, MotorNames, MotorNums, TestNotes, TestResults,
                       TotalMotorCounts, TotalFailCounts);
-end;
-
-procedure TTestLogForm.CloseButtonClick(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TTestLogForm.DelButtonClick(Sender: TObject);

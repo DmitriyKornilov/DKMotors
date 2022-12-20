@@ -14,19 +14,13 @@ type
   { TStatisticForm }
 
   TStatisticForm = class(TForm)
-    ChooseMotorNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     DividerBevel1: TDividerBevel;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
-    DividerBevel4: TDividerBevel;
     ExportButton: TRxSpeedButton;
     Label1: TLabel;
-    Label2: TLabel;
-    MotorNamesLabel: TLabel;
-    MotorNamesPanel: TPanel;
     NumberListCheckBox: TCheckBox;
     NumberListPanel: TPanel;
     OrderNumCheckBox: TCheckBox;
@@ -37,20 +31,11 @@ type
     RadioButton4: TRadioButton;
     ReportPeriodPanel: TPanel;
     ToolPanel: TPanel;
-    procedure ChooseMotorNamesButtonClick(Sender: TObject);
-    procedure CloseButtonClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure Label2Click(Sender: TObject);
-    procedure MotorNamesLabelClick(Sender: TObject);
-    procedure MotorNamesPanelClick(Sender: TObject);
   private
-    UsedNameIDs: TIntVector;
-    UsedNames: TStrVector;
-    procedure ShowStatistic;
-    procedure ChangeUsedMotorList;
-  public
 
+  public
+    procedure ShowStatistic;
   end;
 
 var
@@ -64,44 +49,11 @@ uses UMainForm;
 
 { TStatisticForm }
 
-procedure TStatisticForm.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
-begin
-  MainForm.RxSpeedButton10.Down:= False;
-  MainForm.StatisticForm:= nil;
-  CloseAction:= caFree;
-end;
-
-procedure TStatisticForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TStatisticForm.CloseButtonClick(Sender: TObject);
-begin
-  Close;
-end;
-
 procedure TStatisticForm.FormCreate(Sender: TObject);
 begin
+  MainForm.SetNamesPanelsVisible(True, False);
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= FirstDayInMonth(Date);
-  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
-end;
-
-procedure TStatisticForm.Label2Click(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TStatisticForm.MotorNamesLabelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TStatisticForm.MotorNamesPanelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
 end;
 
 procedure TStatisticForm.ShowStatistic;
@@ -109,11 +61,6 @@ begin
 
 end;
 
-procedure TStatisticForm.ChangeUsedMotorList;
-begin
-  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
-    ShowStatistic;
-end;
 
 end.
 

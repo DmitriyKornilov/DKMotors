@@ -6,40 +6,60 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  DividerBevel, DK_LCLStrRus, rxctrls, USQLite3ListForm,
+  StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
-  UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, USQLite, SheetUtils;
+  UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, USQLite,
+  SheetUtils;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    MotorListButton: TRxSpeedButton;
+    ChooseMotorNamesButton: TSpeedButton;
+    ChooseRecieverNamesButton: TSpeedButton;
     ExitButton: TSpeedButton;
     DividerBevel4: TDividerBevel;
     ImageListEdit24: TImageList;
     ImageListCategory24: TImageList;
     ImageList16: TImageList;
+    Label2: TLabel;
+    Label3: TLabel;
     MainPanel: TPanel;
-    Panel2: TPanel;
-    RxSpeedButton1: TRxSpeedButton;
-    RxSpeedButton10: TRxSpeedButton;
-    RxSpeedButton2: TRxSpeedButton;
-    RxSpeedButton3: TRxSpeedButton;
-    RxSpeedButton4: TRxSpeedButton;
-    RxSpeedButton5: TRxSpeedButton;
-    RxSpeedButton9: TRxSpeedButton;
+    MotorNamesLabel: TLabel;
+    MotorNamesPanel: TPanel;
+    ToolPanel: TPanel;
+    ReceiverNamesLabel: TLabel;
+    ReceiverNamesPanel: TPanel;
+    BuildLogButton: TRxSpeedButton;
+    StatisticButton: TRxSpeedButton;
+    ShipmentButton: TRxSpeedButton;
+    ReclamationButton: TRxSpeedButton;
+    StoreButton: TRxSpeedButton;
+    TestLogButton: TRxSpeedButton;
+    ReportButton: TRxSpeedButton;
     AboutButton: TSpeedButton;
     procedure AboutButtonClick(Sender: TObject);
+    procedure ChooseMotorNamesButtonClick(Sender: TObject);
+    procedure ChooseRecieverNamesButtonClick(Sender: TObject);
     procedure ExitButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure RxSpeedButton10Click(Sender: TObject);
-    procedure RxSpeedButton1Click(Sender: TObject);
-    procedure RxSpeedButton2Click(Sender: TObject);
-    procedure RxSpeedButton3Click(Sender: TObject);
-    procedure RxSpeedButton5Click(Sender: TObject);
-    procedure RxSpeedButton9Click(Sender: TObject);
+    procedure Label2Click(Sender: TObject);
+    procedure Label3Click(Sender: TObject);
+    procedure MotorListButtonClick(Sender: TObject);
+    procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesPanelClick(Sender: TObject);
+    procedure ReceiverNamesLabelClick(Sender: TObject);
+    procedure ReceiverNamesPanelClick(Sender: TObject);
+    procedure StatisticButtonClick(Sender: TObject);
+    procedure BuildLogButtonClick(Sender: TObject);
+    procedure ShipmentButtonClick(Sender: TObject);
+    procedure ReclamationButtonClick(Sender: TObject);
+    procedure StoreButtonClick(Sender: TObject);
+    procedure TestLogButtonClick(Sender: TObject);
+    procedure ReportButtonClick(Sender: TObject);
   private
     procedure DBConnect;
     procedure Choose;
@@ -53,6 +73,11 @@ type
     procedure MotorListFormOpen;
     procedure ReportFormOpen;
     procedure StatisticFormOpen;
+
+    procedure ChangeUsedMotorList;
+    procedure ChangeUsedReceiverList;
+
+    procedure ShowData;
   public
     BuildLogForm: TBuildLogForm;
     TestLogForm: TTestLogForm;
@@ -62,6 +87,15 @@ type
     MotorListForm: TMotorListForm;
     ReportForm: TReportForm;
     StatisticForm: TStatisticForm;
+
+    UsedNameIDs: TIntVector;
+    UsedNames: TStrVector;
+
+    UsedReceiverIDs: TIntVector;
+    UsedReceiverNames: TStrVector;
+
+    procedure SetNamesPanelsVisible(const AMotorNamesPanelVisible,
+                                          AReceiverNamesPanelVisible: Boolean);
   end;
 
 var
@@ -78,14 +112,60 @@ begin
   SQLite:= TSQLite.Create;
   SQLite.SetEditListSettings(COLOR_BACKGROUND_SELECTED, clWindowText);
   DBConnect;
-  MotorListFormOpen;
+  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
+  SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
+  Choose;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(SQLite) then FreeAndNil(SQLite);
-  if Assigned(MotorListForm) then FreeAndNil(MotorListForm);
   FreeForms;
+end;
+
+procedure TMainForm.ChooseMotorNamesButtonClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TMainForm.Label2Click(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TMainForm.MotorNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TMainForm.MotorNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedMotorList;
+end;
+
+procedure TMainForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TMainForm.Label3Click(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TMainForm.MotorListButtonClick(Sender: TObject);
+begin
+  if not Assigned(MotorListForm) then Choose;
+end;
+
+procedure TMainForm.ReceiverNamesLabelClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
+end;
+
+procedure TMainForm.ReceiverNamesPanelClick(Sender: TObject);
+begin
+  ChangeUsedReceiverList;
 end;
 
 procedure TMainForm.ExitButtonClick(Sender: TObject);
@@ -102,34 +182,39 @@ begin
   FreeAndNil(AboutForm);
 end;
 
-procedure TMainForm.RxSpeedButton1Click(Sender: TObject);
+procedure TMainForm.BuildLogButtonClick(Sender: TObject);
 begin
-  Choose;
+  if not Assigned(BuildLogForm) then Choose;
 end;
 
-procedure TMainForm.RxSpeedButton2Click(Sender: TObject);
+procedure TMainForm.ShipmentButtonClick(Sender: TObject);
 begin
-  Choose;
+  if not Assigned(ShipmentForm) then Choose;
 end;
 
-procedure TMainForm.RxSpeedButton3Click(Sender: TObject);
+procedure TMainForm.ReclamationButtonClick(Sender: TObject);
 begin
-  Choose;
+  if not Assigned(ReclamationForm) then Choose;
 end;
 
-procedure TMainForm.RxSpeedButton5Click(Sender: TObject);
+procedure TMainForm.StoreButtonClick(Sender: TObject);
 begin
-  Choose;
+  if not Assigned(StoreForm) then Choose;
 end;
 
-procedure TMainForm.RxSpeedButton9Click(Sender: TObject);
+procedure TMainForm.TestLogButtonClick(Sender: TObject);
 begin
-  Choose;
+  if not Assigned(TestLogForm) then Choose;
 end;
 
-procedure TMainForm.RxSpeedButton10Click(Sender: TObject);
+procedure TMainForm.ReportButtonClick(Sender: TObject);
 begin
-  Choose;
+  if not Assigned(ReportForm) then Choose;
+end;
+
+procedure TMainForm.StatisticButtonClick(Sender: TObject);
+begin
+  if not Assigned(StatisticForm) then Choose;
 end;
 
 procedure TMainForm.DBConnect;
@@ -148,13 +233,14 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     FreeForms;
-    if RxSpeedButton1.Down       then BuildLogFormOpen
-    else if RxSpeedButton2.Down  then ShipmentFormOpen
-    else if RxSpeedButton3.Down  then ReclamationFormOpen
-    else if RxSpeedButton4.Down  then StoreFormOpen
-    else if RxSpeedButton5.Down  then TestFormOpen
-    else if RxSpeedButton9.Down  then ReportFormOpen
-    else if RxSpeedButton10.Down then StatisticFormOpen;
+    if BuildLogButton.Down       then BuildLogFormOpen
+    else if ShipmentButton.Down  then ShipmentFormOpen
+    else if ReclamationButton.Down  then ReclamationFormOpen
+    else if StoreButton.Down  then StoreFormOpen
+    else if TestLogButton.Down  then TestFormOpen
+    else if ReportButton.Down  then ReportFormOpen
+    else if StatisticButton.Down then StatisticFormOpen
+    else if MotorListButton.Down then MotorListFormOpen;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -169,6 +255,7 @@ begin
   if Assigned(StoreForm) then FreeAndNil(StoreForm);
   if Assigned(ReportForm) then FreeAndNil(ReportForm);
   if Assigned(StatisticForm) then FreeAndNil(StatisticForm);
+  if Assigned(MotorListForm) then FreeAndNil(MotorListForm);
 end;
 
 procedure TMainForm.SetFormPosition(AForm: TForm);
@@ -233,6 +320,37 @@ begin
   StatisticForm:= TStatisticForm.Create(MainForm);
   SetFormPosition(TForm(StatisticForm));
   StatisticForm.Show;
+end;
+
+procedure TMainForm.ChangeUsedMotorList;
+begin
+  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True,
+    UsedNameIDs, UsedNames) then ShowData;
+end;
+
+procedure TMainForm.ChangeUsedReceiverList;
+begin
+  if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True,
+    UsedReceiverIDs, UsedReceiverNames) then ShowData;
+end;
+
+procedure TMainForm.ShowData;
+begin
+  if BuildLogButton.Down         then BuildLogForm.ShowBuildLog
+  else if ShipmentButton.Down    then ShipmentForm.ShowShipment
+  else if ReclamationButton.Down then ReclamationForm.ShowReclamation
+  else if StoreButton.Down       then StoreForm.ShowStore
+  else if TestLogButton.Down     then TestLogForm.ShowTestLog
+  else if ReportButton.Down      then ReportForm.ShowReport
+  else if StatisticButton.Down   then StatisticForm.ShowStatistic
+  else if MotorListButton.Down   then MotorListForm.ShowMotorList;
+end;
+
+procedure TMainForm.SetNamesPanelsVisible(const AMotorNamesPanelVisible,
+  AReceiverNamesPanelVisible: Boolean);
+begin
+  MotorNamesPanel.Visible:= AMotorNamesPanelVisible;
+  ReceiverNamesPanel.Visible:= AReceiverNamesPanelVisible;
 end;
 
 

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, StdCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables, USQLite,
+  Spin, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables, USQLite,
   SheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid, DK_Dialogs,
   DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, fpstypes;
 
@@ -16,10 +16,6 @@ type
 
   TShipmentForm = class(TForm)
     AddButton: TSpeedButton;
-    ChooseRecieverNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
-    DividerBevel4: TDividerBevel;
-    Label3: TLabel;
     LogGrid: TsWorksheetGrid;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
@@ -29,26 +25,18 @@ type
     ExportButton: TRxSpeedButton;
     Panel1: TPanel;
     Panel2: TPanel;
-    ReceiverNamesLabel: TLabel;
-    ReceiverNamesPanel: TPanel;
     RxSpeedButton5: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
-    procedure ChooseRecieverNamesButtonClick(Sender: TObject);
-    procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Label3Click(Sender: TObject);
-    procedure ReceiverNamesLabelClick(Sender: TObject);
-    procedure ReceiverNamesPanelClick(Sender: TObject);
     procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTClick(Sender: TObject);
@@ -57,11 +45,7 @@ type
     Shipments: TStrMatrix;
     CargoIDs: TIntMatrix;
 
-    UsedReceiverIDs: TIntVector;
-    UsedReceiverNames: TStrVector;
-
     VST: TVSTCategoryRadioButtonTable;
-
     CargoSheet: TCargoSheet;
 
     procedure OpenShipmentList(const ACargoID: Integer);
@@ -69,10 +53,8 @@ type
 
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
     procedure SetButtonsEnabled(const AEnabled: Boolean);
-
-    procedure ChangeUsedReceiverList;
   public
-
+    procedure ShowShipment;
   end;
 
 var
@@ -86,22 +68,9 @@ uses UMainForm;
 
 { TShipmentForm }
 
-procedure TShipmentForm.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
-begin
-  MainForm.RxSpeedButton2.Down:= False;
-  MainForm.ShipmentForm:= nil;
-  CloseAction:= caFree;
-end;
-
 procedure TShipmentForm.AddButtonClick(Sender: TObject);
 begin
   OpenCargoEditForm(1);
-end;
-
-procedure TShipmentForm.CloseButtonClick(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TShipmentForm.DelButtonClick(Sender: TObject);
@@ -133,6 +102,8 @@ end;
 
 procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
+  MainForm.SetNamesPanelsVisible(False, True);
+
   VST:= TVSTCategoryRadioButtonTable.Create(VT);
   VST.SelectedFont.Style:= [fsBold];
   VST.CanUnselect:= False;
@@ -142,20 +113,12 @@ begin
 
   CargoSheet:= TCargoSheet.Create(LogGrid);
 
-  SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
-
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
-procedure TShipmentForm.ChooseRecieverNamesButtonClick(Sender: TObject);
+procedure TShipmentForm.ShowShipment;
 begin
-  ChangeUsedReceiverList;
-end;
-
-procedure TShipmentForm.ChangeUsedReceiverList;
-begin
-  if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True, UsedReceiverIDs, UsedReceiverNames) then
-    OpenShipmentList(0);
+  OpenShipmentList(0);
 end;
 
 procedure TShipmentForm.FormDestroy(Sender: TObject);
@@ -169,27 +132,12 @@ begin
   OpenShipmentList(0);
 end;
 
-procedure TShipmentForm.Label3Click(Sender: TObject);
-begin
-  ChangeUsedReceiverList;
-end;
-
-procedure TShipmentForm.ReceiverNamesLabelClick(Sender: TObject);
-begin
-  ChangeUsedReceiverList;
-end;
-
-procedure TShipmentForm.ReceiverNamesPanelClick(Sender: TObject);
-begin
-  ChangeUsedReceiverList;
-end;
-
 procedure TShipmentForm.RxSpeedButton5Click(Sender: TObject);
 begin
   if SQLite.EditList('Грузополучатели',
     'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then
   begin
-    SQLite.ShipmentListLoad(UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs);
+    SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs);
     OpenShipment;
   end;
 end;
@@ -212,7 +160,8 @@ begin
   LogGrid.Clear;
   VST.ValuesClear;
   SetButtonsEnabled(False);
-  if not SQLite.ShipmentListLoad(UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs) then Exit;
+  if not SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value,
+                                 Months, Shipments, CargoIDs) then Exit;
   VST.SetCategories(Months);
   VST.SetColumn('Shipments', Shipments, taLeftJustify);
   VST.Draw;

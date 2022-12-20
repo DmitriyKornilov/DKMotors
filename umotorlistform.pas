@@ -18,16 +18,12 @@ type
   TMotorListForm = class(TForm)
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
-    ChooseMotorNamesButton: TSpeedButton;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
     DividerBevel4: TDividerBevel;
     DividerBevel5: TDividerBevel;
     DividerBevel7: TDividerBevel;
     InfoGrid: TsWorksheetGrid;
-    Label3: TLabel;
-    MotorNamesLabel: TLabel;
-    MotorNamesPanel: TPanel;
     MotorNumEdit: TEditButton;
     ExportButton: TRxSpeedButton;
     Label2: TLabel;
@@ -42,13 +38,9 @@ type
     VT1: TVirtualStringTree;
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
-    procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Label3Click(Sender: TObject);
-    procedure MotorNamesLabelClick(Sender: TObject);
-    procedure MotorNamesPanelClick(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorShippedComboBoxChange(Sender: TObject);
@@ -60,15 +52,9 @@ type
     MotorInfoSheet: TMotorInfoSheet;
     MotorIDs: TIntVector;
 
-    UsedNameIDs: TIntVector;
-    UsedNames: TStrVector;
-
-    procedure MotorListOpen;
     procedure InfoOpen;
-
-    procedure ChangeUsedMotorList;
   public
-
+    procedure ShowMotorList;
   end;
 
 var
@@ -76,6 +62,7 @@ var
 
 implementation
 
+uses UMainForm;
 
 {$R *.lfm}
 
@@ -83,6 +70,8 @@ implementation
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
 begin
+  MainForm.SetNamesPanelsVisible(True, False);
+
   VSTTable:= TVSTTable.Create(VT1);
   VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTable.HeaderFont.Style:= [fsBold];
@@ -95,42 +84,14 @@ begin
 
   MotorInfoSheet:= TMotorInfoSheet.Create(InfoGrid);
 
-  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
-
   SpinEdit1.Value:= YearOfDate(Date);
-  MotorListOpen;
-end;
-
-procedure TMotorListForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TMotorListForm.ChangeUsedMotorList;
-begin
-  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
-    MotorListOpen;
+  ShowMotorList;
 end;
 
 procedure TMotorListForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTTable) then FreeAndNil(VSTTable);
   if Assigned(MotorInfoSheet) then FreeAndNil(MotorInfoSheet);
-end;
-
-procedure TMotorListForm.Label3Click(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TMotorListForm.MotorNamesLabelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TMotorListForm.MotorNamesPanelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
 end;
 
 procedure TMotorListForm.MotorNumEditButtonClick(Sender: TObject);
@@ -140,17 +101,17 @@ end;
 
 procedure TMotorListForm.MotorNumEditChange(Sender: TObject);
 begin
-  MotorListOpen;
+  ShowMotorList;
 end;
 
 procedure TMotorListForm.MotorShippedComboBoxChange(Sender: TObject);
 begin
-  MotorListOpen;
+  ShowMotorList;
 end;
 
 procedure TMotorListForm.SpinEdit1Change(Sender: TObject);
 begin
-  MotorListOpen;
+  ShowMotorList;
 end;
 
 procedure TMotorListForm.VT1MouseUp(Sender: TObject; Button: TMouseButton;
@@ -161,7 +122,7 @@ begin
   InfoOpen;
 end;
 
-procedure TMotorListForm.MotorListOpen;
+procedure TMotorListForm.ShowMotorList;
 var
   MotorNumberLike: String;
 
@@ -174,7 +135,7 @@ begin
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
     SQLite.MotorListLoad(SpinEdit1.Value,
-                        MotorShippedComboBox.ItemIndex, UsedNameIDs,
+                        MotorShippedComboBox.ItemIndex, MainForm.UsedNameIDs,
                         MotorNumberLike, Checkbox1.Checked,
                         MotorIDs, ABuildDates,
                         AMotorNames, AMotorNums, AShippings);
@@ -220,7 +181,7 @@ end;
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
-  MotorListOpen;
+  ShowMotorList;
 end;
 
 procedure TMotorListForm.CheckBox2Change(Sender: TObject);

@@ -17,15 +17,9 @@ type
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
-    ChooseMotorNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
-    DividerBevel4: TDividerBevel;
     DividerBevel7: TDividerBevel;
     ExportButton: TRxSpeedButton;
-    Label1: TLabel;
     Label2: TLabel;
-    MotorNamesLabel: TLabel;
-    MotorNamesPanel: TPanel;
     Panel2: TPanel;
     Panel5: TPanel;
     Panel1: TPanel;
@@ -34,27 +28,16 @@ type
     procedure CheckBox1Click(Sender: TObject);
     procedure CheckBox2Click(Sender: TObject);
     procedure CheckBox3Click(Sender: TObject);
-    procedure ChooseMotorNamesButtonClick(Sender: TObject);
-    procedure CloseButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Label1Click(Sender: TObject);
-    procedure MotorNamesLabelClick(Sender: TObject);
-    procedure MotorNamesPanelClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-
   private
-    UsedNameIDs: TIntVector;
-    UsedNames: TStrVector;
     StoreSheet: TStoreSheet;
-    procedure DataOpen;
     procedure ExportSheet;
-    procedure ChangeUsedMotorList;
   public
-
+    procedure ShowStore;
   end;
 
 var
@@ -68,32 +51,20 @@ uses UMainForm;
 
 { TStoreForm }
 
-procedure TStoreForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-begin
-  MainForm.RxSpeedButton4.Down:= False;
-  MainForm.StoreForm:= nil;
-  CloseAction:= caFree;
-end;
-
-procedure TStoreForm.CloseButtonClick(Sender: TObject);
-begin
-  Close;
-end;
-
 procedure TStoreForm.CheckBox1Click(Sender: TObject);
 begin
-  DataOpen;
+  ShowStore;
 end;
 
 procedure TStoreForm.CheckBox2Click(Sender: TObject);
 begin
-  DataOpen;
+  ShowStore;
 end;
 
 procedure TStoreForm.CheckBox3Click(Sender: TObject);
 begin
   SpinEdit1.Enabled:= CheckBox3.Checked;
-  DataOpen;
+  ShowStore;
 end;
 
 procedure TStoreForm.ExportButtonClick(Sender: TObject);
@@ -103,23 +74,9 @@ end;
 
 procedure TStoreForm.FormCreate(Sender: TObject);
 begin
+  MainForm.SetNamesPanelsVisible(True, False);
   StoreSheet:= TStoreSheet.Create(ReportGrid);
-
-  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
-
-  Checkbox2.Visible:= Length(UsedNameIDs)<>1;
-end;
-
-procedure TStoreForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TStoreForm.ChangeUsedMotorList;
-begin
-  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
-    DataOpen;
-  Checkbox2.Visible:= Length(UsedNameIDs)<>1;
+  Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;
 end;
 
 procedure TStoreForm.FormDestroy(Sender: TObject);
@@ -129,36 +86,23 @@ end;
 
 procedure TStoreForm.FormShow(Sender: TObject);
 begin
-  DataOpen;
-end;
-
-procedure TStoreForm.Label1Click(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TStoreForm.MotorNamesLabelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TStoreForm.MotorNamesPanelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
+  ShowStore;
 end;
 
 procedure TStoreForm.SpinEdit1Change(Sender: TObject);
 begin
-  DataOpen;
+  ShowStore;
 end;
 
-procedure TStoreForm.DataOpen;
+procedure TStoreForm.ShowStore;
 var
   TotalMotorNames, MotorNames, MotorNums: TStrVector;
   TotalMotorCounts: TIntVector;
   TestDates: TDateVector;
   DeltaDays: Integer;
 begin
+  Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;
+
   Screen.Cursor:= crHourGlass;
   try
 
@@ -166,10 +110,10 @@ begin
     if CheckBox3.Checked then
       DeltaDays:= SpinEdit1.Value;
 
-    SQLite.StoreListLoad(UsedNameIDs, DeltaDays,
+    SQLite.StoreListLoad(MainForm.UsedNameIDs, DeltaDays,
                        Checkbox1.Checked, Checkbox2.Checked,
                        TestDates, MotorNames, MotorNums);
-    SQLite.StoreTotalLoad(UsedNameIDs, DeltaDays,
+    SQLite.StoreTotalLoad(MainForm.UsedNameIDs, DeltaDays,
                         TotalMotorNames, TotalMotorCounts);
     StoreSheet.Draw(DeltaDays, TestDates, MotorNames, MotorNums,
                     TotalMotorNames, TotalMotorCounts);

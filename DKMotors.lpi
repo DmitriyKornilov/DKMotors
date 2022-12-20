@@ -195,6 +195,7 @@
         <Filename Value="ustatisticform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="StatisticForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UStatisticForm"/>
       </Unit>

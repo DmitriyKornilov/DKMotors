@@ -17,16 +17,11 @@ type
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
     MotorRepairCheckBox: TCheckBox;
-    ChooseMotorNamesButton: TSpeedButton;
-    CloseButton: TSpeedButton;
     DefectListButton: TRxSpeedButton;
-    DividerBevel4: TDividerBevel;
     DividerBevel8: TDividerBevel;
     DividerBevel9: TDividerBevel;
     FactoryListButton: TRxSpeedButton;
-    Label1: TLabel;
     Label2: TLabel;
-    MotorNamesLabel: TLabel;
     LogGrid: TsWorksheetGrid;
     MotorNumEdit: TEditButton;
     Panel2: TPanel;
@@ -40,28 +35,21 @@ type
     Panel1: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
-    MotorNamesPanel: TPanel;
     Panel7: TPanel;
     PlaceListButton: TRxSpeedButton;
     ReasonListButton: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     TopToolsPanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
-    procedure ChooseMotorNamesButtonClick(Sender: TObject);
-    procedure CloseButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FactoryListButtonClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Label1Click(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
-    procedure MotorNamesLabelClick(Sender: TObject);
-    procedure MotorNamesPanelClick(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorRepairCheckBoxChange(Sender: TObject);
@@ -79,23 +67,15 @@ type
     DefectNames, ReasonNames, RecNotes: TStrVector;
     MotorNames, MotorNums: TStrVector;
 
-    UsedNameIDs: TIntVector;
-    UsedNames: TStrVector;
-
     procedure ExportSheet;
 
     procedure SelectionClear;
     procedure SelectLine(const ARow: Integer);
 
-    procedure DataOpen;
-
     procedure DelRaclamation;
-
     procedure ReclamationEditFormOpen(const AEditType: Byte);
-
-    procedure ChangeUsedMotorList;
   public
-
+    procedure ShowReclamation;
   end;
 
 var
@@ -123,32 +103,12 @@ begin
   end;
 end;
 
-procedure TReclamationForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-begin
-  MainForm.RxSpeedButton3.Down:= False;
-  MainForm.ReclamationForm:= nil;
-  CloseAction:= caFree;
-end;
-
 procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
+  MainForm.SetNamesPanelsVisible(True, False);
   SelectedIndex:= -1;
   ReclamationSheet:= TReclamationSheet.Create(LogGrid);
-
-  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
-
   SpinEdit1.Value:= YearOfDate(Date);
-end;
-
-procedure TReclamationForm.ChooseMotorNamesButtonClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TReclamationForm.ChangeUsedMotorList;
-begin
-  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True, UsedNameIDs, UsedNames) then
-    DataOpen;
 end;
 
 procedure TReclamationForm.FormDestroy(Sender: TObject);
@@ -158,12 +118,7 @@ end;
 
 procedure TReclamationForm.FormShow(Sender: TObject);
 begin
-  DataOpen;
-end;
-
-procedure TReclamationForm.Label1Click(Sender: TObject);
-begin
-  ChangeUsedMotorList;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.LogGridMouseDown(Sender: TObject;
@@ -180,16 +135,6 @@ begin
   end;
 end;
 
-procedure TReclamationForm.MotorNamesLabelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
-procedure TReclamationForm.MotorNamesPanelClick(Sender: TObject);
-begin
-  ChangeUsedMotorList;
-end;
-
 procedure TReclamationForm.MotorNumEditButtonClick(Sender: TObject);
 begin
   MotorNumEdit.Text:= EmptyStr;
@@ -197,46 +142,46 @@ end;
 
 procedure TReclamationForm.MotorNumEditChange(Sender: TObject);
 begin
-  DataOpen;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.MotorRepairCheckBoxChange(Sender: TObject);
 begin
   SpinEdit1.Enabled:= not MotorRepairCheckBox.Checked;
-  DataOpen;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.PlaceListButtonClick(Sender: TObject);
 begin
   if SQLite.EditList('Предприятия (депо)',
     'RECLAMATIONPLACES', 'PlaceID', 'PlaceName', True, True) then
-      DataOpen;
+      ShowReclamation;
 end;
 
 procedure TReclamationForm.FactoryListButtonClick(Sender: TObject);
 begin
   if SQLite.EditList('Заводы',
     'RECLAMATIONFACTORIES', 'FactoryID', 'FactoryName', True, True) then
-      DataOpen;
+      ShowReclamation;
 end;
 
 procedure TReclamationForm.DefectListButtonClick(Sender: TObject);
 begin
   if SQLite.EditList('Неисправные элементы',
     'RECLAMATIONDEFECTS', 'DefectID', 'DefectName', True, True) then
-      DataOpen;
+      ShowReclamation;
 end;
 
 procedure TReclamationForm.ReasonListButtonClick(Sender: TObject);
 begin
   if SQLite.EditList('Причины возникновения неисправностей',
     'RECLAMATIONREASONS', 'ReasonID', 'ReasonName', True, True, 'ReasonColor') then
-      DataOpen;
+      ShowReclamation;
 end;
 
 procedure TReclamationForm.SpinEdit1Change(Sender: TObject);
 begin
-  DataOpen;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.SelectionClear;
@@ -266,7 +211,7 @@ begin
   end;
 end;
 
-procedure TReclamationForm.DataOpen;
+procedure TReclamationForm.ShowReclamation;
 var
   BeginDate, EndDate: TDate;
 begin
@@ -278,7 +223,7 @@ begin
     EndDate:= LastDayInYear(SpinEdit1.Value);
 
     SQLite.ReclamationListLoad(BeginDate, EndDate,
-                        UsedNameIDs,
+                        MainForm.UsedNameIDs,
                         STrim(MotorNumEdit.Text),
                         MotorRepairCheckBox.Checked,
                         RecDates, BuildDates, ArrivalDates, SendingDates,
@@ -306,7 +251,7 @@ begin
   if not Confirm('Удалить рекламацию?') then Exit;
   SQLite.Delete('RECLAMATIONS', 'RecID', RecIDs[SelectedIndex]);
   SelectionClear;
-  DataOpen;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.ReclamationEditFormOpen(const AEditType: Byte);
@@ -318,17 +263,12 @@ begin
     ReclamationEditForm.RecID:= 0;
     if AEditType=2 then
       ReclamationEditForm.RecID:= RecIDs[SelectedIndex];
-    if ReclamationEditForm.ShowModal = mrOK then DataOpen;
+    if ReclamationEditForm.ShowModal = mrOK then ShowReclamation;
   finally
     FreeAndNil(ReclamationEditForm);
   end;
   SelectionClear;
-  DataOpen;
-end;
-
-procedure TReclamationForm.CloseButtonClick(Sender: TObject);
-begin
-  Close;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.DelButtonClick(Sender: TObject);
