@@ -15,11 +15,12 @@ object StoreForm: TStoreForm
   object Panel1: TPanel
     Left = 2
     Height = 32
-    Top = 0
+    Top = 2
     Width = 914
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
@@ -279,8 +280,8 @@ object StoreForm: TStoreForm
   end
   object Panel2: TPanel
     Left = 2
-    Height = 184
-    Top = 34
+    Height = 182
+    Top = 36
     Width = 914
     Align = alClient
     BorderSpacing.Left = 2
@@ -289,12 +290,12 @@ object StoreForm: TStoreForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel2'
-    ClientHeight = 180
+    ClientHeight = 178
     ClientWidth = 910
     TabOrder = 1
     object ReportGrid: TsWorksheetGrid
       Left = 0
-      Height = 180
+      Height = 178
       Top = 0
       Width = 910
       AutoExpand = []

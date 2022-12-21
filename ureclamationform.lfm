@@ -15,11 +15,12 @@ object ReclamationForm: TReclamationForm
   object TopToolsPanel: TPanel
     Left = 2
     Height = 32
-    Top = 0
+    Top = 2
     Width = 1371
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
@@ -859,8 +860,8 @@ object ReclamationForm: TReclamationForm
   end
   object Panel4: TPanel
     Left = 2
-    Height = 186
-    Top = 34
+    Height = 184
+    Top = 36
     Width = 1371
     Align = alClient
     BorderSpacing.Left = 2
@@ -869,12 +870,12 @@ object ReclamationForm: TReclamationForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel4'
-    ClientHeight = 182
+    ClientHeight = 180
     ClientWidth = 1367
     TabOrder = 1
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 182
+      Height = 180
       Top = 0
       Width = 1367
       AutoExpand = []

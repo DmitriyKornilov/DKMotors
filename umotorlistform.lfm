@@ -14,10 +14,11 @@ object MotorListForm: TMotorListForm
   object Panel3: TPanel
     Left = 2
     Height = 32
-    Top = 0
+    Top = 2
     Width = 1019
     Align = alTop
     BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
@@ -418,8 +419,8 @@ object MotorListForm: TMotorListForm
   object VT1: TVirtualStringTree
     AnchorSideBottom.Control = Splitter2
     Left = 2
-    Height = 135
-    Top = 34
+    Height = 133
+    Top = 36
     Width = 1019
     Align = alClient
     BorderSpacing.Left = 2

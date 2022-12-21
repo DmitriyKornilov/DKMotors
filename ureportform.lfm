@@ -17,10 +17,11 @@ object ReportForm: TReportForm
     AnchorSideRight.Control = Owner
     Left = 2
     Height = 32
-    Top = 0
+    Top = 2
     Width = 1161
     Align = alTop
     BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
@@ -415,8 +416,8 @@ object ReportForm: TReportForm
   object Panel1: TPanel
     AnchorSideTop.Control = ToolPanel
     Left = 2
-    Height = 186
-    Top = 34
+    Height = 184
+    Top = 36
     Width = 1161
     Align = alClient
     BorderSpacing.Left = 2
@@ -424,12 +425,12 @@ object ReportForm: TReportForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 182
+    ClientHeight = 180
     ClientWidth = 1157
     TabOrder = 1
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 182
+      Height = 180
       Top = 0
       Width = 1157
       AutoExpand = []

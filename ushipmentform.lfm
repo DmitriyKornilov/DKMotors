@@ -15,11 +15,12 @@ object ShipmentForm: TShipmentForm
   object ToolPanel: TPanel
     Left = 2
     Height = 32
-    Top = 0
+    Top = 2
     Width = 566
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
@@ -813,8 +814,8 @@ object ShipmentForm: TShipmentForm
   end
   object Panel1: TPanel
     Left = 2
-    Height = 158
-    Top = 34
+    Height = 156
+    Top = 36
     Width = 400
     Align = alLeft
     BorderSpacing.Left = 2
@@ -822,12 +823,12 @@ object ShipmentForm: TShipmentForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 154
+    ClientHeight = 152
     ClientWidth = 396
     TabOrder = 1
     object VT: TVirtualStringTree
       Left = 0
-      Height = 154
+      Height = 152
       Top = 0
       Width = 396
       Align = alClient
@@ -858,15 +859,15 @@ object ShipmentForm: TShipmentForm
   end
   object Splitter1: TSplitter
     Left = 402
-    Height = 160
-    Top = 34
+    Height = 158
+    Top = 36
     Width = 5
     ResizeStyle = rsLine
   end
   object Panel2: TPanel
     Left = 407
-    Height = 158
-    Top = 34
+    Height = 156
+    Top = 36
     Width = 161
     Align = alClient
     BorderSpacing.Top = 2
@@ -875,13 +876,13 @@ object ShipmentForm: TShipmentForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel2'
-    ClientHeight = 154
+    ClientHeight = 152
     ClientWidth = 157
     ParentFont = False
     TabOrder = 3
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 154
+      Height = 152
       Top = 0
       Width = 157
       AutoExpand = []
