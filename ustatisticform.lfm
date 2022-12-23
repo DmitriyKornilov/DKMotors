@@ -2,12 +2,12 @@ object StatisticForm: TStatisticForm
   Left = 322
   Height = 240
   Top = 250
-  Width = 1014
+  Width = 1193
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StatisticForm'
   ClientHeight = 240
-  ClientWidth = 1014
+  ClientWidth = 1193
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.2.4.0'
@@ -46,40 +46,13 @@ object StatisticForm: TStatisticForm
     Width = 5
     ResizeStyle = rsLine
   end
-  object Panel2: TPanel
+  object MainPanel: TPanel
     Left = 359
     Height = 240
     Top = 0
-    Width = 655
+    Width = 834
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 240
-    ClientWidth = 655
     TabOrder = 2
-    object Panel3: TPanel
-      Left = 0
-      Height = 50
-      Top = 2
-      Width = 653
-      Align = alTop
-      BorderSpacing.Top = 2
-      BorderSpacing.Right = 2
-      BevelOuter = bvNone
-      BorderStyle = bsSingle
-      TabOrder = 0
-    end
-    object Panel4: TPanel
-      Left = 0
-      Height = 184
-      Top = 54
-      Width = 653
-      Align = alClient
-      BorderSpacing.Top = 2
-      BorderSpacing.Right = 2
-      BorderSpacing.Bottom = 2
-      BevelOuter = bvNone
-      BorderStyle = bsSingle
-      TabOrder = 1
-    end
   end
 end

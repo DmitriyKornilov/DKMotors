@@ -61,7 +61,7 @@ object MainForm: TMainForm
     end
     object ReclamationButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 574
+      Left = 678
       Height = 28
       Top = 0
       Width = 115
@@ -120,7 +120,7 @@ object MainForm: TMainForm
     end
     object ReportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 689
+      Left = 574
       Height = 28
       Top = 0
       Width = 89
@@ -162,7 +162,7 @@ object MainForm: TMainForm
     end
     object StatisticButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 778
+      Left = 793
       Height = 28
       Top = 0
       Width = 180
@@ -191,6 +191,16 @@ object MainForm: TMainForm
       ImageIndex = 17
       Margin = 10
       OnClick = MotorListButtonClick
+      ParentFont = False
+    end
+    object DividerBevel5: TDividerBevel
+      Left = 663
+      Height = 28
+      Top = 0
+      Width = 15
+      Align = alLeft
+      Font.Style = [fsBold]
+      Orientation = trVertical
       ParentFont = False
     end
   end

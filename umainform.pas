@@ -16,6 +16,7 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    DividerBevel5: TDividerBevel;
     MotorListButton: TRxSpeedButton;
     ChooseMotorNamesButton: TSpeedButton;
     ChooseRecieverNamesButton: TSpeedButton;

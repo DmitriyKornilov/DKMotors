@@ -119,6 +119,33 @@ type
 
   end;
 
+  { TStatisticReclamationCountSheet }
+
+  TStatisticReclamationCountSheet = class (TObject)
+  private
+    FGrid: TsWorksheetGrid;
+    FWriter: TSheetWriter;
+    FFontName: String;
+    FFontSize: Single;
+    procedure DrawTitle(var ARow: Integer; const ABeginDate, AEndDate: TDate;
+                        const AName, AMotorNames: String);
+    procedure DrawData(const ARow: Integer;
+                const {APartName,} AFirstColName: String;
+                const ANameValues, ATitleReasonNames: TStrVector;
+                const ACountValues: TIntVector;
+                const AReasonCountValues: TIntMatrix;
+                const AResumeNeed: Boolean);
+  public
+    constructor Create(const AGrid: TsWorksheetGrid; const AReasonsCount: Integer);
+    destructor  Destroy; override;
+    procedure Draw(const ABeginDate, AEndDate: TDate;
+                   const AName, AMotorNames, AFirstColName: String;
+                   const ANameValues, ATitleReasonNames: TStrVector;
+                   const ACountValues: TIntVector;
+                   const AReasonCountValues: TIntMatrix;
+                   const AResumeNeed: Boolean);
+  end;
+
 
 
   { TMotorTestSheet }
@@ -261,6 +288,152 @@ type
   end;
 
 implementation
+
+{ TStatisticReclamationCountSheet }
+
+procedure TStatisticReclamationCountSheet.DrawTitle(var ARow: Integer;
+  const ABeginDate, AEndDate: TDate; const AName, AMotorNames: String);
+var
+  R: Integer;
+  S: String;
+begin
+
+  FWriter.SetAlignment(haCenter, vaCenter);
+
+  R:= ARow;
+  S:= 'Отчет по рекламационным случаям электродвигателей';
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  if AMotorNames<>EmptyStr then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
+  end;
+
+  R:= R + 1;
+  S:= 'за ';
+  if SameDate(ABeginDate, AEndDate) then
+    S:= S + FormatDateTime('dd.mm.yyyy', ABeginDate)
+  else
+    S:= S + 'период с ' + FormatDateTime('dd.mm.yyyy', ABeginDate) +
+       ' по ' + FormatDateTime('dd.mm.yyyy', AEndDate);
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  if AName<>EmptyStr then
+  begin
+    R:= R + 1;
+    S:= '(' + AName + ')';
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+  end;
+
+  ARow:= R + 1;
+end;
+
+procedure TStatisticReclamationCountSheet.DrawData(const ARow: Integer;
+  const {APartName,} AFirstColName: String; const ANameValues, ATitleReasonNames: TStrVector;
+  const ACountValues: TIntVector; const AReasonCountValues: TIntMatrix;
+  const AResumeNeed: Boolean);
+var
+  i, j, R: Integer;
+begin
+  R:= ARow;
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
+  FWriter.SetRowHeight(R, 10);
+
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.WriteText(R, 1, R+1, 1, AFirstColName, cbtOuter, True, True);
+  FWriter.WriteText(R, 2, R+1, 2, 'Количество случаев', cbtOuter, True, True);
+  FWriter.WriteText(R, 3, R, 3+High(ATitleReasonNames), 'В том числе по причине', cbtOuter, True, True);
+  R:= R + 1;
+  for i:= 0 to High(ATitleReasonNames) do
+    FWriter.WriteText(R, 3+i, ATitleReasonNames[i], cbtOuter, True, True);
+  FWriter.DrawBorders(R-1, 1, R, 1, cbtOuter);
+  FWriter.DrawBorders(R-1, 2, R, 2, cbtOuter);
+
+  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  for i:= 0 to High(ANameValues) do
+  begin
+    R:= R + 1;
+    FWriter.SetAlignment(haLeft, vaCenter);
+    FWriter.WriteText(R, 1, ANameValues[i], cbtOuter, True, True);
+    FWriter.SetAlignment(haCenter, vaCenter);
+    FWriter.WriteNumber(R, 2, ACountValues[i], cbtOuter);
+    for j:= 0 to High(ATitleReasonNames) do
+      FWriter.WriteNumber(R, 3+j, AReasonCountValues[j, i], cbtOuter);
+  end;
+  if AResumeNeed then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.SetAlignment(haLeft, vaCenter);
+    FWriter.WriteText(R, 1, 'ИТОГО', cbtOuter, True, True);
+    FWriter.SetAlignment(haCenter, vaCenter);
+    FWriter.WriteNumber(R, 2, VSum(ACountValues), cbtOuter);
+    for i:= 0 to High(ATitleReasonNames) do
+      FWriter.WriteNumber(R, 3+i, VSum(AReasonCountValues[i]), cbtOuter);
+  end;
+end;
+
+constructor TStatisticReclamationCountSheet.Create(const AGrid: TsWorksheetGrid;
+  const AReasonsCount: Integer);
+var
+  ColWidths: TIntVector;
+begin
+  FGrid:= AGrid;
+  FGrid.DefaultRowHeight:= ROW_HEIGHT_DEFAULT;
+  FGrid.MouseWheelOption:= mwGrid;
+  FGrid.ShowGridLines:= False;
+  FGrid.ShowHeaders:= False;
+  FGrid.SelectionPen.Style:= psClear;
+
+  FFontName:= SHEET_FONT_NAME;
+  FFontSize:= SHEET_FONT_SIZE;
+
+  ColWidths:= VCreateInt([
+    300, // Наименование двигателя
+    150  // Количество
+  ]);
+
+  if AReasonsCount>0 then
+    VReDim(ColWidths, Length(ColWidths) + AReasonsCount, 150);
+
+  FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
+
+end;
+
+destructor TStatisticReclamationCountSheet.Destroy;
+begin
+  if Assigned(FWriter) then FreeAndNil(FWriter);
+  inherited Destroy;
+end;
+
+procedure TStatisticReclamationCountSheet.Draw(const ABeginDate, AEndDate: TDate;
+                   const AName, AMotorNames, AFirstColName: String;
+                   const ANameValues, ATitleReasonNames: TStrVector;
+                   const ACountValues: TIntVector;
+                   const AReasonCountValues: TIntMatrix;
+                   const AResumeNeed: Boolean);
+var
+  R: Integer;
+begin
+  FGrid.Clear;
+  if VIsNil(ANameValues) then Exit;
+
+  FWriter.BeginEdit;
+  FWriter.SetBackgroundClear;
+  R:= 1;
+  DrawTitle(R, ABeginDate, AEndDate, AName, AMotorNames);
+  DrawData(R, AFirstColName, ANameValues, ATitleReasonNames, ACountValues,
+           AReasonCountValues, AResumeNeed);
+
+  FWriter.EndEdit;
+end;
 
 { TReportReclamationSheet }
 
