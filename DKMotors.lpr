@@ -14,7 +14,7 @@ uses
   UBuildAddForm, SheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
   UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm,
-  UStatisticCountForm;
+  UStatisticCountForm, UStatisticMonthForm;
 
 {$R *.res}
 

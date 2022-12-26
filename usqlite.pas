@@ -190,13 +190,16 @@ type
                       out ANameID, AMotorID, AMileage, APlaceID, AFactoryID,
                           ADefectID, AReasonID, AOpinion, APassport: Integer;
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
+
+    {--- СТАТИСТИКА РЕКЛАМАЦИЙ ------}
+    //общее количество
     function ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs: TIntVector;
                 const ANotNeedUndefinedReason: Boolean;
                 out AExistsNameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
-
+    //распределение по причнам неисправности
     function ReclamationTotalWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
                 out AMotorNames: TStrVector;
@@ -212,6 +215,8 @@ type
                 out APlaceNames: TStrVector;
                 out APlaceMotorCounts: TIntVector;
                 out AMotorReasonCounts: TIntMatrix): Boolean;
+    //распределение по месяцам
+    function ReclamationExistYearsLoad(out AYears: TStrVector): Boolean;
 
   end;
 
@@ -2393,6 +2398,30 @@ begin
              'PlaceID', 'PlaceName', ABeginDate, AEndDate,
              ANameIDs, AReasonIDs, AJointlyReasonIDs,
              APlaceNames, APlaceMotorCounts, AMotorReasonCounts);
+end;
+
+function TSQLite.ReclamationExistYearsLoad(out AYears: TStrVector): Boolean;
+begin
+  Result:= False;
+  AYears:= nil;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT DISTINCT STRFTIME(''%Y'', RecDate) As Value ' +
+    'FROM RECLAMATIONS ' +
+    'ORDER BY Value');
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(AYears, QFieldStr('Value'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
 end;
 
 

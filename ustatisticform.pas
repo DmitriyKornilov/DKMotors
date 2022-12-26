@@ -6,11 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, fpspreadsheetgrid, VirtualTrees, rxctrls, DateTimePicker,
-  DividerBevel, USQLite, DK_Vector, DK_DateUtils, DK_VSTTables, SheetUtils,
-  LCLType,
+  fpspreadsheetgrid, VirtualTrees, DK_Vector,  DK_VSTTables, SheetUtils, LCLType,
 
-  UStatisticCountForm;
+  UStatisticCountForm, UStatisticMonthForm;
 
 type
 
@@ -30,6 +28,7 @@ type
     StatisticList: TVSTTable;
 
     StatisticCountForm: TStatisticCountForm;
+    StatisticMonthForm: TStatisticMonthForm;
 
 
 
@@ -37,11 +36,10 @@ type
     procedure SetFormPosition(AForm: TForm);
 
     procedure ShowStatisticCount;
+    procedure ShowStatisticMonth;
 
     procedure SetStatisticList;
     procedure StatisticListSelectItem;
-
-
   public
 
     procedure ShowStatistic;
@@ -81,10 +79,9 @@ begin
   try
     case SelectedIndex of
     0: ShowStatisticCount;
-
+    1: ShowStatisticMonth;
 
     end;
-
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -93,6 +90,7 @@ end;
 procedure TStatisticForm.FreeForms;
 begin
   if Assigned(StatisticCountForm) then FreeAndNil(StatisticCountForm);
+  if Assigned(StatisticMonthForm) then FreeAndNil(StatisticMonthForm);
 end;
 
 procedure TStatisticForm.SetFormPosition(AForm: TForm);
@@ -115,13 +113,25 @@ begin
   StatisticCountForm.ShowData;
 end;
 
+procedure TStatisticForm.ShowStatisticMonth;
+begin
+  if not Assigned(StatisticMonthForm) then
+  begin
+    FreeForms;
+    StatisticMonthForm:= TStatisticMonthForm.Create(StatisticForm);
+    SetFormPosition(TForm(StatisticMonthForm));
+    StatisticMonthForm.Show;
+  end;
+  StatisticMonthForm.ShowData;
+end;
+
 procedure TStatisticForm.SetStatisticList;
 var
   V: TStrVector;
 begin
   V:= VCreateStr([
     'Распределение по причинам неисправностей за период',
-    'Статистика 2'
+    'Распределение по месяцам года'
   ]);
 
   StatisticList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
