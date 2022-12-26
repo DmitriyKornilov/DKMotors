@@ -16,7 +16,6 @@ type
 
   TReportForm = class(TForm)
     NumberListCheckBox: TCheckBox;
-    OrderNumCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     DividerBevel1: TDividerBevel;
@@ -25,13 +24,13 @@ type
     ExportButton: TRxSpeedButton;
     Label1: TLabel;
     LogGrid: TsWorksheetGrid;
+    OrderNumCheckBox: TCheckBox;
     Panel1: TPanel;
     Panel2: TPanel;
     NumberListPanel: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     RadioButton3: TRadioButton;
-    RadioButton4: TRadioButton;
     ReportPeriodPanel: TPanel;
     ToolPanel: TPanel;
     procedure NumberListCheckBoxChange(Sender: TObject);
@@ -45,17 +44,17 @@ type
     procedure RadioButton1Click(Sender: TObject);
     procedure RadioButton2Click(Sender: TObject);
     procedure RadioButton3Click(Sender: TObject);
-    procedure RadioButton4Click(Sender: TObject);
+
   private
     MotorBuildSheet: TMotorBuildSheet;
     MotorTestSheet: TMotorTestSheet;
     ReportShipmentSheet: TReportShipmentSheet;
-    ReportReclamationSheet: TReportReclamationSheet;
+
 
     procedure ShowBuildReport;
     procedure ShowTestReport;
     procedure ShowShipmentReport;
-    procedure ShowReclamationReport;
+
 
     procedure FreeSheets;
 
@@ -84,8 +83,6 @@ begin
   try
     //Exporter.SheetName:= 'Отчет';
     PageOrientation:= spoPortrait;
-    if RadioButton4.Checked then
-      PageOrientation:= spoLandscape;
     Exporter.PageSettings(PageOrientation, pfWidth);
     Exporter.Save('Выполнено!');
   finally
@@ -117,6 +114,7 @@ end;
 
 procedure TReportForm.NumberListCheckBoxChange(Sender: TObject);
 begin
+  SetControlsVisible;
   ShowReport;
 end;
 
@@ -149,31 +147,17 @@ begin
   ShowReport;
 end;
 
-procedure TReportForm.RadioButton4Click(Sender: TObject);
-begin
-  SetControlsVisible;
-  ShowReport;
-end;
-
 procedure TReportForm.FreeSheets;
 begin
   if Assigned(MotorBuildSheet) then FreeAndNil(MotorBuildSheet);
   if Assigned(MotorTestSheet) then FreeAndNil(MotorTestSheet);
   if Assigned(ReportShipmentSheet) then FreeAndNil(ReportShipmentSheet);
-  if Assigned(ReportReclamationSheet) then FreeAndNil(ReportReclamationSheet);
 end;
 
 procedure TReportForm.SetControlsVisible;
 begin
-  DividerBevel2.Visible:= not RadioButton4.Checked;
-  ExportButton.Align:= alRight;
-  DividerBevel2.Align:= alRight;
-  NumberListPanel.Visible:= not RadioButton4.Checked;
   MainForm.SetNamesPanelsVisible(True, RadioButton3.Checked);
-  OrderNumCheckBox.Visible:= (RadioButton1.Checked or RadioButton2.Checked) and
-                             NumberListCheckBox.Checked;
-  DividerBevel2.Align:= alLeft;
-  ExportButton.Align:= alLeft;
+  OrderNumCheckBox.Visible:= NumberListCheckBox.Checked;
 end;
 
 procedure TReportForm.ShowReport;
@@ -188,10 +172,7 @@ begin
     else if RadioButton2.Checked then
       ShowTestReport
     else if RadioButton3.Checked then
-      ShowShipmentReport
-    else if RadioButton4.Checked then
-      ShowReclamationReport;
-
+      ShowShipmentReport;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -271,6 +252,7 @@ begin
   SQLite.ShipmentRecieversTotalLoad(BD, ED, MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
                 RecieverNames, RecieverMotorNames, RecieverMotorCounts);
   SQLite.ShipmentMotorListLoad(BD, ED, MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
+                OrderNumCheckBox.Checked,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);
 
   ReportShipmentSheet:= TReportShipmentSheet.Create(LogGrid);
@@ -282,46 +264,6 @@ begin
 
 end;
 
-procedure TReportForm.ShowReclamationReport;
-var
-  BD, ED: TDate;
-  TotalMotorNames: TStrVector;
-  TotalMotorCounts: TIntVector;
-  TotalMotorReasonCounts: TIntMatrix;
-
-  TitleReasonIDs: TIntVector;
-  TitleReasonNames: TStrVector;
-
-  PlaceNames: TStrVector;
-  PlaceMotorCounts: TIntVector;
-  PlaceReasonCounts: TIntMatrix;
-
-  DefectNames: TStrVector;
-  DefectMotorCounts: TIntVector;
-  DefectReasonCounts: TIntMatrix;
-begin
-  ED:= DateTimePicker1.Date;
-  BD:= DateTimePicker2.Date;
-  if BD>ED then Exit;
-
-  SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
-                     TitleReasonIDs, TitleReasonNames, True {TODO: не указано тоже нужно учесть!});
-
-  SQLite.ReclamationTotalWithReasonsLoad(BD, ED, MainForm.UsedNameIDs, TitleReasonIDs,
-                   TotalMotorNames, TotalMotorCounts, TotalMotorReasonCounts);
-  SQLite.ReclamationDefectsWithReasonsLoad(BD, ED, MainForm.UsedNameIDs, TitleReasonIDs,
-                   DefectNames, DefectMotorCounts, DefectReasonCounts);
-  SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, MainForm.UsedNameIDs, TitleReasonIDs,
-                   PlaceNames, PlaceMotorCounts, PlaceReasonCounts);
-
-
-  ReportReclamationSheet:= TReportReclamationSheet.Create(LogGrid, Length(TitleReasonNames));
-  ReportReclamationSheet.DrawReport(Length(MainForm.UsedNameIDs)=1,
-                BD, ED, TotalMotorNames, TotalMotorCounts,
-                TitleReasonNames, TotalMotorReasonCounts,
-                PlaceNames, PlaceMotorCounts, PlaceReasonCounts,
-                DefectNames, DefectMotorCounts, DefectReasonCounts);
-end;
 
 
 

@@ -20,7 +20,7 @@ type
        const ABeginDate, AEndDate: TDate; const ANameIDs: TIntVector;
        out AExistsIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector): Boolean;
     function ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName, ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-       const ANameIDs, AReasonIDs: TIntVector;
+       const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
        out ANames: TStrVector; out ATotalCounts: TIntVector; out AReasonCounts: TIntMatrix): Boolean;
   public
     //справочники
@@ -118,6 +118,7 @@ type
                           out ACargoIDs: TIntMatrix): Boolean;
     function ShipmentMotorListLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs, AReceiverIDs: TIntVector;
+                const ANeedOrderByNumber: Boolean;
                 out ASendDates: TDateVector;
                 out AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
     function ShipmentTotalLoad(const ABeginDate, AEndDate: TDate;
@@ -191,22 +192,23 @@ type
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
     function ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs: TIntVector;
+                const ANotNeedUndefinedReason: Boolean;
                 out AExistsNameIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
 
     function ReclamationTotalWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs, AReasonIDs: TIntVector;
+                const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorTotalCounts: TIntVector;
                 out AMotorReasonCounts: TIntMatrix): Boolean;
     function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs, AReasonIDs: TIntVector;
+                const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
                 out ADefectNames: TStrVector;
                 out ADefectMotorCounts: TIntVector;
                 out AMotorReasonCounts: TIntMatrix): Boolean;
     function ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs, AReasonIDs: TIntVector;
+                const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
                 out APlaceNames: TStrVector;
                 out APlaceMotorCounts: TIntVector;
                 out AMotorReasonCounts: TIntMatrix): Boolean;
@@ -310,11 +312,11 @@ end;
 
 function TSQLite.ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName,
   ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-  const ANameIDs, AReasonIDs: TIntVector;
+  const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
   out ANames: TStrVector; out ATotalCounts: TIntVector; out AReasonCounts: TIntMatrix): Boolean;
 var
-  i: Integer;
-  ExistsIDs, ReasonCounts: TIntVector;
+  i, Ind: Integer;
+  ExistsIDs, ReasonCounts, TmpCounts: TIntVector;
 
   procedure GetDataForReason(const AReasonID: Integer; out ACounts: TIntVector);
   var
@@ -368,13 +370,35 @@ begin
                         ABeginDate, AEndDate, ANameIDs, ExistsIDs,
                         ANames, ATotalCounts);
 
-
   if VIsNil(AReasonIDs) or VIsNil(ExistsIDs) then Exit;
 
-  for i:=0 to High(AReasonIDs) do
+  if VIsNil(AJointlyReasonIDs) then
   begin
-    GetDataForReason(AReasonIDs[i], ReasonCounts);
-    MAppend(AReasonCounts, ReasonCounts);
+    for i:=0 to High(AReasonIDs) do
+    begin
+      GetDataForReason(AReasonIDs[i], ReasonCounts);
+      MAppend(AReasonCounts, ReasonCounts);
+    end;
+  end
+  else begin
+    TmpCounts:= nil;
+    for i:=0 to High(AReasonIDs) do
+    begin
+      GetDataForReason(AReasonIDs[i], ReasonCounts);
+      Ind:= VIndexOf(AJointlyReasonIDs, AReasonIDs[i]);
+      if Ind>=0 then //прична неисправности, которая считается совместно
+      begin
+        if VIsNil(TmpCounts) then
+          TmpCounts:= VCut(ReasonCounts)
+        else
+          TmpCounts:= VSum(TmpCounts, ReasonCounts);
+      end
+      else begin //прична неисправности, которая считается отдельно - записываем сразу
+        MAppend(AReasonCounts, ReasonCounts);
+      end;
+    end;
+    //прична неисправности, которая считается совместно - записываем итог суммирования
+    MAppend(AReasonCounts, TmpCounts);
   end;
 
   Result:= True;
@@ -1318,10 +1342,10 @@ begin
 end;
 
 function TSQLite.ShipmentMotorListLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs, AReceiverIDs: TIntVector; out ASendDates: TDateVector; out
-  AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
+  const ANameIDs, AReceiverIDs: TIntVector; const ANeedOrderByNumber: Boolean;
+  out ASendDates: TDateVector; out AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
 var
-  WhereStr: String;
+  WhereStr, OrderStr: String;
 begin
   Result:= False;
   ASendDates:= nil;
@@ -1335,6 +1359,11 @@ begin
   if not VIsNil(AReceiverIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t2','ReceiverID', Length(AReceiverIDs), 'ReceiverID');
 
+  if ANeedOrderByNumber then
+    OrderStr:= 'ORDER BY t1.MotorNum'
+  else
+    OrderStr:= 'ORDER BY t2.SendDate, t2.ReceiverID, t4.MotorName, t1.MotorNum';
+
   QSetQuery(FQuery);
   QSetSQL(
     'SELECT t1.MotorNum, t1.Series, t2.SendDate, t3.ReceiverName, t4.MotorName ' +
@@ -1343,7 +1372,7 @@ begin
     'INNER JOIN CARGORECEIVERS t3 ON (t2.ReceiverID=t3.ReceiverID) ' +
     'INNER JOIN MOTORNAMES t4 ON (t1.NameID=t4.NameID) ' +
     WhereStr +
-    'ORDER BY t2.SendDate, t4.MotorName, t1.MotorNum');
+    OrderStr);
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
   if not VIsNil(ANameIDs) then
@@ -2206,13 +2235,13 @@ begin
 end;
 
 function TSQLite.ReclamationTotalWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs, AReasonIDs: TIntVector;
+                const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorTotalCounts: TIntVector;
                 out AMotorReasonCounts: TIntMatrix): Boolean;
 var
-  i: Integer;
-  ExistsNameIDs, MotorReasonCounts: TIntVector;
+  i, Ind: Integer;
+  ExistsNameIDs, MotorReasonCounts, TmpCounts: TIntVector;
 
   procedure GetDataForReason(const AReasonID: Integer; out ACounts: TIntVector);
   var
@@ -2256,23 +2285,48 @@ begin
   AMotorTotalCounts:= nil;
   AMotorReasonCounts:= nil;
 
-  ReclamationTotalLoad(ABeginDate, AEndDate, ANameIDs, ExistsNameIDs,
+  i:= VIndexOf(AReasonIDs, 0);
+  ReclamationTotalLoad(ABeginDate, AEndDate, ANameIDs, i<0, ExistsNameIDs,
                        AMotorNames, AMotorTotalCounts);
 
 
   if VIsNil(AReasonIDs) or VIsNil(ExistsNameIDs) then Exit;
 
-  for i:=0 to High(AReasonIDs) do
+  if VIsNil(AJointlyReasonIDs) then
   begin
-    GetDataForReason(AReasonIDs[i], MotorReasonCounts);
-    MAppend(AMotorReasonCounts, MotorReasonCounts);
+    for i:=0 to High(AReasonIDs) do
+    begin
+      GetDataForReason(AReasonIDs[i], MotorReasonCounts);
+      MAppend(AMotorReasonCounts, MotorReasonCounts);
+    end;
+  end
+  else begin
+    TmpCounts:= nil;
+    for i:=0 to High(AReasonIDs) do
+    begin
+      GetDataForReason(AReasonIDs[i], MotorReasonCounts);
+      Ind:= VIndexOf(AJointlyReasonIDs, AReasonIDs[i]);
+      if Ind>=0 then //прична неисправности, которая считается совместно
+      begin
+        if VIsNil(TmpCounts) then
+          TmpCounts:= VCut(MotorReasonCounts)
+        else
+          TmpCounts:= VSum(TmpCounts, MotorReasonCounts);
+      end
+      else begin //прична неисправности, которая считается отдельно - записываем сразу
+        MAppend(AMotorReasonCounts, MotorReasonCounts);
+      end;
+    end;
+    //прична неисправности, которая считается совместно - записываем итог суммирования
+    MAppend(AMotorReasonCounts, TmpCounts);
   end;
 
   Result:= True;
 end;
 
 function TSQLite.ReclamationTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out AExistsNameIDs: TIntVector;
+  const ANameIDs: TIntVector; const ANotNeedUndefinedReason: Boolean;
+  out AExistsNameIDs: TIntVector;
   out AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
@@ -2285,6 +2339,9 @@ begin
   WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
+
+  if ANotNeedUndefinedReason then
+    WhereStr:= WhereStr + ' AND (t1.ReasonID>0) ';
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -2316,23 +2373,25 @@ begin
 end;
 
 function TSQLite.ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs, AReasonIDs: TIntVector;
+                const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
                 out ADefectNames: TStrVector;
                 out ADefectMotorCounts: TIntVector;
                 out AMotorReasonCounts: TIntMatrix): Boolean;
 begin
   Result:= ReclamationReportWithReasonsLoad('RECLAMATIONDEFECTS',
-             'DefectID', 'DefectName', ABeginDate, AEndDate, ANameIDs, AReasonIDs,
+             'DefectID', 'DefectName', ABeginDate, AEndDate,
+             ANameIDs, AReasonIDs, AJointlyReasonIDs,
              ADefectNames, ADefectMotorCounts, AMotorReasonCounts);
 end;
 
-function TSQLite.ReclamationPlacesWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const ANameIDs, AReasonIDs: TIntVector; out
-  APlaceNames: TStrVector; out APlaceMotorCounts: TIntVector; out
-  AMotorReasonCounts: TIntMatrix): Boolean;
+function TSQLite.ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                const ANameIDs, AReasonIDs, AJointlyReasonIDs: TIntVector;
+                out APlaceNames: TStrVector; out APlaceMotorCounts: TIntVector;
+                out AMotorReasonCounts: TIntMatrix): Boolean;
 begin
   Result:= ReclamationReportWithReasonsLoad('RECLAMATIONPLACES',
-             'PlaceID', 'PlaceName', ABeginDate, AEndDate, ANameIDs, AReasonIDs,
+             'PlaceID', 'PlaceName', ABeginDate, AEndDate,
+             ANameIDs, AReasonIDs, AJointlyReasonIDs,
              APlaceNames, APlaceMotorCounts, AMotorReasonCounts);
 end;
 

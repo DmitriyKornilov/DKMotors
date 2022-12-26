@@ -25,6 +25,7 @@ object TestLogForm: TTestLogForm
     ClientHeight = 28
     ClientWidth = 619
     Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 0
     object SpinEdit1: TSpinEdit
       Left = 1

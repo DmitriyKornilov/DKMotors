@@ -29,6 +29,7 @@ object ReportForm: TReportForm
     ClientHeight = 28
     ClientWidth = 1157
     Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 0
     object ReportPeriodPanel: TPanel
       Left = 0
@@ -119,12 +120,12 @@ object ReportForm: TReportForm
       Left = 189
       Height = 28
       Top = 0
-      Width = 323
+      Width = 230
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 28
-      ClientWidth = 323
+      ClientWidth = 230
       ParentFont = False
       TabOrder = 1
       object RadioButton1: TRadioButton
@@ -173,21 +174,6 @@ object ReportForm: TReportForm
         ParentFont = False
         TabOrder = 2
       end
-      object RadioButton4: TRadioButton
-        AnchorSideLeft.Control = RadioButton3
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = RadioButton1
-        AnchorSideTop.Side = asrCenter
-        Left = 236
-        Height = 19
-        Top = 5
-        Width = 87
-        BorderSpacing.Left = 6
-        Caption = 'Рекламация'
-        OnClick = RadioButton4Click
-        ParentFont = False
-        TabOrder = 3
-      end
     end
     object DividerBevel1: TDividerBevel
       Left = 174
@@ -201,9 +187,8 @@ object ReportForm: TReportForm
       ParentFont = False
     end
     object DividerBevel2: TDividerBevel
-      AnchorSideLeft.Control = OrderNumCheckBox
       AnchorSideLeft.Side = asrBottom
-      Left = 821
+      Left = 729
       Height = 28
       Top = 0
       Width = 15
@@ -217,7 +202,7 @@ object ReportForm: TReportForm
       AnchorSideLeft.Control = DividerBevel2
       AnchorSideLeft.Side = asrBottom
       Cursor = crHandPoint
-      Left = 836
+      Left = 744
       Height = 28
       Top = 0
       Width = 101
@@ -361,21 +346,8 @@ object ReportForm: TReportForm
       OnClick = ExportButtonClick
       ParentFont = False
     end
-    object OrderNumCheckBox: TCheckBox
-      AnchorSideLeft.Control = NumberListPanel
-      AnchorSideLeft.Side = asrBottom
-      Left = 667
-      Height = 28
-      Top = 0
-      Width = 154
-      Align = alLeft
-      BorderSpacing.Left = 5
-      Caption = 'Упорядочить по номеру'
-      OnChange = OrderNumCheckBoxChange
-      TabOrder = 2
-    end
     object DividerBevel3: TDividerBevel
-      Left = 512
+      Left = 419
       Height = 28
       Top = 0
       Width = 15
@@ -388,17 +360,16 @@ object ReportForm: TReportForm
     object NumberListPanel: TPanel
       AnchorSideLeft.Control = DividerBevel3
       AnchorSideLeft.Side = asrBottom
-      Left = 527
+      Left = 434
       Height = 28
       Top = 0
-      Width = 135
+      Width = 295
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 28
-      ClientWidth = 135
-      TabOrder = 3
-      Visible = False
+      ClientWidth = 295
+      TabOrder = 2
       object NumberListCheckBox: TCheckBox
         AnchorSideLeft.Control = NumberListPanel
         AnchorSideTop.Control = NumberListPanel
@@ -410,6 +381,21 @@ object ReportForm: TReportForm
         Caption = 'Пономерной список'
         OnChange = NumberListCheckBoxChange
         TabOrder = 0
+      end
+      object OrderNumCheckBox: TCheckBox
+        AnchorSideLeft.Control = NumberListCheckBox
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = NumberListPanel
+        AnchorSideTop.Side = asrCenter
+        Left = 141
+        Height = 19
+        Top = 5
+        Width = 154
+        Align = alCustom
+        BorderSpacing.Left = 6
+        Caption = 'Упорядочить по номеру'
+        OnChange = OrderNumCheckBoxChange
+        TabOrder = 1
       end
     end
   end

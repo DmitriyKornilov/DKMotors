@@ -31,17 +31,19 @@ type
 
     StatisticCountForm: TStatisticCountForm;
 
-    procedure Choose;
+
+
     procedure FreeForms;
     procedure SetFormPosition(AForm: TForm);
 
-    procedure StatisticCountFormOpen;
+    procedure ShowStatisticCount;
 
     procedure SetStatisticList;
     procedure StatisticListSelectItem;
 
 
   public
+
     procedure ShowStatistic;
   end;
 
@@ -71,13 +73,15 @@ begin
   FreeForms;
 end;
 
-procedure TStatisticForm.Choose;
+
+
+procedure TStatisticForm.ShowStatistic;
 begin
   Screen.Cursor:= crHourGlass;
   try
-    FreeForms;
     case SelectedIndex of
-    0: StatisticCountFormOpen;
+    0: ShowStatisticCount;
+
 
     end;
 
@@ -99,11 +103,16 @@ begin
   AForm.MakeFullyVisible();
 end;
 
-procedure TStatisticForm.StatisticCountFormOpen;
+procedure TStatisticForm.ShowStatisticCount;
 begin
-  StatisticCountForm:= TStatisticCountForm.Create(StatisticForm);
-  SetFormPosition(TForm(StatisticCountForm));
-  StatisticCountForm.Show;
+  if not Assigned(StatisticCountForm) then
+  begin
+    FreeForms;
+    StatisticCountForm:= TStatisticCountForm.Create(StatisticForm);
+    SetFormPosition(TForm(StatisticCountForm));
+    StatisticCountForm.Show;
+  end;
+  StatisticCountForm.ShowData;
 end;
 
 procedure TStatisticForm.SetStatisticList;
@@ -111,7 +120,7 @@ var
   V: TStrVector;
 begin
   V:= VCreateStr([
-    'Количество за период',
+    'Распределение по причинам неисправностей за период',
     'Статистика 2'
   ]);
 
@@ -129,13 +138,10 @@ procedure TStatisticForm.StatisticListSelectItem;
 begin
   if SelectedIndex=StatisticList.SelectedIndex then Exit;
   SelectedIndex:= StatisticList.SelectedIndex;
-  Choose;
+  ShowStatistic;
 end;
 
-procedure TStatisticForm.ShowStatistic;
-begin
-  Choose;
-end;
+
 
 
 end.

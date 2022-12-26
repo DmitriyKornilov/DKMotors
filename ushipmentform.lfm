@@ -28,6 +28,7 @@ object ShipmentForm: TShipmentForm
     ClientHeight = 28
     ClientWidth = 562
     Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 0
     object SpinEdit1: TSpinEdit
       Left = 1

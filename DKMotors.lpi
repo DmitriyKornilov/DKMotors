@@ -203,6 +203,7 @@
         <Filename Value="ustatisticcountform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="StatisticCountForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UStatisticCountForm"/>
       </Unit>

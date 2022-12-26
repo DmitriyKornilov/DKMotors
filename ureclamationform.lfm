@@ -734,6 +734,7 @@ object ReclamationForm: TReclamationForm
         Images = MainForm.ImageListCategory24
         ImageIndex = 10
         Margin = 10
+        Visible = False
         OnClick = ReasonListButtonClick
         ParentFont = False
       end

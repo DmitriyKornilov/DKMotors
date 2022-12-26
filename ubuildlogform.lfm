@@ -27,6 +27,7 @@ object BuildLogForm: TBuildLogForm
     ClientHeight = 28
     ClientWidth = 1117
     Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 0
     object SpinEdit1: TSpinEdit
       Left = 1

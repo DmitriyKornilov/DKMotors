@@ -28,6 +28,7 @@ object StoreForm: TStoreForm
     ClientHeight = 28
     ClientWidth = 910
     Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
