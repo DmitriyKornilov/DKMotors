@@ -211,6 +211,7 @@
         <Filename Value="ustatisticmonthform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="StatisticMonthForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UStatisticMonthForm"/>
       </Unit>

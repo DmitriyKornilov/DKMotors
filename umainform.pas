@@ -118,6 +118,8 @@ begin
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
   SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
   Choose;
+
+
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);

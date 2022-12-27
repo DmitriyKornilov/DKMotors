@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  VirtualTrees, fpspreadsheetgrid, rxctrls, DK_VSTTables, DK_Vector, USQLite;
+  VirtualTrees, fpspreadsheetgrid, rxctrls, DK_VSTTables, DK_Vector, DK_Matrix,
+  USQLite, SheetUtils;
 
 type
 
@@ -28,6 +29,8 @@ type
     Years: TStrVector;
     YearList: TVSTCheckTable;
 
+    Sheet: TStatisticReclamationMonthSheet;
+
     procedure YearListSelectItem(const AIndex: Integer; const AChecked: Boolean);
     procedure SetYearList;
   public
@@ -38,6 +41,8 @@ var
   StatisticMonthForm: TStatisticMonthForm;
 
 implementation
+
+uses UMainForm;
 
 {$R *.lfm}
 
@@ -54,6 +59,7 @@ end;
 procedure TStatisticMonthForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(YearList) then FreeAndNil(YearList);
+  if Assigned(Sheet) then FreeAndNil(Sheet);
 end;
 
 procedure TStatisticMonthForm.YearListSelectItem(const AIndex: Integer; const AChecked: Boolean);
@@ -74,12 +80,24 @@ end;
 procedure TStatisticMonthForm.ShowData;
 var
   UsedYears: TStrVector;
+  Counts, Accumulations: TIntMatrix;
+  ReportName, MotorNames: String;
 begin
   UsedYears:= nil;
   if YearList.IsSelected then
     UsedYears:= VCut(Years, YearList.Selected);
 
+  SQLite.ReclamationPerMonthTotalLoad(UsedYears, MainForm.UsedNameIDs,
+                                      Counts, Accumulations);
 
+
+  ReportName:= EmptyStr;
+  MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
+
+  Grid1.Clear;
+  if Assigned(Sheet) then FreeAndNil(Sheet);
+  Sheet:= TStatisticReclamationMonthSheet.Create(Grid1, Length(UsedYears));
+  Sheet.Draw(UsedYears, ReportName, MotorNames, Counts, Accumulations, True);
 end;
 
 end.

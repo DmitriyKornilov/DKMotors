@@ -115,9 +115,9 @@ var
   V: TStrVector;
 begin
   V:= VCreateStr([
-    'Общее количество',
-    'По неисправным элементам',
-    'По предприятиям'
+    'Электродвигатели',
+    'Неисправности',
+    'Предприятия'
   ]);
 
   CategoryList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
@@ -179,9 +179,6 @@ begin
     end;
   end;
 
-
-
-
   ReportName:= EmptyStr;
 
   if CategoryList.SelectedIndex=0 then
@@ -197,7 +194,7 @@ begin
     SQLite.ReclamationDefectsWithReasonsLoad(BD, ED,
                    MainForm.UsedNameIDs, TitleReasonIDs, JointlyReasonIDs,
                    NameValues, CountValues, ReasonCountValues);
-    FirstColName:= 'Неисправный элемент';
+    FirstColName:= 'Неисправность';
     ReportName:= 'распределение по неисправным элементам';
   end
   else if CategoryList.SelectedIndex=2 then
@@ -228,6 +225,8 @@ begin
   if not VIsNil(JointlyReasonIDs) then
   N:= Length(TitleReasonIds) - Length(JointlyReasonIDs) + 1;
 
+  Grid1.Clear;
+  if Assigned(Sheet) then FreeAndNil(Sheet);
   Sheet:= TStatisticReclamationCountSheet.Create(Grid1, N);
   Sheet.Draw(BD, ED, ReportName, MotorNames, FirstColName,
              NameValues, ReasonNames, CountValues, ReasonCountValues, True);

@@ -217,6 +217,9 @@ type
                 out AMotorReasonCounts: TIntMatrix): Boolean;
     //распределение по месяцам
     function ReclamationExistYearsLoad(out AYears: TStrVector): Boolean;
+    function ReclamationPerMonthTotalLoad(const AYears: TStrVector;
+                const ANameIDs: TIntVector;
+                out ACounts, AAccumulations: TIntMatrix): Boolean;
 
   end;
 
@@ -2422,6 +2425,91 @@ begin
     Result:= True;
   end;
   QClose;
+end;
+
+function TSQLite.ReclamationPerMonthTotalLoad(const AYears: TStrVector;
+  const ANameIDs: TIntVector; out ACounts, AAccumulations: TIntMatrix): Boolean;
+var
+  i: Integer;
+  YearCounts, YearAccums: TIntVector;
+  {QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT COUNT(t1.' + KeyFieldName + ') As MotorCount, t1.' + KeyFieldName + ', t3.' + PickFieldName + ' ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + KeyFieldName + '=t3.' + KeyFieldName + ') ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND (t1.ReasonID = :ReasonID) AND ' +
+      SqlIN('t2','NameID', Length(ANameIDs), 'NameID') + 'AND' +
+      SqlIN('t1',AIDFieldName, Length(ExistsIDs), AIDFieldName) +
+      'GROUP BY t1.' + KeyFieldName + ' ' +
+      'ORDER BY t3.' + PickFieldName);
+    QParamDT('BD', ABeginDate);
+    QParamDT('ED', AEndDate);
+    QParamInt('ReasonID', AReasonID);
+    QParamsInt(ANameIDs, 'NameID');
+    QParamsInt(ExistsIDs, AIDFieldName);  }
+
+  procedure GetDataForMonth(const AMonth, AYear: Integer; out ACount: Integer);
+  var
+    BD, ED: TDate;
+
+  begin
+    BD:= FirstDayInMonth(AMonth, AYear);
+    ED:=  LastDayInMonth(AMonth, AYear);
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT COUNT(t1.RecID) As ACount ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
+      SqlIN('t2','NameID', Length(ANameIDs), 'NameID')
+      );
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QParamsInt(ANameIDs, 'NameID');
+    QOpen;
+    ACount:= 0;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      ACount:= QFieldInt('ACount');
+    end;
+    QClose;
+  end;
+
+  procedure GetDataForYear(const AYear: Integer; out AYearCounts, AYearAccums: TIntVector);
+  var
+    M, N: Integer;
+  begin
+    AYearCounts:= nil;
+    AYearAccums:= nil;
+    VDim(AYearCounts, 12);
+    VDim(AYearAccums, 12);
+    for M:= 1 to 12 do
+    begin
+      GetDataForMonth(M, AYear, N);
+      AYearCounts[M-1]:= N;
+    end;
+    AYearAccums[0]:= AYearCounts[0];
+    for M:= 2 to 12 do
+      AYearAccums[M-1]:= AYearAccums[M-2] + AYearCounts[M-1];
+  end;
+
+begin
+  Result:= False;
+  ACounts:= nil;
+  AAccumulations:= nil;
+
+  if VIsNil(AYears) then Exit;
+
+  for i:= 0 to High(AYears) do
+  begin
+    GetDataForYear(StrToInt(AYears[i]), YearCounts, YearAccums);
+    MAppend(ACounts, YearCounts);
+    MAppend(AAccumulations, YearAccums);
+  end;
+
+  Result:= True;
 end;
 
 
