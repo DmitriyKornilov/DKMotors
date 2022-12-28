@@ -217,7 +217,14 @@ type
                 out AMotorReasonCounts: TIntMatrix): Boolean;
     //распределение по месяцам
     function ReclamationExistYearsLoad(out AYears: TStrVector): Boolean;
-    function ReclamationPerMonthTotalLoad(const AYears: TStrVector;
+    //ReclamationPerMonthLoad
+    //ACategory: 0 - Общее количество,
+    //           1 - Некачественные комплектующие,
+    //           2 - Дефект сборки / изготовления,
+    //           3 - Неправильная эксплуатация,
+    //           4 - Неисправность локомотива
+    function ReclamationPerMonthLoad(const ACategory: Integer;
+                const AYears: TStrVector;
                 const ANameIDs: TIntVector;
                 out ACounts, AAccumulations: TIntMatrix): Boolean;
 
@@ -2427,8 +2434,10 @@ begin
   QClose;
 end;
 
-function TSQLite.ReclamationPerMonthTotalLoad(const AYears: TStrVector;
-  const ANameIDs: TIntVector; out ACounts, AAccumulations: TIntMatrix): Boolean;
+function TSQLite.ReclamationPerMonthLoad(const ACategory: Integer;
+                const AYears: TStrVector;
+                const ANameIDs: TIntVector;
+                out ACounts, AAccumulations: TIntMatrix): Boolean;
 var
   i: Integer;
   YearCounts, YearAccums: TIntVector;
@@ -2452,21 +2461,28 @@ var
   procedure GetDataForMonth(const AMonth, AYear: Integer; out ACount: Integer);
   var
     BD, ED: TDate;
-
+    WhereStr: String;
   begin
     BD:= FirstDayInMonth(AMonth, AYear);
     ED:=  LastDayInMonth(AMonth, AYear);
+
+    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
+               SqlIN('t2','NameID', Length(ANameIDs), 'NameID');
+    if ACategory>0 then
+      WhereStr:= WhereStr + ' AND (t1.ReasonID = :Category) ';
+
     QSetQuery(FQuery);
     QSetSQL(
       'SELECT COUNT(t1.RecID) As ACount ' +
       'FROM RECLAMATIONS t1 ' +
       'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-      SqlIN('t2','NameID', Length(ANameIDs), 'NameID')
+      WhereStr
       );
     QParamDT('BD', BD);
     QParamDT('ED', ED);
     QParamsInt(ANameIDs, 'NameID');
+    if ACategory>0 then
+      QParamInt('Category', ACategory);
     QOpen;
     ACount:= 0;
     if not QIsEmpty then

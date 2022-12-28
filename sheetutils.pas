@@ -349,6 +349,8 @@ begin
     C:= C + 1;
     FWriter.WriteText(R+1, C, R+1, C, 'Накопление', cbtOuter, True, True);
   end;
+  C:= 1;
+  FWriter.DrawBorders(R, C, R+1, FWriter.ColCount, cbtAll);
 
   R:= R + 1;
 
@@ -422,6 +424,7 @@ var
 begin
   FGrid.Clear;
   if VIsNil(AYears) then Exit;
+  if MIsNil(ACounts) then Exit;
 
   FWriter.BeginEdit;
   FWriter.SetBackgroundClear;
