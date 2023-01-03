@@ -1,58 +1,636 @@
 object StatisticForm: TStatisticForm
-  Left = 322
-  Height = 240
-  Top = 250
-  Width = 1193
+  Left = 560
+  Height = 849
+  Top = 97
+  Width = 1194
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StatisticForm'
-  ClientHeight = 240
-  ClientWidth = 1193
+  ClientHeight = 849
+  ClientWidth = 1194
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.4.0'
-  object Panel1: TPanel
+  LCLVersion = '2.2.2.0'
+  object TopPanel: TPanel
     Left = 2
-    Height = 236
+    Height = 40
     Top = 2
-    Width = 352
-    Align = alLeft
+    Width = 1190
+    Align = alTop
+    AutoSize = True
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
-    BorderSpacing.Bottom = 2
+    BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 232
-    ClientWidth = 348
+    ClientHeight = 36
+    ClientWidth = 1186
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
-    object VT1: TVirtualStringTree
+    object ReportPeriodPanel: TPanel
       Left = 0
-      Height = 232
+      Height = 36
       Top = 0
-      Width = 348
-      Align = alClient
-      BorderStyle = bsNone
-      DefaultText = 'Node'
-      Header.AutoSizeIndex = 0
-      Header.Columns = <>
-      Header.MainColumn = -1
+      Width = 217
+      Align = alLeft
+      AutoSize = True
+      BevelOuter = bvNone
+      ClientHeight = 36
+      ClientWidth = 217
+      ParentFont = False
       TabOrder = 0
+      object DateTimePicker1: TDateTimePicker
+        AnchorSideLeft.Control = Label3
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideTop.Side = asrCenter
+        Left = 118
+        Height = 28
+        Top = 4
+        Width = 99
+        CenturyFrom = 1941
+        MaxDate = 2958465
+        MinDate = -53780
+        ParentFont = False
+        TabOrder = 0
+        BorderSpacing.Left = 6
+        TrailingSeparator = False
+        TextForNullDate = 'NULL'
+        LeadingZeros = True
+        Kind = dtkDate
+        TimeFormat = tf24
+        TimeDisplay = tdHMS
+        DateMode = dmComboBox
+        Date = 44514
+        Time = 0.36772234953969
+        UseDefaultSeparators = True
+        HideDateTimeParts = []
+        MonthNames = 'Long'
+        OnChange = DateTimePicker1Change
+      end
+      object DateTimePicker2: TDateTimePicker
+        AnchorSideLeft.Control = ReportPeriodPanel
+        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideTop.Side = asrCenter
+        Left = 1
+        Height = 28
+        Top = 4
+        Width = 99
+        CenturyFrom = 1941
+        MaxDate = 2958465
+        MinDate = -53780
+        ParentFont = False
+        TabOrder = 1
+        BorderSpacing.Left = 1
+        TrailingSeparator = False
+        TextForNullDate = 'NULL'
+        LeadingZeros = True
+        Kind = dtkDate
+        TimeFormat = tf24
+        TimeDisplay = tdHMS
+        DateMode = dmComboBox
+        Date = 44514
+        Time = 0.36772234953969
+        UseDefaultSeparators = True
+        HideDateTimeParts = []
+        MonthNames = 'Long'
+        OnChange = DateTimePicker2Change
+      end
+      object Label3: TLabel
+        AnchorSideLeft.Control = DateTimePicker2
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = DateTimePicker2
+        AnchorSideTop.Side = asrCenter
+        Left = 106
+        Height = 20
+        Top = 8
+        Width = 6
+        BorderSpacing.Left = 6
+        Caption = '-'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+    end
+    object DividerBevel1: TDividerBevel
+      Left = 217
+      Height = 36
+      Top = 0
+      Width = 20
+      Caption = 'DividerBevel1'
+      Align = alLeft
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
+    object Panel5: TPanel
+      Left = 237
+      Height = 36
+      Top = 0
+      Width = 409
+      Align = alLeft
+      AutoSize = True
+      BevelOuter = bvNone
+      ClientHeight = 36
+      ClientWidth = 409
+      TabOrder = 1
+      object CheckBox1: TCheckBox
+        AnchorSideLeft.Control = Panel5
+        AnchorSideTop.Control = Panel5
+        AnchorSideTop.Side = asrCenter
+        Left = 0
+        Height = 24
+        Top = 6
+        Width = 211
+        Align = alCustom
+        Caption = 'Сопоставить с данными за'
+        OnChange = CheckBox1Change
+        TabOrder = 0
+      end
+      object SpinEdit1: TSpinEdit
+        AnchorSideLeft.Control = CheckBox1
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel5
+        AnchorSideTop.Side = asrCenter
+        Left = 217
+        Height = 28
+        Top = 4
+        Width = 63
+        Align = alCustom
+        Alignment = taCenter
+        BorderSpacing.Left = 6
+        Enabled = False
+        MaxValue = 9
+        MinValue = 1
+        OnChange = SpinEdit1Change
+        TabOrder = 1
+        Value = 2
+      end
+      object Label4: TLabel
+        AnchorSideLeft.Control = SpinEdit1
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel5
+        AnchorSideTop.Side = asrCenter
+        Left = 286
+        Height = 20
+        Top = 8
+        Width = 123
+        BorderSpacing.Left = 6
+        Caption = 'предыдущих года'
+        ParentColor = False
+      end
+    end
+    object ExportButton: TRxSpeedButton
+      AnchorSideLeft.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 666
+      Height = 36
+      Top = 0
+      Width = 112
+      Align = alLeft
+      AutoSize = True
+      Caption = 'Экспорт'
+      Glyph.Data = {
+        36100000424D3610000000000000360000002800000020000000200000000100
+        2000000000000010000064000000640000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000000000000000000000000000000000043711E1043711E3F43711E6F4372
+        1E9F44721F0D0000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000000000000000000000000000000000000043721E014372
+        1E1F43711E4E43711E7E43721EAE43711EDE43711EFE44721FFF44721FFF4472
+        1FFF44721F120000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000000000043721E0543711E2E43711E5E43711E8E43711EBE43711EED4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721F120000000000000000000000000000000000000000000000000000
+        000000000000000000000000000000000000000000000000000043711E484371
+        1E9D43711ECD43711EF844721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FC644721FC244721FC244721FC244721FC244721FC244721FC24472
+        1FC244721FC244721FC244721FC244721FC243711EAC43721F1B44721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFA3BA91FFABBF9AFFABBF9AFFABBF9AFFABBF9AFFABBF9AFFABBF9AFFABBF
+        9AFFABBF9AFFABBF9AFFABBF9AFFABBF9AFF648A46FF43721E8744721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFF1F4EEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF7E9E65FF83A16AFF83A16AFF83A16AFFD3DECBFFBBCCAEFF83A16AFF83A1
+        6AFF83A16AFF83A16AFFD2DDC9FFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFBDCDB0FF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF43711EFF43711EFF43711EFF43711EFFBDCDB0FF99B285FF43711EFF4371
+        1EFF43711EFF43711EFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFE4EADFFFF1F4EEFFF1F4EEFFF1F4EEFFF9FBF8FFF7F9F5FFF1F4EEFFF1F4
+        EEFFF1F4EEFFF1F4EEFFF9FBF8FFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF4D782AFFA1B88EFFABBF9AFF487524FF44721FFF4A76
+        26FFD9E2D2FFEEF2EBFF87A570FF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFB8C9AAFF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFFCAD7BFFFFFFFFFFF8CA875FF44721FFF8EAA
+        78FFFFFFFFFFE0E8DAFF467321FF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFB8C9AAFF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9043711E994371
+        1EFF43711EFF43711EFF43711EFF678C49FFFDFDFDFFE1E8DBFF467321FFE1E8
+        DBFFFEFEFEFF7F9E65FF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF83A16BFF88A571FF88A571FF88A571FFD2DDC9FFBECEB1FF88A571FF88A5
+        71FF88A571FF88A571FFD4DECBFFFEFEFEFF7F9E66FF43711E9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFFBCCCAFFFFFFFFFFFAEC29FFFFFFF
+        FFFFD6E0CEFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFB1C4A2FFBACBACFFBACBACFFBACBACFFE6ECE1FFD9E2D2FFBACBACFFBACB
+        ACFFBACBACFFBACBACFFE6ECE1FFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF5C843CFFFAFBF9FFFCFDFCFFFEFE
+        FEFF739557FF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF457220FFE4EBDFFFFFFFFFFFF5F7
+        F3FF4B7728FF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF809F67FFFFFFFFFFE9EEE5FFFFFF
+        FFFF9CB488FF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFB8CAAAFFC2D1B5FFC2D1B5FFC2D1B5FFE8EEE4FFDDE6D7FFC2D1B5FFC2D1
+        B5FFC2D1B5FFC2D1B5FFE9EEE4FFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFFDBE4D4FFFEFEFEFF77995DFFF5F8
+        F4FFF2F5F0FF507B2DFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF85A36DFF8AA773FF8AA773FF8AA773FFD4DFCCFFBFCFB3FF8AA773FF8AA7
+        73FF8AA773FF8AA773FFD4DFCCFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF7D9D63FFFFFFFFFFDAE3D3FF44721FFFADC1
+        9CFFFFFFFFFFA6BB94FF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFFD5DFCDFFFFFFFFFF8DA977FF44721FFF5B83
+        3AFFFCFCFBFFF6F8F5FF557F34FF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF4E792BFF477422FF44721FFF4472
+        1FFF77985CFF8EAA78FF688D4BFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFE5EBE0FFF1F5EFFFF1F5EFFFF1F5EFFFFAFBF9FFF7F9F6FFF1F5EFFFF1F5
+        EFFFF1F5EFFFF1F5EFFFFAFBF9FFFFFFFFFF7F9F66FF44721F9043711E994371
+        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF4D792AFF4E7A2BFF4E7A2BFF4E7A2BFFC1D0B5FF9FB68CFF4E7A2BFF4E7A
+        2BFF4E7A2BFF4E7A2BFFBFCEB2FFFEFEFEFF7F9E66FF43711E9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFFBDCDB0FF99B285FF44721FFF4472
+        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF6F9253FF729557FF729557FF729557FFCED9C4FFB2C5A3FF729557FF7295
+        57FF729557FF729557FFCCD8C2FFFFFFFFFF7F9F66FF44721F9044721F994472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
+        1FFFF1F4EEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7F9F66FF44721F9043711E994371
+        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFFB2C5A3FFBBCBADFFBBCBADFFBBCBADFFBBCBADFFBBCBADFFBBCBADFFBBCB
+        ADFFBBCBADFFBBCBADFFBBCBADFFBBCBADFF698E4CFF43711E8A43711E544371
+        1EB243711EE243711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF43711EDA43711ED843711ED843711ED843711ED843711ED843711ED84371
+        1ED843711ED843711ED843711ED843711ED843711EC243711E23000000000000
+        00000000000043721E1343711E4343711E7343711EA343711ED343711EFB4371
+        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
+        1EFF43711E120000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000000000000000000000000000000000000043721E084371
+        1E3443711E6443711E9343721EC343711EF243721FFF43721FFF43721FFF4372
+        1FFF43721F120000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000000000000043721E0243711E2443711E5443711E844372
+        1EB443711E0F0000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000
+      }
+      ImageIndex = 7
+      Margin = 10
+      OnClick = ExportButtonClick
+      ParentFont = False
+    end
+    object DividerBevel3: TDividerBevel
+      Left = 646
+      Height = 36
+      Top = 0
+      Width = 20
+      Caption = 'DividerBevel3'
+      Align = alLeft
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
   end
-  object Splitter1: TSplitter
-    Left = 354
-    Height = 240
-    Top = 0
-    Width = 5
-    ResizeStyle = rsLine
-  end
-  object MainPanel: TPanel
-    Left = 359
-    Height = 240
-    Top = 0
-    Width = 834
+  object ClientPanel: TPanel
+    Left = 0
+    Height = 807
+    Top = 42
+    Width = 1194
     Align = alClient
-    BevelOuter = bvNone
-    TabOrder = 2
+    ClientHeight = 807
+    ClientWidth = 1194
+    TabOrder = 1
+    object Panel1: TPanel
+      Left = 1
+      Height = 805
+      Top = 1
+      Width = 400
+      Align = alLeft
+      BevelOuter = bvNone
+      ClientHeight = 805
+      ClientWidth = 400
+      TabOrder = 0
+      object Panel2: TPanel
+        Left = 2
+        Height = 296
+        Top = 2
+        Width = 398
+        Align = alTop
+        BorderSpacing.Left = 2
+        BorderSpacing.Top = 2
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        ClientHeight = 292
+        ClientWidth = 394
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 0
+        object VT1: TVirtualStringTree
+          Left = 0
+          Height = 270
+          Top = 22
+          Width = 394
+          Align = alClient
+          BorderStyle = bsNone
+          DefaultText = 'Node'
+          Header.AutoSizeIndex = 0
+          Header.Columns = <>
+          Header.MainColumn = -1
+          TabOrder = 0
+        end
+        object Label1: TLabel
+          Left = 2
+          Height = 20
+          Top = 0
+          Width = 392
+          Align = alTop
+          BorderSpacing.Left = 2
+          BorderSpacing.Bottom = 2
+          Caption = 'Вид отчёта:'
+          Color = clWindow
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+          Transparent = False
+        end
+      end
+      object Splitter2: TSplitter
+        Cursor = crVSplit
+        Left = 0
+        Height = 6
+        Top = 298
+        Width = 400
+        Align = alTop
+        ResizeAnchor = akTop
+      end
+      object Panel3: TPanel
+        Left = 2
+        Height = 497
+        Top = 306
+        Width = 398
+        Align = alClient
+        BorderSpacing.Left = 2
+        BorderSpacing.Top = 2
+        BorderSpacing.Bottom = 2
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        ClientHeight = 493
+        ClientWidth = 394
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 2
+        object VT2: TVirtualStringTree
+          Left = 0
+          Height = 200
+          Top = 22
+          Width = 394
+          Align = alTop
+          BorderStyle = bsNone
+          DefaultText = 'Node'
+          Header.AutoSizeIndex = 0
+          Header.Columns = <>
+          Header.MainColumn = -1
+          TabOrder = 0
+        end
+        object Label2: TLabel
+          Left = 2
+          Height = 20
+          Top = 0
+          Width = 392
+          Align = alTop
+          BorderSpacing.Left = 2
+          BorderSpacing.Bottom = 2
+          Caption = 'Включать в отчёт:'
+          Color = clWindow
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+          Transparent = False
+        end
+        object Label7: TLabel
+          Left = 2
+          Height = 20
+          Top = 222
+          Width = 392
+          Align = alTop
+          BorderSpacing.Left = 2
+          BorderSpacing.Bottom = 2
+          Caption = 'Дополнительно отображать:'
+          Color = clWindow
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+          Transparent = False
+        end
+        object Panel9: TPanel
+          Left = 0
+          Height = 48
+          Top = 244
+          Width = 394
+          Align = alTop
+          AutoSize = True
+          BevelOuter = bvNone
+          ClientHeight = 48
+          ClientWidth = 394
+          TabOrder = 1
+          object CheckBox2: TCheckBox
+            Left = 6
+            Height = 24
+            Top = 0
+            Width = 388
+            Align = alTop
+            BorderSpacing.Left = 6
+            Caption = '% от общего количества рекламаций за период '
+            OnChange = CheckBox2Change
+            TabOrder = 0
+          end
+          object CheckBox3: TCheckBox
+            Left = 6
+            Height = 24
+            Top = 24
+            Width = 388
+            Align = alTop
+            BorderSpacing.Left = 6
+            Caption = 'количество рекламаций за все периоды'
+            OnChange = CheckBox3Change
+            TabOrder = 1
+            Visible = False
+          end
+        end
+        object Panel6: TPanel
+          Left = 0
+          Height = 90
+          Top = 292
+          Width = 394
+          Align = alTop
+          AutoSize = True
+          BevelOuter = bvNone
+          ClientHeight = 90
+          ClientWidth = 394
+          TabOrder = 2
+          Visible = False
+          object RadioButton1: TRadioButton
+            Left = 6
+            Height = 24
+            Top = 42
+            Width = 388
+            Align = alTop
+            BorderSpacing.Left = 6
+            Caption = 'по причине неисправности'
+            Checked = True
+            OnClick = RadioButton1Click
+            TabOrder = 0
+            TabStop = True
+          end
+          object RadioButton2: TRadioButton
+            Left = 6
+            Height = 24
+            Top = 66
+            Width = 388
+            Align = alTop
+            BorderSpacing.Left = 6
+            Caption = 'по отчетному периоду'
+            OnClick = RadioButton2Click
+            TabOrder = 1
+          end
+          object Label8: TLabel
+            Left = 2
+            Height = 20
+            Top = 20
+            Width = 392
+            Align = alTop
+            BorderSpacing.Left = 2
+            BorderSpacing.Top = 20
+            BorderSpacing.Bottom = 2
+            Caption = 'Группировать данные:'
+            Color = clWindow
+            Font.Style = [fsBold]
+            ParentColor = False
+            ParentFont = False
+            Transparent = False
+          end
+        end
+      end
+    end
+    object Splitter1: TSplitter
+      Left = 401
+      Height = 805
+      Top = 1
+      Width = 6
+      ResizeStyle = rsLine
+    end
+    object Panel4: TPanel
+      Left = 407
+      Height = 805
+      Top = 1
+      Width = 786
+      Align = alClient
+      BevelOuter = bvNone
+      Caption = 'Panel4'
+      ClientHeight = 805
+      ClientWidth = 786
+      TabOrder = 2
+      object MainPanel: TPanel
+        Left = 2
+        Height = 801
+        Top = 2
+        Width = 782
+        Align = alClient
+        BorderSpacing.Left = 2
+        BorderSpacing.Top = 2
+        BorderSpacing.Right = 2
+        BorderSpacing.Bottom = 2
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        ClientHeight = 797
+        ClientWidth = 778
+        TabOrder = 0
+        object Grid1: TsWorksheetGrid
+          Left = 0
+          Height = 797
+          Top = 0
+          Width = 778
+          AutoExpand = []
+          DisplayFixedColRow = False
+          FrozenBorderPen.Style = psClear
+          FrozenCols = 0
+          FrozenRows = 0
+          PageBreakPen.Color = clBlue
+          PageBreakPen.Style = psDash
+          ReadFormulas = False
+          SelectionPen.Color = clWindow
+          SelectionPen.Style = psClear
+          SelectionPen.Width = 0
+          ShowGridLines = False
+          ShowHeaders = False
+          WorkbookSource = Grid1.internal
+          Align = alClient
+          AutoAdvance = aaNone
+          AutoEdit = False
+          BorderStyle = bsNone
+          Color = clWhite
+          DefaultColWidth = 40
+          DefaultRowHeight = 20
+          ExtendedSelect = False
+          Flat = True
+          MouseWheelOption = mwGrid
+          Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+          ParentFont = False
+          TabOrder = 0
+          TabStop = False
+          TitleFont.Style = [fsBold]
+        end
+      end
+    end
   end
 end

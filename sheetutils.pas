@@ -18,6 +18,8 @@ const
 
   CHECK_SYMBOL = '✓';
 
+  PERCENT_FRAC_DIGITS = 1;
+
 type
 
   { TSeriesSheet }
@@ -93,6 +95,70 @@ type
 
   end;
 
+  { TStatisticReclamationSheet }
+
+  TStatisticReclamationSheet = class (TObject)
+  private
+    FGrid: TsWorksheetGrid;
+    FWriter: TSheetWriter;
+    FFontName: String;
+    FFontSize: Single;
+
+    FGroupType: Integer;
+    FSecondColumnType: Integer;
+    FAdditionYearsCount: Integer;
+    FShowAllYearsTotalCount: Boolean;
+    FShowSecondColumn: Boolean;
+    FSeveralYears: Boolean;
+    FUsedReasons: TBoolVector;
+
+    procedure DrawTop(var ARow: Integer; const ABeginDate, AEndDate: TDate;
+
+                        const AReportName, AMotorNames: String);
+    procedure DrawTableCaptionYear(var ACol: Integer; const ARow, AYear: Integer;
+                            const AReasonNames: TStrVector);
+    procedure DrawTableCaptionReason(var ACol: Integer; const ARow, AFirstYear, AIndex: Integer;
+                            const AReasonName: String);
+    procedure DrawTableCaption(var ARow: Integer;
+                        const ABeginDate: TDate;
+                        const AParamCaption: String;
+                        const AReasonNames: TStrVector);
+
+    procedure DrawCountColumn(const ARow, ACol: Integer;
+                              const AValues: TIntVector;
+                              const AResumeNeed: Boolean);
+    procedure DrawAccumColumn(const ARow, ACol: Integer;
+                              const AValues: TIntVector;
+                              const AResumeNeed: Boolean);
+    procedure DrawPercentColumn(const ARow, ACol: Integer;
+                              const ATotal, AValues: TIntVector;
+                              const AResumeNeed: Boolean);
+
+
+    procedure DrawDataYear(const ARow, ACol: Integer; const ACounts: TIntMatrix3D;
+                             const AResumeNeed: Boolean);
+    procedure DrawDataReason(const ARow, ACol: Integer; const ACounts: TIntMatrix3D;
+                             const AResumeNeed: Boolean);
+    procedure DrawData(const ARow: Integer; const AParamNames: TStrVector;
+                       const ACounts: TIntMatrix3D;  const AResumeNeed: Boolean);
+
+  public
+    //AGroupType = 1 - группировка по годам, 2 - группировка по причинам неисправностей
+    //ASecondColumnType = 1 - % от общего количества, 2 - накопление
+    constructor Create(const AGrid: TsWorksheetGrid;
+                       const AParamNameColumnWidth, AGroupType, ASecondColumnType, AAdditionYearsCount: Integer;
+                       const AUsedReasons: TBoolVector;
+                       const AShowSecondColumn: Boolean = True;
+                       const AShowAllYearsTotalCount: Boolean = False);
+    destructor  Destroy; override;
+    procedure Draw(const ABeginDate, AEndDate: TDate;
+                   const AReportName, AMotorNames, AParamCaption: String;
+                   const AParamNames, AReasonNames: TStrVector;
+                   const ACounts: TIntMatrix3D;
+                   const AResumeNeed: Boolean);
+
+  end;
+
   { TStatisticReclamationCountSheet }
 
   TStatisticReclamationCountSheet = class (TObject)
@@ -106,7 +172,7 @@ type
     procedure DrawData(const ARow: Integer;
                 const AFirstColName: String;
                 const ANameValues, ATitleReasonNames: TStrVector;
-                const ACountValues: TIntVector;
+                const AUsedReasons: TBoolVector;
                 const AReasonCountValues: TIntMatrix;
                 const AResumeNeed: Boolean);
   public
@@ -115,7 +181,7 @@ type
     procedure Draw(const ABeginDate, AEndDate: TDate;
                    const AName, AMotorNames, AFirstColName: String;
                    const ANameValues, ATitleReasonNames: TStrVector;
-                   const ACountValues: TIntVector;
+                   const AUsedReasons: TBoolVector;
                    const AReasonCountValues: TIntMatrix;
                    const AResumeNeed: Boolean);
   end;
@@ -283,6 +349,545 @@ type
   end;
 
 implementation
+
+{ TStatisticReclamationSheet }
+
+procedure TStatisticReclamationSheet.DrawTop(var ARow: Integer;
+  const ABeginDate, AEndDate: TDate; const AReportName, AMotorNames: String);
+var
+  R, i: Integer;
+  S: String;
+begin
+
+  FWriter.SetAlignment(haCenter, vaCenter);
+
+  R:= ARow;
+  S:= 'Отчет по рекламационным случаям электродвигателей';
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  if AMotorNames<>EmptyStr then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
+  end;
+
+  R:= R + 1;
+  S:= 'за ';
+  if FSeveralYears then
+  begin
+    if SameDate(ABeginDate, AEndDate) then
+      S:= S + FormatDateTime('dd ', ABeginDate) + MONTHSGEN[MonthOfDate(ABeginDate)]
+    else
+      S:= S + 'период с ' +
+          FormatDateTime('dd ', ABeginDate) + MONTHSGEN[MonthOfDate(ABeginDate)] +
+         ' по ' +
+          FormatDateTime('dd ', AEndDate) + MONTHSGEN[MonthOfDate(AEndDate)];
+    S:= S + ' ' + IntToStr(YearOfDate(ABeginDate)-FAdditionYearsCount);
+    for i:= FAdditionYearsCount-1 downto 0 do
+      S:= S + '/' + IntToStr(YearOfDate(ABeginDate)-i);
+    S:= S + 'гг.'
+  end
+  else begin
+    if SameDate(ABeginDate, AEndDate) then
+      S:= S + FormatDateTime('dd.mm.yyyy', ABeginDate)
+    else
+      S:= S + 'период с ' + FormatDateTime('dd.mm.yyyy', ABeginDate) +
+         ' по ' + FormatDateTime('dd.mm.yyyy', AEndDate);
+  end;
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  if AReportName<>EmptyStr then
+  begin
+    R:= R + 1;
+    S:= '(' + AReportName + ')';
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+  end;
+
+  //EmptyRow
+  R:= R + 1;
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
+  FWriter.SetRowHeight(R, 10);
+
+  ARow:= R + 1;
+
+end;
+
+procedure TStatisticReclamationSheet.DrawTableCaptionYear(var ACol: Integer;
+  const ARow, AYear: Integer; const AReasonNames: TStrVector);
+var
+  R1, R2, C1, C2, i, ColCount: Integer;
+begin
+  R1:= ARow;
+  R2:= R1 + Ord(FSeveralYears);
+  ColCount:= Ord(FUsedReasons[0]) *
+             (1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление}))) +
+             (1+Ord(FShowSecondColumn))*VCountIf(FUsedReasons, True, 1);
+
+  C1:= ACol + 1;
+  C2:= ACol + ColCount;
+  ACol:= C2;
+
+  //Номер Года
+  if FSeveralYears then
+    FWriter.WriteText(R1, C1, R1, C2, IntToStr(AYear), cbtOuter, True, True);
+
+  C2:= C1-1;
+  //Общее количество за этот период
+  if FUsedReasons[0] then
+  begin
+    C1:= C2 + 1;
+    C2:= C1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление}));
+    FWriter.WriteText(R2, C1, R2, C2, AReasonNames[0], cbtOuter, True, True);
+  end;
+
+  for i:= 1 to High(FUsedReasons) do
+  begin
+    if FUsedReasons[i] then
+    begin
+      C1:= C2 + 1;
+      C2:= C1 + Ord(FShowSecondColumn);
+      FWriter.WriteText(R2, C1, R2, C2, AReasonNames[i], cbtOuter, True, True);
+    end;
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawTableCaptionReason(var ACol: Integer;
+  const ARow, AFirstYear, AIndex: Integer; const AReasonName: String);
+var
+  R1, R2, C1, C2, i, ColCount: Integer;
+begin
+  R1:= ARow;
+  R2:= R1 + Ord(FSeveralYears);
+
+  if AIndex=0 then  //общее количество
+    ColCount:= (FAdditionYearsCount + 1) *
+               (1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление})))
+  else //причина
+    ColCount:= (FAdditionYearsCount + 1)*(1 + Ord(FShowSecondColumn));
+
+  C1:= ACol + 1;
+  C2:= ACol + ColCount;
+  ACol:= C2;
+
+  //Наименование причины неисправности
+  FWriter.WriteText(R1, C1, R1, C2, AReasonName, cbtOuter, True, True);
+
+  if not FSeveralYears then Exit;
+  //Общее количество за этот период
+  C2:= C1-1;
+  for i:= 0 to FAdditionYearsCount do
+  begin
+    C1:= C2 + 1;
+    if AIndex=0 then
+      C2:= C1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление}))
+    else
+      C2:= C1 + Ord(FShowSecondColumn);
+    FWriter.WriteNumber(R2, C1, R2, C2, AFirstYear+i, cbtOuter);
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawTableCaption(var ARow: Integer;
+  const ABeginDate: TDate; const AParamCaption: String;
+  const AReasonNames: TStrVector);
+var
+  R1, R2, C, i, FirstYear: Integer;
+begin
+  R1:= ARow;
+  R2:= R1 + Ord(FSeveralYears);
+
+
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+  FWriter.SetAlignment(haCenter, vaCenter);
+
+  C:= 1;
+  FWriter.WriteText(R1, C, R2, C, AParamCaption, cbtOuter, True, True);
+
+  //общее количество за все периоды
+  if FShowAllYearsTotalCount and FSeveralYears then
+  begin
+    C:= C + 1;
+    FWriter.WriteText(R1, C, R2, C, 'Общее количество за все периоды', cbtOuter, True, True);
+  end;
+
+  FirstYear:= YearOfDate(ABeginDate) - FAdditionYearsCount;
+  if FGroupType = 1 then  //группировка по годам
+  begin
+    //пробегаем по всем периодам
+    for i:= 0 to FAdditionYearsCount do
+      DrawTableCaptionYear(C, R1, FirstYear+i, AReasonNames);
+  end
+  else if FGroupType = 2 then //группировка по причинам неисправностей
+  begin
+    //пробегем по всем причинам
+    for i:= 0 to High(AReasonNames) do
+      if FUsedReasons[i] then
+        DrawTableCaptionReason(C, R1, FirstYear, i, AReasonNames[i]);
+  end;
+
+
+
+  FWriter.DrawBorders(R1, 1, R2, FWriter.ColCount, cbtAll);
+
+  ARow:= R2;
+end;
+
+procedure TStatisticReclamationSheet.DrawCountColumn(const ARow, ACol: Integer;
+  const AValues: TIntVector; const AResumeNeed: Boolean);
+var
+  i, R: Integer;
+begin
+  R:= ARow;
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  for i:= 0 to High(AValues) do
+  begin
+    R:= R + 1;
+    FWriter.WriteNumber(R, ACol, AValues[i], cbtOuter);
+  end;
+  if AResumeNeed then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteNumber(R, ACol, VSum(AValues), cbtOuter);
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawAccumColumn(const ARow, ACol: Integer;
+  const AValues: TIntVector; const AResumeNeed: Boolean);
+var
+  Values: TIntVector;
+  i, R: Integer;
+begin
+  Values:= nil;
+  VDim(Values, Length(AValues));
+  Values[0]:= AValues[0];
+  for i:= 1 to High(Values) do
+    Values[i]:= AValues[i] + Values[i-1];
+
+  R:= ARow;
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  for i:= 0 to High(Values) do
+  begin
+    R:= R + 1;
+    FWriter.WriteNumber(R, ACol, Values[i], cbtOuter);
+  end;
+  if AResumeNeed then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteNumber(R, ACol-1, R, ACol, Values[High(Values)], cbtOuter);
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawPercentColumn(const ARow,
+  ACol: Integer; const ATotal, AValues: TIntVector; const AResumeNeed: Boolean);
+var
+  i, R, X: Integer;
+begin
+  R:= ARow;
+  X:= VSum(ATotal);
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  for i:= 0 to High(AValues) do
+  begin
+    R:= R + 1;
+    if X=0 then
+      FWriter.WriteNumber(R, ACol, 0, 1, cbtOuter, nfPercentage)
+    else
+      FWriter.WriteNumber(R, ACol, AValues[i]/X, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
+  end;
+  if AResumeNeed then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    if X=0 then
+      FWriter.WriteNumber(R, ACol, 0, 1, cbtOuter, nfPercentage)
+    else
+      FWriter.WriteNumber(R, ACol, VSum(AValues)/X, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawDataYear(const ARow, ACol: Integer;
+  const ACounts: TIntMatrix3D; const AResumeNeed: Boolean);
+var
+  R, C, i, j: Integer;
+begin
+  R:= ARow;
+  C:= ACol -1;
+  for i:= 0 to FAdditionYearsCount do
+  begin
+    if FUsedReasons[0] then
+    begin
+      C:= C + 1;
+      DrawCountColumn(R, C, ACounts[i, 0], AResumeNeed);
+      if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+      begin
+        C:= C + 1;
+        DrawAccumColumn(R, C, ACounts[i, 0], AResumeNeed);
+      end;
+    end;
+    for j:= 1 to High(FUsedReasons) do
+    begin
+      if FUsedReasons[j] then
+      begin
+        C:= C + 1;
+        DrawCountColumn(R, C, ACounts[i, j], AResumeNeed);
+        if FShowSecondColumn then
+        begin
+          C:= C + 1;
+          if FSecondColumnType = 1 then
+            DrawPercentColumn(R, C, ACounts[i, 0], ACounts[i, j], AResumeNeed)
+          else  //2
+            DrawAccumColumn(R, C, ACounts[i, j], AResumeNeed);
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawDataReason(const ARow, ACol: Integer;
+  const ACounts: TIntMatrix3D; const AResumeNeed: Boolean);
+var
+  i,j, R, C: Integer;
+begin
+  FWriter.SetAlignment(haCenter, vaCenter);
+
+  R:= ARow;
+  C:= ACol - 1;
+
+  if FUsedReasons[0] then
+  begin
+    for i:= 0 to FAdditionYearsCount do
+    begin
+      C:= C + 1;
+      DrawCountColumn(R, C, ACounts[i, 0], AResumeNeed);
+      if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+      begin
+        C:= C + 1;
+        DrawAccumColumn(R, C, ACounts[i, 0], AResumeNeed);
+      end;
+    end;
+  end;
+
+  for j:= 1 to High(FUsedReasons) do
+  begin
+    if not FUsedReasons[j] then
+      continue;
+    for i:= 0 to FAdditionYearsCount do
+    begin
+      C:= C + 1;
+      DrawCountColumn(R, C, ACounts[i, j], AResumeNeed);
+      if FShowSecondColumn then
+      begin
+        C:= C + 1;
+        if FSecondColumnType = 1 then
+          DrawPercentColumn(R, C, ACounts[i, 0], ACounts[i, j], AResumeNeed)
+        else  //2
+          DrawAccumColumn(R, C, ACounts[i, j], AResumeNeed);
+      end;
+    end;
+  end;
+end;
+
+procedure TStatisticReclamationSheet.DrawData(const ARow: Integer;
+  const AParamNames: TStrVector; const ACounts: TIntMatrix3D;
+  const AResumeNeed: Boolean);
+var
+  i, R, C: Integer;
+  Total: TIntVector;
+begin
+  Total:= nil;
+
+  R:= ARow;
+  C:= 1;
+  FWriter.SetAlignment(haLeft, vaCenter);
+  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  for i:= 0 to High(AParamNames) do
+  begin
+    R:= R + 1;
+    FWriter.WriteText(R, C, AParamNames[i], cbtOuter, True, True);
+  end;
+  if AResumeNeed then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
+  end;
+
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  if FShowAllYearsTotalCount and FSeveralYears then //общее количество за все периоды
+  begin
+    VDim(Total, Length(AParamNames));
+    for i:= 0 to High(ACounts) do
+      Total:= VSum(Total, ACounts[i, 0]);
+    R:= ARow;
+    C:= C + 1;
+    for i:= 0 to High(AParamNames) do
+    begin
+      R:= R + 1;
+      FWriter.WriteNumber(R, C, Total[i], cbtOuter);
+    end;
+    if AResumeNeed then
+    begin
+      R:= R + 1;
+      FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+      FWriter.WriteNumber(R, C, VSum(Total), cbtOuter);
+    end;
+  end;
+
+  R:= ARow;
+  C:= C + 1;
+  if FGroupType=1 then
+    DrawDataYear(R, C, ACounts, AResumeNeed)
+  else if FGroupType=2 then
+    DrawDataReason(R, C, ACounts, AResumeNeed)
+end;
+
+constructor TStatisticReclamationSheet.Create(const AGrid: TsWorksheetGrid;
+  const AParamNameColumnWidth, AGroupType, ASecondColumnType, AAdditionYearsCount: Integer;
+  const AUsedReasons: TBoolVector; const AShowSecondColumn: Boolean;
+  const AShowAllYearsTotalCount: Boolean);
+var
+  ColWidths: TIntVector;
+
+  procedure SetWidthsYear;
+  var
+    i, j, W1, W2: Integer;
+  begin
+    if FShowSecondColumn then
+    begin
+      W1:= 120;
+      W2:= 60;
+    end
+    else begin
+      W1:= 120;
+      W2:= 120;
+    end;
+    //пробегаем по всем периодам
+    for i:= 0 to FAdditionYearsCount do
+    begin
+      if FUsedReasons[0] then
+      begin
+        VAppend(ColWidths, W1);
+         //Общее количество за этот период
+        if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+        begin
+          ColWidths[High(ColWidths)]:= W2;
+          VAppend(ColWidths, W2);
+        end;
+      end;
+      for j:= 1 to High(FUsedReasons) do
+      begin
+        if FUsedReasons[j] then
+        begin
+          VAppend(ColWidths, W2); //Не расследовано за этот период
+          if FShowSecondColumn then VAppend(ColWidths, W2); //%
+        end;
+      end;
+    end;
+  end;
+
+  procedure SetWidthsReason;
+  var
+    i, j, W1, W2: Integer;
+  begin
+    if FSeveralYears or (FShowSecondColumn and (FSecondColumnType=2{накопление})) then
+      W1:= 60
+    else
+      W1:= 100;
+    if FShowSecondColumn or FSeveralYears then
+      W2:= 60
+    else
+      W2:= 120;
+
+    if FUsedReasons[0] then
+    begin
+      for j:= 0 to FAdditionYearsCount do
+      begin
+        VAppend(ColWidths, W1);
+        if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+          VAppend(ColWidths, W1);
+      end;
+    end;
+    for i:= 1 to High(FUsedReasons) do
+    begin
+      if FUsedReasons[i] then
+      begin
+        for j:= 0 to FAdditionYearsCount do
+        begin
+          VAppend(ColWidths, W2);
+          if FShowSecondColumn then VAppend(ColWidths, W2); //%
+        end;
+      end;
+    end;
+  end;
+
+begin
+  FGrid:= AGrid;
+  FGrid.DefaultRowHeight:= ROW_HEIGHT_DEFAULT;
+  FGrid.MouseWheelOption:= mwGrid;
+  FGrid.ShowGridLines:= False;
+  FGrid.ShowHeaders:= False;
+  FGrid.SelectionPen.Style:= psClear;
+
+  FFontName:= SHEET_FONT_NAME;
+  FFontSize:= SHEET_FONT_SIZE;
+
+
+
+  FAdditionYearsCount:= AAdditionYearsCount;
+  FShowAllYearsTotalCount:= AShowAllYearsTotalCount;
+  FShowSecondColumn:= AShowSecondColumn;
+  FSeveralYears:= FAdditionYearsCount>0;
+  FUsedReasons:= AUsedReasons;
+  FGroupType:= AGroupType;
+  FSecondColumnType:= ASecondColumnType;
+
+  ColWidths:= nil;
+  VAppend(ColWidths, AParamNameColumnWidth); //наименование параметра распределения
+  if FShowAllYearsTotalCount and FSeveralYears then
+    VAppend(ColWidths, 120); //общее количество за все периоды
+
+  if FGroupType = 1 then
+    SetWidthsYear
+  else if FGroupType = 2 then
+    SetWidthsReason;
+
+  FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
+end;
+
+destructor TStatisticReclamationSheet.Destroy;
+begin
+  if Assigned(FWriter) then FreeAndNil(FWriter);
+  inherited Destroy;
+end;
+
+procedure TStatisticReclamationSheet.Draw(const ABeginDate, AEndDate: TDate;
+  const AReportName, AMotorNames, AParamCaption: String; const AParamNames,
+  AReasonNames: TStrVector; const ACounts: TIntMatrix3D;
+  const AResumeNeed: Boolean);
+var
+  R, FixedRowsCount: Integer;
+begin
+  FGrid.Clear;
+  if VIsNil(AParamNames) then Exit;
+  FWriter.BeginEdit;
+  FWriter.SetBackgroundClear;
+  R:= 1;
+  DrawTop(R, ABeginDate, AEndDate, AReportName, AMotorNames);
+  DrawTableCaption(R, ABeginDate, AParamCaption, AReasonNames);
+  FixedRowsCount:= R;
+  DrawData(R, AParamNames, ACounts, AResumeNeed);
+  FWriter.SetFrozenRows(FixedRowsCount);
+  FWriter.EndEdit;
+
+end;
 
 { TStatisticReclamationMonthSheet }
 
@@ -482,48 +1087,108 @@ end;
 procedure TStatisticReclamationCountSheet.DrawData(const ARow: Integer;
   const AFirstColName: String;
   const ANameValues, ATitleReasonNames: TStrVector;
-  const ACountValues: TIntVector; const AReasonCountValues: TIntMatrix;
+  const AUsedReasons: TBoolVector; const AReasonCountValues: TIntMatrix;
   const AResumeNeed: Boolean);
 var
-  i, j, R: Integer;
+  i, j, R, C, TotalCount, Count: Integer;
+  ShowTotal, ShowReason: Boolean;
 begin
   R:= ARow;
+
+  ShowTotal:= AUsedReasons[0];
+  ShowReason:= VIsTrue(AUsedReasons, 1);
+
+  TotalCount:= VSum(AReasonCountValues[0]);
+
   FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
   FWriter.SetRowHeight(R, 10);
 
   R:= R + 1;
+  C:= 1;
   FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
   FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, R+1, 1, AFirstColName, cbtOuter, True, True);
-  FWriter.WriteText(R, 2, R+1, 2, 'Количество случаев', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, R, 3+High(ATitleReasonNames), 'В том числе по причине', cbtOuter, True, True);
-  R:= R + 1;
-  for i:= 0 to High(ATitleReasonNames) do
-    FWriter.WriteText(R, 3+i, ATitleReasonNames[i], cbtOuter, True, True);
-  FWriter.DrawBorders(R-1, 1, R, 1, cbtOuter);
-  FWriter.DrawBorders(R-1, 2, R, 2, cbtOuter);
+  FWriter.WriteText(R, C, AFirstColName, cbtOuter, True, True);
+  //if ShowReason then
+  //  FWriter.WriteText(R, C, R+1, C, AFirstColName, cbtOuter, True, True)
+  //else
+  //  FWriter.WriteText(R, C, AFirstColName, cbtOuter, True, True);
+
+  if ShowTotal then
+  begin
+    C:= C + 1;
+    FWriter.WriteText(R, C, ATitleReasonNames[0], cbtOuter, True, True);
+    //if ShowReason then
+    //  FWriter.WriteText(R, C, R+1, C, ATitleReasonNames[0], cbtOuter, True, True)
+    //else
+    //  FWriter.WriteText(R, C, ATitleReasonNames[0], cbtOuter, True, True);
+  end;
+
+  if ShowReason then
+  begin
+    C:= Ord(ShowTotal);
+    for i:= 1 to High(ATitleReasonNames) do
+    begin
+      if AUsedReasons[i] then
+      begin
+        C:= C + 2;
+        FWriter.WriteText(R, C, R, C+1, ATitleReasonNames[i], cbtOuter, True, True);
+        //FWriter.WriteText(R+1, C, 'Количество', cbtOuter, True, True);
+        //FWriter.WriteText(R+1, C+1, '%', cbtOuter, True, True);
+      end;
+    end;
+    //R:= R + 1;
+  end;
 
   FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
   for i:= 0 to High(ANameValues) do
   begin
     R:= R + 1;
     FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, ANameValues[i], cbtOuter, True, True);
+    C:= 1;
+    FWriter.WriteText(R, C, ANameValues[i], cbtOuter, True, True);
     FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 2, ACountValues[i], cbtOuter);
-    for j:= 0 to High(ATitleReasonNames) do
-      FWriter.WriteNumber(R, 3+j, AReasonCountValues[j, i], cbtOuter);
+    if ShowTotal then
+    begin
+      C:= C + 1;
+      FWriter.WriteNumber(R, C, AReasonCountValues[0, i], cbtOuter);
+    end;
+    C:= Ord(ShowTotal);
+    for j:= 1 to High(ATitleReasonNames) do
+    begin
+      if AUsedReasons[j] then
+      begin
+        C:= C + 2;
+        Count:= AReasonCountValues[j, i];
+        FWriter.WriteNumber(R, C, Count, cbtOuter);
+        FWriter.WriteNumber(R, C+1, Count/TotalCount, 1, cbtOuter, nfPercentage);
+      end;
+    end;
   end;
   if AResumeNeed then
   begin
     R:= R + 1;
     FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
     FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, 'ИТОГО', cbtOuter, True, True);
+    C:= 1;
+    FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
     FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 2, VSum(ACountValues), cbtOuter);
-    for i:= 0 to High(ATitleReasonNames) do
-      FWriter.WriteNumber(R, 3+i, VSum(AReasonCountValues[i]), cbtOuter);
+
+    if ShowTotal then
+    begin
+      C:= C + 1;
+      FWriter.WriteNumber(R, C, TotalCount, cbtOuter);
+    end;
+    C:= Ord(ShowTotal);
+    for i:= 1 to High(ATitleReasonNames) do
+    begin
+      if AUsedReasons[i] then
+      begin
+        C:= C + 2;
+        Count:= VSum(AReasonCountValues[i]);
+        FWriter.WriteNumber(R, C, Count, cbtOuter);
+        FWriter.WriteNumber(R, C+1, Count/TotalCount, 1, cbtOuter, nfPercentage);
+      end;
+    end;
   end;
 end;
 
@@ -543,12 +1208,12 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    300, // Наименование двигателя
-    100  // Количество
+    270 // Наименование двигателя
+
   ]);
 
   if AReasonsCount>0 then
-    VReDim(ColWidths, Length(ColWidths) + AReasonsCount, 120);
+    VReDim(ColWidths, Length(ColWidths) + AReasonsCount, 80);
 
   FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
 
@@ -563,7 +1228,7 @@ end;
 procedure TStatisticReclamationCountSheet.Draw(const ABeginDate, AEndDate: TDate;
                    const AName, AMotorNames, AFirstColName: String;
                    const ANameValues, ATitleReasonNames: TStrVector;
-                   const ACountValues: TIntVector;
+                   const AUsedReasons: TBoolVector;
                    const AReasonCountValues: TIntMatrix;
                    const AResumeNeed: Boolean);
 var
@@ -576,7 +1241,7 @@ begin
   FWriter.SetBackgroundClear;
   R:= 1;
   DrawTitle(R, ABeginDate, AEndDate, AName, AMotorNames);
-  DrawData(R, AFirstColName, ANameValues, ATitleReasonNames, ACountValues,
+  DrawData(R, AFirstColName, ANameValues, ATitleReasonNames, AUsedReasons,
            AReasonCountValues, AResumeNeed);
 
   FWriter.EndEdit;

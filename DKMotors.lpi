@@ -199,22 +199,6 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UStatisticForm"/>
       </Unit>
-      <Unit>
-        <Filename Value="ustatisticcountform.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="StatisticCountForm"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UStatisticCountForm"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ustatisticmonthform.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="StatisticMonthForm"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UStatisticMonthForm"/>
-      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
