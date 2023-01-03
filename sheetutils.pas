@@ -108,9 +108,11 @@ type
     FSecondColumnType: Integer;
     FAdditionYearsCount: Integer;
     FShowAllYearsTotalCount: Boolean;
+    FShowSecondColumnForTotalCount: Boolean;
     FShowSecondColumn: Boolean;
     FSeveralYears: Boolean;
     FUsedReasons: TBoolVector;
+    FTotal: TIntVector;
 
     procedure DrawTop(var ARow: Integer; const ABeginDate, AEndDate: TDate;
 
@@ -141,7 +143,7 @@ type
                              const AResumeNeed: Boolean);
     procedure DrawData(const ARow: Integer; const AParamNames: TStrVector;
                        const ACounts: TIntMatrix3D;  const AResumeNeed: Boolean);
-
+    procedure CalcTotalForAllPeriods(const ACounts: TIntMatrix3D);
   public
     //AGroupType = 1 - группировка по годам, 2 - группировка по причинам неисправностей
     //ASecondColumnType = 1 - % от общего количества, 2 - накопление
@@ -423,9 +425,9 @@ var
 begin
   R1:= ARow;
   R2:= R1 + Ord(FSeveralYears);
-  ColCount:= Ord(FUsedReasons[0]) *
-             (1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление}))) +
-             (1+Ord(FShowSecondColumn))*VCountIf(FUsedReasons, True, 1);
+
+  ColCount:= Ord(FUsedReasons[0]) * (1 + Ord(FShowSecondColumnForTotalCount)) +
+             (1+Ord(FShowSecondColumn)) * VCountIf(FUsedReasons, True, 1);
 
   C1:= ACol + 1;
   C2:= ACol + ColCount;
@@ -433,14 +435,14 @@ begin
 
   //Номер Года
   if FSeveralYears then
-    FWriter.WriteText(R1, C1, R1, C2, IntToStr(AYear), cbtOuter, True, True);
+    FWriter.WriteNumber(R1, C1, R1, C2, AYear, cbtOuter);
 
   C2:= C1-1;
   //Общее количество за этот период
   if FUsedReasons[0] then
   begin
     C1:= C2 + 1;
-    C2:= C1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление}));
+    C2:= C1 + Ord(FShowSecondColumnForTotalCount);
     FWriter.WriteText(R2, C1, R2, C2, AReasonNames[0], cbtOuter, True, True);
   end;
 
@@ -464,10 +466,9 @@ begin
   R2:= R1 + Ord(FSeveralYears);
 
   if AIndex=0 then  //общее количество
-    ColCount:= (FAdditionYearsCount + 1) *
-               (1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление})))
+    ColCount:= (FAdditionYearsCount + 1) * (1 + Ord(FShowSecondColumnForTotalCount))
   else //причина
-    ColCount:= (FAdditionYearsCount + 1)*(1 + Ord(FShowSecondColumn));
+    ColCount:= (FAdditionYearsCount + 1) * (1 + Ord(FShowSecondColumn));
 
   C1:= ACol + 1;
   C2:= ACol + ColCount;
@@ -483,7 +484,7 @@ begin
   begin
     C1:= C2 + 1;
     if AIndex=0 then
-      C2:= C1 + Ord(FShowSecondColumn and (FSecondColumnType=2{накопление}))
+      C2:= C1 + Ord(FShowSecondColumnForTotalCount)
     else
       C2:= C1 + Ord(FShowSecondColumn);
     FWriter.WriteNumber(R2, C1, R2, C2, AFirstYear+i, cbtOuter);
@@ -498,7 +499,6 @@ var
 begin
   R1:= ARow;
   R2:= R1 + Ord(FSeveralYears);
-
 
   FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
   FWriter.SetAlignment(haCenter, vaCenter);
@@ -625,10 +625,18 @@ begin
     begin
       C:= C + 1;
       DrawCountColumn(R, C, ACounts[i, 0], AResumeNeed);
-      if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+      if FShowSecondColumn then
       begin
-        C:= C + 1;
-        DrawAccumColumn(R, C, ACounts[i, 0], AResumeNeed);
+        if FSecondColumnType=2{накопление} then
+        begin
+          C:= C + 1;
+          DrawAccumColumn(R, C, ACounts[i, 0], AResumeNeed);
+        end
+        else if FSeveralYears and (FSecondColumnType=1{%}) then
+        begin
+          C:= C + 1;
+          DrawPercentColumn(R, C, FTotal, ACounts[i, 0], AResumeNeed)
+        end;
       end;
     end;
     for j:= 1 to High(FUsedReasons) do
@@ -666,10 +674,18 @@ begin
     begin
       C:= C + 1;
       DrawCountColumn(R, C, ACounts[i, 0], AResumeNeed);
-      if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+      if FShowSecondColumn then
       begin
-        C:= C + 1;
-        DrawAccumColumn(R, C, ACounts[i, 0], AResumeNeed);
+        if FSecondColumnType=2{накопление} then
+        begin
+          C:= C + 1;
+          DrawAccumColumn(R, C, ACounts[i, 0], AResumeNeed);
+        end
+        else if FSeveralYears and (FSecondColumnType=1{%}) then
+        begin
+          C:= C + 1;
+          DrawPercentColumn(R, C, FTotal, ACounts[i, 0], AResumeNeed)
+        end;
       end;
     end;
   end;
@@ -694,14 +710,26 @@ begin
   end;
 end;
 
+procedure TStatisticReclamationSheet.CalcTotalForAllPeriods(const ACounts: TIntMatrix3D);
+var
+  i: Integer;
+begin
+  FTotal:= nil;
+  if MIsNil(ACounts) then Exit;
+
+  VDim(FTotal, Length(ACounts[0,0]));
+  for i:= 0 to High(ACounts) do
+    FTotal:= VSum(FTotal, ACounts[i, 0]);
+end;
+
 procedure TStatisticReclamationSheet.DrawData(const ARow: Integer;
   const AParamNames: TStrVector; const ACounts: TIntMatrix3D;
   const AResumeNeed: Boolean);
 var
   i, R, C: Integer;
-  Total: TIntVector;
+  //Total: TIntVector;
 begin
-  Total:= nil;
+  //Total:= nil;
 
   R:= ARow;
   C:= 1;
@@ -723,21 +751,21 @@ begin
   FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
   if FShowAllYearsTotalCount and FSeveralYears then //общее количество за все периоды
   begin
-    VDim(Total, Length(AParamNames));
-    for i:= 0 to High(ACounts) do
-      Total:= VSum(Total, ACounts[i, 0]);
+    //VDim(Total, Length(AParamNames));
+    //for i:= 0 to High(ACounts) do
+    //  Total:= VSum(Total, ACounts[i, 0]);
     R:= ARow;
     C:= C + 1;
     for i:= 0 to High(AParamNames) do
     begin
       R:= R + 1;
-      FWriter.WriteNumber(R, C, Total[i], cbtOuter);
+      FWriter.WriteNumber(R, C, FTotal[i], cbtOuter);
     end;
     if AResumeNeed then
     begin
       R:= R + 1;
       FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-      FWriter.WriteNumber(R, C, VSum(Total), cbtOuter);
+      FWriter.WriteNumber(R, C, VSum(FTotal), cbtOuter);
     end;
   end;
 
@@ -760,15 +788,15 @@ var
   var
     i, j, W1, W2: Integer;
   begin
+    if FShowSecondColumnForTotalCount then
+      W1:= 60
+    else
+      W1:= 100;
     if FShowSecondColumn then
-    begin
-      W1:= 120;
-      W2:= 60;
-    end
-    else begin
-      W1:= 120;
+      W2:= 60
+    else
       W2:= 120;
-    end;
+
     //пробегаем по всем периодам
     for i:= 0 to FAdditionYearsCount do
     begin
@@ -776,18 +804,16 @@ var
       begin
         VAppend(ColWidths, W1);
          //Общее количество за этот период
-        if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
-        begin
-          ColWidths[High(ColWidths)]:= W2;
-          VAppend(ColWidths, W2);
-        end;
+        if FShowSecondColumnForTotalCount then
+          VAppend(ColWidths, W1);
       end;
       for j:= 1 to High(FUsedReasons) do
       begin
         if FUsedReasons[j] then
         begin
           VAppend(ColWidths, W2); //Не расследовано за этот период
-          if FShowSecondColumn then VAppend(ColWidths, W2); //%
+          if FShowSecondColumn then
+            VAppend(ColWidths, W2); //%
         end;
       end;
     end;
@@ -797,7 +823,7 @@ var
   var
     i, j, W1, W2: Integer;
   begin
-    if FSeveralYears or (FShowSecondColumn and (FSecondColumnType=2{накопление})) then
+    if FSeveralYears or FShowSecondColumnForTotalCount then
       W1:= 60
     else
       W1:= 100;
@@ -811,7 +837,7 @@ var
       for j:= 0 to FAdditionYearsCount do
       begin
         VAppend(ColWidths, W1);
-        if FShowSecondColumn and (FSecondColumnType=2{накопление}) then
+        if FShowSecondColumnForTotalCount then
           VAppend(ColWidths, W1);
       end;
     end;
@@ -822,7 +848,8 @@ var
         for j:= 0 to FAdditionYearsCount do
         begin
           VAppend(ColWidths, W2);
-          if FShowSecondColumn then VAppend(ColWidths, W2); //%
+          if FShowSecondColumn then
+            VAppend(ColWidths, W2); //%
         end;
       end;
     end;
@@ -844,10 +871,15 @@ begin
   FAdditionYearsCount:= AAdditionYearsCount;
   FShowAllYearsTotalCount:= AShowAllYearsTotalCount;
   FShowSecondColumn:= AShowSecondColumn;
+
   FSeveralYears:= FAdditionYearsCount>0;
   FUsedReasons:= AUsedReasons;
   FGroupType:= AGroupType;
   FSecondColumnType:= ASecondColumnType;
+
+   FShowSecondColumnForTotalCount:= FShowSecondColumn and
+     ((FSecondColumnType=2{накопление}) or (FSeveralYears and (FSecondColumnType=1{%})));
+
 
   ColWidths:= nil;
   VAppend(ColWidths, AParamNameColumnWidth); //наименование параметра распределения
@@ -877,6 +909,7 @@ var
 begin
   FGrid.Clear;
   if VIsNil(AParamNames) then Exit;
+  CalcTotalForAllPeriods(ACounts);
   FWriter.BeginEdit;
   FWriter.SetBackgroundClear;
   R:= 1;
