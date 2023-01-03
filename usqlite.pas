@@ -227,18 +227,8 @@ type
                 out AMileageNames: TStrVector;
                 out AMotorCounts: TIntMatrix3D): Boolean;
 
-    //распределение по месяцам
-    function ReclamationExistYearsLoad(out AYears: TStrVector): Boolean;
-    //ReclamationPerMonthLoad
-    //ACategory: 0 - Общее количество,
-    //           1 - Некачественные комплектующие,
-    //           2 - Дефект сборки / изготовления,
-    //           3 - Неправильная эксплуатация,
-    //           4 - Неисправность локомотива
-    function ReclamationPerMonthLoad(const ACategory: Integer;
-                const AYears: TStrVector;
-                const ANameIDs: TIntVector;
-                out ACounts, AAccumulations: TIntMatrix): Boolean;
+
+
 
   end;
 
@@ -2553,14 +2543,24 @@ var
   var
     WhereStr: String;
     BD, ED: TDate;
+
+    function GetDate(const ADate: TDate): TDate;
+    var
+      D: Integer;
+    begin
+      D:= DayOfDate(ADate);
+      if (AMonth=2) and (D=29) and (not IsLeapYear(AYear)) then D:= 28;
+      Result:= EncodeDate(AYear, AMonth, D);
+    end;
+
   begin
     if AMonth=FirstMonth then
-      BD:= EncodeDate(AYear, AMonth, DayOfDate(ABeginDate))
+      BD:= GetDate(ABeginDate)
     else
       BD:= FirstDayInMonth(AMonth, AYear);
 
     if AMonth=LastMonth then
-      ED:= EncodeDate(AYear, AMonth, DayOfDate(AEndDate))
+      ED:= GetDate(AEndDate)
     else
       ED:= LastDayInMonth(AMonth, AYear);
 
@@ -2600,7 +2600,7 @@ var
     for M:= FirstMonth to LastMonth do
     begin
       GetDataForMonth(M, AYear, AReasonID, N);
-      AYearCounts[M-1]:= N;
+      AYearCounts[M-FirstMonth]:= N;
     end;
   end;
 
@@ -2756,107 +2756,9 @@ begin
   Result:= True;
 end;
 
-function TSQLite.ReclamationExistYearsLoad(out AYears: TStrVector): Boolean;
-begin
-  Result:= False;
-  AYears:= nil;
 
-  QSetQuery(FQuery);
-  QSetSQL(
-    'SELECT DISTINCT STRFTIME(''%Y'', RecDate) As Value ' +
-    'FROM RECLAMATIONS ' +
-    'ORDER BY Value');
-  QOpen;
-  if not QIsEmpty then
-  begin
-    QFirst;
-    while not QEOF do
-    begin
-      VAppend(AYears, QFieldStr('Value'));
-      QNext;
-    end;
-    Result:= True;
-  end;
-  QClose;
-end;
 
-function TSQLite.ReclamationPerMonthLoad(const ACategory: Integer;
-                const AYears: TStrVector;
-                const ANameIDs: TIntVector;
-                out ACounts, AAccumulations: TIntMatrix): Boolean;
-var
-  i: Integer;
-  YearCounts, YearAccums: TIntVector;
 
-  procedure GetDataForMonth(const AMonth, AYear: Integer; out ACount: Integer);
-  var
-    BD, ED: TDate;
-    WhereStr: String;
-  begin
-    BD:= FirstDayInMonth(AMonth, AYear);
-    ED:=  LastDayInMonth(AMonth, AYear);
-
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-               SqlIN('t2','NameID', Length(ANameIDs), 'NameID');
-    if ACategory>0 then
-      WhereStr:= WhereStr + ' AND (t1.ReasonID = :Category) ';
-
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t1.RecID) As ACount ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      WhereStr
-      );
-    QParamDT('BD', BD);
-    QParamDT('ED', ED);
-    QParamsInt(ANameIDs, 'NameID');
-    if ACategory>0 then
-      QParamInt('Category', ACategory);
-    QOpen;
-    ACount:= 0;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      ACount:= QFieldInt('ACount');
-    end;
-    QClose;
-  end;
-
-  procedure GetDataForYear(const AYear: Integer; out AYearCounts, AYearAccums: TIntVector);
-  var
-    M, N: Integer;
-  begin
-    AYearCounts:= nil;
-    AYearAccums:= nil;
-    VDim(AYearCounts, 12);
-    VDim(AYearAccums, 12);
-    for M:= 1 to 12 do
-    begin
-      GetDataForMonth(M, AYear, N);
-      AYearCounts[M-1]:= N;
-    end;
-    AYearAccums[0]:= AYearCounts[0];
-    for M:= 2 to 12 do
-      AYearAccums[M-1]:= AYearAccums[M-2] + AYearCounts[M-1];
-  end;
-
-begin
-  Result:= False;
-  ACounts:= nil;
-  AAccumulations:= nil;
-
-  if VIsNil(AYears) then Exit;
-
-  for i:= 0 to High(AYears) do
-  begin
-    GetDataForYear(StrToInt(AYears[i]), YearCounts, YearAccums);
-    MAppend(ACounts, YearCounts);
-    MAppend(AAccumulations, YearAccums);
-  end;
-
-  Result:= True;
-end;
 
 
 end.
