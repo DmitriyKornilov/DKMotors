@@ -119,9 +119,10 @@ begin
   VST.GridLinesVisible:= False;
   VST.AddColumn('Dates');
 
-  SpinEdit1.Value:= YearOfDate(Date);
+
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
   MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
+  SpinEdit1.Value:= YearOfDate(Date);
 end;
 
 procedure TTestLogForm.ShowTestLog;
