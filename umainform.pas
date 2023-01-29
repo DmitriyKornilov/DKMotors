@@ -8,14 +8,15 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
-  UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, USQLite,
-  SheetUtils;
+  UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
+  USQLite, SheetUtils;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    ControlMotorsButton: TRxSpeedButton;
     DividerBevel5: TDividerBevel;
     DividerBevel6: TDividerBevel;
     DividerBevel7: TDividerBevel;
@@ -32,6 +33,7 @@ type
     MainPanel: TPanel;
     MotorNamesLabel: TLabel;
     MotorNamesPanel: TPanel;
+    RepairButton: TRxSpeedButton;
     ToolPanel: TPanel;
     ReceiverNamesLabel: TLabel;
     ReceiverNamesPanel: TPanel;
@@ -56,6 +58,7 @@ type
     procedure MotorNamesPanelClick(Sender: TObject);
     procedure ReceiverNamesLabelClick(Sender: TObject);
     procedure ReceiverNamesPanelClick(Sender: TObject);
+    procedure RepairButtonClick(Sender: TObject);
     procedure StatisticButtonClick(Sender: TObject);
     procedure BuildLogButtonClick(Sender: TObject);
     procedure ShipmentButtonClick(Sender: TObject);
@@ -76,6 +79,7 @@ type
     procedure MotorListFormOpen;
     procedure ReportFormOpen;
     procedure StatisticFormOpen;
+    procedure RepairFormOpen;
 
     procedure ChangeUsedMotorList;
     procedure ChangeUsedReceiverList;
@@ -90,6 +94,7 @@ type
     MotorListForm: TMotorListForm;
     ReportForm: TReportForm;
     StatisticForm: TStatisticForm;
+    RepairForm: TRepairForm;
 
     UsedNameIDs: TIntVector;
     UsedNames: TStrVector;
@@ -173,6 +178,11 @@ begin
   ChangeUsedReceiverList;
 end;
 
+procedure TMainForm.RepairButtonClick(Sender: TObject);
+begin
+  if not Assigned(RepairForm) then Choose;
+end;
+
 procedure TMainForm.ExitButtonClick(Sender: TObject);
 begin
   Close;
@@ -245,7 +255,8 @@ begin
     else if TestLogButton.Down  then TestFormOpen
     else if ReportButton.Down  then ReportFormOpen
     else if StatisticButton.Down then StatisticFormOpen
-    else if MotorListButton.Down then MotorListFormOpen;
+    else if MotorListButton.Down then MotorListFormOpen
+    else if RepairButton.Down then RepairFormOpen;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -261,6 +272,7 @@ begin
   if Assigned(ReportForm) then FreeAndNil(ReportForm);
   if Assigned(StatisticForm) then FreeAndNil(StatisticForm);
   if Assigned(MotorListForm) then FreeAndNil(MotorListForm);
+  if Assigned(RepairForm) then FreeAndNil(RepairForm);
 end;
 
 procedure TMainForm.SetFormPosition(AForm: TForm);
@@ -327,6 +339,13 @@ begin
   StatisticForm.Show;
 end;
 
+procedure TMainForm.RepairFormOpen;
+begin
+  RepairForm:= TRepairForm.Create(MainForm);
+  SetFormPosition(TForm(RepairForm));
+  RepairForm.Show;
+end;
+
 procedure TMainForm.ChangeUsedMotorList;
 begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True,
@@ -348,7 +367,8 @@ begin
   else if TestLogButton.Down     then TestLogForm.ShowTestLog
   else if ReportButton.Down      then ReportForm.ShowReport
   else if StatisticButton.Down   then StatisticForm.ShowStatistic
-  else if MotorListButton.Down   then MotorListForm.ShowMotorList;
+  else if MotorListButton.Down   then MotorListForm.ShowMotorList
+  else if RepairButton.Down      then RepairForm.ShowRepair;
 end;
 
 procedure TMainForm.SetNamesPanelsVisible(const AMotorNamesPanelVisible,

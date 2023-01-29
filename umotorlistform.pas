@@ -128,7 +128,7 @@ var
 
   ABuildDates, AMotorNames, AMotorNums, AShippings: TStrVector;
 begin
-   Screen.Cursor:= crHourGlass;
+  Screen.Cursor:= crHourGlass;
   try
     InfoGrid.Clear;
 

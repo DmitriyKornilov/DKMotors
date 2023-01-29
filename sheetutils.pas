@@ -342,6 +342,7 @@ type
   public
     constructor Create(const AGrid: TsWorksheetGrid);
     destructor  Destroy; override;
+    procedure Zoom(const APercents: Integer);
     procedure DrawLine(const AIndex: Integer; const ASelected: Boolean);
     procedure Draw(const ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
                    const AMileages, AOpinions, AReasonColors, APassports: TIntVector;
@@ -788,14 +789,15 @@ var
   var
     i, j, W1, W2: Integer;
   begin
-    if FShowSecondColumnForTotalCount then
-      W1:= 60
-    else
-      W1:= 100;
-    if FShowSecondColumn then
-      W2:= 60
-    else
-      W2:= 120;
+    //if FShowSecondColumnForTotalCount then
+    //  W1:= 100
+    //else
+    //  W1:= 120;
+    //if FShowSecondColumn then
+    //  W2:= 100
+    //else
+    //  W2:= 140;
+    W1:= 100; W2:= 100;
 
     //пробегаем по всем периодам
     for i:= 0 to FAdditionYearsCount do
@@ -823,14 +825,15 @@ var
   var
     i, j, W1, W2: Integer;
   begin
-    if FSeveralYears or FShowSecondColumnForTotalCount then
-      W1:= 60
-    else
-      W1:= 100;
-    if FShowSecondColumn or FSeveralYears then
-      W2:= 60
-    else
-      W2:= 120;
+    //if FSeveralYears or FShowSecondColumnForTotalCount then
+    //  W1:= 100
+    //else
+    //  W1:= 120;
+    //if FShowSecondColumn or FSeveralYears then
+    //  W2:= 100
+    //else
+    //  W2:= 140;
+    W1:= 150; W2:= 150;
 
     if FUsedReasons[0] then
     begin
@@ -882,9 +885,9 @@ begin
 
 
   ColWidths:= nil;
-  VAppend(ColWidths, AParamNameColumnWidth); //наименование параметра распределения
+  VAppend(ColWidths, {AParamNameColumnWidth} 300); //наименование параметра распределения
   if FShowAllYearsTotalCount and FSeveralYears then
-    VAppend(ColWidths, 120); //общее количество за все периоды
+    VAppend(ColWidths, 150); //общее количество за все периоды
 
   if FGroupType = 1 then
     SetWidthsYear
@@ -1297,7 +1300,7 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    100, // № п/п - Дата отправки
+    150, // № п/п - Дата отправки
     300, // Наименование двигателя
     150, // Номер двигателя
     300  // Грузополучатель
@@ -1468,7 +1471,7 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    100, // Дата сборки
+    150, // Дата сборки
     300, // Наименование двигателя
     200, // Номер двигателя
     300  // Примечание
@@ -1873,7 +1876,7 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    100, // Дата сдачи (испытаний)
+    150, // Дата сдачи (испытаний)
     300, // Наименование двигателя
     200//, // Номер двигателя
     //100  // Номер партии
@@ -2017,11 +2020,11 @@ begin
   //FFontSize:= Screen.SystemFont.Size;
 
   ColWidths:= VCreateInt([
-    100, // Дата испытаний
+    150, // Дата испытаний
     300, // Наименование двигателя
-    150, // Номер двигателя
+    200, // Номер двигателя
     //150, // Номер партии
-    150, // Результат (норма/брак)
+    200, // Результат (норма/брак)
     300  // Примечание
   ]);
   FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
@@ -2256,7 +2259,7 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    100, // № п/п - Дата сборки
+    150, // № п/п - Дата сборки
     300, // Наименование двигателя
     200, // Номер двигателя
     200  // Номер Ротора
@@ -2454,21 +2457,21 @@ begin
 
 
   ColWidths:= VCreateInt([
-    40,  //№п/п
-    90,  // Дата уведомления
-    150, // Наименование двигателя
-    60,  // Номер двигателя
-    70,  // Дата сборки
-    60,  // Пробег, км
-    130, // Предприятие
+    45,  //№п/п
+    100,  // Дата уведомления
+    180, // Наименование двигателя
+    65,  // Номер двигателя
+    100,  // Дата сборки
+    70,  // Пробег, км
+    150, // Предприятие
     100,  // Завод
     100, // Выезд/ФИО
     120, // Неисправный элемент
     130, // Причина неисправности
-    50,  // Особое мнение
+    60,  // Особое мнение
     450, // Примечание
     70,  //Прибыл в ремонт
-    60,  // Наличие паспорта
+    70,  // Наличие паспорта
     70,   // Убыл из ремонта
     50   //Срок
   ]);
@@ -2481,6 +2484,11 @@ destructor TReclamationSheet.Destroy;
 begin
   if Assigned(FWriter) then FreeAndNil(FWriter);
   inherited Destroy;
+end;
+
+procedure TReclamationSheet.Zoom(const APercents: Integer);
+begin
+  FWriter.SetZoom(APercents);
 end;
 
 procedure TReclamationSheet.DrawLine(const AIndex: Integer; const ASelected: Boolean);
@@ -2628,8 +2636,8 @@ begin
 
   ColWidths:= VCreateInt([
     300, // Наименование
-    100, // Количество      номера
-    90, //                 номера
+    150, // Количество      номера
+    150, //                 номера
     100  // Номер партии
   ]);
   FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);

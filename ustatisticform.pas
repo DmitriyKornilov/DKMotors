@@ -121,6 +121,8 @@ begin
   DateTimePicker2.Date:= FirstDayInYear(Date);
   CanShow:= True;
   DateTimePicker1.Date:= LastDayInMonth(Date);
+
+  ShowStatistic;
 end;
 
 procedure TStatisticForm.ExportButtonClick(Sender: TObject);

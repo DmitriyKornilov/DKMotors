@@ -170,7 +170,7 @@ type
                           ARecNotes: TStrVector): Boolean;
     function ReclamationListLoad(const ABeginDate, AEndDate: TDate;
           const ANameIDs: TIntVector; const ANumberLike: String;
-          const ARepairMotorsOnly: Boolean;
+          const AOrderByMotorNum: Boolean;
           out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
           out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
           out APlaceNames, AFactoryNames, ADepartures,
@@ -193,6 +193,13 @@ type
                       out ANameID, AMotorID, AMileage, APlaceID, AFactoryID,
                           ADefectID, AReasonID, AOpinion, APassport: Integer;
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
+    //ремонты
+    function RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
+          const OrderType: Integer; //1 - по дате прибытия, 2 - по номеру
+          const AListType: Integer; //0 - все, 1-в ремонте, 2 - отремонтированные
+          out AArrivalDates, ASendingDates: TDateVector;
+          out ARecIDs, AMotorIDs, APassports: TIntVector;
+          out AMotorNames, AMotorNums: TStrVector): Boolean;
 
     {--- СТАТИСТИКА РЕКЛАМАЦИЙ ------}
     //общее количество
@@ -2028,13 +2035,13 @@ end;
 
 function TSQLite.ReclamationListLoad(const ABeginDate, AEndDate: TDate;
   const ANameIDs: TIntVector; const ANumberLike: String;
-  const ARepairMotorsOnly: Boolean;
+  const AOrderByMotorNum: Boolean;
   out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
   out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
   out APlaceNames, AFactoryNames, ADepartures, ADefectNames, AReasonNames,
   ARecNotes, AMotorNames, AMotorNums: TStrVector): Boolean;
 var
-  WhereStr: String;
+  WhereStr, OrderStr: String;
 begin
   Result:= False;
 
@@ -2058,20 +2065,17 @@ begin
   APassports:= nil;
 
 
-  if ARepairMotorsOnly then
-    WhereStr:= 'WHERE ((t1.ArrivalDate>0) AND (t1.SendingDate=0)) '
-  else
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
-
   if ANumberLike<>EmptyStr then
-    WhereStr:= WhereStr +  'AND (UPPER(t6.MotorNum) LIKE :NumberLike) ';
-  //if ANumberLike=EmptyStr then
-  //  WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) '
-  //else
-  //  WhereStr:= 'WHERE (UPPER(t6.MotorNum) LIKE :NumberLike) ';
-
+    WhereStr:= 'WHERE (UPPER(t6.MotorNum) LIKE :NumberLike) '
+   else
+    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t6','NameID', Length(ANameIDs));
+
+  if AOrderByMotorNum then
+    OrderStr:= 'ORDER BY t6.MotorNum'
+  else
+    OrderStr:= 'ORDER BY t1.RecDate';
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -2088,24 +2092,16 @@ begin
     'INNER JOIN MOTORLIST t6 ON (t1.MotorID=t6.MotorID) ' +
     'INNER JOIN MOTORNAMES t7 ON (t6.NameID=t7.NameID) ' +
     WhereStr +
-    'ORDER BY t1.RecDate');
+    OrderStr);
 
-  if not ARepairMotorsOnly then
-  begin
+
+  if ANumberLike<>EmptyStr then
+    QParamStr('NumberLike', ANumberLike+'%')
+  else begin
     QParamDT('BD', ABeginDate);
     QParamDT('ED', AEndDate);
   end;
 
-  if ANumberLike<>EmptyStr then
-    QParamStr('NumberLike', ANumberLike+'%');
-
-  //if ANumberLike=EmptyStr then
-  //begin
-  //  QParamDT('BD', ABeginDate);
-  //  QParamDT('ED', AEndDate);
-  //end
-  //else
-  //  QParamStr('NumberLike', ANumberLike+'%');
 
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
@@ -2314,6 +2310,79 @@ begin
     AArrivalDate:= QFieldDT('ArrivalDate');
     ASendingDate:= QFieldDT('SendingDate');
     APassport:= QFieldInt('Passport');
+    Result:= True;
+  end;
+  QClose;
+end;
+
+function TSQLite.RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
+          const OrderType: Integer; //1 - по дате прибытия, 2 - по номеру
+          const AListType: Integer; //0 - все, 1-в ремонте, 2 - отремонтированные
+          out AArrivalDates, ASendingDates: TDateVector;
+          out ARecIDs, AMotorIDs, APassports: TIntVector;
+          out AMotorNames, AMotorNums: TStrVector): Boolean;
+var
+  WhereStr, OrderStr: String;
+begin
+  Result:= False;
+
+  ARecIDs:= nil;
+  AMotorIDs:= nil;
+  AMotorNames:= nil;
+  AMotorNums:= nil;
+  AArrivalDates:= nil;
+  ASendingDates:= nil;
+  APassports:= nil;
+
+  if ANumberLike<>EmptyStr then
+    WhereStr:= 'WHERE ((t1.ArrivalDate>0) AND (UPPER(t2.MotorNum) LIKE :NumberLike)) '
+  else if AListType=1 then //в ремонте
+    WhereStr:= 'WHERE ((t1.ArrivalDate>0) AND (t1.SendingDate=0)) '
+  else if AListType=2 then //отремонтированные
+    WhereStr:= 'WHERE ((t1.ArrivalDate>0) AND (t1.SendingDate>0)) '
+  else //все
+    WhereStr:= 'WHERE (t1.ArrivalDate>0) ';
+
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
+
+  if OrderType=1 then
+    OrderStr:= 'ORDER BY t1.ArrivalDate'
+  else if OrderType=2 then
+    OrderStr:= 'ORDER BY t2.MotorNum';
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT t1.RecID, t1.MotorID, t1.RecDate, ' +
+           't1.ArrivalDate, t1.SendingDate, t1.Passport, ' +
+           't2.MotorNum, t3.MotorName ' +
+    'FROM RECLAMATIONS t1 ' +
+    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+    'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+    WhereStr +
+    OrderStr);
+
+  if ANumberLike<>EmptyStr then
+    QParamStr('NumberLike', ANumberLike+'%');
+
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
+
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(ARecIDs, QFieldInt('RecID'));
+      VAppend(AMotorIDs, QFieldInt('MotorID'));
+      VAppend(AMotorNames, QFieldStr('MotorName'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(AArrivalDates, QFieldDT('ArrivalDate'));
+      VAppend(ASendingDates, QFieldDT('SendingDate'));
+      VAppend(APassports, QFieldInt('Passport'));
+      QNext;
+    end;
     Result:= True;
   end;
   QClose;

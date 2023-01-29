@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Spin, EditBtn, fpspreadsheetgrid, rxctrls,
+  StdCtrls, Spin, EditBtn, ComCtrls, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, SheetUtils, DK_DateUtils, UReclamationEditForm,
   DK_StrUtils, DK_Dialogs, DK_SheetExporter, fpstypes, USQLite;
 
@@ -16,7 +16,7 @@ type
 
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
-    MotorRepairCheckBox: TCheckBox;
+    ZoomCaptionLabel: TLabel;
     DefectListButton: TRxSpeedButton;
     DividerBevel8: TDividerBevel;
     DividerBevel9: TDividerBevel;
@@ -24,6 +24,7 @@ type
     Label2: TLabel;
     LogGrid: TsWorksheetGrid;
     MotorNumEdit: TEditButton;
+    MotorNumOrderCheckBox: TCheckBox;
     Panel2: TPanel;
     Panel4: TPanel;
     DelButton: TSpeedButton;
@@ -35,11 +36,17 @@ type
     Panel1: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
+    Panel6: TPanel;
     Panel7: TPanel;
     PlaceListButton: TRxSpeedButton;
     ReasonListButton: TRxSpeedButton;
+    ZoomOutButton: TSpeedButton;
+    ZoomInButton: TSpeedButton;
     SpinEdit1: TSpinEdit;
     TopToolsPanel: TPanel;
+    ZoomValueLabel: TLabel;
+    ZoomPanel: TPanel;
+    ZoomTrackBar: TTrackBar;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -52,11 +59,14 @@ type
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
-    procedure MotorRepairCheckBoxChange(Sender: TObject);
+    procedure MotorNumOrderCheckBoxChange(Sender: TObject);
     procedure PlaceListButtonClick(Sender: TObject);
     procedure DefectListButtonClick(Sender: TObject);
     procedure ReasonListButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
+    procedure ZoomInButtonClick(Sender: TObject);
+    procedure ZoomOutButtonClick(Sender: TObject);
+    procedure ZoomTrackBarChange(Sender: TObject);
   private
     SelectedIndex: Integer;
     ReclamationSheet: TReclamationSheet;
@@ -74,6 +84,9 @@ type
 
     procedure DelRaclamation;
     procedure ReclamationEditFormOpen(const AEditType: Byte);
+
+    procedure DrawReclamation;
+
   public
     procedure ShowReclamation;
   end;
@@ -145,11 +158,12 @@ begin
   ShowReclamation;
 end;
 
-procedure TReclamationForm.MotorRepairCheckBoxChange(Sender: TObject);
+procedure TReclamationForm.MotorNumOrderCheckBoxChange(Sender: TObject);
 begin
-  SpinEdit1.Enabled:= not MotorRepairCheckBox.Checked;
   ShowReclamation;
 end;
+
+
 
 procedure TReclamationForm.PlaceListButtonClick(Sender: TObject);
 begin
@@ -182,6 +196,22 @@ end;
 procedure TReclamationForm.SpinEdit1Change(Sender: TObject);
 begin
   ShowReclamation;
+end;
+
+procedure TReclamationForm.ZoomInButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
+end;
+
+procedure TReclamationForm.ZoomOutButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
+end;
+
+procedure TReclamationForm.ZoomTrackBarChange(Sender: TObject);
+begin
+  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
+  DrawReclamation;
 end;
 
 procedure TReclamationForm.SelectionClear;
@@ -225,25 +255,28 @@ begin
     SQLite.ReclamationListLoad(BeginDate, EndDate,
                         MainForm.UsedNameIDs,
                         STrim(MotorNumEdit.Text),
-                        MotorRepairCheckBox.Checked,
+                        MotorNumOrderCheckBox.Checked,
                         RecDates, BuildDates, ArrivalDates, SendingDates,
                         RecIDs, MotorIDs, Mileages, Opinions,
                         ReasonColors, Passports,
                         PlaceNames, FactoryNames, Departures,
                         DefectNames, ReasonNames, RecNotes,
                         MotorNames, MotorNums);
-
-    ReclamationSheet.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
-                          Mileages, Opinions, ReasonColors, Passports,
-                          PlaceNames, FactoryNames, Departures, DefectNames,
-                          ReasonNames, RecNotes, MotorNames, MotorNums);
-
-
-
+    DrawReclamation;
   finally
     Screen.Cursor:= crDefault;
   end;
 end;
+
+procedure TReclamationForm.DrawReclamation;
+begin
+  ReclamationSheet.Zoom(ZoomTrackBar.Position);
+  ReclamationSheet.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
+                          Mileages, Opinions, ReasonColors, Passports,
+                          PlaceNames, FactoryNames, Departures, DefectNames,
+                          ReasonNames, RecNotes, MotorNames, MotorNums);
+end;
+
 
 procedure TReclamationForm.DelRaclamation;
 begin
@@ -270,6 +303,8 @@ begin
   SelectionClear;
   ShowReclamation;
 end;
+
+
 
 procedure TReclamationForm.DelButtonClick(Sender: TObject);
 begin
