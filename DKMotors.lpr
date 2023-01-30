@@ -14,7 +14,7 @@ uses
   UBuildAddForm, SheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
   UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm,
-  URepairForm;
+  URepairForm, UControlListForm;
 
 {$R *.res}
 
@@ -23,6 +23,7 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TControlListForm, ControlListForm);
   Application.Run;
 end.
 

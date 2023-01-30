@@ -1,12 +1,13 @@
 object RepairForm: TRepairForm
-  Left = 301
+  Left = 345
   Height = 637
-  Top = 218
-  Width = 1467
+  Top = 205
+  Width = 1556
   Align = alClient
   BorderStyle = bsNone
+  Caption = 'RepairForm'
   ClientHeight = 637
-  ClientWidth = 1467
+  ClientWidth = 1556
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -15,7 +16,7 @@ object RepairForm: TRepairForm
     Left = 2
     Height = 40
     Top = 2
-    Width = 1463
+    Width = 1552
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -25,14 +26,14 @@ object RepairForm: TRepairForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1459
+    ClientWidth = 1548
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1213
+      Left = 638
       Height = 36
       Top = 0
       Width = 112
@@ -172,10 +173,11 @@ object RepairForm: TRepairForm
         0000000000000000000000000000000000000000000000000000
       }
       Margin = 10
+      OnClick = ExportButtonClick
       ParentFont = False
     end
     object Panel1: TPanel
-      Left = 0
+      Left = 140
       Height = 36
       Top = 0
       Width = 0
@@ -196,7 +198,7 @@ object RepairForm: TRepairForm
       ParentFont = False
     end
     object DividerBevel7: TDividerBevel
-      Left = 1193
+      Left = 618
       Height = 36
       Top = 0
       Width = 20
@@ -666,7 +668,7 @@ object RepairForm: TRepairForm
       end
     end
     object Panel5: TPanel
-      Left = 1193
+      Left = 618
       Height = 36
       Top = 0
       Width = 0
@@ -722,7 +724,7 @@ object RepairForm: TRepairForm
       end
     end
     object Panel2: TPanel
-      Left = 1193
+      Left = 618
       Height = 36
       Top = 0
       Width = 0
@@ -731,217 +733,181 @@ object RepairForm: TRepairForm
       BevelOuter = bvNone
       TabOrder = 4
     end
-    object DividerBevel9: TDividerBevel
-      Left = 839
-      Height = 36
-      Top = 0
-      Width = 20
-      Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
-    end
-    object Panel4: TPanel
+    object MoreInfoCheckBox: TCheckBox
       Left = 419
       Height = 36
       Top = 0
-      Width = 420
+      Width = 199
       Align = alLeft
-      AutoSize = True
-      BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 420
+      Caption = 'Подробная информация'
+      Checked = True
+      OnChange = MoreInfoCheckBoxChange
+      State = cbChecked
       TabOrder = 5
-      object RadioButton1: TRadioButton
-        AnchorSideLeft.Control = Label1
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel4
-        AnchorSideTop.Side = asrCenter
-        Left = 94
-        Height = 24
-        Top = 6
-        Width = 96
-        Align = alCustom
-        BorderSpacing.Left = 6
-        Caption = 'в ремонте'
-        Checked = True
-        OnClick = RadioButton1Click
-        TabOrder = 2
-        TabStop = True
-      end
-      object RadioButton2: TRadioButton
-        AnchorSideLeft.Control = RadioButton1
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel4
-        AnchorSideTop.Side = asrCenter
-        Left = 196
-        Height = 24
-        Top = 6
-        Width = 171
-        Align = alCustom
-        BorderSpacing.Left = 6
-        Caption = 'отремонтированные'
-        OnClick = RadioButton2Click
-        TabOrder = 0
-      end
-      object RadioButton3: TRadioButton
-        AnchorSideLeft.Control = RadioButton2
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel4
-        AnchorSideTop.Side = asrCenter
-        Left = 373
-        Height = 24
-        Top = 6
-        Width = 47
-        Align = alCustom
-        BorderSpacing.Left = 6
-        Caption = 'все'
-        OnClick = RadioButton3Click
-        TabOrder = 1
-      end
-      object Label1: TLabel
-        AnchorSideLeft.Control = Panel4
-        AnchorSideTop.Control = Panel4
-        AnchorSideTop.Side = asrCenter
-        Left = 0
-        Height = 20
-        Top = 8
-        Width = 88
-        Caption = 'Отображать:'
-        ParentColor = False
-      end
-    end
-    object Panel8: TPanel
-      Left = 859
-      Height = 36
-      Top = 0
-      Width = 334
-      Align = alLeft
-      AutoSize = True
-      BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 334
-      TabOrder = 6
-      object RadioButton4: TRadioButton
-        AnchorSideLeft.Control = Label3
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel8
-        AnchorSideTop.Side = asrCenter
-        Left = 123
-        Height = 24
-        Top = 6
-        Width = 128
-        Align = alCustom
-        BorderSpacing.Left = 6
-        Caption = 'дате прибытия'
-        Checked = True
-        OnClick = RadioButton4Click
-        TabOrder = 1
-        TabStop = True
-      end
-      object RadioButton5: TRadioButton
-        AnchorSideLeft.Control = RadioButton4
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel8
-        AnchorSideTop.Side = asrCenter
-        Left = 257
-        Height = 24
-        Top = 6
-        Width = 77
-        Align = alCustom
-        BorderSpacing.Left = 6
-        Caption = 'номеру'
-        OnClick = RadioButton5Click
-        TabOrder = 0
-      end
-      object Label3: TLabel
-        AnchorSideLeft.Control = Panel8
-        AnchorSideTop.Control = Panel8
-        AnchorSideTop.Side = asrCenter
-        Left = 0
-        Height = 20
-        Top = 8
-        Width = 117
-        Caption = 'Упорядочить по:'
-        ParentColor = False
-      end
     end
   end
   object Panel6: TPanel
     Left = 2
-    Height = 398
-    Top = 237
-    Width = 1463
-    Align = alBottom
+    Height = 591
+    Top = 44
+    Width = 236
+    Align = alLeft
     BorderSpacing.Left = 2
-    BorderSpacing.Right = 2
+    BorderSpacing.Top = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 394
-    ClientWidth = 1459
+    ClientHeight = 587
+    ClientWidth = 232
+    Color = clWindow
+    ParentColor = False
     TabOrder = 1
-    object InfoGrid: TsWorksheetGrid
-      Left = 0
-      Height = 394
+    object Label4: TLabel
+      Left = 2
+      Height = 20
       Top = 0
-      Width = 1459
-      AutoExpand = []
-      DisplayFixedColRow = False
-      FrozenCols = 0
-      FrozenRows = 0
-      PageBreakPen.Color = clBlue
-      PageBreakPen.Style = psDash
-      ReadFormulas = False
-      SelectionPen.Color = clWindow
-      SelectionPen.Style = psClear
-      SelectionPen.Width = 0
-      ShowGridLines = False
-      ShowHeaders = False
-      WorkbookSource = InfoGrid.internal
-      Align = alClient
-      AutoAdvance = aaNone
-      AutoEdit = False
-      BorderStyle = bsNone
-      Color = clWhite
-      DefaultColWidth = 40
-      DefaultRowHeight = 20
-      ExtendedSelect = False
-      Flat = True
-      MouseWheelOption = mwGrid
-      Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+      Width = 230
+      Align = alTop
+      BorderSpacing.Left = 2
+      BorderSpacing.Bottom = 2
+      Caption = 'Отображать:'
+      Color = clWindow
+      Font.Style = [fsBold]
+      ParentColor = False
       ParentFont = False
+      Transparent = False
+    end
+    object VT2: TVirtualStringTree
+      Left = 0
+      Height = 126
+      Top = 22
+      Width = 232
+      Align = alTop
+      BorderStyle = bsNone
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
       TabOrder = 0
-      TabStop = False
-      TitleFont.Style = [fsBold]
+    end
+    object Label5: TLabel
+      Left = 2
+      Height = 20
+      Top = 148
+      Width = 230
+      Align = alTop
+      BorderSpacing.Left = 2
+      BorderSpacing.Bottom = 2
+      Caption = 'Упорядочить по:'
+      Color = clWindow
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+      Transparent = False
+    end
+    object VT3: TVirtualStringTree
+      Left = 0
+      Height = 126
+      Top = 170
+      Width = 232
+      Align = alTop
+      BorderStyle = bsNone
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
+      TabOrder = 1
     end
   end
-  object Splitter2: TSplitter
-    AnchorSideBottom.Control = Panel6
-    Cursor = crVSplit
-    Left = 0
-    Height = 6
-    Top = 231
-    Width = 1467
-    Align = alBottom
-    ResizeAnchor = akBottom
+  object Splitter1: TSplitter
+    Left = 238
+    Height = 593
+    Top = 44
+    Width = 6
     ResizeStyle = rsLine
   end
-  object VT1: TVirtualStringTree
-    AnchorSideBottom.Control = Splitter2
-    Left = 2
-    Height = 187
+  object Panel9: TPanel
+    Left = 244
+    Height = 593
     Top = 44
-    Width = 1463
+    Width = 1312
     Align = alClient
-    BorderSpacing.Left = 2
-    BorderSpacing.Top = 2
-    BorderSpacing.Right = 2
-    DefaultText = 'Node'
-    Header.AutoSizeIndex = 0
-    Header.Columns = <>
-    Header.MainColumn = -1
+    BevelOuter = bvNone
+    ClientHeight = 593
+    ClientWidth = 1312
     TabOrder = 3
-    OnMouseUp = VT1MouseUp
+    object Panel10: TPanel
+      Left = 0
+      Height = 398
+      Top = 193
+      Width = 1310
+      Align = alBottom
+      BorderSpacing.Right = 2
+      BorderSpacing.Bottom = 2
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      ClientHeight = 394
+      ClientWidth = 1306
+      TabOrder = 0
+      object InfoGrid: TsWorksheetGrid
+        Left = 0
+        Height = 394
+        Top = 0
+        Width = 1306
+        AutoExpand = []
+        DisplayFixedColRow = False
+        FrozenCols = 0
+        FrozenRows = 0
+        PageBreakPen.Color = clBlue
+        PageBreakPen.Style = psDash
+        ReadFormulas = False
+        SelectionPen.Color = clWindow
+        SelectionPen.Style = psClear
+        SelectionPen.Width = 0
+        ShowGridLines = False
+        ShowHeaders = False
+        WorkbookSource = InfoGrid.internal
+        Align = alClient
+        AutoAdvance = aaNone
+        AutoEdit = False
+        BorderStyle = bsNone
+        Color = clWhite
+        DefaultColWidth = 40
+        DefaultRowHeight = 20
+        ExtendedSelect = False
+        Flat = True
+        MouseWheelOption = mwGrid
+        Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+        ParentFont = False
+        TabOrder = 0
+        TabStop = False
+        TitleFont.Style = [fsBold]
+      end
+    end
+    object Splitter2: TSplitter
+      AnchorSideBottom.Control = Panel10
+      Cursor = crVSplit
+      Left = 0
+      Height = 6
+      Top = 187
+      Width = 1312
+      Align = alBottom
+      ResizeAnchor = akBottom
+      ResizeStyle = rsLine
+    end
+    object VT1: TVirtualStringTree
+      AnchorSideBottom.Control = Splitter2
+      Left = 0
+      Height = 187
+      Top = 0
+      Width = 1310
+      Align = alClient
+      BorderSpacing.Right = 2
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
+      TabOrder = 2
+    end
   end
 end

@@ -17,7 +17,7 @@ type
 
   TMotorListForm = class(TForm)
     CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
+    MoreInfoCheckBox: TCheckBox;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
     DividerBevel4: TDividerBevel;
@@ -37,7 +37,7 @@ type
     Splitter2: TSplitter;
     VT1: TVirtualStringTree;
     procedure CheckBox1Change(Sender: TObject);
-    procedure CheckBox2Change(Sender: TObject);
+    procedure MoreInfoCheckBoxChange(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -173,6 +173,7 @@ begin
                       PlaceNames, FactoryNames, Departures,
                       DefectNames, ReasonNames, RecNotes);
 
+
   MotorInfoSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
                       RotorNum, ReceiverName, TestDates, TestResults, TestNotes,
                       RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
@@ -184,9 +185,9 @@ begin
   ShowMotorList;
 end;
 
-procedure TMotorListForm.CheckBox2Change(Sender: TObject);
+procedure TMotorListForm.MoreInfoCheckBoxChange(Sender: TObject);
 begin
-  If CheckBox2.Checked then
+  If MoreInfoCheckBox.Checked then
   begin
     VT1.Align:= alCustom;
     Splitter2.Visible:= True;
@@ -200,7 +201,7 @@ begin
     Splitter2.Visible:= False;
   end;
 
-  VSTTable.CanSelect:= CheckBox2.Checked;
+  VSTTable.CanSelect:= MoreInfoCheckBox.Checked;
 end;
 
 procedure TMotorListForm.ExportButtonClick(Sender: TObject);

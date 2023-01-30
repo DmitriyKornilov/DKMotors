@@ -224,7 +224,7 @@ object MainForm: TMainForm
       Orientation = trVertical
       ParentFont = False
     end
-    object ControlMotorsButton: TRxSpeedButton
+    object ControlListButton: TRxSpeedButton
       Cursor = crHandPoint
       Left = 234
       Height = 36
@@ -237,6 +237,7 @@ object MainForm: TMainForm
       Images = ImageListCategory24
       ImageIndex = 18
       Margin = 10
+      OnClick = ControlListButtonClick
       ParentFont = False
     end
     object RepairButton: TRxSpeedButton

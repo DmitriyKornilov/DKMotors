@@ -591,44 +591,231 @@ object StatisticForm: TStatisticForm
         BorderSpacing.Right = 2
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
-        BorderStyle = bsSingle
-        ClientHeight = 797
-        ClientWidth = 778
+        ClientHeight = 801
+        ClientWidth = 782
         TabOrder = 0
-        object Grid1: TsWorksheetGrid
+        object Panel7: TPanel
           Left = 0
-          Height = 797
+          Height = 763
           Top = 0
-          Width = 778
-          AutoExpand = []
-          DisplayFixedColRow = False
-          FrozenBorderPen.Style = psClear
-          FrozenCols = 0
-          FrozenRows = 0
-          PageBreakPen.Color = clBlue
-          PageBreakPen.Style = psDash
-          ReadFormulas = False
-          SelectionPen.Color = clWindow
-          SelectionPen.Style = psClear
-          SelectionPen.Width = 0
-          ShowGridLines = False
-          ShowHeaders = False
-          WorkbookSource = Grid1.internal
+          Width = 782
           Align = alClient
-          AutoAdvance = aaNone
-          AutoEdit = False
-          BorderStyle = bsNone
-          Color = clWhite
-          DefaultColWidth = 40
-          DefaultRowHeight = 20
-          ExtendedSelect = False
-          Flat = True
-          MouseWheelOption = mwGrid
-          Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
-          ParentFont = False
+          BorderSpacing.Bottom = 2
+          BevelOuter = bvNone
+          BorderStyle = bsSingle
+          Caption = 'Panel7'
+          ClientHeight = 759
+          ClientWidth = 778
           TabOrder = 0
-          TabStop = False
-          TitleFont.Style = [fsBold]
+          object Grid1: TsWorksheetGrid
+            Left = 0
+            Height = 759
+            Top = 0
+            Width = 778
+            AutoExpand = []
+            DisplayFixedColRow = False
+            FrozenBorderPen.Style = psClear
+            FrozenCols = 0
+            FrozenRows = 0
+            PageBreakPen.Color = clBlue
+            PageBreakPen.Style = psDash
+            ReadFormulas = False
+            SelectionPen.Color = clWindow
+            SelectionPen.Style = psClear
+            SelectionPen.Width = 0
+            ShowGridLines = False
+            ShowHeaders = False
+            WorkbookSource = Grid1.internal
+            Align = alClient
+            AutoAdvance = aaNone
+            AutoEdit = False
+            BorderStyle = bsNone
+            Color = clWhite
+            DefaultColWidth = 40
+            DefaultRowHeight = 20
+            ExtendedSelect = False
+            Flat = True
+            MouseWheelOption = mwGrid
+            Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+            ParentFont = False
+            TabOrder = 0
+            TabStop = False
+            TitleFont.Style = [fsBold]
+          end
+        end
+        object Panel8: TPanel
+          Left = 0
+          Height = 36
+          Top = 765
+          Width = 782
+          Align = alBottom
+          AutoSize = True
+          BevelOuter = bvNone
+          BorderStyle = bsSingle
+          ClientHeight = 32
+          ClientWidth = 778
+          TabOrder = 1
+          object ZoomPanel: TPanel
+            Left = 420
+            Height = 20
+            Top = 6
+            Width = 338
+            Align = alRight
+            BorderSpacing.Top = 6
+            BorderSpacing.Right = 20
+            BorderSpacing.Bottom = 6
+            BevelOuter = bvNone
+            ClientHeight = 20
+            ClientWidth = 338
+            TabOrder = 0
+            object ZoomCaptionLabel: TLabel
+              AnchorSideLeft.Control = ZoomPanel
+              AnchorSideTop.Control = ZoomPanel
+              AnchorSideTop.Side = asrCenter
+              Left = 2
+              Height = 20
+              Top = 0
+              Width = 63
+              BorderSpacing.Left = 2
+              Caption = 'Масштаб'
+              ParentColor = False
+            end
+            object ZoomTrackBar: TTrackBar
+              AnchorSideLeft.Control = ZoomOutButton
+              AnchorSideLeft.Side = asrBottom
+              AnchorSideTop.Control = ZoomPanel
+              AnchorSideTop.Side = asrCenter
+              Left = 100
+              Height = 20
+              Top = 0
+              Width = 150
+              LineSize = 5
+              Max = 150
+              Min = 50
+              OnChange = ZoomTrackBarChange
+              PageSize = 5
+              Position = 100
+              TickStyle = tsNone
+              Align = alCustom
+              TabOrder = 0
+            end
+            object ZoomOutButton: TSpeedButton
+              AnchorSideLeft.Control = ZoomCaptionLabel
+              AnchorSideLeft.Side = asrBottom
+              Cursor = crHandPoint
+              Left = 80
+              Height = 20
+              Top = 0
+              Width = 20
+              AutoSize = True
+              BorderSpacing.Left = 15
+              Flat = True
+              Glyph.Data = {
+                36040000424D3604000000000000360000002800000010000000100000000100
+                2000000000000004000064000000640000000000000000000000000000000000
+                0000000000130000003600000040000000400000004000000040000000400000
+                0040000000400000004000000036000000130000000000000000000000000000
+                001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+                00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
+                00B40000006F0000000800000000000000000000000000000000000000000000
+                00000000000000000000000000080000006F000000B400000013000000360000
+                00CA000000080000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000008000000CA00000036000000400000
+                00BF000000000000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF000000000000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF000000000000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
+                007F0000007F0000005C0000000000000000000000BF00000040000000400000
+                00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
+                007F0000007F0000005C0000000000000000000000BF00000040000000400000
+                00BF000000000000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF000000000000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF000000000000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000000000000BF00000040000000360000
+                00CA000000080000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000008000000CA00000036000000130000
+                00B50000006F0000000800000000000000000000000000000000000000000000
+                00000000000000000000000000080000006F000000B400000013000000000000
+                001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+                00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
+                0000000000130000003600000040000000400000004000000040000000400000
+                0040000000400000004000000036000000130000000000000000
+              }
+              OnClick = ZoomOutButtonClick
+            end
+            object ZoomInButton: TSpeedButton
+              AnchorSideLeft.Control = ZoomTrackBar
+              AnchorSideLeft.Side = asrBottom
+              AnchorSideTop.Control = ZoomPanel
+              AnchorSideTop.Side = asrCenter
+              Cursor = crHandPoint
+              Left = 250
+              Height = 20
+              Top = 0
+              Width = 20
+              AutoSize = True
+              Flat = True
+              Glyph.Data = {
+                36040000424D3604000000000000360000002800000010000000100000000100
+                2000000000000004000064000000640000000000000000000000000000000000
+                0000000000130000003600000040000000400000004000000040000000400000
+                0040000000400000004000000036000000130000000000000000000000000000
+                001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+                00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
+                00B40000006F0000000800000000000000000000000000000000000000000000
+                00000000000000000000000000080000006F000000B400000013000000360000
+                00CA000000080000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000008000000CA00000036000000400000
+                00BF00000000000000000000000000000000000000000000005C0000005C0000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF00000000000000000000000000000000000000000000007F0000007F0000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF00000000000000000000000000000000000000000000007F0000007F0000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
+                007F0000007F0000005C0000000000000000000000BF00000040000000400000
+                00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
+                007F0000007F0000005C0000000000000000000000BF00000040000000400000
+                00BF00000000000000000000000000000000000000000000007F0000007F0000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF00000000000000000000000000000000000000000000007F0000007F0000
+                000000000000000000000000000000000000000000BF00000040000000400000
+                00BF00000000000000000000000000000000000000000000005D0000005C0000
+                000000000000000000000000000000000000000000BF00000040000000360000
+                00CA000000080000000000000000000000000000000000000000000000000000
+                000000000000000000000000000000000008000000CA00000036000000130000
+                00B50000006F0000000800000000000000000000000000000000000000000000
+                00000000000000000000000000080000006F000000B400000013000000000000
+                001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+                00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
+                0000000000130000003600000040000000400000004000000040000000400000
+                0040000000400000004000000036000000130000000000000000
+              }
+              OnClick = ZoomInButtonClick
+            end
+            object ZoomValueLabel: TLabel
+              AnchorSideLeft.Control = ZoomInButton
+              AnchorSideLeft.Side = asrBottom
+              AnchorSideTop.Control = ZoomPanel
+              AnchorSideTop.Side = asrCenter
+              AnchorSideRight.Control = ZoomPanel
+              AnchorSideRight.Side = asrBottom
+              Left = 292
+              Height = 20
+              Top = 0
+              Width = 40
+              Anchors = [akTop, akRight]
+              BorderSpacing.Left = 15
+              BorderSpacing.Right = 6
+              Caption = '100 %'
+              ParentColor = False
+            end
+          end
         end
       end
     end

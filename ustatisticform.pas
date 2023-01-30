@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, SheetUtils, LCLType,
-  StdCtrls, Spin, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel, USQLite,
-  DK_Matrix, DK_SheetExporter, fpstypes, DK_StrUtils;
+  StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
+  USQLite, DK_Matrix, DK_SheetExporter, fpstypes, DK_StrUtils;
 
 type
 
@@ -37,6 +37,8 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
+    Panel7: TPanel;
+    Panel8: TPanel;
     Panel9: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
@@ -48,6 +50,12 @@ type
     ClientPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
+    ZoomCaptionLabel: TLabel;
+    ZoomInButton: TSpeedButton;
+    ZoomOutButton: TSpeedButton;
+    ZoomPanel: TPanel;
+    ZoomTrackBar: TTrackBar;
+    ZoomValueLabel: TLabel;
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
     procedure CheckBox3Change(Sender: TObject);
@@ -59,6 +67,9 @@ type
     procedure RadioButton1Click(Sender: TObject);
     procedure RadioButton2Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
+    procedure ZoomInButtonClick(Sender: TObject);
+    procedure ZoomOutButtonClick(Sender: TObject);
+    procedure ZoomTrackBarChange(Sender: TObject);
 
   private
     SelectedIndex: Integer;
@@ -69,6 +80,11 @@ type
     ReasonList: TVSTCheckTable;
 
     StatisticList: TVSTTable;
+
+    ParamNames: TStrVector;
+    Counts: TIntMatrix3D;
+    ParamCaption, ReportName, MotorNames: String;
+    ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount: Integer;
 
     procedure VerifyDates;
 
@@ -84,7 +100,7 @@ type
     //2 - Распределение по предприятиям
     //3 - Распределение по месяцам
     procedure Statistic(const AParamType: Integer);
-
+    procedure DrawStatistic;
   public
 
 
@@ -223,6 +239,22 @@ begin
   ShowStatistic;
 end;
 
+procedure TStatisticForm.ZoomInButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
+end;
+
+procedure TStatisticForm.ZoomOutButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
+end;
+
+procedure TStatisticForm.ZoomTrackBarChange(Sender: TObject);
+begin
+  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
+  DrawStatistic;
+end;
+
 procedure TStatisticForm.ShowStatistic;
 begin
   if not CanShow then Exit;
@@ -307,15 +339,9 @@ end;
 procedure TStatisticForm.Statistic(const AParamType: Integer);
 var
   BD, ED: TDate;
-  ParamNames: TStrVector;
-  Counts: TIntMatrix3D;
-  ParamCaption, ReportName, MotorNames: String;
-  i,W, ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount: Integer;
-  Sheet: TStatisticReclamationSheet;
+  i,W: Integer;
 begin
   if AParamType<0 then Exit;
-
-
 
   BD:= DateTimePicker2.Date;
   ED:= DateTimePicker1.Date;
@@ -372,18 +398,29 @@ begin
   MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
 
   //ширина столбца с наименованиями параметра распределения
-  ParamNameColumnWidth:= 90;
+  ParamNameColumnWidth:= 120;
   for i:=0 to High(ParamNames) do
   begin
-    W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+10;
+    W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+50;
     if W>ParamNameColumnWidth then
       ParamNameColumnWidth:= W;
   end;
 
+  DrawStatistic;
+end;
+
+procedure TStatisticForm.DrawStatistic;
+var
+  BD, ED: TDate;
+  Sheet: TStatisticReclamationSheet;
+begin
   Sheet:= TStatisticReclamationSheet.Create(Grid1,
                     ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount,
                     ReasonList.Selected, CheckBox2.Checked, CheckBox3.Checked);
   try
+    BD:= DateTimePicker2.Date;
+    ED:= DateTimePicker1.Date;
+    Sheet.Zoom(ZoomTrackBar.Position);
     Sheet.Draw(BD, ED, ReportName, MotorNames, ParamCaption,
              ParamNames, ReasonNames, Counts, True);
   finally

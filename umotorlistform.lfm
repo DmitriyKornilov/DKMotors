@@ -309,7 +309,7 @@ object MotorListForm: TMotorListForm
       OnClick = ExportButtonClick
       ParentFont = False
     end
-    object CheckBox2: TCheckBox
+    object MoreInfoCheckBox: TCheckBox
       Left = 869
       Height = 36
       Top = 0
@@ -317,7 +317,7 @@ object MotorListForm: TMotorListForm
       Align = alLeft
       Caption = 'Подробная информация'
       Checked = True
-      OnChange = CheckBox2Change
+      OnChange = MoreInfoCheckBoxChange
       State = cbChecked
       TabOrder = 3
     end

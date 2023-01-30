@@ -9,14 +9,14 @@ uses
   StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
-  USQLite, SheetUtils;
+  UControlListForm, USQLite, SheetUtils;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
-    ControlMotorsButton: TRxSpeedButton;
+    ControlListButton: TRxSpeedButton;
     DividerBevel5: TDividerBevel;
     DividerBevel6: TDividerBevel;
     DividerBevel7: TDividerBevel;
@@ -48,6 +48,7 @@ type
     procedure AboutButtonClick(Sender: TObject);
     procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ChooseRecieverNamesButtonClick(Sender: TObject);
+    procedure ControlListButtonClick(Sender: TObject);
     procedure ExitButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -67,6 +68,17 @@ type
     procedure TestLogButtonClick(Sender: TObject);
     procedure ReportButtonClick(Sender: TObject);
   private
+    BuildLogForm: TBuildLogForm;
+    TestLogForm: TTestLogForm;
+    ShipmentForm: TShipmentForm;
+    ReclamationForm: TReclamationForm;
+    StoreForm: TStoreForm;
+    MotorListForm: TMotorListForm;
+    ReportForm: TReportForm;
+    StatisticForm: TStatisticForm;
+    RepairForm: TRepairForm;
+    ControlListForm: TControlListForm;
+
     procedure DBConnect;
     procedure Choose;
     procedure FreeForms;
@@ -80,21 +92,14 @@ type
     procedure ReportFormOpen;
     procedure StatisticFormOpen;
     procedure RepairFormOpen;
+    procedure ControlListFormOpen;
 
     procedure ChangeUsedMotorList;
     procedure ChangeUsedReceiverList;
 
     procedure ShowData;
   public
-    BuildLogForm: TBuildLogForm;
-    TestLogForm: TTestLogForm;
-    ShipmentForm: TShipmentForm;
-    ReclamationForm: TReclamationForm;
-    StoreForm: TStoreForm;
-    MotorListForm: TMotorListForm;
-    ReportForm: TReportForm;
-    StatisticForm: TStatisticForm;
-    RepairForm: TRepairForm;
+
 
     UsedNameIDs: TIntVector;
     UsedNames: TStrVector;
@@ -156,6 +161,11 @@ end;
 procedure TMainForm.ChooseRecieverNamesButtonClick(Sender: TObject);
 begin
   ChangeUsedReceiverList;
+end;
+
+procedure TMainForm.ControlListButtonClick(Sender: TObject);
+begin
+  if not Assigned(ControlListForm) then Choose;
 end;
 
 procedure TMainForm.Label3Click(Sender: TObject);
@@ -256,7 +266,8 @@ begin
     else if ReportButton.Down  then ReportFormOpen
     else if StatisticButton.Down then StatisticFormOpen
     else if MotorListButton.Down then MotorListFormOpen
-    else if RepairButton.Down then RepairFormOpen;
+    else if RepairButton.Down then RepairFormOpen
+    else if ControlListButton.Down then ControlListFormOpen;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -273,6 +284,7 @@ begin
   if Assigned(StatisticForm) then FreeAndNil(StatisticForm);
   if Assigned(MotorListForm) then FreeAndNil(MotorListForm);
   if Assigned(RepairForm) then FreeAndNil(RepairForm);
+  if Assigned(ControlListForm) then FreeAndNil(ControlListForm);
 end;
 
 procedure TMainForm.SetFormPosition(AForm: TForm);
@@ -346,6 +358,13 @@ begin
   RepairForm.Show;
 end;
 
+procedure TMainForm.ControlListFormOpen;
+begin
+  ControlListForm:= TControlListForm.Create(MainForm);
+  SetFormPosition(TForm(ControlListForm));
+  ControlListForm.Show;
+end;
+
 procedure TMainForm.ChangeUsedMotorList;
 begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True,
@@ -368,7 +387,8 @@ begin
   else if ReportButton.Down      then ReportForm.ShowReport
   else if StatisticButton.Down   then StatisticForm.ShowStatistic
   else if MotorListButton.Down   then MotorListForm.ShowMotorList
-  else if RepairButton.Down      then RepairForm.ShowRepair;
+  else if RepairButton.Down      then RepairForm.ShowRepair
+  else if ControlListButton.Down then ControlListForm.ShowControlList;
 end;
 
 procedure TMainForm.SetNamesPanelsVisible(const AMotorNamesPanelVisible,

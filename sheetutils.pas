@@ -5,7 +5,7 @@ unit SheetUtils;
 interface
 
 uses
-  Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid,
+  Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid, fpspreadsheet,
   DK_Vector, DK_Matrix, DK_Fonts, Grids, Graphics, DK_SheetConst, DK_Const,
   DateUtils, DK_DateUtils;
 
@@ -153,6 +153,7 @@ type
                        const AShowSecondColumn: Boolean = True;
                        const AShowAllYearsTotalCount: Boolean = False);
     destructor  Destroy; override;
+    procedure Zoom(const APercents: Integer);
     procedure Draw(const ABeginDate, AEndDate: TDate;
                    const AReportName, AMotorNames, AParamCaption: String;
                    const AParamNames, AReasonNames: TStrVector;
@@ -163,53 +164,53 @@ type
 
   { TStatisticReclamationCountSheet }
 
-  TStatisticReclamationCountSheet = class (TObject)
-  private
-    FGrid: TsWorksheetGrid;
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
-    procedure DrawTitle(var ARow: Integer; const ABeginDate, AEndDate: TDate;
-                        const AName, AMotorNames: String);
-    procedure DrawData(const ARow: Integer;
-                const AFirstColName: String;
-                const ANameValues, ATitleReasonNames: TStrVector;
-                const AUsedReasons: TBoolVector;
-                const AReasonCountValues: TIntMatrix;
-                const AResumeNeed: Boolean);
-  public
-    constructor Create(const AGrid: TsWorksheetGrid; const AReasonsCount: Integer);
-    destructor  Destroy; override;
-    procedure Draw(const ABeginDate, AEndDate: TDate;
-                   const AName, AMotorNames, AFirstColName: String;
-                   const ANameValues, ATitleReasonNames: TStrVector;
-                   const AUsedReasons: TBoolVector;
-                   const AReasonCountValues: TIntMatrix;
-                   const AResumeNeed: Boolean);
-  end;
+  //TStatisticReclamationCountSheet = class (TObject)
+  //private
+  //  FGrid: TsWorksheetGrid;
+  //  FWriter: TSheetWriter;
+  //  FFontName: String;
+  //  FFontSize: Single;
+  //  procedure DrawTitle(var ARow: Integer; const ABeginDate, AEndDate: TDate;
+  //                      const AName, AMotorNames: String);
+  //  procedure DrawData(const ARow: Integer;
+  //              const AFirstColName: String;
+  //              const ANameValues, ATitleReasonNames: TStrVector;
+  //              const AUsedReasons: TBoolVector;
+  //              const AReasonCountValues: TIntMatrix;
+  //              const AResumeNeed: Boolean);
+  //public
+  //  constructor Create(const AGrid: TsWorksheetGrid; const AReasonsCount: Integer);
+  //  destructor  Destroy; override;
+  //  procedure Draw(const ABeginDate, AEndDate: TDate;
+  //                 const AName, AMotorNames, AFirstColName: String;
+  //                 const ANameValues, ATitleReasonNames: TStrVector;
+  //                 const AUsedReasons: TBoolVector;
+  //                 const AReasonCountValues: TIntMatrix;
+  //                 const AResumeNeed: Boolean);
+  //end;
 
   { TStatisticReclamationMonthSheet }
 
-  TStatisticReclamationMonthSheet = class (TObject)
-  private
-    FGrid: TsWorksheetGrid;
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
-    procedure DrawTitle(var ARow: Integer; const AYears: TStrVector;
-                        const AName, AMotorNames: String);
-    procedure DrawData(const ARow: Integer;
-                const AYears: TStrVector;
-                const ACounts, AAccumulations: TIntMatrix;
-                const AResumeNeed: Boolean);
-  public
-    constructor Create(const AGrid: TsWorksheetGrid; const AYearsCount: Integer);
-    destructor  Destroy; override;
-    procedure Draw(const AYears: TStrVector;
-                   const AName, AMotorNames: String;
-                   const ACounts, AAccumulations: TIntMatrix;
-                   const AResumeNeed: Boolean);
-  end;
+  //TStatisticReclamationMonthSheet = class (TObject)
+  //private
+  //  FGrid: TsWorksheetGrid;
+  //  FWriter: TSheetWriter;
+  //  FFontName: String;
+  //  FFontSize: Single;
+  //  procedure DrawTitle(var ARow: Integer; const AYears: TStrVector;
+  //                      const AName, AMotorNames: String);
+  //  procedure DrawData(const ARow: Integer;
+  //              const AYears: TStrVector;
+  //              const ACounts, AAccumulations: TIntMatrix;
+  //              const AResumeNeed: Boolean);
+  //public
+  //  constructor Create(const AGrid: TsWorksheetGrid; const AYearsCount: Integer);
+  //  destructor  Destroy; override;
+  //  procedure Draw(const AYears: TStrVector;
+  //                 const AName, AMotorNames: String;
+  //                 const ACounts, AAccumulations: TIntMatrix;
+  //                 const AResumeNeed: Boolean);
+  //end;
 
   { TMotorTestSheet }
 
@@ -301,6 +302,22 @@ type
                    const AMotorNums, ASeries: TStrMatrix);
   end;
 
+  { TRepairSheet }
+
+  TRepairSheet = class (TObject)
+  private
+    FWriter: TSheetWriter;
+    FFontName: String;
+    FFontSize: Single;
+
+  public
+    constructor Create(const ASheet: TsWorksheet);
+    destructor  Destroy; override;
+    procedure Draw(const APassports: TIntVector;
+                   const AMotorNames, AMotorNums: TStrVector;
+                   const AArrivalDates, ASendingDates: TDateVector);
+  end;
+
   { TMotorInfoSheet }
 
   TMotorInfoSheet = class (TObject)
@@ -352,6 +369,87 @@ type
   end;
 
 implementation
+
+{ TRepairSheet }
+
+constructor TRepairSheet.Create(const ASheet: TsWorksheet);
+var
+  ColWidths: TIntVector;
+begin
+  FFontName:= SHEET_FONT_NAME;
+  FFontSize:= SHEET_FONT_SIZE;
+
+  ColWidths:= VCreateInt([
+    60,   //№п/п
+    300,  // Наименование
+    150,  // Номер
+    100,  // Наличие паспорта
+    150,  // Прибыл в ремонт
+    150,  // Убыл из ремонта
+    150   // Срок ремонта (дней)
+  ]);
+  FWriter:= TSheetWriter.Create(ColWidths, ASheet, nil);
+end;
+
+destructor TRepairSheet.Destroy;
+begin
+  if Assigned(FWriter) then FreeAndNil(FWriter);
+  inherited Destroy;
+end;
+
+procedure TRepairSheet.Draw(const APassports: TIntVector; const AMotorNames,
+  AMotorNums: TStrVector; const AArrivalDates, ASendingDates: TDateVector);
+var
+  R, i, n: Integer;
+  S: String;
+begin
+  FWriter.BeginEdit;
+  FWriter.SetBackgroundClear;
+
+  R:= 1;
+  FWriter.SetAlignment(haCenter, vaCenter);
+  S:= 'Гарантийный ремонт электродвигателей';
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  R:=R + 1;
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, '№п/п', cbtOuter, True, True);
+  FWriter.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
+  FWriter.WriteText(R, 3, 'Номер', cbtOuter, True, True);
+  FWriter.WriteText(R, 4, 'Наличие паспорта', cbtOuter, True, True);
+  FWriter.WriteText(R, 5, 'Прибыл в ремонт', cbtOuter, True, True);
+  FWriter.WriteText(R, 6, 'Убыл из ремонта', cbtOuter, True, True);
+  FWriter.WriteText(R, 7, 'Срок ремонта (дней)', cbtOuter, True, True);
+
+  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  for i:= 0 to High(AMotorNums) do
+  begin
+    R:=R + 1;
+    FWriter.SetAlignment(haCenter, vaCenter);
+    FWriter.WriteNumber(R, 1, i+1, cbtOuter);
+    FWriter.SetAlignment(haLeft, vaCenter);
+    FWriter.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
+    FWriter.SetAlignment(haCenter, vaCenter);
+    FWriter.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
+    S:= EmptyStr;
+    if APassports[i]>0 then S:= CHECK_SYMBOL;
+    FWriter.WriteText(R, 4, S, cbtOuter);
+    FWriter.WriteDate(R, 5, AArrivalDates[i], cbtOuter);
+    if ASendingDates[i]>0 then
+      FWriter.WriteDate(R, 6, ASendingDates[i], cbtOuter)
+    else
+      FWriter.WriteText(R, 6, EmptyStr, cbtOuter);
+
+    if ASendingDates[i]>0 then
+      n:= DaysBetweenDates(AArrivalDates[i], ASendingDates[i]) + 1
+    else
+      n:= DaysBetweenDates(AArrivalDates[i], Date) + 1;
+    FWriter.WriteNumber(R, 7, n, cbtOuter);
+  end;
+
+  FWriter.EndEdit;
+end;
 
 { TStatisticReclamationSheet }
 
@@ -789,15 +887,15 @@ var
   var
     i, j, W1, W2: Integer;
   begin
-    //if FShowSecondColumnForTotalCount then
-    //  W1:= 100
-    //else
-    //  W1:= 120;
-    //if FShowSecondColumn then
-    //  W2:= 100
-    //else
-    //  W2:= 140;
-    W1:= 100; W2:= 100;
+    if FShowSecondColumnForTotalCount then
+      W1:= 80
+    else
+      W1:= 100;
+    if FShowSecondColumn then
+      W2:= 80
+    else
+      W2:= 150;
+
 
     //пробегаем по всем периодам
     for i:= 0 to FAdditionYearsCount do
@@ -825,15 +923,15 @@ var
   var
     i, j, W1, W2: Integer;
   begin
-    //if FSeveralYears or FShowSecondColumnForTotalCount then
-    //  W1:= 100
-    //else
-    //  W1:= 120;
-    //if FShowSecondColumn or FSeveralYears then
-    //  W2:= 100
-    //else
-    //  W2:= 140;
-    W1:= 150; W2:= 150;
+    if FSeveralYears or FShowSecondColumnForTotalCount then
+      W1:= 80
+    else
+      W1:= 100;
+    if FShowSecondColumn or FSeveralYears then
+      W2:= 80
+    else
+      W2:= 150;
+
 
     if FUsedReasons[0] then
     begin
@@ -885,9 +983,9 @@ begin
 
 
   ColWidths:= nil;
-  VAppend(ColWidths, {AParamNameColumnWidth} 300); //наименование параметра распределения
+  VAppend(ColWidths, AParamNameColumnWidth); //наименование параметра распределения
   if FShowAllYearsTotalCount and FSeveralYears then
-    VAppend(ColWidths, 150); //общее количество за все периоды
+    VAppend(ColWidths, 120); //общее количество за все периоды
 
   if FGroupType = 1 then
     SetWidthsYear
@@ -901,6 +999,11 @@ destructor TStatisticReclamationSheet.Destroy;
 begin
   if Assigned(FWriter) then FreeAndNil(FWriter);
   inherited Destroy;
+end;
+
+procedure TStatisticReclamationSheet.Zoom(const APercents: Integer);
+begin
+  FWriter.SetZoom(APercents);
 end;
 
 procedure TStatisticReclamationSheet.Draw(const ABeginDate, AEndDate: TDate;
@@ -927,361 +1030,361 @@ end;
 
 { TStatisticReclamationMonthSheet }
 
-procedure TStatisticReclamationMonthSheet.DrawTitle(var ARow: Integer;
-  const AYears: TStrVector; const AName, AMotorNames: String);
-var
-  R: Integer;
-  S: String;
-begin
-  FWriter.SetAlignment(haCenter, vaCenter);
-
-  R:= ARow;
-  S:= 'Отчет по рекламационным случаям электродвигателей';
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
-
-  if AMotorNames<>EmptyStr then
-  begin
-    R:= R + 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
-  end;
-
-  if not VIsNil(AYears) then
-  begin
-    R:= R + 1;
-    S:= 'за ' + VVectorToStr(AYears, '/') + 'гг.';
-    FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
-  end;
-
-  if AName<>EmptyStr then
-  begin
-    R:= R + 1;
-    S:= '(' + AName + ')';
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
-  end;
-
-  ARow:= R + 1;
-end;
-
-procedure TStatisticReclamationMonthSheet.DrawData(const ARow: Integer;
-  const AYears: TStrVector; const ACounts, AAccumulations: TIntMatrix;
-  const AResumeNeed: Boolean);
-var
-  i, j, R, C: Integer;
-begin
-  R:= ARow;
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
-  FWriter.SetRowHeight(R, 10);
-
-  FWriter.SetAlignment(haCenter, vaCenter);
-
-  R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R+1, 1, 'Месяц', cbtOuter, True, True);
-  C:= 1;
-  for i:= 0 to High(AYears) do
-  begin
-    C:= C + 1;
-    FWriter.WriteText(R, C, R, C+1, AYears[i], cbtOuter, True, True);
-    FWriter.WriteText(R+1, C, R+1, C, 'Количество', cbtOuter, True, True);
-    C:= C + 1;
-    FWriter.WriteText(R+1, C, R+1, C, 'Накопление', cbtOuter, True, True);
-  end;
-  C:= 1;
-  FWriter.DrawBorders(R, C, R+1, FWriter.ColCount, cbtAll);
-
-  R:= R + 1;
-
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
-  for i:= 1 to 12 do
-  begin
-    R:= R + 1;
-    C:= 1;
-    FWriter.WriteText(R, C, R, C, MONTHSNOM[i], cbtOuter, True, True);
-    for j:= 0 to High(AYears) do
-    begin
-      C:= C + 1;
-      FWriter.WriteNumber(R, C, ACounts[j,i-1], cbtOuter);
-      C:= C + 1;
-      FWriter.WriteNumber(R, C, AAccumulations[j,i-1], cbtOuter);
-    end;
-  end;
-
-  if AResumeNeed then
-  begin
-    R:= R + 1;
-    C:= 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
-    C:= 0;
-    for j:= 0 to High(AYears) do
-    begin
-      C:= C + 2;
-      FWriter.WriteNumber(R, C, R, C+1, AAccumulations[j,11], cbtOuter);
-    end;
-  end;
-end;
-
-constructor TStatisticReclamationMonthSheet.Create(
-  const AGrid: TsWorksheetGrid; const AYearsCount: Integer);
-var
-  ColWidths: TIntVector;
-begin
-  FGrid:= AGrid;
-  FGrid.DefaultRowHeight:= ROW_HEIGHT_DEFAULT;
-  FGrid.MouseWheelOption:= mwGrid;
-  FGrid.ShowGridLines:= False;
-  FGrid.ShowHeaders:= False;
-  FGrid.SelectionPen.Style:= psClear;
-
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
-    100 // Месяц
-  ]);
-
-  if AYearsCount>0 then
-    VReDim(ColWidths, Length(ColWidths) + 2*AYearsCount, 100);  // Кол-во|Накопление
-
-  FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
-
-end;
-
-destructor TStatisticReclamationMonthSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
-end;
-
-procedure TStatisticReclamationMonthSheet.Draw(const AYears: TStrVector;
-  const AName, AMotorNames: String; const ACounts, AAccumulations: TIntMatrix;
-  const AResumeNeed: Boolean);
-var
-  R: Integer;
-begin
-  FGrid.Clear;
-  if VIsNil(AYears) then Exit;
-  if MIsNil(ACounts) then Exit;
-
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
-  R:= 1;
-  DrawTitle(R, AYears,AName, AMotorNames);
-  DrawData(R, AYears, ACounts, AAccumulations, AResumeNeed);
-
-  FWriter.EndEdit;
-end;
+//procedure TStatisticReclamationMonthSheet.DrawTitle(var ARow: Integer;
+//  const AYears: TStrVector; const AName, AMotorNames: String);
+//var
+//  R: Integer;
+//  S: String;
+//begin
+//  FWriter.SetAlignment(haCenter, vaCenter);
+//
+//  R:= ARow;
+//  S:= 'Отчет по рекламационным случаям электродвигателей';
+//  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+//  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+//
+//  if AMotorNames<>EmptyStr then
+//  begin
+//    R:= R + 1;
+//    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
+//  end;
+//
+//  if not VIsNil(AYears) then
+//  begin
+//    R:= R + 1;
+//    S:= 'за ' + VVectorToStr(AYears, '/') + 'гг.';
+//    FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+//    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+//  end;
+//
+//  if AName<>EmptyStr then
+//  begin
+//    R:= R + 1;
+//    S:= '(' + AName + ')';
+//    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+//  end;
+//
+//  ARow:= R + 1;
+//end;
+//
+//procedure TStatisticReclamationMonthSheet.DrawData(const ARow: Integer;
+//  const AYears: TStrVector; const ACounts, AAccumulations: TIntMatrix;
+//  const AResumeNeed: Boolean);
+//var
+//  i, j, R, C: Integer;
+//begin
+//  R:= ARow;
+//  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
+//  FWriter.SetRowHeight(R, 10);
+//
+//  FWriter.SetAlignment(haCenter, vaCenter);
+//
+//  R:= R + 1;
+//  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//  FWriter.WriteText(R, 1, R+1, 1, 'Месяц', cbtOuter, True, True);
+//  C:= 1;
+//  for i:= 0 to High(AYears) do
+//  begin
+//    C:= C + 1;
+//    FWriter.WriteText(R, C, R, C+1, AYears[i], cbtOuter, True, True);
+//    FWriter.WriteText(R+1, C, R+1, C, 'Количество', cbtOuter, True, True);
+//    C:= C + 1;
+//    FWriter.WriteText(R+1, C, R+1, C, 'Накопление', cbtOuter, True, True);
+//  end;
+//  C:= 1;
+//  FWriter.DrawBorders(R, C, R+1, FWriter.ColCount, cbtAll);
+//
+//  R:= R + 1;
+//
+//  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+//  for i:= 1 to 12 do
+//  begin
+//    R:= R + 1;
+//    C:= 1;
+//    FWriter.WriteText(R, C, R, C, MONTHSNOM[i], cbtOuter, True, True);
+//    for j:= 0 to High(AYears) do
+//    begin
+//      C:= C + 1;
+//      FWriter.WriteNumber(R, C, ACounts[j,i-1], cbtOuter);
+//      C:= C + 1;
+//      FWriter.WriteNumber(R, C, AAccumulations[j,i-1], cbtOuter);
+//    end;
+//  end;
+//
+//  if AResumeNeed then
+//  begin
+//    R:= R + 1;
+//    C:= 1;
+//    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//    FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
+//    C:= 0;
+//    for j:= 0 to High(AYears) do
+//    begin
+//      C:= C + 2;
+//      FWriter.WriteNumber(R, C, R, C+1, AAccumulations[j,11], cbtOuter);
+//    end;
+//  end;
+//end;
+//
+//constructor TStatisticReclamationMonthSheet.Create(
+//  const AGrid: TsWorksheetGrid; const AYearsCount: Integer);
+//var
+//  ColWidths: TIntVector;
+//begin
+//  FGrid:= AGrid;
+//  FGrid.DefaultRowHeight:= ROW_HEIGHT_DEFAULT;
+//  FGrid.MouseWheelOption:= mwGrid;
+//  FGrid.ShowGridLines:= False;
+//  FGrid.ShowHeaders:= False;
+//  FGrid.SelectionPen.Style:= psClear;
+//
+//  FFontName:= SHEET_FONT_NAME;
+//  FFontSize:= SHEET_FONT_SIZE;
+//
+//  ColWidths:= VCreateInt([
+//    100 // Месяц
+//  ]);
+//
+//  if AYearsCount>0 then
+//    VReDim(ColWidths, Length(ColWidths) + 2*AYearsCount, 100);  // Кол-во|Накопление
+//
+//  FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
+//
+//end;
+//
+//destructor TStatisticReclamationMonthSheet.Destroy;
+//begin
+//  if Assigned(FWriter) then FreeAndNil(FWriter);
+//  inherited Destroy;
+//end;
+//
+//procedure TStatisticReclamationMonthSheet.Draw(const AYears: TStrVector;
+//  const AName, AMotorNames: String; const ACounts, AAccumulations: TIntMatrix;
+//  const AResumeNeed: Boolean);
+//var
+//  R: Integer;
+//begin
+//  FGrid.Clear;
+//  if VIsNil(AYears) then Exit;
+//  if MIsNil(ACounts) then Exit;
+//
+//  FWriter.BeginEdit;
+//  FWriter.SetBackgroundClear;
+//  R:= 1;
+//  DrawTitle(R, AYears,AName, AMotorNames);
+//  DrawData(R, AYears, ACounts, AAccumulations, AResumeNeed);
+//
+//  FWriter.EndEdit;
+//end;
 
 { TStatisticReclamationCountSheet }
 
-procedure TStatisticReclamationCountSheet.DrawTitle(var ARow: Integer;
-  const ABeginDate, AEndDate: TDate; const AName, AMotorNames: String);
-var
-  R: Integer;
-  S: String;
-begin
-
-  FWriter.SetAlignment(haCenter, vaCenter);
-
-  R:= ARow;
-  S:= 'Отчет по рекламационным случаям электродвигателей';
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
-
-  if AMotorNames<>EmptyStr then
-  begin
-    R:= R + 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
-  end;
-
-  R:= R + 1;
-  S:= 'за ';
-  if SameDate(ABeginDate, AEndDate) then
-    S:= S + FormatDateTime('dd.mm.yyyy', ABeginDate)
-  else
-    S:= S + 'период с ' + FormatDateTime('dd.mm.yyyy', ABeginDate) +
-       ' по ' + FormatDateTime('dd.mm.yyyy', AEndDate);
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
-
-  if AName<>EmptyStr then
-  begin
-    R:= R + 1;
-    S:= '(' + AName + ')';
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
-  end;
-
-  ARow:= R + 1;
-end;
-
-procedure TStatisticReclamationCountSheet.DrawData(const ARow: Integer;
-  const AFirstColName: String;
-  const ANameValues, ATitleReasonNames: TStrVector;
-  const AUsedReasons: TBoolVector; const AReasonCountValues: TIntMatrix;
-  const AResumeNeed: Boolean);
-var
-  i, j, R, C, TotalCount, Count: Integer;
-  ShowTotal, ShowReason: Boolean;
-begin
-  R:= ARow;
-
-  ShowTotal:= AUsedReasons[0];
-  ShowReason:= VIsTrue(AUsedReasons, 1);
-
-  TotalCount:= VSum(AReasonCountValues[0]);
-
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
-  FWriter.SetRowHeight(R, 10);
-
-  R:= R + 1;
-  C:= 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, C, AFirstColName, cbtOuter, True, True);
-  //if ShowReason then
-  //  FWriter.WriteText(R, C, R+1, C, AFirstColName, cbtOuter, True, True)
-  //else
-  //  FWriter.WriteText(R, C, AFirstColName, cbtOuter, True, True);
-
-  if ShowTotal then
-  begin
-    C:= C + 1;
-    FWriter.WriteText(R, C, ATitleReasonNames[0], cbtOuter, True, True);
-    //if ShowReason then
-    //  FWriter.WriteText(R, C, R+1, C, ATitleReasonNames[0], cbtOuter, True, True)
-    //else
-    //  FWriter.WriteText(R, C, ATitleReasonNames[0], cbtOuter, True, True);
-  end;
-
-  if ShowReason then
-  begin
-    C:= Ord(ShowTotal);
-    for i:= 1 to High(ATitleReasonNames) do
-    begin
-      if AUsedReasons[i] then
-      begin
-        C:= C + 2;
-        FWriter.WriteText(R, C, R, C+1, ATitleReasonNames[i], cbtOuter, True, True);
-        //FWriter.WriteText(R+1, C, 'Количество', cbtOuter, True, True);
-        //FWriter.WriteText(R+1, C+1, '%', cbtOuter, True, True);
-      end;
-    end;
-    //R:= R + 1;
-  end;
-
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
-  for i:= 0 to High(ANameValues) do
-  begin
-    R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    C:= 1;
-    FWriter.WriteText(R, C, ANameValues[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    if ShowTotal then
-    begin
-      C:= C + 1;
-      FWriter.WriteNumber(R, C, AReasonCountValues[0, i], cbtOuter);
-    end;
-    C:= Ord(ShowTotal);
-    for j:= 1 to High(ATitleReasonNames) do
-    begin
-      if AUsedReasons[j] then
-      begin
-        C:= C + 2;
-        Count:= AReasonCountValues[j, i];
-        FWriter.WriteNumber(R, C, Count, cbtOuter);
-        FWriter.WriteNumber(R, C+1, Count/TotalCount, 1, cbtOuter, nfPercentage);
-      end;
-    end;
-  end;
-  if AResumeNeed then
-  begin
-    R:= R + 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.SetAlignment(haLeft, vaCenter);
-    C:= 1;
-    FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-
-    if ShowTotal then
-    begin
-      C:= C + 1;
-      FWriter.WriteNumber(R, C, TotalCount, cbtOuter);
-    end;
-    C:= Ord(ShowTotal);
-    for i:= 1 to High(ATitleReasonNames) do
-    begin
-      if AUsedReasons[i] then
-      begin
-        C:= C + 2;
-        Count:= VSum(AReasonCountValues[i]);
-        FWriter.WriteNumber(R, C, Count, cbtOuter);
-        FWriter.WriteNumber(R, C+1, Count/TotalCount, 1, cbtOuter, nfPercentage);
-      end;
-    end;
-  end;
-end;
-
-constructor TStatisticReclamationCountSheet.Create(const AGrid: TsWorksheetGrid;
-  const AReasonsCount: Integer);
-var
-  ColWidths: TIntVector;
-begin
-  FGrid:= AGrid;
-  FGrid.DefaultRowHeight:= ROW_HEIGHT_DEFAULT;
-  FGrid.MouseWheelOption:= mwGrid;
-  FGrid.ShowGridLines:= False;
-  FGrid.ShowHeaders:= False;
-  FGrid.SelectionPen.Style:= psClear;
-
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
-    270 // Наименование двигателя
-
-  ]);
-
-  if AReasonsCount>0 then
-    VReDim(ColWidths, Length(ColWidths) + AReasonsCount, 80);
-
-  FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
-
-end;
-
-destructor TStatisticReclamationCountSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
-end;
-
-procedure TStatisticReclamationCountSheet.Draw(const ABeginDate, AEndDate: TDate;
-                   const AName, AMotorNames, AFirstColName: String;
-                   const ANameValues, ATitleReasonNames: TStrVector;
-                   const AUsedReasons: TBoolVector;
-                   const AReasonCountValues: TIntMatrix;
-                   const AResumeNeed: Boolean);
-var
-  R: Integer;
-begin
-  FGrid.Clear;
-  if VIsNil(ANameValues) then Exit;
-
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
-  R:= 1;
-  DrawTitle(R, ABeginDate, AEndDate, AName, AMotorNames);
-  DrawData(R, AFirstColName, ANameValues, ATitleReasonNames, AUsedReasons,
-           AReasonCountValues, AResumeNeed);
-
-  FWriter.EndEdit;
-end;
+//procedure TStatisticReclamationCountSheet.DrawTitle(var ARow: Integer;
+//  const ABeginDate, AEndDate: TDate; const AName, AMotorNames: String);
+//var
+//  R: Integer;
+//  S: String;
+//begin
+//
+//  FWriter.SetAlignment(haCenter, vaCenter);
+//
+//  R:= ARow;
+//  S:= 'Отчет по рекламационным случаям электродвигателей';
+//  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+//  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+//
+//  if AMotorNames<>EmptyStr then
+//  begin
+//    R:= R + 1;
+//    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
+//  end;
+//
+//  R:= R + 1;
+//  S:= 'за ';
+//  if SameDate(ABeginDate, AEndDate) then
+//    S:= S + FormatDateTime('dd.mm.yyyy', ABeginDate)
+//  else
+//    S:= S + 'период с ' + FormatDateTime('dd.mm.yyyy', ABeginDate) +
+//       ' по ' + FormatDateTime('dd.mm.yyyy', AEndDate);
+//  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+//  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+//
+//  if AName<>EmptyStr then
+//  begin
+//    R:= R + 1;
+//    S:= '(' + AName + ')';
+//    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+//  end;
+//
+//  ARow:= R + 1;
+//end;
+//
+//procedure TStatisticReclamationCountSheet.DrawData(const ARow: Integer;
+//  const AFirstColName: String;
+//  const ANameValues, ATitleReasonNames: TStrVector;
+//  const AUsedReasons: TBoolVector; const AReasonCountValues: TIntMatrix;
+//  const AResumeNeed: Boolean);
+//var
+//  i, j, R, C, TotalCount, Count: Integer;
+//  ShowTotal, ShowReason: Boolean;
+//begin
+//  R:= ARow;
+//
+//  ShowTotal:= AUsedReasons[0];
+//  ShowReason:= VIsTrue(AUsedReasons, 1);
+//
+//  TotalCount:= VSum(AReasonCountValues[0]);
+//
+//  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
+//  FWriter.SetRowHeight(R, 10);
+//
+//  R:= R + 1;
+//  C:= 1;
+//  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//  FWriter.SetAlignment(haCenter, vaCenter);
+//  FWriter.WriteText(R, C, AFirstColName, cbtOuter, True, True);
+//  //if ShowReason then
+//  //  FWriter.WriteText(R, C, R+1, C, AFirstColName, cbtOuter, True, True)
+//  //else
+//  //  FWriter.WriteText(R, C, AFirstColName, cbtOuter, True, True);
+//
+//  if ShowTotal then
+//  begin
+//    C:= C + 1;
+//    FWriter.WriteText(R, C, ATitleReasonNames[0], cbtOuter, True, True);
+//    //if ShowReason then
+//    //  FWriter.WriteText(R, C, R+1, C, ATitleReasonNames[0], cbtOuter, True, True)
+//    //else
+//    //  FWriter.WriteText(R, C, ATitleReasonNames[0], cbtOuter, True, True);
+//  end;
+//
+//  if ShowReason then
+//  begin
+//    C:= Ord(ShowTotal);
+//    for i:= 1 to High(ATitleReasonNames) do
+//    begin
+//      if AUsedReasons[i] then
+//      begin
+//        C:= C + 2;
+//        FWriter.WriteText(R, C, R, C+1, ATitleReasonNames[i], cbtOuter, True, True);
+//        //FWriter.WriteText(R+1, C, 'Количество', cbtOuter, True, True);
+//        //FWriter.WriteText(R+1, C+1, '%', cbtOuter, True, True);
+//      end;
+//    end;
+//    //R:= R + 1;
+//  end;
+//
+//  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+//  for i:= 0 to High(ANameValues) do
+//  begin
+//    R:= R + 1;
+//    FWriter.SetAlignment(haLeft, vaCenter);
+//    C:= 1;
+//    FWriter.WriteText(R, C, ANameValues[i], cbtOuter, True, True);
+//    FWriter.SetAlignment(haCenter, vaCenter);
+//    if ShowTotal then
+//    begin
+//      C:= C + 1;
+//      FWriter.WriteNumber(R, C, AReasonCountValues[0, i], cbtOuter);
+//    end;
+//    C:= Ord(ShowTotal);
+//    for j:= 1 to High(ATitleReasonNames) do
+//    begin
+//      if AUsedReasons[j] then
+//      begin
+//        C:= C + 2;
+//        Count:= AReasonCountValues[j, i];
+//        FWriter.WriteNumber(R, C, Count, cbtOuter);
+//        FWriter.WriteNumber(R, C+1, Count/TotalCount, 1, cbtOuter, nfPercentage);
+//      end;
+//    end;
+//  end;
+//  if AResumeNeed then
+//  begin
+//    R:= R + 1;
+//    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+//    FWriter.SetAlignment(haLeft, vaCenter);
+//    C:= 1;
+//    FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
+//    FWriter.SetAlignment(haCenter, vaCenter);
+//
+//    if ShowTotal then
+//    begin
+//      C:= C + 1;
+//      FWriter.WriteNumber(R, C, TotalCount, cbtOuter);
+//    end;
+//    C:= Ord(ShowTotal);
+//    for i:= 1 to High(ATitleReasonNames) do
+//    begin
+//      if AUsedReasons[i] then
+//      begin
+//        C:= C + 2;
+//        Count:= VSum(AReasonCountValues[i]);
+//        FWriter.WriteNumber(R, C, Count, cbtOuter);
+//        FWriter.WriteNumber(R, C+1, Count/TotalCount, 1, cbtOuter, nfPercentage);
+//      end;
+//    end;
+//  end;
+//end;
+//
+//constructor TStatisticReclamationCountSheet.Create(const AGrid: TsWorksheetGrid;
+//  const AReasonsCount: Integer);
+//var
+//  ColWidths: TIntVector;
+//begin
+//  FGrid:= AGrid;
+//  FGrid.DefaultRowHeight:= ROW_HEIGHT_DEFAULT;
+//  FGrid.MouseWheelOption:= mwGrid;
+//  FGrid.ShowGridLines:= False;
+//  FGrid.ShowHeaders:= False;
+//  FGrid.SelectionPen.Style:= psClear;
+//
+//  FFontName:= SHEET_FONT_NAME;
+//  FFontSize:= SHEET_FONT_SIZE;
+//
+//  ColWidths:= VCreateInt([
+//    270 // Наименование двигателя
+//
+//  ]);
+//
+//  if AReasonsCount>0 then
+//    VReDim(ColWidths, Length(ColWidths) + AReasonsCount, 80);
+//
+//  FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
+//
+//end;
+//
+//destructor TStatisticReclamationCountSheet.Destroy;
+//begin
+//  if Assigned(FWriter) then FreeAndNil(FWriter);
+//  inherited Destroy;
+//end;
+//
+//procedure TStatisticReclamationCountSheet.Draw(const ABeginDate, AEndDate: TDate;
+//                   const AName, AMotorNames, AFirstColName: String;
+//                   const ANameValues, ATitleReasonNames: TStrVector;
+//                   const AUsedReasons: TBoolVector;
+//                   const AReasonCountValues: TIntMatrix;
+//                   const AResumeNeed: Boolean);
+//var
+//  R: Integer;
+//begin
+//  FGrid.Clear;
+//  if VIsNil(ANameValues) then Exit;
+//
+//  FWriter.BeginEdit;
+//  FWriter.SetBackgroundClear;
+//  R:= 1;
+//  DrawTitle(R, ABeginDate, AEndDate, AName, AMotorNames);
+//  DrawData(R, AFirstColName, ANameValues, ATitleReasonNames, AUsedReasons,
+//           AReasonCountValues, AResumeNeed);
+//
+//  FWriter.EndEdit;
+//end;
 
 { TReportShipmentSheet }
 
@@ -1605,10 +1708,10 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    130, // Дата уведомления
-    80, // Пробег, км
+    160, // Дата уведомления
+    120, // Пробег, км
     150, // Предприятие
-    80, // Завод
+    120, // Завод
     130, // Выезд/ФИО
     180, // Неисправный элемент
     200,  // Причина неисправности
@@ -1769,6 +1872,7 @@ begin
   R:= R + 1;
   for i:= 1 to 9 do
     FWriter.WriteText(R, i, EmptyStr, cbtTop);
+
 
 
   FWriter.EndEdit;
