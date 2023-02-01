@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, fpspreadsheetgrid, SheetUtils, USQLite, rxctrls,
+  Buttons, fpspreadsheetgrid, USheetUtils, USQLite, rxctrls,
   DividerBevel,  DK_Vector, DK_SheetExporter,
   FPSTypes, LCLType, EditBtn, Spin, DK_StrUtils, DK_DateUtils,
   VirtualTrees, DK_VSTTables;

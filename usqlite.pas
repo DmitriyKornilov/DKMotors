@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, StdCtrls, DateUtils, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
-  DK_Vector, DK_Matrix, DK_Const, DK_StrUtils;
+  DK_Vector, DK_Matrix, DK_Const, DK_StrUtils, UCalendar;
 
 type
 
@@ -26,6 +26,13 @@ type
        const ANameIDs, AReasonIDs: TIntVector;
        out AParamNames: TStrVector; out AParamCounts: TIntMatrix3D): Boolean;
   public
+    {КАЛЕНДАРЬ}
+    //особые даты производственного календаря
+    function LoadCalendarSpecDays(const ABeginDate, AEndDate: TDate): TCalendarSpecDays;
+    function WriteCalendarSpecDays(const ADates: TDateVector;
+                              const AStatuses, ASwapDays: Integer): Boolean;
+    procedure DeleteCalendarSpecDay(const ADate: TDate);
+
     //справочники
     procedure NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
                   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
@@ -245,6 +252,61 @@ var
 implementation
 
 { TSQLite }
+
+function TSQLite.LoadCalendarSpecDays(const ABeginDate, AEndDate: TDate): TCalendarSpecDays;
+begin
+  Result:= EmptyCalendarSpecDays;
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT * FROM CALENDAR ' +
+    'WHERE DayDate BETWEEN :BD AND :ED ' +
+    'ORDER BY DayDate');
+  QParamDT('BD', ABeginDate);
+  QParamDT('ED', AEndDate);
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(Result.Dates, QFieldDT('DayDate'));
+      VAppend(Result.Statuses, QFieldInt('Status'));
+      VAppend(Result.SwapDays, QFieldInt('SwapDay'));
+      QNext;
+    end;
+  end;
+  QClose;
+end;
+
+function TSQLite.WriteCalendarSpecDays(const ADates: TDateVector;
+  const AStatuses, ASwapDays: Integer): Boolean;
+var
+  i: Integer;
+begin
+  Result:= False;
+  if VIsNil(ADates) then Exit;
+  QSetQuery(FQuery);
+  try
+    QSetSQL('INSERT OR REPLACE INTO CALENDAR (DayDate, Status, SwapDay) ' +
+           'VALUES (:DayDate, :Status, :SwapDay)');
+    QParamInt('Status', AStatuses);
+    QParamInt('SwapDay', ASwapDays);
+    for i:= 0 to High(ADates) do
+    begin
+      QParamDT('DayDate', ADates[i]);
+      QExec;
+    end;
+    QCommit;
+    Result:= True;
+  except
+    QRollback;
+  end;
+end;
+
+procedure TSQLite.DeleteCalendarSpecDay(const ADate: TDate);
+begin
+  Delete('CALENDAR', 'DayDate', ADate);
+end;
 
 
 function TSQLite.NameIDsAndMotorNamesSelectedLoad(ALabel: TLabel;

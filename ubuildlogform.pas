@@ -8,7 +8,7 @@ uses
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
   rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables,
   DK_Dialogs, DK_Const, UBuildAddForm, UBuildEditForm,
-  SheetUtils, fpspreadsheetgrid;
+  USheetUtils, fpspreadsheetgrid;
 
 type
 

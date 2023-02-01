@@ -9,7 +9,7 @@ uses
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
   DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables,
   DK_Dialogs, DK_Const, UTestAddForm, fpspreadsheetgrid,
-  SheetUtils;
+  USheetUtils;
 
 type
 

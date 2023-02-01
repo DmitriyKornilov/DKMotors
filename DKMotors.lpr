@@ -11,10 +11,10 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, UMainForm, rxnew, lazcontrols, datetimectrls, UReclamationForm,
-  UBuildAddForm, SheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
+  UBuildAddForm, USheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
   UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm,
-  URepairForm, UControlListForm;
+  URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm;
 
 {$R *.res}
 
@@ -23,7 +23,6 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TControlListForm, ControlListForm);
   Application.Run;
 end.
 

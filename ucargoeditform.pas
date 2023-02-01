@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, DateTimePicker, DK_Vector, DK_Dialogs, DK_VSTTables,
   DK_StrUtils, LCLType, VirtualTrees, DK_Const, DividerBevel, USQLite,
-  SheetUtils;
+  USheetUtils;
 
 type
 

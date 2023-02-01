@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  Buttons, DateTimePicker, DividerBevel, DK_Vector, USQLite, SheetUtils,
+  Buttons, DateTimePicker, DividerBevel, DK_Vector, USQLite, USheetUtils,
   DK_Dialogs, DK_StrUtils, DK_Const, LCLType, VirtualTrees, DK_VSTTables;
 
 type

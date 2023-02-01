@@ -9,7 +9,7 @@ uses
   StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
-  UControlListForm, USQLite, SheetUtils;
+  UControlListForm, UCalendarForm, USQLite, USheetUtils;
 
 type
 
@@ -20,6 +20,7 @@ type
     DividerBevel5: TDividerBevel;
     DividerBevel6: TDividerBevel;
     DividerBevel7: TDividerBevel;
+    DividerBevel8: TDividerBevel;
     MotorListButton: TRxSpeedButton;
     ChooseMotorNamesButton: TSpeedButton;
     ChooseRecieverNamesButton: TSpeedButton;
@@ -34,6 +35,7 @@ type
     MotorNamesLabel: TLabel;
     MotorNamesPanel: TPanel;
     RepairButton: TRxSpeedButton;
+    CalendarButton: TRxSpeedButton;
     ToolPanel: TPanel;
     ReceiverNamesLabel: TLabel;
     ReceiverNamesPanel: TPanel;
@@ -46,6 +48,7 @@ type
     ReportButton: TRxSpeedButton;
     AboutButton: TSpeedButton;
     procedure AboutButtonClick(Sender: TObject);
+    procedure CalendarButtonClick(Sender: TObject);
     procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ChooseRecieverNamesButtonClick(Sender: TObject);
     procedure ControlListButtonClick(Sender: TObject);
@@ -78,6 +81,7 @@ type
     StatisticForm: TStatisticForm;
     RepairForm: TRepairForm;
     ControlListForm: TControlListForm;
+    CalendarForm: TCalendarForm;
 
     procedure DBConnect;
     procedure Choose;
@@ -93,6 +97,7 @@ type
     procedure StatisticFormOpen;
     procedure RepairFormOpen;
     procedure ControlListFormOpen;
+    procedure CalendarFormOpen;
 
     procedure ChangeUsedMotorList;
     procedure ChangeUsedReceiverList;
@@ -207,6 +212,11 @@ begin
   FreeAndNil(AboutForm);
 end;
 
+procedure TMainForm.CalendarButtonClick(Sender: TObject);
+begin
+  if not Assigned(CalendarForm) then Choose;
+end;
+
 procedure TMainForm.BuildLogButtonClick(Sender: TObject);
 begin
   if not Assigned(BuildLogForm) then Choose;
@@ -267,7 +277,8 @@ begin
     else if StatisticButton.Down then StatisticFormOpen
     else if MotorListButton.Down then MotorListFormOpen
     else if RepairButton.Down then RepairFormOpen
-    else if ControlListButton.Down then ControlListFormOpen;
+    else if ControlListButton.Down then ControlListFormOpen
+    else if CalendarButton.Down then CalendarFormOpen;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -285,6 +296,7 @@ begin
   if Assigned(MotorListForm) then FreeAndNil(MotorListForm);
   if Assigned(RepairForm) then FreeAndNil(RepairForm);
   if Assigned(ControlListForm) then FreeAndNil(ControlListForm);
+  if Assigned(CalendarForm) then FreeAndNil(CalendarForm);
 end;
 
 procedure TMainForm.SetFormPosition(AForm: TForm);
@@ -363,6 +375,13 @@ begin
   ControlListForm:= TControlListForm.Create(MainForm);
   SetFormPosition(TForm(ControlListForm));
   ControlListForm.Show;
+end;
+
+procedure TMainForm.CalendarFormOpen;
+begin
+  CalendarForm:= TCalendarForm.Create(MainForm);
+  SetFormPosition(TForm(CalendarForm));
+  CalendarForm.Show;
 end;
 
 procedure TMainForm.ChangeUsedMotorList;

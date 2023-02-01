@@ -1,5 +1,6 @@
 {
   "TablesList" : [
+    "CALENDAR",
     "CARGOLIST",
     "CARGORECEIVERS",
     "CONTROLLIST",
@@ -12,6 +13,95 @@
     "RECLAMATIONREASONS",
     "RECLAMATIONS"
   ],
+  "CALENDAR" : {
+    "Description" : "Особые дни производственного календаря",
+    "Notes" : [
+    ],
+    "FieldsList" : [
+      "DayDate",
+      "Status",
+      "SwapDay"
+    ],
+    "DayDate" : {
+      "FieldType" : "DATETIME",
+      "PrimaryKey" : true,
+      "Status" : false,
+      "NotNull" : true,
+      "DefaultValue" : "",
+      "Description" : [
+      ],
+      "ExistingValues" : [
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "Status" : {
+      "FieldType" : "INTEGER",
+      "PrimaryKey" : false,
+      "Status" : false,
+      "NotNull" : true,
+      "DefaultValue" : "0",
+      "Description" : [
+        "0 - неизвестный ",
+        "1 - праздничный",
+        "2 - выходной",
+        "3 - предпраздничный",
+        "4 - рабочий"
+      ],
+      "ExistingValues" : [
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "SwapDay" : {
+      "FieldType" : "INTEGER",
+      "PrimaryKey" : false,
+      "Status" : false,
+      "NotNull" : true,
+      "DefaultValue" : "0",
+      "Description" : [
+        "Змаещает день",
+        "0 - нет замещения",
+        "1-5 - пн...пт"
+      ],
+      "ExistingValues" : [
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "IndexesList" : [
+    ]
+  },
   "CARGOLIST" : {
     "Description" : "Список отгрузок",
     "Notes" : [
