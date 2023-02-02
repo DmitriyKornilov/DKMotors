@@ -16,6 +16,7 @@ type
 
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
+    ZoomValuePanel: TPanel;
     ZoomCaptionLabel: TLabel;
     DefectListButton: TRxSpeedButton;
     DividerBevel8: TDividerBevel;
@@ -44,9 +45,9 @@ type
     ZoomInButton: TSpeedButton;
     SpinEdit1: TSpinEdit;
     TopToolsPanel: TPanel;
-    ZoomValueLabel: TLabel;
     ZoomPanel: TPanel;
     ZoomTrackBar: TTrackBar;
+    ZoomValueLabel: TLabel;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);

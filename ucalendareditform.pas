@@ -17,17 +17,14 @@ type
     ButtonPanel: TPanel;
     CancelButton: TSpeedButton;
     ComboBox1: TComboBox;
-    ComboBox2: TComboBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     DividerBevel1: TDividerBevel;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Label4: TLabel;
     SaveButton: TSpeedButton;
     procedure CancelButtonClick(Sender: TObject);
-    procedure ComboBox1Change(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
@@ -52,12 +49,6 @@ begin
   ModalResult:= mrCancel;
 end;
 
-procedure TCalendarEditForm.ComboBox1Change(Sender: TObject);
-begin
-  Label4.Visible:= (ComboBox1.ItemIndex=2) or (ComboBox1.ItemIndex=3);
-  ComboBox2.Visible:= Label4.Visible;
-end;
-
 procedure TCalendarEditForm.DateTimePicker1Change(Sender: TObject);
 begin
   DateTimePicker2.MinDate:= DateTimePicker1.Date;
@@ -79,17 +70,16 @@ end;
 
 procedure TCalendarEditForm.SaveButtonClick(Sender: TObject);
 var
-  i, N, Status, SwapDay: Integer;
+  i, N, Status: Integer;
   Dates: TDateVector;
 begin
-  Status:= ComboBox1.ItemIndex+1;
-  SwapDay:= Ord(ComboBox2.Visible)*(ComboBox2.ItemIndex);
+  Status:= ComboBox1.ItemIndex + 1;
   N:= DaysBetweenDates(DateTimePicker1.Date, DateTimePicker2.Date);
   Dates:= nil;
   VDim(Dates, N+1);
   for i:= 0 to N do
     Dates[i]:= IncDay(DateTimePicker1.Date, i);
-  SQLite.WriteCalendarSpecDays(Dates, Status, SwapDay);
+  SQLite.WriteCalendarSpecDays(Dates, Status);
 
   ModalResult:= mrOK;
 end;

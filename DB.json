@@ -19,8 +19,7 @@
     ],
     "FieldsList" : [
       "DayDate",
-      "Status",
-      "SwapDay"
+      "Status"
     ],
     "DayDate" : {
       "FieldType" : "DATETIME",
@@ -57,32 +56,6 @@
         "2 - выходной",
         "3 - предпраздничный",
         "4 - рабочий"
-      ],
-      "ExistingValues" : [
-      ],
-      "ReferenceTo" : {
-        "TableName" : "",
-        "FieldName" : "",
-        "OnDelete" : 4,
-        "OnUpdate" : 4
-      },
-      "ReferenceFrom" : {
-        "TableNames" : [
-        ],
-        "FieldNames" : [
-        ]
-      }
-    },
-    "SwapDay" : {
-      "FieldType" : "INTEGER",
-      "PrimaryKey" : false,
-      "Status" : false,
-      "NotNull" : true,
-      "DefaultValue" : "0",
-      "Description" : [
-        "Змаещает день",
-        "0 - нет замещения",
-        "1-5 - пн...пт"
       ],
       "ExistingValues" : [
       ],

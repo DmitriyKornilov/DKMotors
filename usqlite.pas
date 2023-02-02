@@ -29,9 +29,13 @@ type
     {КАЛЕНДАРЬ}
     //особые даты производственного календаря
     function LoadCalendarSpecDays(const ABeginDate, AEndDate: TDate): TCalendarSpecDays;
-    function WriteCalendarSpecDays(const ADates: TDateVector;
-                              const AStatuses, ASwapDays: Integer): Boolean;
+    function WriteCalendarSpecDays(const ADates: TDateVector; const AStatus: Integer): Boolean;
     procedure DeleteCalendarSpecDay(const ADate: TDate);
+    //производственный календарь
+    function LoadCalendar(const ABeginDate, AEndDate: TDate): TCalendar;
+    //последняя дата срока, заданного в рабочих днях
+    function LoadWorkDaysPeriodEndDate(const ABeginDate: TDate;
+                              const AWorkDaysCount: Integer): TDate;
 
     //справочники
     procedure NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
@@ -271,7 +275,6 @@ begin
     begin
       VAppend(Result.Dates, QFieldDT('DayDate'));
       VAppend(Result.Statuses, QFieldInt('Status'));
-      VAppend(Result.SwapDays, QFieldInt('SwapDay'));
       QNext;
     end;
   end;
@@ -279,7 +282,7 @@ begin
 end;
 
 function TSQLite.WriteCalendarSpecDays(const ADates: TDateVector;
-  const AStatuses, ASwapDays: Integer): Boolean;
+  const AStatus: Integer): Boolean;
 var
   i: Integer;
 begin
@@ -287,10 +290,9 @@ begin
   if VIsNil(ADates) then Exit;
   QSetQuery(FQuery);
   try
-    QSetSQL('INSERT OR REPLACE INTO CALENDAR (DayDate, Status, SwapDay) ' +
-           'VALUES (:DayDate, :Status, :SwapDay)');
-    QParamInt('Status', AStatuses);
-    QParamInt('SwapDay', ASwapDays);
+    QSetSQL('INSERT OR REPLACE INTO CALENDAR (DayDate, Status) ' +
+           'VALUES (:DayDate, :Status)');
+    QParamInt('Status', AStatus);
     for i:= 0 to High(ADates) do
     begin
       QParamDT('DayDate', ADates[i]);
@@ -306,6 +308,48 @@ end;
 procedure TSQLite.DeleteCalendarSpecDay(const ADate: TDate);
 begin
   Delete('CALENDAR', 'DayDate', ADate);
+end;
+
+function TSQLite.LoadCalendar(const ABeginDate, AEndDate: TDate): TCalendar;
+var
+  SpecDays: TCalendarSpecDays;
+begin
+  SpecDays:= LoadCalendarSpecDays(ABeginDate, AEndDate);
+  Result:= TCalendar.Create;
+  Result.Calc(ABeginDate, AEndDate, SpecDays);
+end;
+
+function TSQLite.LoadWorkDaysPeriodEndDate(const ABeginDate: TDate;
+  const AWorkDaysCount: Integer): TDate;
+var
+  Calendar: TCalendar;
+  BD, ED: TDate;
+  i, N: Integer;
+begin
+  Result:= ABeginDate;
+  if AWorkDaysCount<1 then Exit;
+
+  BD:= ABeginDate;
+  N:= 0;
+  while N<AWorkDaysCount do
+  begin
+    Calendar:= SQLite.LoadCalendar(BD, IncDay(BD, AWorkDaysCount));
+    try
+      for i:=0 to Calendar.DaysCount-1 do
+      begin
+        ED:= Calendar.Dates[i];
+        if Calendar.IsWorkDay[i] then
+        begin
+          N:= N + 1;
+          if N=AWorkDaysCount then break;
+        end;
+      end;
+      BD:= IncDay(ED, 1);
+    finally
+      FreeAndNil(Calendar);
+    end;
+  end;
+  Result:= ED;
 end;
 
 

@@ -22,7 +22,7 @@ const
                                               'предпраздничный',
                                               'рабочий');
   COLOR_BEIGE       = $00D7F4FF;
-  COLOR_GRAY        = clBtnFace;//$00D6D6D6;
+  COLOR_GRAY        = clBtnFace; //$00D6D6D6;
   COLOR_BLACK       = $00000000;
   COLOR_WHITE       = $00FFFFFF;
   COLOR_ORANGE      = $0097CBFF;
@@ -83,6 +83,9 @@ type
   end;
 
   {Простой календарь}
+
+  { TSimpleCalendar }
+
   TSimpleCalendar = class (TObject)
     protected
       FCalculated         : Boolean;     //рассчитан ли календарь
@@ -91,6 +94,7 @@ type
       FDayNumsInWeek      : TIntVector;  //номер дня в неделе
       FWeekNumsInMonth    : TIntVector;  //номер недели в месяце
     private
+      function GetIsWorkDay(const AIndex: Integer): Boolean;
       function GetWeekDaysCount: Integer;
       function GetOffDaysCount: Integer;
       function GetBeginDate: TDate;
@@ -111,27 +115,26 @@ type
       property WeekNumsInMonth: TIntVector read FWeekNumsInMonth;
       property WeekDaysCount: Integer read GetWeekDaysCount;//кол-во будних дней
       property OffDaysCount: Integer read GetOffDaysCount;  //кол-во выходных дней
+
+      property IsWorkDay[const AIndex: Integer]: Boolean read GetIsWorkDay;
   end;
 
-  {Особые дни производственного календаря}
+  {Корректировки производственного календаря}
     TCalendarSpecDays = record
       Dates   : TDateVector;
       Statuses: TIntVector;
-      SwapDays: TIntVector;
     end;
 
 const
     EmptyCalendarSpecDays: TCalendarSpecDays =
       (Dates   : nil;
        Statuses: nil;
-       SwapDays: nil;
       );
 
   function DayDateToStr(const ADate: TDate): String;
   function DayStatusToStr(const AStatus: Integer): String;
-  function SwapDayToStr(const  ASwapDay: Integer): String;
   procedure CalendarSpecDaysToStr(const ASpecDays: TCalendarSpecDays;
-                                  out ADates, AStatuses, ASwapDays: TStrVector);
+                                  out ADates, AStatuses: TStrVector);
 
 type
 
@@ -141,7 +144,7 @@ type
       FSwapDays : TIntVector;  //заменяемый день для особого дня со статусом "рабочий"
     private
       function GetHoliDaysCount: Integer;
-      function GetBeforeCount: Integer;
+      function GetBeforeDaysCount: Integer;
       function GetWorkDaysCount: Integer;
       function GetNotWorkDaysCount: Integer;
     public
@@ -154,7 +157,7 @@ type
       function SumWorkHoursFrac(const AHoursInWeek: Byte): Double; //сумма рабочих часов в зависимости от кол-ва часов в неделю AHoursInWeek (40, 36, 24) в дробном формате
       property SwapDays: TIntVector read FSwapDays;
       property HoliDaysCount: Integer read GetHoliDaysCount; //кол-во праздничных дней
-      property BeforeCount: Integer read GetBeforeCount;   //кол-во предпраздничных дней
+      property BeforeDaysCount: Integer read GetBeforeDaysCount;   //кол-во предпраздничных дней
       property WorkDaysCount: Integer read GetWorkDaysCount; //кол-во рабочих дней (будни+предпраздничные)
       property NotWorkDaysCount: Integer read GetNotWorkDaysCount; //кол-во нерабочих дней (выходные+праздничные)
   end;
@@ -202,6 +205,7 @@ type
   public
     constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid);
     destructor  Destroy; override;
+    procedure Zoom(const APercents: Integer);
     procedure Draw(const AYearCalendar: TCalendar; const AHighLightDays: TDateVector);
     procedure UpdateColors(const AColorVector: TColorVector);
     procedure ClearColors;
@@ -337,6 +341,12 @@ begin
     Result:= 0;
 end;
 
+function TSimpleCalendar.GetIsWorkDay(const AIndex: Integer): Boolean;
+begin
+  Result:= (FDayStatuses[AIndex]=DAY_STATUS_WEEKDAY) or
+           (FDayStatuses[AIndex]=DAY_STATUS_BEFORE);
+end;
+
 function TSimpleCalendar.GetWeekDaysCount: Integer;
 begin
   Result:= VCountIf(FDayStatuses, DAY_STATUS_WEEKDAY);
@@ -359,33 +369,21 @@ begin
   Result:= DAY_STATUS_NAMES[AStatus];
 end;
 
-function SwapDayToStr(const  ASwapDay: Integer): String;
-begin
-  Result:= '-';
-  if ASwapDay>0 then
-    Result:= SLower(WEEKDAYSLONG[ASwapDay]);
-end;
-
 procedure CalendarSpecDaysToStr(const ASpecDays: TCalendarSpecDays;
-                            out ADates, AStatuses, ASwapDays: TStrVector);
+                            out ADates, AStatuses: TStrVector);
 var
   i: Integer;
 begin
   ADates:= nil;
   AStatuses:= nil;
-  ASwapDays:= nil;
+  if VIsNil(ASpecDays.Dates) then Exit;
 
-  i:= Length(ASpecDays.Dates);
-  if i=0 then Exit;
-  VDim(ADates, i);
-  VDim(AStatuses, i);
-  VDim(ASwapDays, i);
-
+  VDim(ADates, Length(ASpecDays.Dates));
+  VDim(AStatuses, Length(ASpecDays.Dates));
   for i:= 0 to High(ADates) do
   begin
     ADates[i]:= DayDateToStr(ASpecDays.Dates[i]);
     AStatuses[i]:= DayStatusToStr(ASpecDays.Statuses[i]);
-    ASwapDays[i]:= SwapDayToStr(ASpecDays.SwapDays[i]);
   end;
 end;
 
@@ -415,16 +413,12 @@ begin
   Clear;
   inherited Calc(ABeginDate, AEndDate);
   FCalculated:= False;
-  VDim(FSwapDays, DaysCount, 0);
   for i:= 0 to High(ASpecDays.Dates) do
   begin
     n:= DaysBetweenDates(BeginDate, ASpecDays.Dates[i]);
     //добавляем только даты, входящие в период календаря
     if (n>=0) and (n<DaysCount) then
-    begin
       FDayStatuses[n]:= ASpecDays.Statuses[i];
-      FSwapDays[n]:= ASpecDays.SwapDays[i];
-    end;
   end;
   FCalculated:= True;
 end;
@@ -467,7 +461,7 @@ begin
   begin
     x:= WeekHoursToWorkHoursInt(AHoursInWeek);
     Result:= x*WeekDaysCount +
-            (x - WORKHOURS_DENOMINATOR*REDUCE_HOURS_COUNT_IN_BEFORE)*BeforeCount;
+            (x - WORKHOURS_DENOMINATOR*REDUCE_HOURS_COUNT_IN_BEFORE)*BeforeDaysCount;
   end;
 end;
 
@@ -476,7 +470,7 @@ begin
   Result:= 0;
   if AHoursInWeek>0 then
     Result:= AHoursInWeek*WorkDaysCount/5   -
-             REDUCE_HOURS_COUNT_IN_BEFORE*BeforeCount;
+             REDUCE_HOURS_COUNT_IN_BEFORE*BeforeDaysCount;
 end;
 
 function TCalendar.GetHoliDaysCount: Integer;
@@ -484,14 +478,14 @@ begin
   Result:= VCountIf(FDayStatuses, DAY_STATUS_HOLIDAY);
 end;
 
-function TCalendar.GetBeforeCount: Integer;
+function TCalendar.GetBeforeDaysCount: Integer;
 begin
   Result:= VCountIf(FDayStatuses, DAY_STATUS_BEFORE);
 end;
 
 function TCalendar.GetWorkDaysCount: Integer;
 begin
-  Result:= WeekDaysCount + BeforeCount;
+  Result:= WeekDaysCount + BeforeDaysCount;
 end;
 
 function TCalendar.GetNotWorkDaysCount: Integer;
@@ -783,6 +777,11 @@ destructor TCalendarSheet.Destroy;
 begin
   FreeAndNil(FWriter);
   inherited Destroy;
+end;
+
+procedure TCalendarSheet.Zoom(const APercents: Integer);
+begin
+  FWriter.SetZoom(APercents);
 end;
 
 procedure TCalendarSheet.Draw(const AYearCalendar: TCalendar;

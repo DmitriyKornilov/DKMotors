@@ -1,24 +1,25 @@
 object CalendarForm: TCalendarForm
-  Left = 412
-  Height = 400
-  Top = 250
-  Width = 759
+  Left = 469
+  Height = 701
+  Top = 138
+  Width = 949
   Align = alClient
   BorderStyle = bsNone
   Caption = 'CalendarForm'
-  ClientHeight = 400
-  ClientWidth = 759
+  ClientHeight = 701
+  ClientWidth = 949
+  DesignTimePPI = 120
   FormStyle = fsStayOnTop
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '2.2.2.0'
   Visible = True
   object TopPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 755
+    Width = 945
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -27,20 +28,20 @@ object CalendarForm: TCalendarForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 751
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 941
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
     object YearSpinEdit: TSpinEdit
-      Left = 5
-      Height = 23
-      Top = 3
-      Width = 56
+      Left = 6
+      Height = 30
+      Top = 4
+      Width = 70
       Align = alLeft
       Alignment = taCenter
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 3
+      BorderSpacing.Left = 6
+      BorderSpacing.Top = 4
       BorderSpacing.Bottom = 2
       MinValue = 2010
       OnChange = YearSpinEditChange
@@ -48,10 +49,10 @@ object CalendarForm: TCalendarForm
       Value = 2022
     end
     object DividerBevel1: TDividerBevel
-      Left = 61
-      Height = 28
+      Left = 76
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -59,10 +60,10 @@ object CalendarForm: TCalendarForm
     end
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 76
-      Height = 28
+      Left = 96
+      Height = 36
       Top = 0
-      Width = 101
+      Width = 112
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -204,282 +205,910 @@ object CalendarForm: TCalendarForm
     end
   end
   object Splitter1: TSplitter
-    AnchorSideLeft.Control = LeftPanel
-    AnchorSideLeft.Side = asrBottom
-    Left = 352
-    Height = 364
-    Top = 36
-    Width = 5
+    Left = 310
+    Height = 657
+    Top = 44
+    Width = 6
     ResizeStyle = rsLine
   end
-  object LeftPanel: TPanel
-    Left = 2
-    Height = 362
-    Top = 36
-    Width = 350
-    Align = alLeft
-    BorderSpacing.Left = 2
-    BorderSpacing.Bottom = 2
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    ClientHeight = 358
-    ClientWidth = 346
-    Color = clWindow
-    ParentColor = False
-    TabOrder = 2
-    object EditPanel: TPanel
-      Left = 0
-      Height = 228
-      Top = 0
-      Width = 346
-      Align = alClient
-      BevelOuter = bvNone
-      Caption = 'EditPanel'
-      ClientHeight = 228
-      ClientWidth = 346
-      TabOrder = 0
-      object DateEditPanel: TPanel
-        Left = 0
-        Height = 32
-        Top = 0
-        Width = 346
-        Align = alTop
-        AutoSize = True
-        BorderSpacing.Bottom = 2
-        BevelOuter = bvNone
-        ClientHeight = 32
-        ClientWidth = 346
-        Constraints.MinHeight = 32
-        TabOrder = 0
-        object AddDateButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 0
-          Height = 32
-          Hint = 'Записать'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 0
-          OnClick = AddDateButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-        object DelDateButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 32
-          Height = 32
-          Hint = 'Удалить'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Enabled = False
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 1
-          OnClick = DelDateButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-        object EditDateButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 64
-          Height = 32
-          Hint = 'Изменить'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Enabled = False
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 2
-          OnClick = EditDateButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-        object CopyDateButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 96
-          Height = 32
-          Hint = 'Копировать'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Enabled = False
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 5
-          OnClick = CopyDateButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-      end
-      object VT1: TVirtualStringTree
-        Left = 1
-        Height = 194
-        Top = 34
-        Width = 344
-        Align = alClient
-        BorderSpacing.Left = 1
-        BorderSpacing.Top = 1
-        BorderSpacing.Right = 1
-        BorderStyle = bsNone
-        DefaultText = 'Node'
-        Header.AutoSizeIndex = 0
-        Header.Columns = <>
-        Header.MainColumn = -1
-        TabOrder = 1
-        OnDblClick = VT1DblClick
-        OnKeyUp = VT1KeyUp
-        OnMouseUp = VT1MouseUp
-      end
-    end
-    object CopyPanel: TPanel
-      Left = 0
-      Height = 130
-      Top = 228
-      Width = 346
-      Align = alBottom
-      BevelOuter = bvNone
-      Caption = 'CopyPanel'
-      ClientHeight = 130
-      ClientWidth = 346
-      TabOrder = 1
-      Visible = False
-      object CopyEditPanel: TPanel
-        Left = 0
-        Height = 32
-        Top = 0
-        Width = 346
-        Align = alTop
-        AutoSize = True
-        BorderSpacing.Bottom = 2
-        BevelOuter = bvNone
-        ClientHeight = 32
-        ClientWidth = 346
-        Constraints.MinHeight = 32
-        TabOrder = 0
-        object SaveCopyButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 0
-          Height = 32
-          Hint = 'Сохранить'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Enabled = False
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 3
-          OnClick = SaveCopyButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-        object DelCopyButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 32
-          Height = 32
-          Hint = 'Удалить'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Enabled = False
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 1
-          OnClick = DelCopyButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-        object CancelCopyButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 64
-          Height = 32
-          Hint = 'Отмена'
-          Top = 0
-          Width = 32
-          Align = alLeft
-          AllowAllUp = True
-          Constraints.MaxWidth = 32
-          Constraints.MinWidth = 32
-          Images = MainForm.ImageListEdit24
-          ImageIndex = 4
-          OnClick = CancelCopyButtonClick
-          ShowHint = True
-          ParentShowHint = False
-        end
-      end
-      object VT2: TVirtualStringTree
-        Left = 1
-        Height = 96
-        Top = 34
-        Width = 344
-        Align = alClient
-        BorderSpacing.Left = 1
-        BorderSpacing.Top = 1
-        BorderSpacing.Right = 1
-        BorderStyle = bsNone
-        DefaultText = 'Node'
-        Header.AutoSizeIndex = 0
-        Header.Columns = <>
-        Header.MainColumn = -1
-        TabOrder = 1
-        OnKeyUp = VT2KeyUp
-        OnMouseUp = VT2MouseUp
-      end
-    end
-  end
-  object GridPanel: TPanel
-    AnchorSideLeft.Control = Splitter1
-    AnchorSideLeft.Side = asrBottom
-    Left = 359
-    Height = 362
-    Top = 36
-    Width = 398
+  object MainPanel: TPanel
+    Left = 316
+    Height = 655
+    Top = 44
+    Width = 631
     Align = alClient
-    BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
-    BorderStyle = bsSingle
-    ClientHeight = 358
-    ClientWidth = 394
-    TabOrder = 3
-    object CalendarGrid: TsWorksheetGrid
-      AnchorSideLeft.Side = asrBottom
+    ClientHeight = 655
+    ClientWidth = 631
+    TabOrder = 2
+    object Panel7: TPanel
       Left = 0
-      Height = 358
+      Height = 617
       Top = 0
-      Width = 394
-      FrozenCols = 0
-      FrozenRows = 0
-      PageBreakPen.Color = clBlue
-      PageBreakPen.Style = psDash
-      ReadFormulas = False
-      WorkbookSource = CalendarGrid.internal
+      Width = 631
       Align = alClient
-      AutoAdvance = aaDown
-      BorderStyle = bsNone
-      DefaultColWidth = 80
-      DefaultRowHeight = 27
+      BorderSpacing.Bottom = 2
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Caption = 'Panel7'
+      ClientHeight = 613
+      ClientWidth = 627
       TabOrder = 0
-      Visible = False
-      OnDblClick = CalendarGridDblClick
-      OnMouseDown = CalendarGridMouseDown
+      object CalendarGrid: TsWorksheetGrid
+        Left = 0
+        Height = 613
+        Top = 0
+        Width = 627
+        AutoExpand = []
+        DisplayFixedColRow = False
+        FrozenBorderPen.Style = psClear
+        FrozenCols = 0
+        FrozenRows = 0
+        PageBreakPen.Color = clBlue
+        PageBreakPen.Style = psDash
+        ReadFormulas = False
+        SelectionPen.Color = clWindow
+        SelectionPen.Style = psClear
+        SelectionPen.Width = 0
+        ShowGridLines = False
+        ShowHeaders = False
+        WorkbookSource = CalendarGrid.internal
+        Align = alClient
+        AutoAdvance = aaNone
+        AutoEdit = False
+        BorderStyle = bsNone
+        Color = clWhite
+        DefaultColWidth = 40
+        DefaultRowHeight = 20
+        ExtendedSelect = False
+        Flat = True
+        MouseWheelOption = mwGrid
+        Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+        ParentFont = False
+        TabOrder = 0
+        TabStop = False
+        TitleFont.Style = [fsBold]
+        OnDblClick = CalendarGridDblClick
+        OnMouseDown = CalendarGridMouseDown
+      end
+    end
+    object Panel8: TPanel
+      Left = 0
+      Height = 36
+      Top = 619
+      Width = 631
+      Align = alBottom
+      AutoSize = True
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      ClientHeight = 32
+      ClientWidth = 627
+      TabOrder = 1
+      object ZoomPanel: TPanel
+        Left = 287
+        Height = 20
+        Top = 6
+        Width = 340
+        Align = alRight
+        AutoSize = True
+        BorderSpacing.Top = 6
+        BorderSpacing.Bottom = 6
+        BevelOuter = bvNone
+        ClientHeight = 20
+        ClientWidth = 340
+        Constraints.MaxHeight = 20
+        TabOrder = 0
+        object ZoomCaptionLabel: TLabel
+          Left = 2
+          Height = 20
+          Top = 0
+          Width = 63
+          Align = alRight
+          BorderSpacing.Left = 2
+          Caption = 'Масштаб'
+          ParentColor = False
+        end
+        object ZoomTrackBar: TTrackBar
+          Left = 100
+          Height = 20
+          Top = 0
+          Width = 150
+          LineSize = 5
+          Max = 150
+          Min = 50
+          OnChange = ZoomTrackBarChange
+          PageSize = 5
+          Position = 100
+          TickStyle = tsNone
+          Align = alRight
+          TabOrder = 0
+        end
+        object ZoomOutButton: TSpeedButton
+          Cursor = crHandPoint
+          Left = 80
+          Height = 20
+          Top = 0
+          Width = 20
+          Align = alRight
+          AutoSize = True
+          BorderSpacing.Left = 15
+          Flat = True
+          Glyph.Data = {
+            36040000424D3604000000000000360000002800000010000000100000000100
+            2000000000000004000064000000640000000000000000000000000000000000
+            0000000000130000003600000040000000400000004000000040000000400000
+            0040000000400000004000000036000000130000000000000000000000000000
+            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+            00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
+            00B40000006F0000000800000000000000000000000000000000000000000000
+            00000000000000000000000000080000006F000000B400000013000000360000
+            00CA000000080000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000008000000CA00000036000000400000
+            00BF000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
+            007F0000007F0000005C0000000000000000000000BF00000040000000400000
+            00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
+            007F0000007F0000005C0000000000000000000000BF00000040000000400000
+            00BF000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000BF00000040000000360000
+            00CA000000080000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000008000000CA00000036000000130000
+            00B50000006F0000000800000000000000000000000000000000000000000000
+            00000000000000000000000000080000006F000000B400000013000000000000
+            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+            00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
+            0000000000130000003600000040000000400000004000000040000000400000
+            0040000000400000004000000036000000130000000000000000
+          }
+          OnClick = ZoomOutButtonClick
+        end
+        object ZoomInButton: TSpeedButton
+          Cursor = crHandPoint
+          Left = 250
+          Height = 20
+          Top = 0
+          Width = 20
+          Align = alRight
+          AutoSize = True
+          Flat = True
+          Glyph.Data = {
+            36040000424D3604000000000000360000002800000010000000100000000100
+            2000000000000004000064000000640000000000000000000000000000000000
+            0000000000130000003600000040000000400000004000000040000000400000
+            0040000000400000004000000036000000130000000000000000000000000000
+            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+            00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
+            00B40000006F0000000800000000000000000000000000000000000000000000
+            00000000000000000000000000080000006F000000B400000013000000360000
+            00CA000000080000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000008000000CA00000036000000400000
+            00BF00000000000000000000000000000000000000000000005C0000005C0000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF00000000000000000000000000000000000000000000007F0000007F0000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF00000000000000000000000000000000000000000000007F0000007F0000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
+            007F0000007F0000005C0000000000000000000000BF00000040000000400000
+            00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
+            007F0000007F0000005C0000000000000000000000BF00000040000000400000
+            00BF00000000000000000000000000000000000000000000007F0000007F0000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF00000000000000000000000000000000000000000000007F0000007F0000
+            000000000000000000000000000000000000000000BF00000040000000400000
+            00BF00000000000000000000000000000000000000000000005D0000005C0000
+            000000000000000000000000000000000000000000BF00000040000000360000
+            00CA000000080000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000008000000CA00000036000000130000
+            00B50000006F0000000800000000000000000000000000000000000000000000
+            00000000000000000000000000080000006F000000B400000013000000000000
+            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+            00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
+            0000000000130000003600000040000000400000004000000040000000400000
+            0040000000400000004000000036000000130000000000000000
+          }
+          OnClick = ZoomInButtonClick
+        end
+        object ZoomValuePanel: TPanel
+          Left = 270
+          Height = 20
+          Top = 0
+          Width = 70
+          Align = alRight
+          BevelOuter = bvNone
+          ClientHeight = 20
+          ClientWidth = 70
+          TabOrder = 1
+          object ZoomValueLabel: TLabel
+            AnchorSideLeft.Side = asrBottom
+            Left = 24
+            Height = 20
+            Top = 0
+            Width = 40
+            Align = alRight
+            BorderSpacing.Left = 15
+            BorderSpacing.Right = 6
+            Caption = '100 %'
+            ParentColor = False
+          end
+        end
+      end
+    end
+  end
+  object LeftPanel: TPanel
+    Left = 0
+    Height = 657
+    Top = 44
+    Width = 310
+    Align = alLeft
+    BevelOuter = bvNone
+    ClientHeight = 657
+    ClientWidth = 310
+    Color = clBtnFace
+    ParentColor = False
+    TabOrder = 3
+    object DayPanel: TPanel
+      Left = 2
+      Height = 249
+      Top = 0
+      Width = 308
+      Align = alClient
+      BorderSpacing.Left = 2
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      ClientHeight = 245
+      ClientWidth = 304
+      Color = clWindow
+      ParentColor = False
+      TabOrder = 0
+      object EditPanel: TPanel
+        Left = 0
+        Height = 115
+        Top = 0
+        Width = 304
+        Align = alClient
+        BevelOuter = bvNone
+        Caption = 'EditPanel'
+        ClientHeight = 115
+        ClientWidth = 304
+        TabOrder = 0
+        object DateEditPanel: TPanel
+          Left = 0
+          Height = 40
+          Top = 0
+          Width = 304
+          Align = alTop
+          AutoSize = True
+          BorderSpacing.Bottom = 2
+          BevelOuter = bvNone
+          ClientHeight = 40
+          ClientWidth = 304
+          Constraints.MinHeight = 40
+          TabOrder = 0
+          object AddDateButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 0
+            Height = 40
+            Hint = 'Записать'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 0
+            OnClick = AddDateButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object DelDateButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 40
+            Height = 40
+            Hint = 'Удалить'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Enabled = False
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 1
+            OnClick = DelDateButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object EditDateButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 80
+            Height = 40
+            Hint = 'Изменить'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Enabled = False
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 2
+            OnClick = EditDateButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object CopyDateButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 120
+            Height = 40
+            Hint = 'Копировать'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Enabled = False
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 5
+            OnClick = CopyDateButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+        end
+        object VT1: TVirtualStringTree
+          Left = 1
+          Height = 73
+          Top = 42
+          Width = 302
+          Align = alClient
+          BorderSpacing.Left = 1
+          BorderSpacing.Top = 1
+          BorderSpacing.Right = 1
+          BorderStyle = bsNone
+          DefaultText = 'Node'
+          Header.AutoSizeIndex = 0
+          Header.Columns = <>
+          Header.MainColumn = -1
+          TabOrder = 1
+          OnDblClick = VT1DblClick
+          OnKeyUp = VT1KeyUp
+          OnMouseUp = VT1MouseUp
+        end
+      end
+      object CopyPanel: TPanel
+        Left = 0
+        Height = 130
+        Top = 115
+        Width = 304
+        Align = alBottom
+        BevelOuter = bvNone
+        Caption = 'CopyPanel'
+        ClientHeight = 130
+        ClientWidth = 304
+        TabOrder = 1
+        Visible = False
+        object CopyEditPanel: TPanel
+          Left = 0
+          Height = 40
+          Top = 0
+          Width = 304
+          Align = alTop
+          AutoSize = True
+          BorderSpacing.Bottom = 2
+          BevelOuter = bvNone
+          ClientHeight = 40
+          ClientWidth = 304
+          Constraints.MinHeight = 40
+          TabOrder = 0
+          object SaveCopyButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 0
+            Height = 40
+            Hint = 'Сохранить'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Enabled = False
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 3
+            OnClick = SaveCopyButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object DelCopyButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 40
+            Height = 40
+            Hint = 'Удалить'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Enabled = False
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 1
+            OnClick = DelCopyButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object CancelCopyButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 80
+            Height = 40
+            Hint = 'Отмена'
+            Top = 0
+            Width = 40
+            Align = alLeft
+            AllowAllUp = True
+            Constraints.MaxWidth = 40
+            Constraints.MinWidth = 40
+            Images = MainForm.ImageListEdit24
+            ImageIndex = 4
+            OnClick = CancelCopyButtonClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+        end
+        object VT2: TVirtualStringTree
+          Left = 1
+          Height = 88
+          Top = 42
+          Width = 302
+          Align = alClient
+          BorderSpacing.Left = 1
+          BorderSpacing.Top = 1
+          BorderSpacing.Right = 1
+          BorderStyle = bsNone
+          DefaultText = 'Node'
+          Header.AutoSizeIndex = 0
+          Header.Columns = <>
+          Header.MainColumn = -1
+          TabOrder = 1
+          OnKeyUp = VT2KeyUp
+          OnMouseUp = VT2MouseUp
+        end
+      end
+    end
+    object CalcPanel: TPanel
+      Left = 2
+      Height = 400
+      Top = 255
+      Width = 308
+      Align = alBottom
+      BorderSpacing.Left = 2
+      BorderSpacing.Bottom = 2
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      ClientHeight = 396
+      ClientWidth = 304
+      Color = clWindow
+      ParentColor = False
+      TabOrder = 1
+      object Label1: TLabel
+        Left = 6
+        Height = 20
+        Top = 6
+        Width = 292
+        Align = alTop
+        BorderSpacing.Left = 6
+        BorderSpacing.Top = 6
+        BorderSpacing.Right = 6
+        Caption = 'Количество дней за период'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object PeriodPanel: TPanel
+        Left = 6
+        Height = 28
+        Top = 32
+        Width = 298
+        Align = alTop
+        AutoSize = True
+        BorderSpacing.Left = 6
+        BorderSpacing.Top = 6
+        BevelOuter = bvNone
+        ClientHeight = 28
+        ClientWidth = 298
+        ParentFont = False
+        TabOrder = 0
+        object DateTimePicker1: TDateTimePicker
+          AnchorSideLeft.Control = Label2
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = PeriodPanel
+          AnchorSideTop.Side = asrCenter
+          Left = 118
+          Height = 28
+          Top = 0
+          Width = 99
+          CenturyFrom = 1941
+          MaxDate = 2958465
+          MinDate = -53780
+          ParentFont = False
+          TabOrder = 0
+          BorderSpacing.Left = 6
+          TrailingSeparator = False
+          TextForNullDate = 'NULL'
+          LeadingZeros = True
+          Kind = dtkDate
+          TimeFormat = tf24
+          TimeDisplay = tdHMS
+          DateMode = dmComboBox
+          Date = 44514
+          Time = 0.36772234953969
+          UseDefaultSeparators = True
+          HideDateTimeParts = []
+          MonthNames = 'Long'
+          OnChange = DateTimePicker1Change
+        end
+        object DateTimePicker2: TDateTimePicker
+          AnchorSideLeft.Control = PeriodPanel
+          AnchorSideTop.Control = PeriodPanel
+          AnchorSideTop.Side = asrCenter
+          Left = 1
+          Height = 28
+          Top = 0
+          Width = 99
+          CenturyFrom = 1941
+          MaxDate = 2958465
+          MinDate = -53780
+          ParentFont = False
+          TabOrder = 1
+          BorderSpacing.Left = 1
+          TrailingSeparator = False
+          TextForNullDate = 'NULL'
+          LeadingZeros = True
+          Kind = dtkDate
+          TimeFormat = tf24
+          TimeDisplay = tdHMS
+          DateMode = dmComboBox
+          Date = 44514
+          Time = 0.36772234953969
+          UseDefaultSeparators = True
+          HideDateTimeParts = []
+          MonthNames = 'Long'
+          OnChange = DateTimePicker2Change
+        end
+        object Label2: TLabel
+          AnchorSideLeft.Control = DateTimePicker2
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = DateTimePicker2
+          AnchorSideTop.Side = asrCenter
+          Left = 106
+          Height = 20
+          Top = 4
+          Width = 6
+          BorderSpacing.Left = 6
+          Caption = '-'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object Panel1: TPanel
+        Left = 0
+        Height = 180
+        Top = 60
+        Width = 304
+        Align = alTop
+        BevelOuter = bvNone
+        ClientHeight = 180
+        ClientWidth = 304
+        TabOrder = 1
+        object Label4: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Panel1
+          Left = 6
+          Height = 20
+          Top = 6
+          Width = 48
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          Caption = '- всего'
+          ParentColor = False
+        end
+        object Label5: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Label4
+          AnchorSideTop.Side = asrBottom
+          Left = 6
+          Height = 20
+          Top = 32
+          Width = 69
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          Caption = '- рабочих'
+          ParentColor = False
+        end
+        object Label6: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Label5
+          AnchorSideTop.Side = asrBottom
+          Left = 6
+          Height = 20
+          Top = 58
+          Width = 86
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          Caption = '- нерабочих'
+          ParentColor = False
+        end
+        object Label7: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Label6
+          AnchorSideTop.Side = asrBottom
+          Left = 6
+          Height = 20
+          Top = 84
+          Width = 80
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          Caption = '- выходных'
+          ParentColor = False
+        end
+        object Label8: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Label7
+          AnchorSideTop.Side = asrBottom
+          Left = 6
+          Height = 20
+          Top = 110
+          Width = 104
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          BorderSpacing.Bottom = 6
+          Caption = '- праздничных'
+          ParentColor = False
+        end
+        object TotalCountLabel: TLabel
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Panel1
+          Left = 156
+          Height = 20
+          Top = 6
+          Width = 8
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '0'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+        object WorkCountLabel: TLabel
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = TotalCountLabel
+          AnchorSideTop.Side = asrBottom
+          Left = 156
+          Height = 20
+          Top = 32
+          Width = 8
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '0'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+        object NotWorkCountLabel: TLabel
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = WorkCountLabel
+          AnchorSideTop.Side = asrBottom
+          Left = 156
+          Height = 20
+          Top = 58
+          Width = 8
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '0'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+        object OffDayCountLabel: TLabel
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = NotWorkCountLabel
+          AnchorSideTop.Side = asrBottom
+          Left = 156
+          Height = 20
+          Top = 84
+          Width = 8
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '0'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+        object HolidayCountLabel: TLabel
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = OffDayCountLabel
+          AnchorSideTop.Side = asrBottom
+          Left = 156
+          Height = 20
+          Top = 110
+          Width = 8
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '0'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+        object Label9: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = HolidayCountLabel
+          AnchorSideTop.Side = asrBottom
+          Left = 6
+          Height = 20
+          Top = 136
+          Width = 138
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          BorderSpacing.Bottom = 6
+          Caption = '- предпраздничных'
+          ParentColor = False
+        end
+        object BeforeCountLabel: TLabel
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Label8
+          AnchorSideTop.Side = asrBottom
+          Left = 156
+          Height = 20
+          Top = 136
+          Width = 8
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '0'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object Label3: TLabel
+        Left = 6
+        Height = 20
+        Top = 246
+        Width = 292
+        Align = alTop
+        BorderSpacing.Left = 6
+        BorderSpacing.Top = 6
+        BorderSpacing.Right = 6
+        Caption = 'Срок в рабочих днях'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object Panel2: TPanel
+        Left = 0
+        Height = 130
+        Top = 266
+        Width = 304
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 130
+        ClientWidth = 304
+        TabOrder = 2
+        object SpinEdit1: TSpinEdit
+          AnchorSideLeft.Control = Panel2
+          AnchorSideTop.Control = Panel2
+          Left = 6
+          Height = 28
+          Top = 6
+          Width = 55
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          MinValue = 1
+          OnChange = SpinEdit1Change
+          TabOrder = 0
+          Value = 2
+        end
+        object Label14: TLabel
+          AnchorSideLeft.Control = SpinEdit1
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = SpinEdit1
+          AnchorSideTop.Side = asrCenter
+          Left = 67
+          Height = 20
+          Top = 10
+          Width = 52
+          BorderSpacing.Left = 6
+          Caption = 'от даты'
+          ParentColor = False
+        end
+        object DateTimePicker3: TDateTimePicker
+          AnchorSideLeft.Control = Label14
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = SpinEdit1
+          AnchorSideTop.Side = asrCenter
+          Left = 125
+          Height = 28
+          Top = 6
+          Width = 99
+          CenturyFrom = 1941
+          MaxDate = 2958465
+          MinDate = -53780
+          ParentFont = False
+          TabOrder = 1
+          BorderSpacing.Left = 6
+          TrailingSeparator = False
+          TextForNullDate = 'NULL'
+          LeadingZeros = True
+          Kind = dtkDate
+          TimeFormat = tf24
+          TimeDisplay = tdHMS
+          DateMode = dmComboBox
+          Date = 44514
+          Time = 0.36772234953969
+          UseDefaultSeparators = True
+          HideDateTimeParts = []
+          MonthNames = 'Long'
+          OnChange = DateTimePicker3Change
+        end
+        object Label15: TLabel
+          AnchorSideLeft.Control = Panel2
+          AnchorSideTop.Control = SpinEdit1
+          AnchorSideTop.Side = asrBottom
+          Left = 6
+          Height = 20
+          Top = 40
+          Width = 101
+          BorderSpacing.Left = 6
+          BorderSpacing.Top = 6
+          Caption = 'заканчивается'
+          ParentColor = False
+        end
+        object EndDateLabel: TLabel
+          AnchorSideLeft.Control = Label15
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = SpinEdit1
+          AnchorSideTop.Side = asrBottom
+          Left = 119
+          Height = 20
+          Top = 40
+          Width = 71
+          BorderSpacing.Left = 12
+          BorderSpacing.Top = 6
+          Caption = '14.11.2021'
+          Font.Style = [fsItalic]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+    end
+    object Splitter2: TSplitter
+      Cursor = crVSplit
+      Left = 0
+      Height = 6
+      Top = 249
+      Width = 310
+      Align = alBottom
+      ResizeAnchor = akBottom
+      ResizeStyle = rsLine
     end
   end
 end

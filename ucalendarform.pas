@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
-  Buttons, VirtualTrees, DividerBevel, fpspreadsheetgrid,
-  DK_VSTTables, DK_SheetExporter, DK_DateUtils, UCalendar, USQLite,
-  DK_Vector, fpsTypes, LCLType, rxctrls, UCalendarEditForm, DK_Const,
+  Buttons, VirtualTrees, DividerBevel, DateTimePicker, fpspreadsheetgrid,
+  DK_VSTTables, DK_SheetExporter, DK_DateUtils, UCalendar, USQLite, DK_Vector,
+  fpsTypes, LCLType, StdCtrls, ComCtrls, rxctrls, UCalendarEditForm, DK_Const,
   DateUtils, USheetUtils;
 
 type
@@ -16,33 +16,73 @@ type
   { TCalendarForm }
 
   TCalendarForm = class(TForm)
-    ExportButton: TRxSpeedButton;
-    SaveCopyButton: TSpeedButton;
     AddDateButton: TSpeedButton;
+    CancelCopyButton: TSpeedButton;
+    CopyDateButton: TSpeedButton;
+    CopyEditPanel: TPanel;
+    CopyPanel: TPanel;
+    DateEditPanel: TPanel;
+    DateTimePicker1: TDateTimePicker;
+    DateTimePicker2: TDateTimePicker;
+    DateTimePicker3: TDateTimePicker;
+    DayPanel: TPanel;
     DelCopyButton: TSpeedButton;
     DelDateButton: TSpeedButton;
-    CopyDateButton: TSpeedButton;
-    CancelCopyButton: TSpeedButton;
     EditDateButton: TSpeedButton;
-    CopyEditPanel: TPanel;
-    DividerBevel1: TDividerBevel;
-    CalendarGrid: TsWorksheetGrid;
-    DateEditPanel: TPanel;
-    CopyPanel: TPanel;
-    TopPanel: TPanel;
-    LeftPanel: TPanel;
-    GridPanel: TPanel;
     EditPanel: TPanel;
+    ExportButton: TRxSpeedButton;
+    CalendarGrid: TsWorksheetGrid;
+    BeforeCountLabel: TLabel;
+    Label1: TLabel;
+    Label9: TLabel;
+    WorkCountLabel: TLabel;
+    NotWorkCountLabel: TLabel;
+    OffDayCountLabel: TLabel;
+    HolidayCountLabel: TLabel;
+    Label14: TLabel;
+    Label15: TLabel;
+    EndDateLabel: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    TotalCountLabel: TLabel;
+    MainPanel: TPanel;
+    LeftPanel: TPanel;
+    CalcPanel: TPanel;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel7: TPanel;
+    Panel8: TPanel;
+    DividerBevel1: TDividerBevel;
+    PeriodPanel: TPanel;
+    SaveCopyButton: TSpeedButton;
+    SpinEdit1: TSpinEdit;
+    Splitter2: TSplitter;
+    TopPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     YearSpinEdit: TSpinEdit;
     Splitter1: TSplitter;
+    ZoomCaptionLabel: TLabel;
+    ZoomInButton: TSpeedButton;
+    ZoomOutButton: TSpeedButton;
+    ZoomPanel: TPanel;
+    ZoomTrackBar: TTrackBar;
+    ZoomValueLabel: TLabel;
+    ZoomValuePanel: TPanel;
     procedure AddDateButtonClick(Sender: TObject);
     procedure CalendarGridDblClick(Sender: TObject);
     procedure CalendarGridMouseDown(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
     procedure CancelCopyButtonClick(Sender: TObject);
     procedure CopyDateButtonClick(Sender: TObject);
+    procedure DateTimePicker1Change(Sender: TObject);
+    procedure DateTimePicker2Change(Sender: TObject);
+    procedure DateTimePicker3Change(Sender: TObject);
     procedure DelCopyButtonClick(Sender: TObject);
     procedure DelDateButtonClick(Sender: TObject);
     procedure EditDateButtonClick(Sender: TObject);
@@ -51,6 +91,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SaveCopyButtonClick(Sender: TObject);
+    procedure SpinEdit1Change(Sender: TObject);
     procedure VT1DblClick(Sender: TObject);
     procedure VT1KeyUp(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
@@ -59,6 +100,9 @@ type
     procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
     procedure YearSpinEditChange(Sender: TObject);
+    procedure ZoomInButtonClick(Sender: TObject);
+    procedure ZoomOutButtonClick(Sender: TObject);
+    procedure ZoomTrackBarChange(Sender: TObject);
   private
     YearCalendar: TCalendar;
     VSTDays: TVSTTable;
@@ -67,8 +111,8 @@ type
     ColorVector: TColorVector;
 
     SelectedDates: TDateVector;
-    SelectedStatusStr, SelectedSwapDayStr: String;
-    SelectedStatus, SelectedSwapDay: Integer;
+    SelectedStatusStr: String;
+    SelectedStatus: Integer;
 
     SpecDays: TCalendarSpecDays;
 
@@ -79,6 +123,11 @@ type
     procedure CalcCalendar;
     procedure DrawCalendar;
     procedure RefreshCalendar;
+
+    procedure CalcAndShowInfo;
+    procedure CalcAndShowDaysCount;
+    procedure CalcAndShowWorkDaysEnd;
+
 
     procedure LoadCopyList(const ASelectedIndex: Integer=-1);
 
@@ -114,39 +163,19 @@ uses UMainForm;
 
 procedure TCalendarForm.FormCreate(Sender: TObject);
 var
-  W1, W2, W3: Integer;
-
-  procedure CalcWidths;
-  //const
-  //  DeltaW = 55;
-  //var
-  //  FName: String;
-  //  FSize: Single;
-  //  x: Integer;
-  begin
-    //LoadFontFromControl(CalendarGrid, FName, FSize);
-    //x:= Round(FSize);
-    //if x<FSize then
-    //  FSize:= x + 1
-    //else
-    //  FSize:= x;
-    //
-    //W1:= SWidth('00.00.0000', FName, FSize) + DeltaW;
-    //W2:= SWidth('предпраздничный', FName, FSize) + DeltaW;
-    //W3:= SWidth('Заменяемый день', FName, FSize) + DeltaW;
-    W1:= 90;
-    W2:= 150;
-    W3:= 150;
-  end;
-
+  W1, W2: Integer;
 begin
   MainForm.SetNamesPanelsVisible(False, False);
 
+  DateTimePicker1.Date:= Date;
+  DateTimePicker2.Date:= Date;
+  DateTimePicker3.Date:= Date;
+
   LoadColors;
 
-  //DefaultGridSettings(CalendarGrid);
-  CalcWidths;
-  LeftPanel.Width:= W1+W2+W3;
+  W1:= 110;
+  W2:= 200;
+  LeftPanel.Width:= W1+W2;
 
   CalendarSheet:= TCalendarSheet.Create(CalendarGrid.Worksheet, CalendarGrid);
 
@@ -156,7 +185,6 @@ begin
   //DefaultVSTTablesSettings(VSTDays);
   VSTDays.AddColumn('Дата', W1);
   VSTDays.AddColumn('Статус', W2);
-  VSTDays.AddColumn('Заменяемый день');
   VSTDays.Draw;
 
   VSTCopy:= TVSTTable.Create(VT2);
@@ -165,7 +193,6 @@ begin
   VSTCopy.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTCopy.AddColumn('Дата', W1);
   VSTCopy.AddColumn('Статус', W2);
-  VSTCopy.AddColumn('Заменяемый день');
   VSTCopy.Draw;
 
   YearCalendar:= TCalendar.Create;
@@ -190,6 +217,11 @@ end;
 procedure TCalendarForm.SaveCopyButtonClick(Sender: TObject);
 begin
   EndCopy;
+end;
+
+procedure TCalendarForm.SpinEdit1Change(Sender: TObject);
+begin
+  CalcAndShowWorkDaysEnd;
 end;
 
 procedure TCalendarForm.VT1DblClick(Sender: TObject);
@@ -247,6 +279,22 @@ begin
   RefreshCalendar;
 end;
 
+procedure TCalendarForm.ZoomInButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
+end;
+
+procedure TCalendarForm.ZoomOutButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
+end;
+
+procedure TCalendarForm.ZoomTrackBarChange(Sender: TObject);
+begin
+  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
+  DrawCalendar;
+end;
+
 procedure TCalendarForm.LoadColors;
 begin
   ColorVector:= nil;
@@ -263,16 +311,15 @@ end;
 procedure TCalendarForm.LoadSpecDays(const ASelectedIndex: Integer = -1);
 var
   BD, ED: TDate;
-  StrDates, StrStatuses, StrSwapDays: TStrVector;
+  StrDates, StrStatuses: TStrVector;
 begin
   BD:= FirstDayInYear(YearSpinEdit.Value);
   ED:= LastDayInYear(YearSpinEdit.Value);
   SpecDays:= SQLite.LoadCalendarSpecDays(BD, ED);
 
-  CalendarSpecDaysToStr(SpecDays, StrDates, StrStatuses, StrSwapDays);
+  CalendarSpecDaysToStr(SpecDays, StrDates, StrStatuses);
   VSTDays.SetColumn('Дата', StrDates);
   VSTDays.SetColumn('Статус', StrStatuses);
-  VSTDays.SetColumn('Заменяемый день', StrSwapDays);
   VSTDays.Draw;
 
   if (ASelectedIndex>=0) and (ASelectedIndex<=High(StrDates)) then
@@ -290,6 +337,7 @@ end;
 
 procedure TCalendarForm.DrawCalendar;
 begin
+  CalendarSheet.Zoom(ZoomTrackBar.Position);
   CalendarSheet.Draw(YearCalendar, SelectedDates);
   CalendarSheet.UpdateColors(ColorVector);
 end;
@@ -300,6 +348,56 @@ begin
   LoadSpecDays;
   CalcCalendar;
   DrawCalendar;
+  CalcAndShowInfo;
+end;
+
+procedure TCalendarForm.CalcAndShowInfo;
+begin
+  CalcAndShowDaysCount;
+  CalcAndShowWorkDaysEnd;
+end;
+
+procedure TCalendarForm.CalcAndShowDaysCount;
+var
+  Calendar: TCalendar;
+  BD, ED: TDate;
+begin
+  BD:= DateTimePicker2.Date;
+  ED:= DateTimePicker1.Date;
+
+  if CompareDate(BD, ED)>0 then
+  begin
+    TotalCountLabel.Caption:= '0';
+    WorkCountLabel.Caption:= '0';
+    NotWorkCountLabel.Caption:= '0';
+    OffDayCountLabel.Caption:= '0';
+    HolidayCountLabel.Caption:= '0';
+    BeforeCountLabel.Caption:= '0';
+    Exit;
+  end;
+
+  Calendar:= SQLite.LoadCalendar(BD, ED);
+  try
+    TotalCountLabel.Caption:= IntToStr(Calendar.DaysCount);
+    WorkCountLabel.Caption:= IntToStr(Calendar.WorkDaysCount);
+    NotWorkCountLabel.Caption:= IntToStr(Calendar.NotWorkDaysCount);
+    OffDayCountLabel.Caption:= IntToStr(Calendar.OffDaysCount);
+    HolidayCountLabel.Caption:= IntToStr(Calendar.HoliDaysCount);
+    BeforeCountLabel.Caption:= IntToStr(Calendar.BeforeDaysCount);
+  finally
+    FreeAndNil(Calendar);
+  end;
+end;
+
+procedure TCalendarForm.CalcAndShowWorkDaysEnd;
+var
+  BD, ED: TDate;
+  N: Integer;
+begin
+  N:= SpinEdit1.Value;
+  BD:= DateTimePicker3.Date;
+  ED:= SQLite.LoadWorkDaysPeriodEndDate(BD, N);
+  EndDateLabel.Caption:= FormatDateTime('dd.mm.yyyy', ED);
 end;
 
 procedure TCalendarForm.SetEditButtonsEnabled;
@@ -339,16 +437,13 @@ end;
 
 procedure TCalendarForm.LoadCopyList(const ASelectedIndex: Integer = -1);
 var
-  SelStatuses, SelSwapdays, SelDates: TStrVector;
+  SelStatuses, SelDates: TStrVector;
 begin
   SelStatuses:= nil;
-  SelSwapdays:= nil;
   SelDates:= VDateToStr(SelectedDates);
   VDim(SelStatuses, Length(SelectedDates), SelectedStatusStr);
-  VDim(SelSwapdays, Length(SelectedDates), SelectedSwapDayStr);
   VSTCopy.SetColumn('Дата', SelDates);
   VSTCopy.SetColumn('Статус', SelStatuses);
-  VSTCopy.SetColumn('Заменяемый день', SelSwapdays);
   VSTCopy.Draw;
 
   if (ASelectedIndex>=0) and (ASelectedIndex<=High(SelectedDates)) then
@@ -426,9 +521,7 @@ begin
   CopyPanel.Visible:= True;
 
   SelectedStatus:= SpecDays.Statuses[VSTDays.SelectedIndex];
-  SelectedSwapDay:= SpecDays.SwapDays[VSTDays.SelectedIndex];
   SelectedStatusStr:= DayStatusToStr(SelectedStatus);
-  SelectedSwapDayStr:= SwapDayToStr(SelectedSwapDay);
 
   SelectedDates:= nil;
   DrawCalendar;
@@ -442,7 +535,7 @@ begin
   begin
     if IsCopyDates then
     begin
-      SQLite.WriteCalendarSpecDays(SelectedDates, SelectedStatus, SelectedSwapDay);
+      SQLite.WriteCalendarSpecDays(SelectedDates, SelectedStatus);
       RefreshCalendar;
     end
     else begin
@@ -465,6 +558,21 @@ end;
 procedure TCalendarForm.CopyDateButtonClick(Sender: TObject);
 begin
   BeginCopy;
+end;
+
+procedure TCalendarForm.DateTimePicker1Change(Sender: TObject);
+begin
+  CalcAndShowDaysCount;
+end;
+
+procedure TCalendarForm.DateTimePicker2Change(Sender: TObject);
+begin
+  CalcAndShowDaysCount;
+end;
+
+procedure TCalendarForm.DateTimePicker3Change(Sender: TObject);
+begin
+  CalcAndShowWorkDaysEnd;
 end;
 
 procedure TCalendarForm.DelCopyButtonClick(Sender: TObject);

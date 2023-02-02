@@ -211,6 +211,7 @@
         <Filename Value="ucontrollistform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ControlListForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UControlListForm"/>
       </Unit>

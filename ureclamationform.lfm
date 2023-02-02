@@ -1,7 +1,7 @@
 object ReclamationForm: TReclamationForm
-  Left = 214
+  Left = 218
   Height = 354
-  Top = 175
+  Top = 131
   Width = 1664
   Align = alClient
   BorderStyle = bsNone
@@ -929,35 +929,30 @@ object ReclamationForm: TReclamationForm
     ClientWidth = 1656
     TabOrder = 2
     object ZoomPanel: TPanel
-      Left = 1298
+      Left = 1316
       Height = 20
       Top = 6
-      Width = 338
+      Width = 340
       Align = alRight
+      AutoSize = True
       BorderSpacing.Top = 6
-      BorderSpacing.Right = 20
       BorderSpacing.Bottom = 6
       BevelOuter = bvNone
       ClientHeight = 20
-      ClientWidth = 338
+      ClientWidth = 340
+      Constraints.MaxHeight = 20
       TabOrder = 0
       object ZoomCaptionLabel: TLabel
-        AnchorSideLeft.Control = ZoomPanel
-        AnchorSideTop.Control = ZoomPanel
-        AnchorSideTop.Side = asrCenter
         Left = 2
         Height = 20
         Top = 0
         Width = 63
+        Align = alRight
         BorderSpacing.Left = 2
         Caption = 'Масштаб'
         ParentColor = False
       end
       object ZoomTrackBar: TTrackBar
-        AnchorSideLeft.Control = ZoomOutButton
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = ZoomPanel
-        AnchorSideTop.Side = asrCenter
         Left = 100
         Height = 20
         Top = 0
@@ -969,17 +964,16 @@ object ReclamationForm: TReclamationForm
         PageSize = 5
         Position = 100
         TickStyle = tsNone
-        Align = alCustom
+        Align = alRight
         TabOrder = 0
       end
       object ZoomOutButton: TSpeedButton
-        AnchorSideLeft.Control = ZoomCaptionLabel
-        AnchorSideLeft.Side = asrBottom
         Cursor = crHandPoint
         Left = 80
         Height = 20
         Top = 0
         Width = 20
+        Align = alRight
         AutoSize = True
         BorderSpacing.Left = 15
         Flat = True
@@ -1022,15 +1016,12 @@ object ReclamationForm: TReclamationForm
         OnClick = ZoomOutButtonClick
       end
       object ZoomInButton: TSpeedButton
-        AnchorSideLeft.Control = ZoomTrackBar
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = ZoomPanel
-        AnchorSideTop.Side = asrCenter
         Cursor = crHandPoint
         Left = 250
         Height = 20
         Top = 0
         Width = 20
+        Align = alRight
         AutoSize = True
         Flat = True
         Glyph.Data = {
@@ -1071,22 +1062,28 @@ object ReclamationForm: TReclamationForm
         }
         OnClick = ZoomInButtonClick
       end
-      object ZoomValueLabel: TLabel
-        AnchorSideLeft.Control = ZoomInButton
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = ZoomPanel
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = ZoomPanel
-        AnchorSideRight.Side = asrBottom
-        Left = 292
+      object ZoomValuePanel: TPanel
+        Left = 270
         Height = 20
         Top = 0
-        Width = 40
-        Anchors = [akTop, akRight]
-        BorderSpacing.Left = 15
-        BorderSpacing.Right = 6
-        Caption = '100 %'
-        ParentColor = False
+        Width = 70
+        Align = alRight
+        BevelOuter = bvNone
+        ClientHeight = 20
+        ClientWidth = 70
+        TabOrder = 1
+        object ZoomValueLabel: TLabel
+          AnchorSideLeft.Side = asrBottom
+          Left = 24
+          Height = 20
+          Top = 0
+          Width = 40
+          Align = alRight
+          BorderSpacing.Left = 15
+          BorderSpacing.Right = 6
+          Caption = '100 %'
+          ParentColor = False
+        end
       end
     end
   end

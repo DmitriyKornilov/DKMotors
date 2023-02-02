@@ -56,6 +56,7 @@ type
     ZoomPanel: TPanel;
     ZoomTrackBar: TTrackBar;
     ZoomValueLabel: TLabel;
+    ZoomValuePanel: TPanel;
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
     procedure CheckBox3Change(Sender: TObject);

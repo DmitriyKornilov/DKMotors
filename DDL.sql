@@ -4,8 +4,7 @@ PRAGMA FOREIGN_KEYS = ON;
 /* Особые дни производственного календаря */
 CREATE TABLE IF NOT EXISTS CALENDAR (
     DayDate DATETIME PRIMARY KEY NOT NULL,
-    Status  INTEGER  NOT NULL DEFAULT 0,
-    SwapDay INTEGER  NOT NULL DEFAULT 0
+    Status  INTEGER  NOT NULL DEFAULT 0
 );
 
 /* Список грузополучателей */
