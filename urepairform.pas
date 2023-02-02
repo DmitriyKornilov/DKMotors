@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, EditBtn, VirtualTrees, DividerBevel, DK_VSTTables, USheetUtils,
-  rxctrls, fpspreadsheetgrid, DK_Vector, USQLite, DK_StrUtils, DK_DateUtils,
-  DK_SheetExporter, fpspreadsheet, fpstypes;
+  rxctrls, fpspreadsheetgrid, DK_Vector, USQLite, DK_StrUtils,
+  DK_SheetExporter, fpspreadsheet, fpstypes, UCalendar;
 
 type
 
@@ -56,9 +56,10 @@ type
     RecIDs, MotorIDs: TIntVector;
 
     ArrivalDates, SendingDates: TDateVector;
-    Passports: TIntVector;
+    Passports, DayCounts: TIntVector;
     MotorNames, MotorNums: TStrVector;
 
+    function CalcRepairWorkDaysCount(const ABeginDate, AEndDate: TDate): Integer;
     procedure InfoOpen;
     procedure TypeSelect;
     procedure OrderSelect;
@@ -88,13 +89,13 @@ begin
   VSTMotorTable.OnSelect:= @MotorSelect;
   VSTMotorTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTMotorTable.HeaderFont.Style:= [fsBold];
-  VSTMotorTable.AddColumn('№ п/п', 80);
-  VSTMotorTable.AddColumn('Наименование', 300);
-  VSTMotorTable.AddColumn('Номер', 200);
-  VSTMotorTable.AddColumn('Наличие паспорта', 200);
-  VSTMotorTable.AddColumn('Прибыл в ремонт', 200);
-  VSTMotorTable.AddColumn('Убыл из ремонта', 200);
-  VSTMotorTable.AddColumn('Срок ремонта (дней)', 200);
+  VSTMotorTable.AddColumn('№ п/п', 60);
+  VSTMotorTable.AddColumn('Наименование', 250);
+  VSTMotorTable.AddColumn('Номер', 150);
+  VSTMotorTable.AddColumn('Наличие паспорта', 150);
+  VSTMotorTable.AddColumn('Прибыл в ремонт', 150);
+  VSTMotorTable.AddColumn('Убыл из ремонта', 150);
+  VSTMotorTable.AddColumn('Срок ремонта (рабочих дней)', 200);
   VSTMotorTable.CanSelect:= True;
   VSTMotorTable.AutosizeColumnDisable;
   VSTMotorTable.Draw;
@@ -142,7 +143,7 @@ begin
     Sheet:= Exporter.AddWorksheet('Лист1');
     RepairSheet:= TRepairSheet.Create(Sheet);
     try
-      RepairSheet.Draw(Passports, MotorNames, MotorNums, ArrivalDates, SendingDates);
+      RepairSheet.Draw(Passports, DayCounts, MotorNames, MotorNums, ArrivalDates, SendingDates);
     finally
       FreeAndNil(RepairSheet);
     end;
@@ -239,11 +240,29 @@ begin
   InfoOpen;
 end;
 
+function TRepairForm.CalcRepairWorkDaysCount(const ABeginDate, AEndDate: TDate): Integer;
+var
+  Calendar: TCalendar;
+  D: TDate;
+begin
+  Result:= 0;
+  if ABeginDate=0 then Exit;
+
+  D:= AEndDate;
+  if D=0 then D:= Date;
+  Calendar:= SQLite.LoadCalendar(ABeginDate, D);
+  try
+    Result:= Calendar.WorkDaysCount;
+  finally
+    FreeAndNil(Calendar);
+  end;
+end;
+
 procedure TRepairForm.ShowRepair;
 var
   MotorNumberLike: String;
   i: Integer;
-  PassStrs, DayCounts, SendingDatesStrs: TStrVector;
+  PassStrs, DayCountsStrs, SendingDatesStrs: TStrVector;
 begin
   if (not VSTTypeTable.IsSelected) or (not VSTOrderTable.IsSelected) then Exit;
 
@@ -263,17 +282,18 @@ begin
       if Passports[i]>0 then
         PassStrs[i]:= CHECK_SYMBOL;
 
-    VDim(DayCounts{%H-}, Length(ArrivalDates));
-    VDim(SendingDatesStrs{%H-}, Length(ArrivalDates));
+    VDim(DayCounts{%H-}, Length(MotorIDs));
     for i:= 0 to High(DayCounts) do
+      DayCounts[i]:= CalcRepairWorkDaysCount(ArrivalDates[i], SendingDates[i]);
+
+    VDim(DayCountsStrs{%H-}, Length(ArrivalDates));
+    VDim(SendingDatesStrs{%H-}, Length(ArrivalDates));
+    for i:= 0 to High(DayCountsStrs) do
     begin
       if SendingDates[i]>0 then
-      begin
         SendingDatesStrs[i]:= FormatDateTime('dd.mm.yyyy', SendingDates[i]);
-        DayCounts[i]:= IntToStr(DaysBetweenDates(ArrivalDates[i], SendingDates[i]) + 1)
-      end
-      else
-        DayCounts[i]:= IntToStr(DaysBetweenDates(ArrivalDates[i], Date) + 1);
+      if DayCounts[i]>0 then
+        DayCountsStrs[i]:= IntToStr(DayCounts[i]);
     end;
 
     VSTMotorTable.ValuesClear;
@@ -283,7 +303,7 @@ begin
     VSTMotorTable.SetColumn('Наличие паспорта', PassStrs);
     VSTMotorTable.SetColumn('Прибыл в ремонт', VFormatDateTime('dd.mm.yyyy', ArrivalDates));
     VSTMotorTable.SetColumn('Убыл из ремонта', SendingDatesStrs);
-    VSTMotorTable.SetColumn('Срок ремонта (дней)', DayCounts);
+    VSTMotorTable.SetColumn('Срок ремонта (рабочих дней)', DayCountsStrs);
 
 
     VSTMotorTable.Draw;

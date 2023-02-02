@@ -313,7 +313,7 @@ type
   public
     constructor Create(const ASheet: TsWorksheet);
     destructor  Destroy; override;
-    procedure Draw(const APassports: TIntVector;
+    procedure Draw(const APassports, ADayCounts: TIntVector;
                    const AMotorNames, AMotorNums: TStrVector;
                    const AArrivalDates, ASendingDates: TDateVector);
   end;
@@ -362,7 +362,7 @@ type
     procedure Zoom(const APercents: Integer);
     procedure DrawLine(const AIndex: Integer; const ASelected: Boolean);
     procedure Draw(const ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
-                   const AMileages, AOpinions, AReasonColors, APassports: TIntVector;
+                   const AMileages, AOpinions, AReasonColors{, APassports}: TIntVector;
                    const APlaceNames, AFactoryNames, ADepartures,
                          ADefectNames, AReasonNames, ARecNotes,
                          AMotorNames, AMotorNums: TStrVector);
@@ -386,7 +386,7 @@ begin
     100,  // Наличие паспорта
     150,  // Прибыл в ремонт
     150,  // Убыл из ремонта
-    150   // Срок ремонта (дней)
+    130   // Срок ремонта (дней)
   ]);
   FWriter:= TSheetWriter.Create(ColWidths, ASheet, nil);
 end;
@@ -397,10 +397,11 @@ begin
   inherited Destroy;
 end;
 
-procedure TRepairSheet.Draw(const APassports: TIntVector; const AMotorNames,
-  AMotorNums: TStrVector; const AArrivalDates, ASendingDates: TDateVector);
+procedure TRepairSheet.Draw(const APassports, ADayCounts: TIntVector;
+               const AMotorNames, AMotorNums: TStrVector;
+               const AArrivalDates, ASendingDates: TDateVector);
 var
-  R, i, n: Integer;
+  R, i: Integer;
   S: String;
 begin
   FWriter.BeginEdit;
@@ -420,7 +421,7 @@ begin
   FWriter.WriteText(R, 4, 'Наличие паспорта', cbtOuter, True, True);
   FWriter.WriteText(R, 5, 'Прибыл в ремонт', cbtOuter, True, True);
   FWriter.WriteText(R, 6, 'Убыл из ремонта', cbtOuter, True, True);
-  FWriter.WriteText(R, 7, 'Срок ремонта (дней)', cbtOuter, True, True);
+  FWriter.WriteText(R, 7, 'Срок ремонта (рабочих дней)', cbtOuter, True, True);
 
   FWriter.SetFont(FFontName, FFontSize, [], clBlack);
   for i:= 0 to High(AMotorNums) do
@@ -440,12 +441,10 @@ begin
       FWriter.WriteDate(R, 6, ASendingDates[i], cbtOuter)
     else
       FWriter.WriteText(R, 6, EmptyStr, cbtOuter);
-
-    if ASendingDates[i]>0 then
-      n:= DaysBetweenDates(AArrivalDates[i], ASendingDates[i]) + 1
+    if ADayCounts[i]>0 then
+      FWriter.WriteNumber(R, 7, ADayCounts[i], cbtOuter)
     else
-      n:= DaysBetweenDates(AArrivalDates[i], Date) + 1;
-    FWriter.WriteNumber(R, 7, n, cbtOuter);
+      FWriter.WriteText(R, 7, EmptyStr, cbtOuter);
   end;
 
   FWriter.EndEdit;
@@ -2538,9 +2537,9 @@ begin
   FWriter.WriteText(R, 12, 'Особое мнение', cbtOuter, True, True);
   FWriter.WriteText(R, 13, 'Примечание', cbtOuter, True, True);
   FWriter.WriteText(R, 14, 'Прибыл в ремонт', cbtOuter, True, True);
-  FWriter.WriteText(R, 15, 'Наличие паспорта', cbtOuter, True, True);
-  FWriter.WriteText(R, 16, 'Убыл из ремонта', cbtOuter, True, True);
-  FWriter.WriteText(R, 17, 'Срок, дней', cbtOuter, True, True);
+  //FWriter.WriteText(R, 15, 'Наличие паспорта', cbtOuter, True, True);
+  FWriter.WriteText(R, 15, 'Убыл из ремонта', cbtOuter, True, True);
+  //FWriter.WriteText(R, 17, 'Срок, дней', cbtOuter, True, True);
 
 end;
 
@@ -2575,9 +2574,9 @@ begin
     60,  // Особое мнение
     450, // Примечание
     70,  //Прибыл в ремонт
-    70,  // Наличие паспорта
-    70,   // Убыл из ремонта
-    50   //Срок
+    //70,  // Наличие паспорта
+    70   // Убыл из ремонта
+    //50   //Срок
   ]);
 
   FWriter:= TSheetWriter.Create(ColWidths, FGrid.Worksheet, FGrid);
@@ -2651,31 +2650,31 @@ begin
   else
     FWriter.WriteDate(R, 14, ArrivalDates[AIndex], cbtOuter);
 
-  S:= EmptyStr;
-  if Passports[AIndex]=1 then S:= CHECK_SYMBOL;
-  FWriter.WriteText(R, 15, S, cbtOuter);
+  //S:= EmptyStr;
+  //if Passports[AIndex]=1 then S:= CHECK_SYMBOL;
+  //FWriter.WriteText(R, 15, S, cbtOuter);
 
   if SendingDates[AIndex]=0 then
-    FWriter.WriteText(R, 16, EmptyStr, cbtOuter, True, True)
+    FWriter.WriteText(R, 15, EmptyStr, cbtOuter, True, True)
   else
-    FWriter.WriteDate(R, 16, SendingDates[AIndex], cbtOuter);
+    FWriter.WriteDate(R, 15, SendingDates[AIndex], cbtOuter);
 
-  if ArrivalDates[AIndex]=0 then
-    FWriter.WriteText(R, 17, EmptyStr, cbtOuter, True, True)
-  else begin
-    if SendingDates[AIndex]>0 then
-      D:= SendingDates[AIndex]
-    else
-      D:= Date;
-    NumDays:= DaysBetweenDates(ArrivalDates[AIndex], D) + 1;
-    FWriter.WriteNumber(R, 17, NumDays, cbtOuter);
-  end;
+  //if ArrivalDates[AIndex]=0 then
+  //  FWriter.WriteText(R, 17, EmptyStr, cbtOuter, True, True)
+  //else begin
+  //  if SendingDates[AIndex]>0 then
+  //    D:= SendingDates[AIndex]
+  //  else
+  //    D:= Date;
+  //  NumDays:= DaysBetweenDates(ArrivalDates[AIndex], D) + 1;
+  //  FWriter.WriteNumber(R, 17, NumDays, cbtOuter);
+  //end;
 
 end;
 
 procedure TReclamationSheet.Draw(const ARecDates, ABuildDates,
                    AArrivalDates, ASendingDates: TDateVector;
-                   const AMileages, AOpinions, AReasonColors, APassports: TIntVector;
+                   const AMileages, AOpinions, AReasonColors{, APassports}: TIntVector;
                    const APlaceNames, AFactoryNames, ADepartures,
                          ADefectNames, AReasonNames, ARecNotes,
                          AMotorNames, AMotorNums: TStrVector);
@@ -2700,7 +2699,7 @@ begin
   ReasonColors:= AReasonColors;
   ArrivalDates:= AArrivalDates;
   SendingDates:= ASendingDates;
-  Passports:= APassports;
+  //Passports:= APassports;
 
   DrawTitle;
 

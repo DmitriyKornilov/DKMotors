@@ -22,7 +22,7 @@ const
                                               'предпраздничный',
                                               'рабочий');
   COLOR_BEIGE       = $00D7F4FF;
-  COLOR_GRAY        = clBtnFace; //$00D6D6D6;
+  COLOR_GRAY        = $00D6D6D6;
   COLOR_BLACK       = $00000000;
   COLOR_WHITE       = $00FFFFFF;
   COLOR_ORANGE      = $0097CBFF;

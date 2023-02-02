@@ -273,7 +273,7 @@ procedure TReclamationForm.DrawReclamation;
 begin
   ReclamationSheet.Zoom(ZoomTrackBar.Position);
   ReclamationSheet.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
-                          Mileages, Opinions, ReasonColors, Passports,
+                          Mileages, Opinions, ReasonColors, {Passports,}
                           PlaceNames, FactoryNames, Departures, DefectNames,
                           ReasonNames, RecNotes, MotorNames, MotorNums);
 end;

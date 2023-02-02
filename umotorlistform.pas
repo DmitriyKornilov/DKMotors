@@ -17,25 +17,27 @@ type
 
   TMotorListForm = class(TForm)
     CheckBox1: TCheckBox;
+    InfoGrid: TsWorksheetGrid;
+    Label4: TLabel;
     MoreInfoCheckBox: TCheckBox;
-    DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
     DividerBevel4: TDividerBevel;
     DividerBevel5: TDividerBevel;
     DividerBevel7: TDividerBevel;
-    InfoGrid: TsWorksheetGrid;
     MotorNumEdit: TEditButton;
     ExportButton: TRxSpeedButton;
     Label2: TLabel;
-    MotorShippedComboBox: TComboBox;
+    Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
+    CardPanel: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
     Panel7: TPanel;
     SpinEdit1: TSpinEdit;
+    Splitter1: TSplitter;
     Splitter2: TSplitter;
     VT1: TVirtualStringTree;
+    VT2: TVirtualStringTree;
     procedure CheckBox1Change(Sender: TObject);
     procedure MoreInfoCheckBoxChange(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
@@ -43,16 +45,17 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
-    procedure MotorShippedComboBoxChange(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
-    VSTTable: TVSTTable;
+    VSTMotorsTable: TVSTTable;
+    VSTTypeTable: TVSTTable;
     MotorInfoSheet: TMotorInfoSheet;
     MotorIDs: TIntVector;
 
     procedure InfoOpen;
+    procedure TypeSelect;
   public
     procedure ShowMotorList;
   end;
@@ -69,28 +72,46 @@ uses UMainForm;
 { TMotorListForm }
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
+var
+  V: TStrVector;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
 
-  VSTTable:= TVSTTable.Create(VT1);
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTTable.HeaderFont.Style:= [fsBold];
-  VSTTable.AddColumn('Дата сборки', 150);
-  VSTTable.AddColumn('Наименование', 300);
-  VSTTable.AddColumn('Номер', 150);
-  VSTTable.AddColumn('Отгружен', 150);
-  VSTTable.CanSelect:= True;
-  VSTTable.Draw;
+  VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTMotorsTable.HeaderFont.Style:= [fsBold];
+  VSTMotorsTable.AddColumn('Дата сборки', 150);
+  VSTMotorsTable.AddColumn('Наименование', 300);
+  VSTMotorsTable.AddColumn('Номер', 150);
+  VSTMotorsTable.AddColumn('Отгружен', 150);
+  VSTMotorsTable.CanSelect:= True;
+  VSTMotorsTable.Draw;
+
+  VSTTypeTable:= TVSTTable.Create(VT2);
+  VSTTypeTable.OnSelect:= @TypeSelect;
+  VSTTypeTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTTypeTable.HeaderVisible:= False;
+  VSTTypeTable.GridLinesVisible:= False;
+  VSTTypeTable.CanSelect:= True;
+  VSTTypeTable.CanUnselect:= False;
+  VSTTypeTable.AddColumn('Список');
+  V:= VCreateStr(['Все', 'Отгруженные', 'Неотгруженные']);
+  VSTTypeTable.SetColumn('Список', V, taLeftJustify);
+  VSTTypeTable.Draw;
 
   MotorInfoSheet:= TMotorInfoSheet.Create(InfoGrid);
 
   SpinEdit1.Value:= YearOfDate(Date);
+
+  VSTTypeTable.Select(0);
+
   ShowMotorList;
 end;
 
 procedure TMotorListForm.FormDestroy(Sender: TObject);
 begin
-  if Assigned(VSTTable) then FreeAndNil(VSTTable);
+  if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
+  if Assigned(VSTTypeTable) then FreeAndNil(VSTTypeTable);
   if Assigned(MotorInfoSheet) then FreeAndNil(MotorInfoSheet);
 end;
 
@@ -104,11 +125,6 @@ begin
   ShowMotorList;
 end;
 
-procedure TMotorListForm.MotorShippedComboBoxChange(Sender: TObject);
-begin
-  ShowMotorList;
-end;
-
 procedure TMotorListForm.SpinEdit1Change(Sender: TObject);
 begin
   ShowMotorList;
@@ -118,7 +134,7 @@ procedure TMotorListForm.VT1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   InfoGrid.Clear;
-  if not VSTTable.IsSelected then Exit;
+  if not VSTMotorsTable.IsSelected then Exit;
   InfoOpen;
 end;
 
@@ -128,6 +144,8 @@ var
 
   ABuildDates, AMotorNames, AMotorNums, AShippings: TStrVector;
 begin
+   if not VSTTypeTable.IsSelected then Exit;
+
   Screen.Cursor:= crHourGlass;
   try
     InfoGrid.Clear;
@@ -135,17 +153,17 @@ begin
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
     SQLite.MotorListLoad(SpinEdit1.Value,
-                        MotorShippedComboBox.ItemIndex, MainForm.UsedNameIDs,
+                        VSTTypeTable.SelectedIndex, MainForm.UsedNameIDs,
                         MotorNumberLike, Checkbox1.Checked,
                         MotorIDs, ABuildDates,
                         AMotorNames, AMotorNums, AShippings);
 
-    VSTTable.ValuesClear;
-    VSTTable.SetColumn('Дата сборки', ABuildDates);
-    VSTTable.SetColumn('Наименование', AMotorNames);
-    VSTTable.SetColumn('Номер', AMotorNums);
-    VSTTable.SetColumn('Отгружен', AShippings, taLeftJustify);
-    VSTTable.Draw;
+    VSTMotorsTable.ValuesClear;
+    VSTMotorsTable.SetColumn('Дата сборки', ABuildDates);
+    VSTMotorsTable.SetColumn('Наименование', AMotorNames);
+    VSTMotorsTable.SetColumn('Номер', AMotorNums);
+    VSTMotorsTable.SetColumn('Отгружен', AShippings, taLeftJustify);
+    VSTMotorsTable.Draw;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -162,9 +180,9 @@ var
   DefectNames, ReasonNames, RecNotes: TStrVector;
 begin
   if VIsNil(MotorIDs) then Exit;
-  if not VSTTable.IsSelected then Exit;
+  if not VSTMotorsTable.IsSelected then Exit;
 
-  MotorID:= MotorIDs[VSTTable.SelectedIndex];
+  MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
   SQLite.MotorInfoLoad(MotorID, BuildDate, SendDate,
                 MotorName, MotorNum, Sers, RotorNum, ReceiverName,
                 TestDates, TestResults, TestNotes);
@@ -180,6 +198,11 @@ begin
                       Departures, DefectNames, ReasonNames, RecNotes);
 end;
 
+procedure TMotorListForm.TypeSelect;
+begin
+  ShowMotorList;
+end;
+
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
   ShowMotorList;
@@ -192,23 +215,23 @@ begin
     VT1.Align:= alCustom;
     Splitter2.Visible:= True;
     Splitter2.Align:= alTop;
-    Panel2.Visible:= True;
+    CardPanel.Visible:= True;
     Splitter2.Align:= alBottom;
     VT1.Align:= alClient;
   end
   else begin
-    Panel2.Visible:= False;
+    CardPanel.Visible:= False;
     Splitter2.Visible:= False;
   end;
 
-  VSTTable.CanSelect:= MoreInfoCheckBox.Checked;
+  VSTMotorsTable.CanSelect:= MoreInfoCheckBox.Checked;
 end;
 
 procedure TMotorListForm.ExportButtonClick(Sender: TObject);
 var
   Exporter: TGridExporter;
 begin
-  if not VSTTable.IsSelected then Exit;
+  if not VSTMotorsTable.IsSelected then Exit;
   Exporter:= TGridExporter.Create(InfoGrid);
   try
     //Exporter.SheetName:= 'Отчет';
