@@ -32,7 +32,7 @@ object RepairForm: TRepairForm
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 519
+      Left = 565
       Height = 28
       Top = 0
       Width = 101
@@ -176,7 +176,7 @@ object RepairForm: TRepairForm
       ParentFont = False
     end
     object Panel1: TPanel
-      Left = 332
+      Left = 550
       Height = 28
       Top = 0
       Width = 0
@@ -197,7 +197,7 @@ object RepairForm: TRepairForm
       ParentFont = False
     end
     object DividerBevel7: TDividerBevel
-      Left = 504
+      Left = 550
       Height = 28
       Top = 0
       Width = 15
@@ -667,7 +667,7 @@ object RepairForm: TRepairForm
       end
     end
     object Panel5: TPanel
-      Left = 504
+      Left = 550
       Height = 28
       Top = 0
       Width = 0
@@ -723,7 +723,7 @@ object RepairForm: TRepairForm
       end
     end
     object Panel2: TPanel
-      Left = 504
+      Left = 550
       Height = 28
       Top = 0
       Width = 0
@@ -736,9 +736,9 @@ object RepairForm: TRepairForm
       Left = 332
       Height = 28
       Top = 0
-      Width = 172
+      Width = 218
       Align = alLeft
-      Caption = 'Карточка электродвигателя'
+      Caption = 'Учетная карточка электродвигателя'
       Checked = True
       OnChange = MoreInfoCheckBoxChange
       State = cbChecked
@@ -835,22 +835,22 @@ object RepairForm: TRepairForm
     ClientHeight = 474
     ClientWidth = 1049
     TabOrder = 3
-    object Panel10: TPanel
+    object CardPanel: TPanel
       Left = 0
-      Height = 318
-      Top = 154
+      Height = 400
+      Top = 72
       Width = 1047
       Align = alBottom
       BorderSpacing.Right = 2
       BorderSpacing.Bottom = 2
       BevelOuter = bvNone
       BorderStyle = bsSingle
-      ClientHeight = 314
+      ClientHeight = 396
       ClientWidth = 1043
       TabOrder = 0
       object InfoGrid: TsWorksheetGrid
         Left = 0
-        Height = 314
+        Height = 396
         Top = 0
         Width = 1043
         AutoExpand = []
@@ -884,11 +884,11 @@ object RepairForm: TRepairForm
       end
     end
     object Splitter2: TSplitter
-      AnchorSideBottom.Control = Panel10
+      AnchorSideBottom.Control = CardPanel
       Cursor = crVSplit
       Left = 0
       Height = 5
-      Top = 149
+      Top = 67
       Width = 1049
       Align = alBottom
       ResizeAnchor = akBottom
@@ -897,7 +897,7 @@ object RepairForm: TRepairForm
     object VT1: TVirtualStringTree
       AnchorSideBottom.Control = Splitter2
       Left = 0
-      Height = 149
+      Height = 67
       Top = 0
       Width = 1047
       Align = alClient

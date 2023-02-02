@@ -113,6 +113,8 @@ type
     function MotorsInTestLogWrite(const ATestDate: TDate;
                            const AMotorIDs, ATestResults: TIntVector;
                            const ATestNotes: TStrVector): Boolean;
+    //контроль
+    function ControlNoteLoad(const AMotorID: Integer): String;
 
     //склад
     function StoreListLoad(const ANameIDs: TIntVector;
@@ -1365,6 +1367,11 @@ begin
   except
     QRollback;
   end;
+end;
+
+function TSQLite.ControlNoteLoad(const AMotorID: Integer): String;
+begin
+  Result:= ValueStrInt32ID('CONTROLLIST', 'Note', 'MotorID', AMotorID);
 end;
 
 function TSQLite.StoreListLoad(const ANameIDs: TIntVector; const ADeltaDays: Integer;

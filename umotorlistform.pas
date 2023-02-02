@@ -46,8 +46,6 @@ type
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     VSTMotorsTable: TVSTTable;
     VSTTypeTable: TVSTTable;
@@ -56,6 +54,7 @@ type
 
     procedure InfoOpen;
     procedure TypeSelect;
+    procedure MotorSelect;
   public
     procedure ShowMotorList;
   end;
@@ -78,6 +77,7 @@ begin
   MainForm.SetNamesPanelsVisible(True, False);
 
   VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.OnSelect:= @MotorSelect;
   VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
   VSTMotorsTable.AddColumn('Дата сборки', 150);
@@ -130,14 +130,6 @@ begin
   ShowMotorList;
 end;
 
-procedure TMotorListForm.VT1MouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  InfoGrid.Clear;
-  if not VSTMotorsTable.IsSelected then Exit;
-  InfoOpen;
-end;
-
 procedure TMotorListForm.ShowMotorList;
 var
   MotorNumberLike: String;
@@ -173,7 +165,7 @@ procedure TMotorListForm.InfoOpen;
 var
   MotorID: Integer;
   BuildDate, SendDate: TDate;
-  MotorName, MotorNum, RotorNum, ReceiverName, Sers: String;
+  MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
   TestDates, RecDates: TDateVector;
   TestResults, Mileages, Opinions: TIntVector;
   TestNotes, PlaceNames, FactoryNames, Departures,
@@ -186,6 +178,7 @@ begin
   SQLite.MotorInfoLoad(MotorID, BuildDate, SendDate,
                 MotorName, MotorNum, Sers, RotorNum, ReceiverName,
                 TestDates, TestResults, TestNotes);
+  ControlNote:= SQLite.ControlNoteLoad(MotorID);
 
   SQLite.ReclamationListLoad(MotorID, RecDates, Mileages, Opinions,
                       PlaceNames, FactoryNames, Departures,
@@ -193,7 +186,7 @@ begin
 
 
   MotorInfoSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
-                      RotorNum, ReceiverName, TestDates, TestResults, TestNotes,
+                      RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
                       RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
                       Departures, DefectNames, ReasonNames, RecNotes);
 end;
@@ -201,6 +194,13 @@ end;
 procedure TMotorListForm.TypeSelect;
 begin
   ShowMotorList;
+end;
+
+procedure TMotorListForm.MotorSelect;
+begin
+  InfoGrid.Clear;
+  if not VSTMotorsTable.IsSelected then Exit;
+  InfoOpen;
 end;
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);

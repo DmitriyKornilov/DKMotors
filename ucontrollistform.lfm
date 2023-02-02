@@ -1,20 +1,19 @@
 object ControlListForm: TControlListForm
   Left = 401
-  Height = 615
+  Height = 492
   Top = 250
-  Width = 1373
+  Width = 1098
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ControlListForm'
-  ClientHeight = 615
-  ClientWidth = 1373
-  DesignTimePPI = 120
-  LCLVersion = '2.2.2.0'
+  ClientHeight = 492
+  ClientWidth = 1098
+  LCLVersion = '2.2.4.0'
   object TopToolsPanel: TPanel
     Left = 2
-    Height = 40
+    Height = 32
     Top = 2
-    Width = 1369
+    Width = 1094
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -23,18 +22,18 @@ object ControlListForm: TControlListForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1365
-    Constraints.MaxHeight = 40
-    Constraints.MinHeight = 40
+    ClientHeight = 28
+    ClientWidth = 1090
+    Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 638
-      Height = 36
+      Left = 565
+      Height = 28
       Top = 0
-      Width = 112
+      Width = 101
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -174,8 +173,8 @@ object ControlListForm: TControlListForm
       ParentFont = False
     end
     object Panel1: TPanel
-      Left = 399
-      Height = 36
+      Left = 550
+      Height = 28
       Top = 0
       Width = 0
       Align = alLeft
@@ -185,10 +184,10 @@ object ControlListForm: TControlListForm
       TabOrder = 0
     end
     object DividerBevel6: TDividerBevel
-      Left = 399
-      Height = 36
+      Left = 317
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -196,25 +195,25 @@ object ControlListForm: TControlListForm
     end
     object Panel3: TPanel
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 140
+      Width = 111
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 140
+      ClientHeight = 28
+      ClientWidth = 111
       ParentFont = False
       TabOrder = 1
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 36
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 32
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 40
+        Constraints.MinWidth = 32
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -353,13 +352,13 @@ object ControlListForm: TControlListForm
       end
       object EditButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 80
-        Height = 36
+        Left = 64
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 32
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 40
+        Constraints.MinWidth = 32
         Enabled = False
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
@@ -499,13 +498,13 @@ object ControlListForm: TControlListForm
       end
       object DelButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 40
-        Height = 36
+        Left = 32
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 32
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 40
+        Constraints.MinWidth = 32
         Enabled = False
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
@@ -644,10 +643,10 @@ object ControlListForm: TControlListForm
         ParentFont = False
       end
       object DividerBevel5: TDividerBevel
-        Left = 120
-        Height = 36
+        Left = 96
+        Height = 28
         Top = 0
-        Width = 20
+        Width = 15
         Align = alLeft
         Font.Style = [fsBold]
         Orientation = trVertical
@@ -655,8 +654,8 @@ object ControlListForm: TControlListForm
       end
     end
     object Panel5: TPanel
-      Left = 750
-      Height = 36
+      Left = 666
+      Height = 28
       Top = 0
       Width = 0
       Align = alLeft
@@ -666,24 +665,24 @@ object ControlListForm: TControlListForm
       TabOrder = 2
     end
     object Panel7: TPanel
-      Left = 140
-      Height = 36
+      Left = 111
+      Height = 28
       Top = 0
-      Width = 259
+      Width = 206
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 259
+      ClientHeight = 28
+      ClientWidth = 206
       TabOrder = 3
       object Label2: TLabel
         AnchorSideLeft.Control = Panel7
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 20
-        Top = 8
-        Width = 122
+        Height = 15
+        Top = 7
+        Width = 97
         Caption = 'Поиск по номеру'
         ParentColor = False
       end
@@ -693,13 +692,13 @@ object ControlListForm: TControlListForm
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         AnchorSideBottom.Side = asrBottom
-        Left = 130
-        Height = 28
-        Top = 4
-        Width = 129
-        BorderSpacing.Left = 8
+        Left = 103
+        Height = 23
+        Top = 3
+        Width = 103
+        BorderSpacing.Left = 6
         ButtonCursor = crHandPoint
-        ButtonWidth = 29
+        ButtonWidth = 23
         Images = MainForm.ImageList16
         ImageIndex = 0
         MaxLength = 0
@@ -709,8 +708,8 @@ object ControlListForm: TControlListForm
       end
     end
     object Panel2: TPanel
-      Left = 750
-      Height = 36
+      Left = 666
+      Height = 28
       Top = 0
       Width = 0
       Align = alLeft
@@ -719,21 +718,21 @@ object ControlListForm: TControlListForm
       TabOrder = 4
     end
     object MoreInfoCheckBox: TCheckBox
-      Left = 419
-      Height = 36
+      Left = 332
+      Height = 28
       Top = 0
-      Width = 199
+      Width = 218
       Align = alLeft
-      Caption = 'Подробная информация'
+      Caption = 'Учётная карточка электродвигателя'
       Checked = True
       State = cbChecked
       TabOrder = 5
     end
     object DividerBevel7: TDividerBevel
-      Left = 618
-      Height = 36
+      Left = 550
+      Height = 28
       Top = 0
-      Width = 20
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -742,23 +741,23 @@ object ControlListForm: TControlListForm
   end
   object Panel6: TPanel
     Left = 2
-    Height = 398
-    Top = 215
-    Width = 1369
+    Height = 318
+    Top = 172
+    Width = 1094
     Align = alBottom
     BorderSpacing.Left = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 394
-    ClientWidth = 1365
+    ClientHeight = 314
+    ClientWidth = 1090
     TabOrder = 1
     object InfoGrid: TsWorksheetGrid
       Left = 0
-      Height = 394
+      Height = 314
       Top = 0
-      Width = 1365
+      Width = 1090
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
@@ -793,9 +792,9 @@ object ControlListForm: TControlListForm
     AnchorSideBottom.Control = Panel6
     Cursor = crVSplit
     Left = 0
-    Height = 6
-    Top = 209
-    Width = 1373
+    Height = 5
+    Top = 167
+    Width = 1098
     Align = alBottom
     ResizeAnchor = akBottom
     ResizeStyle = rsLine
@@ -803,9 +802,9 @@ object ControlListForm: TControlListForm
   object VT1: TVirtualStringTree
     AnchorSideBottom.Control = Splitter2
     Left = 2
-    Height = 165
-    Top = 44
-    Width = 1369
+    Height = 131
+    Top = 36
+    Width = 1094
     Align = alClient
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2

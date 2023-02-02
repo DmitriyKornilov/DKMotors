@@ -330,7 +330,7 @@ type
     constructor Create(const AGrid: TsWorksheetGrid);
     destructor  Destroy; override;
     procedure Draw(const ABuildDate, ASendDate: TDate;
-      const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName: String;
+      const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName, AControlNote: String;
       const ATestDates: TDateVector;
       const ATestResults: TIntVector;
       const ATestNotes: TStrVector;
@@ -350,7 +350,7 @@ type
     FFontSize: Single;
 
     RecDates, BuildDates, ArrivalDates, SendingDates: TDateVector;
-    Mileages, Opinions, ReasonColors, Passports: TIntVector;
+    Mileages, Opinions, ReasonColors{, Passports}: TIntVector;
     PlaceNames, FactoryNames, Departures: TStrVector;
     DefectNames, ReasonNames, RecNotes: TStrVector;
     MotorNames, MotorNums: TStrVector;
@@ -1728,7 +1728,7 @@ begin
 end;
 
 procedure TMotorInfoSheet.Draw(const ABuildDate, ASendDate: TDate;
-      const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName: String;
+      const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName, AControlNote: String;
       const ATestDates: TDateVector;
       const ATestResults: TIntVector;
       const ATestNotes: TStrVector;
@@ -1736,88 +1736,99 @@ procedure TMotorInfoSheet.Draw(const ABuildDate, ASendDate: TDate;
       const AMileages, AOpinions: TIntVector;
       const APlaceNames, AFactoryNames, ADepartures,
       ADefectNames, AReasonNames, ARecNotes: TStrVector);
-const
-  FONTSIZE_DELTA = 2;
 var
   R, i: Integer;
   S: String;
-
-  procedure DrawLine(const ARow: Integer; const AItemName, AItemValue: String);
-  begin
-    FWriter.SetFont(FFontName, FFontSize+FONTSIZE_DELTA, [fsBold], clBlack);
-    FWriter.WriteText(ARow, 1,{ ARow, 2,} AItemName, cbtNone, True, True);
-    FWriter.SetFont(FFontName, FFontSize+FONTSIZE_DELTA, [{fsBold}], clBlack);
-    FWriter.WriteText(ARow, 2, ARow, 9, AItemValue, cbtNone, True, True);
-  end;
-
-
-
 begin
   FGrid.Clear;
   FWriter.BeginEdit;
   FWriter.SetBackgroundClear;
-  FWriter.SetAlignment(haLeft, vaCenter);
+
+  FWriter.SetAlignment(haCenter, vaCenter);
 
   R:= 1;
-  S:= AMotorName + ' № ' + AMotorNum;
-  if ASeries<>EmptyStr then
-    S:= S + ' (' + ASeries + ')';
-  DrawLine(R, 'Двигатель:', S);
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'УЧЁТНАЯ КАРТОЧКА ЭЛЕКТРОДВИГАТЕЛЯ');
+
   R:= R + 1;
-  DrawLine(R, 'Дата сборки: ', FormatDateTime('dd.mm.yyyy', ABuildDate));
+  FWriter.WriteText(R, 1,  EmptyStr);
+  FWriter.SetRowHeight(R, 10);
   R:= R + 1;
-  DrawLine(R, 'Номер ротора:', ARotorNum);
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, 2,  'Наименование', cbtOuter, True, True);
+  FWriter.WriteText(R, 3, 'Номер', cbtOuter, True, True);
+  FWriter.WriteText(R, 4, 'Партия', cbtOuter, True, True);
+  FWriter.WriteText(R, 5, 'Дата сборки', cbtOuter, True, True);
+  FWriter.WriteText(R, 6, 'Ротор', cbtOuter, True, True);
+  FWriter.WriteText(R, 7, R, FWriter.ColCount,  'Отгружен', cbtOuter, True, True);
   R:= R + 1;
-  if AReceiverName=EmptyStr then
-    S:= 'нет'
-  else
+  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  FWriter.WriteText(R, 1, R, 2,  AMotorName, cbtOuter, True, True);
+  FWriter.WriteText(R, 3, AMotorNum, cbtOuter, True, True);
+  FWriter.WriteText(R, 4, ASeries, cbtOuter, True, True);
+  FWriter.WriteDate(R, 5, ABuildDate, cbtOuter);
+  FWriter.WriteText(R, 6, ARotorNum, cbtOuter, True, True);
+  FWriter.SetAlignment(haLeft, vaCenter);
+  S:= EmptyStr;
+  if AReceiverName<>EmptyStr then
     S:= FormatDateTime('dd.mm.yyyy', ASendDate) + ' - ' + AReceiverName;
-  DrawLine(R, 'Отгружен:', S);
-  R:= R + 1;
+  FWriter.WriteText(R, 7, R, FWriter.ColCount,  S, cbtOuter, True, True);
 
-  //R:= R + 1;
-  DrawLine(R, 'Испытания:', EmptyStr);
+  R:= R + 1;
+  FWriter.WriteText(R, 1,  EmptyStr);
+  FWriter.SetRowHeight(R, 10);
+  R:= R + 1;
+  FWriter.SetAlignment(haLeft, vaCenter);
+  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Приемо-сдаточные испытания:');
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
   FWriter.SetAlignment(haCenter, vaCenter);
-  R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize{+FONTSIZE_DELTA}, [fsBold], clBlack);
   FWriter.WriteText(R, 1, 'Дата', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, {R, 3,} 'Результат', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, R, 5, 'Примечание', cbtOuter, True, True);
-  FWriter.WriteText(R, 6, EmptyStr, cbtLeft);
-
-  FWriter.SetFont(FFontName, FFontSize{+FONTSIZE_DELTA}, [{fsBold}], clBlack);
-
+  FWriter.WriteText(R, 2, 'Результат', cbtOuter, True, True);
+  FWriter.WriteText(R, 3, R, FWriter.ColCount, 'Примечание', cbtOuter, True, True);
+  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
   if VIsNil(ATestDates) then
   begin
     R:= R + 1;
     FWriter.WriteText(R, 1, EmptyStr, cbtOuter);
     FWriter.WriteText(R, 2, EmptyStr, cbtOuter, True, True);
-    FWriter.WriteText(R, 3, R, 5, EmptyStr, cbtOuter, True, True);
-    FWriter.WriteText(R, 6, EmptyStr, cbtLeft);
+    FWriter.WriteText(R, 3, R, FWriter.ColCount, EmptyStr, cbtOuter, True, True);
   end
   else begin
     for i:= 0 to High(ATestDates) do
     begin
       R:= R + 1;
       if ATestResults[i]=0 then
-      begin
-        FWriter.SetFont(FFontName, FFontSize{+FONTSIZE_DELTA}, [{fsBold}], clBlack);
-        S:= 'норма';
-      end
-      else begin
-        FWriter.SetFont(FFontName, FFontSize{+FONTSIZE_DELTA}, [{fsBold}], clRed);
+        S:= 'норма'
+      else
         S:= 'брак';
-      end;
+      FWriter.SetAlignment(haCenter, vaCenter);
       FWriter.WriteDate(R, 1, ATestDates[i], cbtOuter);
-      FWriter.WriteText(R, 2, {R, 3,} S, cbtOuter, True, True);
-      FWriter.WriteText(R, 3, R, 5, ATestNotes[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 6, EmptyStr, cbtLeft);
+      FWriter.WriteText(R, 2, S, cbtOuter, True, True);
+      FWriter.SetAlignment(haLeft, vaCenter);
+      FWriter.WriteText(R, 3, R, FWriter.ColCount, ATestNotes[i], cbtOuter, True, True);
     end;
   end;
 
   R:= R + 1;
+  FWriter.WriteText(R, 1,  EmptyStr);
+  FWriter.SetRowHeight(R, 10);
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
   FWriter.SetAlignment(haLeft, vaCenter);
-  DrawLine(R, 'Рекламации:', EmptyStr);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Контроль:');
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount,  AControlNote, cbtOuter, True, True);
+
+  R:= R + 1;
+  FWriter.WriteText(R, 1,  EmptyStr);
+  FWriter.SetRowHeight(R, 10);
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
+  FWriter.SetAlignment(haLeft, vaCenter);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Рекламации:');
   R:= R + 1;
   FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
   FWriter.SetAlignment(haCenter, vaCenter);
@@ -1832,11 +1843,11 @@ begin
   FWriter.WriteText(R, 8, 'Особое мнение', cbtOuter, True, True);
   FWriter.WriteText(R, 9, 'Примечание', cbtOuter, True, True);
 
+
+  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
   if VIsNil(ARecDates) then
   begin
     R:= R + 1;
-    FWriter.SetBackgroundClear;
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
     for i:= 1 to 9 do
       FWriter.WriteText(R, i, EmptyStr, cbtOuter);
   end
@@ -1844,8 +1855,6 @@ begin
     for i:= 0 to High(ARecDates) do
     begin
       R:= R + 1;
-      FWriter.SetBackgroundClear;
-      FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
       FWriter.SetAlignment(haCenter, vaTop);
       FWriter.WriteDate(R, 1, ARecDates[i], cbtOuter);
       if AMileages[i]>=0 then
@@ -1862,8 +1871,6 @@ begin
       FWriter.WriteText(R, 8, S, cbtOuter);
       FWriter.SetAlignment(haLeft, vaTop);
       FWriter.WriteText(R, 9, ARecNotes[i], cbtOuter, True, True);
-
-
     end;
   end;
   FWriter.SetBackgroundClear;
@@ -2596,9 +2603,8 @@ end;
 
 procedure TReclamationSheet.DrawLine(const AIndex: Integer; const ASelected: Boolean);
 var
-  R, NumDays: Integer;
+  R: Integer;
   S: String;
-  D: TDate;
 begin
   R:= 2 + AIndex;
 

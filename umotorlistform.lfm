@@ -106,7 +106,7 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel7: TDividerBevel
-      Left = 633
+      Left = 679
       Height = 28
       Top = 0
       Width = 15
@@ -117,7 +117,7 @@ object MotorListForm: TMotorListForm
     end
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 648
+      Left = 694
       Height = 28
       Top = 0
       Width = 101
@@ -266,9 +266,9 @@ object MotorListForm: TMotorListForm
       Left = 461
       Height = 28
       Top = 0
-      Width = 172
+      Width = 218
       Align = alLeft
-      Caption = 'Карточка электродвигателя'
+      Caption = 'Учётная карточка электродвигателя'
       Checked = True
       OnChange = MoreInfoCheckBoxChange
       State = cbChecked
@@ -377,18 +377,18 @@ object MotorListForm: TMotorListForm
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
-      Height = 350
-      Top = 133
+      Height = 400
+      Top = 83
       Width = 844
       Align = alBottom
       BevelOuter = bvNone
       BorderStyle = bsSingle
-      ClientHeight = 346
+      ClientHeight = 396
       ClientWidth = 840
       TabOrder = 0
       object InfoGrid: TsWorksheetGrid
         Left = 0
-        Height = 346
+        Height = 396
         Top = 0
         Width = 840
         AutoExpand = []
@@ -426,7 +426,7 @@ object MotorListForm: TMotorListForm
       Cursor = crVSplit
       Left = 0
       Height = 5
-      Top = 128
+      Top = 78
       Width = 844
       Align = alBottom
       ResizeAnchor = akBottom
@@ -435,7 +435,7 @@ object MotorListForm: TMotorListForm
     object VT1: TVirtualStringTree
       AnchorSideBottom.Control = Splitter2
       Left = 0
-      Height = 128
+      Height = 78
       Top = 0
       Width = 844
       Align = alClient
@@ -444,7 +444,6 @@ object MotorListForm: TMotorListForm
       Header.Columns = <>
       Header.MainColumn = -1
       TabOrder = 2
-      OnMouseUp = VT1MouseUp
     end
   end
 end

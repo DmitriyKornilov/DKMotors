@@ -29,7 +29,7 @@ type
     MoreInfoCheckBox: TCheckBox;
     MotorNumEdit: TEditButton;
     Panel1: TPanel;
-    Panel10: TPanel;
+    CardPanel: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
@@ -170,12 +170,12 @@ begin
     VT1.Align:= alCustom;
     Splitter2.Visible:= True;
     Splitter2.Align:= alTop;
-    Panel10.Visible:= True;
+    CardPanel.Visible:= True;
     Splitter2.Align:= alBottom;
     VT1.Align:= alClient;
   end
   else begin
-    Panel10.Visible:= False;
+    CardPanel.Visible:= False;
     Splitter2.Visible:= False;
   end;
 
@@ -198,7 +198,7 @@ procedure TRepairForm.InfoOpen;
 var
   MotorID: Integer;
   BuildDate, SendDate: TDate;
-  MotorName, MotorNum, RotorNum, ReceiverName, Sers: String;
+  MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
   TestDates, RecDates: TDateVector;
   TestResults, Mileages, Opinions: TIntVector;
   TestNotes, PlaceNames, FactoryNames, Departures,
@@ -212,13 +212,15 @@ begin
                 MotorName, MotorNum, Sers, RotorNum, ReceiverName,
                 TestDates, TestResults, TestNotes);
 
+  ControlNote:= SQLite.ControlNoteLoad(MotorID);
+
   SQLite.ReclamationListLoad(MotorID, RecDates, Mileages, Opinions,
                       PlaceNames, FactoryNames, Departures,
                       DefectNames, ReasonNames, RecNotes);
 
 
   MotorInfoSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
-                      RotorNum, ReceiverName, TestDates, TestResults, TestNotes,
+                      RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
                       RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
                       Departures, DefectNames, ReasonNames, RecNotes);
 end;
