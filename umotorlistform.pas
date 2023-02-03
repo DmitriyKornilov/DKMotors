@@ -9,7 +9,7 @@ uses
   Buttons, fpspreadsheetgrid, USheetUtils, USQLite, rxctrls,
   DividerBevel,  DK_Vector, DK_SheetExporter,
   FPSTypes, LCLType, EditBtn, Spin, DK_StrUtils, DK_DateUtils,
-  VirtualTrees, DK_VSTTables;
+  VirtualTrees, DK_VSTTables, UCardForm;
 
 type
 
@@ -17,7 +17,6 @@ type
 
   TMotorListForm = class(TForm)
     CheckBox1: TCheckBox;
-    InfoGrid: TsWorksheetGrid;
     Label4: TLabel;
     MoreInfoCheckBox: TCheckBox;
     DividerBevel3: TDividerBevel;
@@ -47,12 +46,11 @@ type
     procedure MotorNumEditChange(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
+    CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
     VSTTypeTable: TVSTTable;
-    MotorInfoSheet: TMotorInfoSheet;
     MotorIDs: TIntVector;
 
-    procedure InfoOpen;
     procedure TypeSelect;
     procedure MotorSelect;
   public
@@ -75,6 +73,7 @@ var
   V: TStrVector;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
+  CardForm:= CrateCardForm(MotorListForm, CardPanel);
 
   VSTMotorsTable:= TVSTTable.Create(VT1);
   VSTMotorsTable.OnSelect:= @MotorSelect;
@@ -99,8 +98,6 @@ begin
   VSTTypeTable.SetColumn('Список', V, taLeftJustify);
   VSTTypeTable.Draw;
 
-  MotorInfoSheet:= TMotorInfoSheet.Create(InfoGrid);
-
   SpinEdit1.Value:= YearOfDate(Date);
 
   VSTTypeTable.Select(0);
@@ -112,7 +109,7 @@ procedure TMotorListForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
   if Assigned(VSTTypeTable) then FreeAndNil(VSTTypeTable);
-  if Assigned(MotorInfoSheet) then FreeAndNil(MotorInfoSheet);
+  if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
 procedure TMotorListForm.MotorNumEditButtonClick(Sender: TObject);
@@ -140,7 +137,7 @@ begin
 
   Screen.Cursor:= crHourGlass;
   try
-    InfoGrid.Clear;
+    CardForm.ShowCard(0);
 
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
@@ -161,35 +158,7 @@ begin
   end;
 end;
 
-procedure TMotorListForm.InfoOpen;
-var
-  MotorID: Integer;
-  BuildDate, SendDate: TDate;
-  MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
-  TestDates, RecDates: TDateVector;
-  TestResults, Mileages, Opinions: TIntVector;
-  TestNotes, PlaceNames, FactoryNames, Departures,
-  DefectNames, ReasonNames, RecNotes: TStrVector;
-begin
-  if VIsNil(MotorIDs) then Exit;
-  if not VSTMotorsTable.IsSelected then Exit;
 
-  MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
-  SQLite.MotorInfoLoad(MotorID, BuildDate, SendDate,
-                MotorName, MotorNum, Sers, RotorNum, ReceiverName,
-                TestDates, TestResults, TestNotes);
-  ControlNote:= SQLite.ControlNoteLoad(MotorID);
-
-  SQLite.ReclamationListLoad(MotorID, RecDates, Mileages, Opinions,
-                      PlaceNames, FactoryNames, Departures,
-                      DefectNames, ReasonNames, RecNotes);
-
-
-  MotorInfoSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
-                      RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
-                      RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
-                      Departures, DefectNames, ReasonNames, RecNotes);
-end;
 
 procedure TMotorListForm.TypeSelect;
 begin
@@ -197,11 +166,16 @@ begin
 end;
 
 procedure TMotorListForm.MotorSelect;
+var
+  MotorID: Integer;
 begin
-  InfoGrid.Clear;
-  if not VSTMotorsTable.IsSelected then Exit;
-  InfoOpen;
+  MotorID:= 0;
+  if VSTMotorsTable.IsSelected then
+    MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
+  CardForm.ShowCard(MotorID);
 end;
+
+
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
@@ -228,18 +202,9 @@ begin
 end;
 
 procedure TMotorListForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TGridExporter;
+
 begin
-  if not VSTMotorsTable.IsSelected then Exit;
-  Exporter:= TGridExporter.Create(InfoGrid);
-  try
-    //Exporter.SheetName:= 'Отчет';
-    Exporter.PageSettings(spoLandscape, pfOnePage);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
+
 end;
 
 end.

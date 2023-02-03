@@ -14,7 +14,8 @@ uses
   UBuildAddForm, USheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
   UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm,
-  URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm;
+  URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm,
+  UCardForm;
 
 {$R *.res}
 

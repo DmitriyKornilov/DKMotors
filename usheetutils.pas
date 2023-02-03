@@ -318,9 +318,9 @@ type
                    const AArrivalDates, ASendingDates: TDateVector);
   end;
 
-  { TMotorInfoSheet }
+  { TMotorCardSheet }
 
-  TMotorInfoSheet = class (TObject)
+  TMotorCardSheet = class (TObject)
   private
     FGrid: TsWorksheetGrid;
     FWriter: TSheetWriter;
@@ -329,6 +329,7 @@ type
   public
     constructor Create(const AGrid: TsWorksheetGrid);
     destructor  Destroy; override;
+    procedure Zoom(const APercents: Integer);
     procedure Draw(const ABuildDate, ASendDate: TDate;
       const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName, AControlNote: String;
       const ATestDates: TDateVector;
@@ -1689,9 +1690,9 @@ begin
 
 end;
 
-{ TMotorInfoSheet }
+{ TMotorCardSheet }
 
-constructor TMotorInfoSheet.Create(const AGrid: TsWorksheetGrid);
+constructor TMotorCardSheet.Create(const AGrid: TsWorksheetGrid);
 var
   ColWidths: TIntVector;
 begin
@@ -1707,12 +1708,12 @@ begin
   FFontSize:= SHEET_FONT_SIZE;
 
   ColWidths:= VCreateInt([
-    160, // Дата уведомления
-    120, // Пробег, км
-    150, // Предприятие
-    120, // Завод
+    130, // Дата уведомления
+    130, // Пробег, км
+    130, // Предприятие
+    130, // Завод
     130, // Выезд/ФИО
-    180, // Неисправный элемент
+    200, // Неисправный элемент
     200,  // Причина неисправности
     100,  //Особое мнение
     350  //Примечание
@@ -1721,13 +1722,18 @@ begin
 
 end;
 
-destructor TMotorInfoSheet.Destroy;
+destructor TMotorCardSheet.Destroy;
 begin
   if Assigned(FWriter) then FreeAndNil(FWriter);
   inherited Destroy;
 end;
 
-procedure TMotorInfoSheet.Draw(const ABuildDate, ASendDate: TDate;
+procedure TMotorCardSheet.Zoom(const APercents: Integer);
+begin
+  FWriter.SetZoom(APercents);
+end;
+
+procedure TMotorCardSheet.Draw(const ABuildDate, ASendDate: TDate;
       const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName, AControlNote: String;
       const ATestDates: TDateVector;
       const ATestResults: TIntVector;
@@ -1832,7 +1838,6 @@ begin
   R:= R + 1;
   FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
   FWriter.SetAlignment(haCenter, vaCenter);
-
   FWriter.WriteText(R, 1, 'Дата уведомления', cbtOuter, True, True);
   FWriter.WriteText(R, 2, 'Пробег, км', cbtOuter, True, True);
   FWriter.WriteText(R, 3, 'Предприятие', cbtOuter, True, True);
@@ -1873,7 +1878,23 @@ begin
       FWriter.WriteText(R, 9, ARecNotes[i], cbtOuter, True, True);
     end;
   end;
-  FWriter.SetBackgroundClear;
+
+
+  R:= R + 1;
+  FWriter.WriteText(R, 1,  EmptyStr);
+  FWriter.SetRowHeight(R, 10);
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
+  FWriter.SetAlignment(haLeft, vaCenter);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Гарантийный ремонт:');
+  R:= R + 1;
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.WriteText(R, 1, 'Дата прибытия', cbtOuter, True, True);
+  FWriter.WriteText(R, 2, 'Наличие паспорта', cbtOuter, True, True);
+  FWriter.WriteText(R, 3, 'Дата убытия', cbtOuter, True, True);
+  FWriter.WriteText(R, 4, 'Срок ремонта (рабочих дней)', cbtOuter, True, True);
+  FWriter.WriteText(R, 5, R, FWriter.ColCount,  'Примечание', cbtOuter, True, True);
 
   R:= R + 1;
   for i:= 1 to 9 do

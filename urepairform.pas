@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, EditBtn, VirtualTrees, DividerBevel, DK_VSTTables, USheetUtils,
   rxctrls, fpspreadsheetgrid, DK_Vector, USQLite, DK_StrUtils,
-  DK_SheetExporter, fpspreadsheet, fpstypes, UCalendar;
+  DK_SheetExporter, fpspreadsheet, fpstypes, UCalendar, UCardForm;
 
 type
 
@@ -22,11 +22,10 @@ type
     DividerBevel7: TDividerBevel;
     EditButton: TSpeedButton;
     ExportButton: TRxSpeedButton;
-    InfoGrid: TsWorksheetGrid;
     Label2: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    MoreInfoCheckBox: TCheckBox;
+    MotorCardCheckBox: TCheckBox;
     MotorNumEdit: TEditButton;
     Panel1: TPanel;
     CardPanel: TPanel;
@@ -45,14 +44,14 @@ type
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure MoreInfoCheckBoxChange(Sender: TObject);
+    procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
   private
-    VSTMotorTable: TVSTTable;
+    CardForm: TCardForm;
+    VSTMotorsTable: TVSTTable;
     VSTTypeTable: TVSTTable;
     VSTOrderTable: TVSTTable;
-    MotorInfoSheet: TMotorInfoSheet;
     RecIDs, MotorIDs: TIntVector;
 
     ArrivalDates, SendingDates: TDateVector;
@@ -60,10 +59,11 @@ type
     MotorNames, MotorNums: TStrVector;
 
     function CalcRepairWorkDaysCount(const ABeginDate, AEndDate: TDate): Integer;
-    procedure InfoOpen;
+
     procedure TypeSelect;
     procedure OrderSelect;
     procedure MotorSelect;
+
   public
     procedure ShowRepair;
   end;
@@ -84,23 +84,22 @@ var
   v: TStrVector;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
+  CardForm:= CrateCardForm(RepairForm, CardPanel);
 
-  VSTMotorTable:= TVSTTable.Create(VT1);
-  VSTMotorTable.OnSelect:= @MotorSelect;
-  VSTMotorTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTMotorTable.HeaderFont.Style:= [fsBold];
-  VSTMotorTable.AddColumn('№ п/п', 60);
-  VSTMotorTable.AddColumn('Наименование', 250);
-  VSTMotorTable.AddColumn('Номер', 150);
-  VSTMotorTable.AddColumn('Наличие паспорта', 150);
-  VSTMotorTable.AddColumn('Прибыл в ремонт', 150);
-  VSTMotorTable.AddColumn('Убыл из ремонта', 150);
-  VSTMotorTable.AddColumn('Срок ремонта (рабочих дней)', 200);
-  VSTMotorTable.CanSelect:= True;
-  VSTMotorTable.AutosizeColumnDisable;
-  VSTMotorTable.Draw;
-
-  MotorInfoSheet:= TMotorInfoSheet.Create(InfoGrid);
+  VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.OnSelect:= @MotorSelect;
+  VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTMotorsTable.HeaderFont.Style:= [fsBold];
+  VSTMotorsTable.AddColumn('№ п/п', 60);
+  VSTMotorsTable.AddColumn('Наименование', 250);
+  VSTMotorsTable.AddColumn('Номер', 150);
+  VSTMotorsTable.AddColumn('Наличие паспорта', 150);
+  VSTMotorsTable.AddColumn('Дата прибытия', 150);
+  VSTMotorsTable.AddColumn('Дата убытия', 150);
+  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 200);
+  VSTMotorsTable.AddColumn('Примечание');
+  VSTMotorsTable.CanSelect:= True;
+  VSTMotorsTable.Draw;
 
   VSTTypeTable:= TVSTTable.Create(VT2);
   VSTTypeTable.OnSelect:= @TypeSelect;
@@ -128,6 +127,7 @@ begin
 
   VSTTypeTable.Select(1);
   VSTOrderTable.Select(0);
+  MotorCardCheckBox.Checked:= False;
 
   ShowRepair;
 end;
@@ -157,15 +157,15 @@ end;
 
 procedure TRepairForm.FormDestroy(Sender: TObject);
 begin
-  if Assigned(VSTMotorTable) then FreeAndNil(VSTMotorTable);
+  if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
   if Assigned(VSTTypeTable) then FreeAndNil(VSTTypeTable);
   if Assigned(VSTOrderTable) then FreeAndNil(VSTOrderTable);
-  if Assigned(MotorInfoSheet) then FreeAndNil(MotorInfoSheet);
+  if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
-procedure TRepairForm.MoreInfoCheckBoxChange(Sender: TObject);
+procedure TRepairForm.MotorCardCheckBoxChange(Sender: TObject);
 begin
-  If MoreInfoCheckBox.Checked then
+  If MotorCardCheckBox.Checked then
   begin
     VT1.Align:= alCustom;
     Splitter2.Visible:= True;
@@ -178,8 +178,6 @@ begin
     CardPanel.Visible:= False;
     Splitter2.Visible:= False;
   end;
-
-  VSTMotorTable.CanSelect:= MoreInfoCheckBox.Checked;
 end;
 
 procedure TRepairForm.MotorNumEditButtonClick(Sender: TObject);
@@ -190,39 +188,6 @@ end;
 procedure TRepairForm.MotorNumEditChange(Sender: TObject);
 begin
   ShowRepair;
-end;
-
-
-
-procedure TRepairForm.InfoOpen;
-var
-  MotorID: Integer;
-  BuildDate, SendDate: TDate;
-  MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
-  TestDates, RecDates: TDateVector;
-  TestResults, Mileages, Opinions: TIntVector;
-  TestNotes, PlaceNames, FactoryNames, Departures,
-  DefectNames, ReasonNames, RecNotes: TStrVector;
-begin
-  if VIsNil(MotorIDs) then Exit;
-  if not VSTMotorTable.IsSelected then Exit;
-
-  MotorID:= MotorIDs[VSTMotorTable.SelectedIndex];
-  SQLite.MotorInfoLoad(MotorID, BuildDate, SendDate,
-                MotorName, MotorNum, Sers, RotorNum, ReceiverName,
-                TestDates, TestResults, TestNotes);
-
-  ControlNote:= SQLite.ControlNoteLoad(MotorID);
-
-  SQLite.ReclamationListLoad(MotorID, RecDates, Mileages, Opinions,
-                      PlaceNames, FactoryNames, Departures,
-                      DefectNames, ReasonNames, RecNotes);
-
-
-  MotorInfoSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
-                      RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
-                      RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
-                      Departures, DefectNames, ReasonNames, RecNotes);
 end;
 
 procedure TRepairForm.TypeSelect;
@@ -236,10 +201,13 @@ begin
 end;
 
 procedure TRepairForm.MotorSelect;
+var
+  MotorID: Integer;
 begin
-  InfoGrid.Clear;
-  if not VSTMotorTable.IsSelected then Exit;
-  InfoOpen;
+  MotorID:= 0;
+  if VSTMotorsTable.IsSelected then
+    MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
+  CardForm.ShowCard(MotorID);
 end;
 
 function TRepairForm.CalcRepairWorkDaysCount(const ABeginDate, AEndDate: TDate): Integer;
@@ -270,7 +238,7 @@ begin
 
   Screen.Cursor:= crHourGlass;
   try
-    InfoGrid.Clear;
+    CardForm.ShowCard(0);
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
     SQLite.RepairListLoad(MainForm.UsedNameIDs, MotorNumberLike,
@@ -298,17 +266,17 @@ begin
         DayCountsStrs[i]:= IntToStr(DayCounts[i]);
     end;
 
-    VSTMotorTable.ValuesClear;
-    VSTMotorTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorIDs))));
-    VSTMotorTable.SetColumn('Наименование', MotorNames, taLeftJustify);
-    VSTMotorTable.SetColumn('Номер', MotorNums);
-    VSTMotorTable.SetColumn('Наличие паспорта', PassStrs);
-    VSTMotorTable.SetColumn('Прибыл в ремонт', VFormatDateTime('dd.mm.yyyy', ArrivalDates));
-    VSTMotorTable.SetColumn('Убыл из ремонта', SendingDatesStrs);
-    VSTMotorTable.SetColumn('Срок ремонта (рабочих дней)', DayCountsStrs);
+    VSTMotorsTable.ValuesClear;
+    VSTMotorsTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorIDs))));
+    VSTMotorsTable.SetColumn('Наименование', MotorNames, taLeftJustify);
+    VSTMotorsTable.SetColumn('Номер', MotorNums);
+    VSTMotorsTable.SetColumn('Наличие паспорта', PassStrs);
+    VSTMotorsTable.SetColumn('Дата прибытия', VFormatDateTime('dd.mm.yyyy', ArrivalDates));
+    VSTMotorsTable.SetColumn('Дата убытия', SendingDatesStrs);
+    VSTMotorsTable.SetColumn('Срок ремонта (рабочих дней)', DayCountsStrs);
 
 
-    VSTMotorTable.Draw;
+    VSTMotorsTable.Draw;
   finally
     Screen.Cursor:= crDefault;
   end;

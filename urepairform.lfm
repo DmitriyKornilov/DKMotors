@@ -176,7 +176,7 @@ object RepairForm: TRepairForm
       ParentFont = False
     end
     object Panel1: TPanel
-      Left = 550
+      Left = 565
       Height = 28
       Top = 0
       Width = 0
@@ -732,7 +732,7 @@ object RepairForm: TRepairForm
       BevelOuter = bvNone
       TabOrder = 4
     end
-    object MoreInfoCheckBox: TCheckBox
+    object MotorCardCheckBox: TCheckBox
       Left = 332
       Height = 28
       Top = 0
@@ -740,7 +740,7 @@ object RepairForm: TRepairForm
       Align = alLeft
       Caption = 'Учетная карточка электродвигателя'
       Checked = True
-      OnChange = MoreInfoCheckBoxChange
+      OnChange = MotorCardCheckBoxChange
       State = cbChecked
       TabOrder = 5
     end
@@ -844,44 +844,7 @@ object RepairForm: TRepairForm
       BorderSpacing.Right = 2
       BorderSpacing.Bottom = 2
       BevelOuter = bvNone
-      BorderStyle = bsSingle
-      ClientHeight = 396
-      ClientWidth = 1043
       TabOrder = 0
-      object InfoGrid: TsWorksheetGrid
-        Left = 0
-        Height = 396
-        Top = 0
-        Width = 1043
-        AutoExpand = []
-        DisplayFixedColRow = False
-        FrozenCols = 0
-        FrozenRows = 0
-        PageBreakPen.Color = clBlue
-        PageBreakPen.Style = psDash
-        ReadFormulas = False
-        SelectionPen.Color = clWindow
-        SelectionPen.Style = psClear
-        SelectionPen.Width = 0
-        ShowGridLines = False
-        ShowHeaders = False
-        WorkbookSource = InfoGrid.internal
-        Align = alClient
-        AutoAdvance = aaNone
-        AutoEdit = False
-        BorderStyle = bsNone
-        Color = clWhite
-        DefaultColWidth = 40
-        DefaultRowHeight = 20
-        ExtendedSelect = False
-        Flat = True
-        MouseWheelOption = mwGrid
-        Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
-        ParentFont = False
-        TabOrder = 0
-        TabStop = False
-        TitleFont.Style = [fsBold]
-      end
     end
     object Splitter2: TSplitter
       AnchorSideBottom.Control = CardPanel
