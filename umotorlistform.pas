@@ -6,9 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, fpspreadsheetgrid, USheetUtils, USQLite, rxctrls,
-  DividerBevel,  DK_Vector, DK_SheetExporter,
-  LCLType, EditBtn, Spin, DK_StrUtils, DK_DateUtils,
+  Buttons, fpspreadsheetgrid, USheetUtils, USQLite,
+  DividerBevel,  DK_Vector, LCLType, EditBtn, Spin, DK_StrUtils, DK_DateUtils,
   VirtualTrees, DK_VSTTables, UCardForm;
 
 type
@@ -22,13 +21,11 @@ type
     DividerBevel3: TDividerBevel;
     DividerBevel4: TDividerBevel;
     DividerBevel5: TDividerBevel;
-    DividerBevel7: TDividerBevel;
     MotorNumEdit: TEditButton;
-    ExportButton: TRxSpeedButton;
     Label2: TLabel;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
+    LeftPanel: TPanel;
+    MainPanel: TPanel;
+    ToolPanel: TPanel;
     CardPanel: TPanel;
     Panel5: TPanel;
     Panel7: TPanel;
@@ -39,7 +36,6 @@ type
     VT2: TVirtualStringTree;
     procedure CheckBox1Change(Sender: TObject);
     procedure MoreInfoCheckBoxChange(Sender: TObject);
-    procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
@@ -158,8 +154,6 @@ begin
   end;
 end;
 
-
-
 procedure TMotorListForm.TypeSelect;
 begin
   ShowMotorList;
@@ -174,8 +168,6 @@ begin
     MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
   CardForm.ShowCard(MotorID);
 end;
-
-
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
@@ -199,12 +191,6 @@ begin
   end;
 
   VSTMotorsTable.CanSelect:= MoreInfoCheckBox.Checked;
-end;
-
-procedure TMotorListForm.ExportButtonClick(Sender: TObject);
-
-begin
-
 end;
 
 end.

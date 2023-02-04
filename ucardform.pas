@@ -104,10 +104,10 @@ procedure TCardForm.DrawCard;
 var
   BuildDate, SendDate: TDate;
   MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
-  TestDates, RecDates: TDateVector;
-  TestResults, Mileages, Opinions: TIntVector;
+  TestDates, RecDates, ArrivalDates, SendingDates: TDateVector;
+  TestResults, Mileages, Opinions, Passports, WorkDayCounts: TIntVector;
   TestNotes, PlaceNames, FactoryNames, Departures,
-  DefectNames, ReasonNames, RecNotes: TStrVector;
+  DefectNames, ReasonNames, RecNotes, RepairNotes: TStrVector;
 begin
   SQLite.MotorInfoLoad(MotorID, BuildDate, SendDate,
                 MotorName, MotorNum, Sers, RotorNum, ReceiverName,
@@ -118,11 +118,15 @@ begin
                       PlaceNames, FactoryNames, Departures,
                       DefectNames, ReasonNames, RecNotes);
 
+  SQLite.RepairListForMotorIDLoad(MotorID, ArrivalDates, SendingDates,
+                      Passports, WorkDayCounts, RepairNotes);
+
   MotorCardSheet.Zoom(ZoomTrackBar.Position);
   MotorCardSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
                       RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
                       RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
-                      Departures, DefectNames, ReasonNames, RecNotes);
+                      Departures, DefectNames, ReasonNames, RecNotes,
+                      ArrivalDates, SendingDates, Passports, WorkDayCounts, RepairNotes);
 end;
 
 procedure TCardForm.ShowCard(const AMotorID: Integer);

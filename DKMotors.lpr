@@ -15,7 +15,7 @@ uses
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
   UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm,
   URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm,
-  UCardForm;
+  UCardForm, URepairEditForm, UControlListEditForm;
 
 {$R *.res}
 
@@ -24,6 +24,7 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TControlListEditForm, ControlListEditForm);
   Application.Run;
 end.
 

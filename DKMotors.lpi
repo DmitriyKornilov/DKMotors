@@ -244,6 +244,20 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UCardForm"/>
       </Unit>
+      <Unit>
+        <Filename Value="urepaireditform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RepairEditForm"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="URepairEditForm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ucontrollisteditform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ControlListEditForm"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UControlListEditForm"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

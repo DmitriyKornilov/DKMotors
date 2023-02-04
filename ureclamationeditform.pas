@@ -86,6 +86,7 @@ implementation
 procedure TReclamationEditForm.FormCreate(Sender: TObject);
 begin
   DateTimePicker1.Date:= Date;
+  DateTimePicker2.Date:= Date;
   VSTTable:= TVSTTable.Create(VT1);
   LoadNames;
   CanFormClose:= True;
@@ -125,7 +126,7 @@ begin
 
   if not VSTTable.IsSelected then
   begin
-    ShowInfo('Не указан рекламационный электродвигатель');
+    ShowInfo('Не указан рекламационный электродвигатель!');
     Exit;
   end;
 

@@ -1,18 +1,18 @@
 object RepairForm: TRepairForm
   Left = 345
-  Height = 638
+  Height = 697
   Top = 205
   Width = 1556
   Align = alClient
   BorderStyle = bsNone
   Caption = 'RepairForm'
-  ClientHeight = 638
+  ClientHeight = 697
   ClientWidth = 1556
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.2.2.0'
-  object TopToolsPanel: TPanel
+  object ToolPanel: TPanel
     Left = 2
     Height = 40
     Top = 2
@@ -362,6 +362,7 @@ object RepairForm: TRepairForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 0
+        OnClick = AddButtonClick
         ParentFont = False
       end
       object EditButton: TSpeedButton
@@ -508,6 +509,7 @@ object RepairForm: TRepairForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 2
+        OnClick = EditButtonClick
         ParentFont = False
       end
       object DelButton: TSpeedButton
@@ -654,6 +656,7 @@ object RepairForm: TRepairForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 1
+        OnClick = DelButtonClick
         ParentFont = False
       end
       object DividerBevel5: TDividerBevel
@@ -746,9 +749,9 @@ object RepairForm: TRepairForm
       TabOrder = 5
     end
   end
-  object Panel6: TPanel
+  object LeftPanel: TPanel
     Left = 2
-    Height = 592
+    Height = 651
     Top = 44
     Width = 236
     Align = alLeft
@@ -757,7 +760,7 @@ object RepairForm: TRepairForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 588
+    ClientHeight = 647
     ClientWidth = 232
     Color = clWindow
     ParentColor = False
@@ -821,29 +824,30 @@ object RepairForm: TRepairForm
   end
   object Splitter1: TSplitter
     Left = 238
-    Height = 594
+    Height = 653
     Top = 44
     Width = 6
     ResizeStyle = rsLine
   end
-  object Panel9: TPanel
+  object MainPanel: TPanel
     Left = 244
-    Height = 594
+    Height = 651
     Top = 44
-    Width = 1312
+    Width = 1310
     Align = alClient
+    BorderSpacing.Top = 2
+    BorderSpacing.Right = 2
+    BorderSpacing.Bottom = 2
     BevelOuter = bvNone
-    ClientHeight = 594
-    ClientWidth = 1312
+    ClientHeight = 651
+    ClientWidth = 1310
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
-      Height = 500
-      Top = 92
+      Height = 550
+      Top = 101
       Width = 1310
       Align = alBottom
-      BorderSpacing.Right = 2
-      BorderSpacing.Bottom = 2
       BevelOuter = bvNone
       TabOrder = 0
     end
@@ -852,8 +856,8 @@ object RepairForm: TRepairForm
       Cursor = crVSplit
       Left = 0
       Height = 6
-      Top = 86
-      Width = 1312
+      Top = 95
+      Width = 1310
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
@@ -861,9 +865,9 @@ object RepairForm: TRepairForm
     object VT1: TVirtualStringTree
       AnchorSideBottom.Control = Splitter2
       Left = 0
-      Height = 86
+      Height = 95
       Top = 0
-      Width = 1310
+      Width = 1308
       Align = alClient
       BorderSpacing.Right = 2
       DefaultText = 'Node'

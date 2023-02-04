@@ -3,7 +3,6 @@
     "CALENDAR",
     "CARGOLIST",
     "CARGORECEIVERS",
-    "CONTROLLIST",
     "MOTORLIST",
     "MOTORNAMES",
     "MOTORTEST",
@@ -224,88 +223,6 @@
     "IndexesList" : [
     ]
   },
-  "CONTROLLIST" : {
-    "Description" : "Список двигателей на контроле",
-    "Notes" : [
-    ],
-    "FieldsList" : [
-      "ControlID",
-      "MotorID",
-      "Note"
-    ],
-    "ControlID" : {
-      "FieldType" : "INTEGER",
-      "PrimaryKey" : true,
-      "Status" : true,
-      "NotNull" : true,
-      "DefaultValue" : "",
-      "Description" : [
-      ],
-      "ExistingValues" : [
-      ],
-      "ReferenceTo" : {
-        "TableName" : "",
-        "FieldName" : "",
-        "OnDelete" : 4,
-        "OnUpdate" : 4
-      },
-      "ReferenceFrom" : {
-        "TableNames" : [
-        ],
-        "FieldNames" : [
-        ]
-      }
-    },
-    "MotorID" : {
-      "FieldType" : "INTEGER",
-      "PrimaryKey" : false,
-      "Status" : true,
-      "NotNull" : true,
-      "DefaultValue" : "",
-      "Description" : [
-      ],
-      "ExistingValues" : [
-      ],
-      "ReferenceTo" : {
-        "TableName" : "MOTORLIST",
-        "FieldName" : "MotorID",
-        "OnDelete" : 0,
-        "OnUpdate" : 0
-      },
-      "ReferenceFrom" : {
-        "TableNames" : [
-        ],
-        "FieldNames" : [
-        ]
-      }
-    },
-    "Note" : {
-      "FieldType" : "TEXT",
-      "PrimaryKey" : false,
-      "Status" : false,
-      "NotNull" : true,
-      "DefaultValue" : "",
-      "Description" : [
-        "причина"
-      ],
-      "ExistingValues" : [
-      ],
-      "ReferenceTo" : {
-        "TableName" : "",
-        "FieldName" : "",
-        "OnDelete" : 4,
-        "OnUpdate" : 4
-      },
-      "ReferenceFrom" : {
-        "TableNames" : [
-        ],
-        "FieldNames" : [
-        ]
-      }
-    },
-    "IndexesList" : [
-    ]
-  },
   "MOTORLIST" : {
     "Description" : "Список собранных двигателей",
     "Notes" : [
@@ -318,7 +235,8 @@
       "BuildDate",
       "CargoID",
       "Series",
-      "OldMotor"
+      "OldMotor",
+      "ControlNote"
     ],
     "MotorID" : {
       "FieldType" : "INTEGER",
@@ -340,11 +258,9 @@
         "TableNames" : [
           "MOTORTEST",
           "CARGOITEMS",
-          "RECLAMATIONS",
-          "CONTROLLIST"
+          "RECLAMATIONS"
         ],
         "FieldNames" : [
-          "MotorID",
           "MotorID",
           "MotorID",
           "MotorID"
@@ -504,6 +420,30 @@
       "Description" : [
         "1 - старый двигатель,  который записан только для истории рекламаций",
         "0 - новый двигатель, подлежащий учету"
+      ],
+      "ExistingValues" : [
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "ControlNote" : {
+      "FieldType" : "TEXT",
+      "PrimaryKey" : false,
+      "Status" : false,
+      "NotNull" : false,
+      "DefaultValue" : "",
+      "Description" : [
+        "Контроль по причине"
       ],
       "ExistingValues" : [
       ],
@@ -1034,7 +974,8 @@
       "RecNote",
       "ArrivalDate",
       "SendingDate",
-      "Passport"
+      "Passport",
+      "RepairNote"
     ],
     "RecID" : {
       "FieldType" : "INTEGER",
@@ -1360,6 +1301,30 @@
       "DefaultValue" : "0",
       "Description" : [
         "Наличие паспорта"
+      ],
+      "ExistingValues" : [
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "RepairNote" : {
+      "FieldType" : "TEXT",
+      "PrimaryKey" : false,
+      "Status" : false,
+      "NotNull" : false,
+      "DefaultValue" : "",
+      "Description" : [
+        "Примечание к ремонту"
       ],
       "ExistingValues" : [
       ],

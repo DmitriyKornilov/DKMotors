@@ -117,6 +117,17 @@ type
                            const ATestNotes: TStrVector): Boolean;
     //контроль
     function ControlNoteLoad(const AMotorID: Integer): String;
+    function ControlListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
+          out AMotorIDs: TIntVector;
+          out AMotorNames, AMotorNums, ASeries, ANotes: TStrVector): Boolean;
+    function ControlUpdate(const AMotorID: Integer; const ANote: String): Boolean;
+    function ControlDelete(const AMotorID: Integer): Boolean;
+    function MotorListToControl(const ANameID: Integer; const ANumberLike: String;
+                                out AMotorIDs: TIntVector;
+                                out AMotorNums, ASeries: TStrVector): Boolean;
+    function MotorListOnControl(const AMotorID: Integer;
+                                out AMotorIDs: TIntVector;
+                                out AMotorNums, ASeries: TStrVector): Boolean;
 
     //склад
     function StoreListLoad(const ANameIDs: TIntVector;
@@ -210,11 +221,29 @@ type
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
     //ремонты
     function RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
-          const OrderType: Integer; //1 - по дате прибытия, 2 - по номеру
+          const AOrderType: Integer; //1 - по дате прибытия, 2 - по номеру
           const AListType: Integer; //0 - все, 1-в ремонте, 2 - отремонтированные
           out AArrivalDates, ASendingDates: TDateVector;
-          out ARecIDs, AMotorIDs, APassports: TIntVector;
-          out AMotorNames, AMotorNums: TStrVector): Boolean;
+          out ARecIDs, AMotorIDs, APassports, AWorkDayCounts: TIntVector;
+          out AMotorNames, AMotorNums, ARepairNotes: TStrVector): Boolean;
+    function RepairListForMotorIDLoad(const AMotorID: Integer;
+          out AArrivalDates, ASendingDates: TDateVector;
+          out APassports, AWorkDayCounts: TIntVector;
+          out ARepairNotes: TStrVector): Boolean;
+    function RepairUpdate(const ARecID: Integer;
+          const AArrivalDate, ASendingDate: TDate;
+          const APassport: Integer; const ARepairNote: String): Boolean;
+    function RepairLoad(const ARecID: Integer;
+          out AArrivalDate, ASendingDate: TDate;
+          out APassport: Integer; out ARepairNote: String): Boolean;
+    procedure RepairDelete(const ARecID: Integer);
+    function MotorListToRepair(const ANameID: Integer; const AMotorNumberLike: String;
+          out ARecIDs, AMotorNameIDs: TIntVector; out ABuildDates, ARecDates: TDateVector;
+          out AMotorNums, APlaceNames: TStrVector): Boolean;
+    function MotorListOnRepair(const ARecID: Integer;
+          out ARecIDs, AMotorNameIDs: TIntVector; out ABuildDates, ARecDates: TDateVector;
+          out AMotorNums, APlaceNames: TStrVector): Boolean;
+
 
     {--- СТАТИСТИКА РЕКЛАМАЦИЙ ------}
     //общее количество
@@ -1392,7 +1421,175 @@ end;
 
 function TSQLite.ControlNoteLoad(const AMotorID: Integer): String;
 begin
-  Result:= ValueStrInt32ID('CONTROLLIST', 'Note', 'MotorID', AMotorID);
+  Result:= ValueStrInt32ID('MOTORLIST', 'ControlNote', 'MotorID', AMotorID);
+end;
+
+function TSQLite.ControlListLoad(const ANameIDs: TIntVector;
+  const ANumberLike: String; out AMotorIDs: TIntVector;
+  out AMotorNames, AMotorNums, ASeries, ANotes: TStrVector): Boolean;
+var
+  WhereStr: String;
+begin
+  Result:= False;
+
+
+  AMotorIDs:= nil;
+  AMotorNames:= nil;
+  AMotorNums:= nil;
+  ASeries:= nil;
+  ANotes:= nil;
+
+  WhereStr:= 'WHERE (t1.ControlNote IS NOT NULL) ';
+  if ANumberLike<>EmptyStr then
+    WhereStr:= WhereStr + ' AND (UPPER(t1.MotorNum) LIKE :NumberLike)) ';
+  if not VIsNil(ANameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT t1.MotorID, t1.ControlNote, t1.MotorNum, t1.Series, t2.MotorName ' +
+    'FROM MOTORLIST t1 ' +
+    'INNER JOIN MOTORNAMES t2 ON (t1.NameID=t2.NameID) ' +
+    WhereStr +
+    'ORDER BY t1.MotorNum'
+    );
+
+  if ANumberLike<>EmptyStr then
+    QParamStr('NumberLike', ANumberLike+'%');
+
+  if not VIsNil(ANameIDs) then
+    QParamsInt(ANameIDs);
+
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(AMotorIDs, QFieldInt('MotorID'));
+      VAppend(AMotorNames, QFieldStr('MotorName'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(ASeries, QFieldStr('Series'));
+      VAppend(ANotes, QFieldStr('ControlNote'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
+end;
+
+function TSQLite.ControlUpdate(const AMotorID: Integer; const ANote: String): Boolean;
+begin
+  Result:= False;
+  QSetQuery(FQuery);
+  try
+    QSetSQL(
+      'UPDATE MOTORLIST ' +
+      'SET ControlNote = :ControlNote ' +
+      'WHERE MotorID = :MotorID'
+      );
+    QParamInt('MotorID', AMotorID);
+    QParamStr('ControlNote', ANote);
+    QExec;
+    QCommit;
+    Result:= True;
+  except
+    QRollback;
+  end;
+end;
+
+function TSQLite.ControlDelete(const AMotorID: Integer): Boolean;
+begin
+  Result:= False;
+  QSetQuery(FQuery);
+  try
+    QSetSQL(
+      'UPDATE MOTORLIST ' +
+      'SET ControlNote = NULL ' +
+      'WHERE MotorID = :MotorID'
+      );
+    QParamInt('MotorID', AMotorID);
+    QExec;
+    QCommit;
+    Result:= True;
+  except
+    QRollback;
+  end;
+end;
+
+function TSQLite.MotorListToControl(const ANameID: Integer; const ANumberLike: String;
+                                out AMotorIDs: TIntVector;
+                                out AMotorNums, ASeries: TStrVector): Boolean;
+begin
+  Result:= False;
+
+  AMotorIDs:= nil;
+  AMotorNums:= nil;
+  ASeries:= nil;
+  if (ANumberLike=EmptyStr) or (ANameID<=0) then Exit;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT MotorID, MotorNum, Series, ControlNote ' +
+    'FROM MOTORLIST ' +
+    'WHERE (ControlNote IS NULL) AND ' +
+          '(NameID = :NameID) AND ' +
+          '(UPPER(MotorNum) LIKE :NumberLike) ' +
+    'ORDER BY MotorNum'
+    );
+  QParamStr('NumberLike', ANumberLike+'%');
+  QParamInt('NameID', ANameID);
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(AMotorIDs, QFieldInt('MotorID'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(ASeries, QFieldStr('Series'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
+
+end;
+
+function TSQLite.MotorListOnControl(const AMotorID: Integer;
+  out AMotorIDs: TIntVector; out AMotorNums, ASeries: TStrVector): Boolean;
+begin
+  Result:= False;
+
+  AMotorIDs:= nil;
+  AMotorNums:= nil;
+  ASeries:= nil;
+
+  if AMotorID<=0 then Exit;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT MotorID, MotorNum, Series, ControlNote ' +
+    'FROM MOTORLIST ' +
+    'WHERE MotorID = :MotorID ' +
+    //'WHERE ControlNote IS NOT NULL ' +
+    'ORDER BY MotorNum'
+    );
+  QParamInt('MotorID', AMotorID);
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(AMotorIDs, QFieldInt('MotorID'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(ASeries, QFieldStr('Series'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
 end;
 
 function TSQLite.StoreListLoad(const ANameIDs: TIntVector; const ADeltaDays: Integer;
@@ -2450,12 +2647,13 @@ begin
 end;
 
 function TSQLite.RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
-          const OrderType: Integer; //1 - по дате прибытия, 2 - по номеру
+          const AOrderType: Integer; //1 - по дате прибытия, 2 - по номеру
           const AListType: Integer; //0 - все, 1-в ремонте, 2 - отремонтированные
           out AArrivalDates, ASendingDates: TDateVector;
-          out ARecIDs, AMotorIDs, APassports: TIntVector;
-          out AMotorNames, AMotorNums: TStrVector): Boolean;
+          out ARecIDs, AMotorIDs, APassports, AWorkDayCounts: TIntVector;
+          out AMotorNames, AMotorNums, ARepairNotes: TStrVector): Boolean;
 var
+  i: Integer;
   WhereStr, OrderStr: String;
 begin
   Result:= False;
@@ -2464,9 +2662,11 @@ begin
   AMotorIDs:= nil;
   AMotorNames:= nil;
   AMotorNums:= nil;
+  ARepairNotes:= nil;
   AArrivalDates:= nil;
   ASendingDates:= nil;
   APassports:= nil;
+  AWorkDayCounts:= nil;
 
   if ANumberLike<>EmptyStr then
     WhereStr:= 'WHERE ((t1.ArrivalDate>0) AND (UPPER(t2.MotorNum) LIKE :NumberLike)) '
@@ -2480,14 +2680,14 @@ begin
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
-  if OrderType=1 then
+  if AOrderType=1 then
     OrderStr:= 'ORDER BY t1.ArrivalDate'
-  else if OrderType=2 then
+  else if AOrderType=2 then
     OrderStr:= 'ORDER BY t2.MotorNum';
 
   QSetQuery(FQuery);
   QSetSQL(
-    'SELECT t1.RecID, t1.MotorID, t1.RecDate, ' +
+    'SELECT t1.RecID, t1.MotorID, t1.RecDate, t1.RepairNote, ' +
            't1.ArrivalDate, t1.SendingDate, t1.Passport, ' +
            't2.MotorNum, t3.MotorName ' +
     'FROM RECLAMATIONS t1 ' +
@@ -2512,9 +2712,221 @@ begin
       VAppend(AMotorIDs, QFieldInt('MotorID'));
       VAppend(AMotorNames, QFieldStr('MotorName'));
       VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(ARepairNotes, QFieldStr('RepairNote'));
       VAppend(AArrivalDates, QFieldDT('ArrivalDate'));
       VAppend(ASendingDates, QFieldDT('SendingDate'));
       VAppend(APassports, QFieldInt('Passport'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
+
+  if not Result then Exit;
+  VDim(AWorkDayCounts{%H-}, Length(AArrivalDates));
+    for i:= 0 to High(AWorkDayCounts) do
+      AWorkDayCounts[i]:= SQLite.LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);
+end;
+
+function TSQLite.RepairListForMotorIDLoad(const AMotorID: Integer;
+          out AArrivalDates, ASendingDates: TDateVector;
+          out APassports, AWorkDayCounts: TIntVector;
+          out ARepairNotes: TStrVector): Boolean;
+var
+  i: Integer;
+begin
+  Result:= False;
+  AArrivalDates:= nil;
+  ASendingDates:= nil;
+  APassports:= nil;
+  AWorkDayCounts:= nil;
+  ARepairNotes:= nil;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT RepairNote, ArrivalDate, SendingDate, Passport  ' +
+    'FROM RECLAMATIONS ' +
+    'WHERE (ArrivalDate > 0) AND (MotorID = :MotorID) ' +
+    'ORDER BY ArrivalDate'
+    );
+  QParamInt('MotorID', AMotorID);
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(AArrivalDates, QFieldDT('ArrivalDate'));
+      VAppend(ASendingDates, QFieldDT('SendingDate'));
+      VAppend(APassports, QFieldInt('Passport'));
+      VAppend(ARepairNotes, QFieldStr('RepairNote'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
+
+  if not Result then Exit;
+  VDim(AWorkDayCounts{%H-}, Length(AArrivalDates));
+    for i:= 0 to High(AWorkDayCounts) do
+      AWorkDayCounts[i]:= SQLite.LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);
+end;
+
+function TSQLite.RepairUpdate(const ARecID: Integer; const AArrivalDate,
+  ASendingDate: TDate; const APassport: Integer; const ARepairNote: String): Boolean;
+begin
+  Result:= False;
+  QSetQuery(FQuery);
+  try
+    QSetSQL(
+      'UPDATE RECLAMATIONS ' +
+      'SET ArrivalDate = :ArrivalDate, SendingDate = :SendingDate, ' +
+          'Passport = :Passport, RepairNote = :RepairNote ' +
+      'WHERE RecID = :RecID'
+      );
+    QParamInt('RecID', ARecID);
+    QParamDT('ArrivalDate', AArrivalDate);
+    QParamDT('SendingDate', ASendingDate);
+    QParamInt('Passport', APassport);
+    QParamStr('RepairNote', ARepairNote);
+    QExec;
+    QCommit;
+    Result:= True;
+  except
+    QRollback;
+  end;
+end;
+
+function TSQLite.RepairLoad(const ARecID: Integer; out AArrivalDate,
+  ASendingDate: TDate; out APassport: Integer; out ARepairNote: String): Boolean;
+begin
+  Result:= False;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT RepairNote, ArrivalDate, SendingDate, Passport  ' +
+    'FROM RECLAMATIONS ' +
+    'WHERE RecID = :RecID'
+    );
+  QParamInt('RecID', ARecID);
+
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    AArrivalDate:= QFieldDT('ArrivalDate');
+    ASendingDate:= QFieldDT('SendingDate');
+    APassport:= QFieldInt('Passport');
+    ARepairNote:= QFieldStr('RepairNote');
+    Result:= True;
+  end;
+  QClose;
+end;
+
+procedure TSQLite.RepairDelete(const ARecID: Integer);
+begin
+  QSetQuery(FQuery);
+  try
+    QSetSQL(
+      'UPDATE RECLAMATIONS ' +
+      'SET ArrivalDate = 0, SendingDate = 0, ' +
+          'Passport = 0, RepairNote = NULL ' +
+      'WHERE RecID = :RecID'
+      );
+    QParamInt('RecID', ARecID);
+    QExec;
+    QCommit;
+  except
+    QRollback;
+  end;
+end;
+
+function TSQLite.MotorListToRepair(const ANameID: Integer;
+          const AMotorNumberLike: String;
+          out ARecIDs, AMotorNameIDs: TIntVector;
+          out ABuildDates, ARecDates: TDateVector;
+          out AMotorNums, APlaceNames: TStrVector): Boolean;
+begin
+  Result:= False;
+  ARecIDs:= nil;
+  AMotorNameIDs:= nil;
+  ABuildDates:= nil;
+  ARecDates:= nil;
+  AMotorNums:= nil;
+  APlaceNames:= nil;
+  if (AMotorNumberLike=EmptyStr) or (ANameID<=0) then Exit;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT t1.RecID, t1.RecDate, t1.RepairNote, ' +
+           't2.MotorNum, t2.BuildDate, t2.NameID, t3.PlaceName ' +
+    'FROM RECLAMATIONS t1 ' +
+    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+    'INNER JOIN RECLAMATIONPLACES t3 ON (t1.PlaceID=t3.PlaceID) ' +
+    'WHERE (t1.ArrivalDate = 0) AND ' +
+          '(t2.NameID = :NameID) AND ' +
+          '(UPPER(t2.MotorNum) LIKE :NumberLike) ' +
+    'ORDER BY t2.MotorNum'
+    );
+  QParamStr('NumberLike', AMotorNumberLike+'%');
+  QParamInt('NameID', ANameID);
+
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(ARecIDs, QFieldInt('RecID'));
+      VAppend(AMotorNameIDs, QFieldInt('NameID'));
+      VAppend(ABuildDates, QFieldDT('BuildDate'));
+      VAppend(ARecDates, QFieldDT('RecDate'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(APlaceNames, QFieldStr('PlaceName'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
+end;
+
+function TSQLite.MotorListOnRepair(const ARecID: Integer; out ARecIDs,
+  AMotorNameIDs: TIntVector; out ABuildDates, ARecDates: TDateVector; out
+  AMotorNums, APlaceNames: TStrVector): Boolean;
+begin
+  Result:= False;
+  ARecIDs:= nil;
+  AMotorNameIDs:= nil;
+  ABuildDates:= nil;
+  ARecDates:= nil;
+  AMotorNums:= nil;
+  APlaceNames:= nil;
+  if ARecID<=0 then Exit;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT t1.RecID, t1.RecDate, t1.RepairNote, ' +
+           't2.MotorNum, t2.BuildDate, t2.NameID, t3.PlaceName ' +
+    'FROM RECLAMATIONS t1 ' +
+    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+    'INNER JOIN RECLAMATIONPLACES t3 ON (t1.PlaceID=t3.PlaceID) ' +
+    'WHERE t1.RecID = :RecID ' +
+    'ORDER BY t2.MotorNum'
+    );
+  QParamInt('RecID', ARecID);
+
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(ARecIDs, QFieldInt('RecID'));
+      VAppend(AMotorNameIDs, QFieldInt('NameID'));
+      VAppend(ABuildDates, QFieldDT('BuildDate'));
+      VAppend(ARecDates, QFieldDT('RecDate'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(APlaceNames, QFieldStr('PlaceName'));
       QNext;
     end;
     Result:= True;

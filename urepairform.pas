@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, EditBtn, VirtualTrees, DividerBevel, DK_VSTTables, USheetUtils,
-  rxctrls, DK_Vector, USQLite, DK_StrUtils,
-  DK_SheetExporter, UCalendar, UCardForm;
+  rxctrls, DK_Vector, USQLite, DK_StrUtils, DK_Dialogs,
+  DK_SheetExporter, UCalendar, UCardForm, URepairEditForm;
 
 type
 
@@ -32,15 +32,18 @@ type
     Panel2: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
+    LeftPanel: TPanel;
     Panel7: TPanel;
-    Panel9: TPanel;
+    MainPanel: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
-    TopToolsPanel: TPanel;
+    ToolPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     VT3: TVirtualStringTree;
+    procedure AddButtonClick(Sender: TObject);
+    procedure DelButtonClick(Sender: TObject);
+    procedure EditButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -56,7 +59,7 @@ type
 
     ArrivalDates, SendingDates: TDateVector;
     Passports, DayCounts: TIntVector;
-    MotorNames, MotorNums: TStrVector;
+    MotorNames, MotorNums, RepairNotes: TStrVector;
 
 
 
@@ -64,6 +67,7 @@ type
     procedure OrderSelect;
     procedure MotorSelect;
 
+    procedure RepairEditFormOpen(const AEditType: Byte);
   public
     procedure ShowRepair;
   end;
@@ -96,7 +100,8 @@ begin
   VSTMotorsTable.AddColumn('Наличие паспорта', 150);
   VSTMotorsTable.AddColumn('Дата прибытия', 150);
   VSTMotorsTable.AddColumn('Дата убытия', 150);
-  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 200);
+  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 250);
+  //VSTMotorsTable.AutosizeColumnDisable;
   VSTMotorsTable.AddColumn('Примечание');
   VSTMotorsTable.CanSelect:= True;
   VSTMotorsTable.Draw;
@@ -155,6 +160,24 @@ begin
   end;
 end;
 
+procedure TRepairForm.AddButtonClick(Sender: TObject);
+begin
+  RepairEditFormOpen(1);
+end;
+
+procedure TRepairForm.DelButtonClick(Sender: TObject);
+begin
+  if not VSTMotorsTable.IsSelected then Exit;
+  if not Confirm('Удалить данные о гарантийном ремонте?') then Exit;
+  SQLite.RepairDelete(RecIDs[VSTMotorsTable.SelectedIndex]);
+  ShowRepair;
+end;
+
+procedure TRepairForm.EditButtonClick(Sender: TObject);
+begin
+  RepairEditFormOpen(2);
+end;
+
 procedure TRepairForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
@@ -165,7 +188,7 @@ end;
 
 procedure TRepairForm.MotorCardCheckBoxChange(Sender: TObject);
 begin
-  If MotorCardCheckBox.Checked then
+  if MotorCardCheckBox.Checked then
   begin
     VT1.Align:= alCustom;
     Splitter2.Visible:= True;
@@ -204,19 +227,39 @@ procedure TRepairForm.MotorSelect;
 var
   MotorID: Integer;
 begin
+  DelButton.Enabled:= VSTMotorsTable.IsSelected;
+  EditButton.Enabled:= VSTMotorsTable.IsSelected;
+
   MotorID:= 0;
   if VSTMotorsTable.IsSelected then
     MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
   CardForm.ShowCard(MotorID);
 end;
 
-
+procedure TRepairForm.RepairEditFormOpen(const AEditType: Byte);
+var
+  RepairEditForm: TRepairEditForm;
+begin
+  RepairEditForm:= TRepairEditForm.Create(RepairForm);
+  try
+    RepairEditForm.RecID:= 0;
+    if AEditType=2 then
+    begin
+      RepairEditForm.RecID:= RecIDs[VSTMotorsTable.SelectedIndex];
+      RepairEditForm.MotorName:= MotorNames[VSTMotorsTable.SelectedIndex];
+      RepairEditForm.MotorNum:= MotorNums[VSTMotorsTable.SelectedIndex];
+    end;
+    if RepairEditForm.ShowModal = mrOK then ShowRepair;
+  finally
+    FreeAndNil(RepairEditForm);
+  end;
+end;
 
 procedure TRepairForm.ShowRepair;
 var
   MotorNumberLike: String;
   i: Integer;
-  PassStrs, DayCountsStrs, SendingDatesStrs: TStrVector;
+  PassStrs, DayCountsStrs, SendingDatesStrs, ArrivalDatesStrs: TStrVector;
 begin
   if (not VSTTypeTable.IsSelected) or (not VSTOrderTable.IsSelected) then Exit;
 
@@ -228,38 +271,26 @@ begin
     SQLite.RepairListLoad(MainForm.UsedNameIDs, MotorNumberLike,
                           VSTOrderTable.SelectedIndex+1, VSTTypeTable.SelectedIndex,
                           ArrivalDates, SendingDates,
-                          RecIDs, MotorIDs, Passports,
-                          MotorNames, MotorNums);
+                          RecIDs, MotorIDs, Passports, DayCounts,
+                          MotorNames, MotorNums, RepairNotes);
 
     VDim(PassStrs{%H-}, Length(Passports));
     for i:= 0 to High(PassStrs) do
       if Passports[i]>0 then
         PassStrs[i]:= CHECK_SYMBOL;
-
-    VDim(DayCounts{%H-}, Length(MotorIDs));
-    for i:= 0 to High(DayCounts) do
-      DayCounts[i]:= SQLite.LoadWorkDaysCountInPeriod(ArrivalDates[i], SendingDates[i]);
-
-    VDim(DayCountsStrs{%H-}, Length(ArrivalDates));
-    VDim(SendingDatesStrs{%H-}, Length(ArrivalDates));
-    for i:= 0 to High(DayCountsStrs) do
-    begin
-      if SendingDates[i]>0 then
-        SendingDatesStrs[i]:= FormatDateTime('dd.mm.yyyy', SendingDates[i]);
-      if DayCounts[i]>0 then
-        DayCountsStrs[i]:= IntToStr(DayCounts[i]);
-    end;
+    DayCountsStrs:= VIntToStr(DayCounts, True);
+    ArrivalDatesStrs:= VFormatDateTime('dd.mm.yyyy', ArrivalDates, True);
+    SendingDatesStrs:= VFormatDateTime('dd.mm.yyyy', SendingDates, True);
 
     VSTMotorsTable.ValuesClear;
     VSTMotorsTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorIDs))));
     VSTMotorsTable.SetColumn('Наименование', MotorNames, taLeftJustify);
     VSTMotorsTable.SetColumn('Номер', MotorNums);
     VSTMotorsTable.SetColumn('Наличие паспорта', PassStrs);
-    VSTMotorsTable.SetColumn('Дата прибытия', VFormatDateTime('dd.mm.yyyy', ArrivalDates));
+    VSTMotorsTable.SetColumn('Дата прибытия', ArrivalDatesStrs);
     VSTMotorsTable.SetColumn('Дата убытия', SendingDatesStrs);
     VSTMotorsTable.SetColumn('Срок ремонта (рабочих дней)', DayCountsStrs);
-
-
+    VSTMotorsTable.SetColumn('Примечание', RepairNotes, taLeftJustify);
     VSTMotorsTable.Draw;
   finally
     Screen.Cursor:= crDefault;
