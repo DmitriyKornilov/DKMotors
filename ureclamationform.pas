@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, Spin, EditBtn, ComCtrls, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
-  DK_StrUtils, DK_Dialogs, DK_SheetExporter, fpstypes, USQLite;
+  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite;
 
 type
 

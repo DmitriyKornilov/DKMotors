@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, EditBtn, VirtualTrees, DividerBevel, DK_VSTTables, USheetUtils,
-  rxctrls, fpspreadsheetgrid, DK_Vector, USQLite, DK_StrUtils,
-  DK_SheetExporter, fpspreadsheet, fpstypes, UCalendar, UCardForm;
+  rxctrls, DK_Vector, USQLite, DK_StrUtils,
+  DK_SheetExporter, UCalendar, UCardForm;
 
 type
 
@@ -58,7 +58,7 @@ type
     Passports, DayCounts: TIntVector;
     MotorNames, MotorNums: TStrVector;
 
-    function CalcRepairWorkDaysCount(const ABeginDate, AEndDate: TDate): Integer;
+
 
     procedure TypeSelect;
     procedure OrderSelect;
@@ -210,23 +210,7 @@ begin
   CardForm.ShowCard(MotorID);
 end;
 
-function TRepairForm.CalcRepairWorkDaysCount(const ABeginDate, AEndDate: TDate): Integer;
-var
-  Calendar: TCalendar;
-  D: TDate;
-begin
-  Result:= 0;
-  if ABeginDate=0 then Exit;
 
-  D:= AEndDate;
-  if D=0 then D:= Date;
-  Calendar:= SQLite.LoadCalendar(ABeginDate, D);
-  try
-    Result:= Calendar.WorkDaysCount;
-  finally
-    FreeAndNil(Calendar);
-  end;
-end;
 
 procedure TRepairForm.ShowRepair;
 var
@@ -254,7 +238,7 @@ begin
 
     VDim(DayCounts{%H-}, Length(MotorIDs));
     for i:= 0 to High(DayCounts) do
-      DayCounts[i]:= CalcRepairWorkDaysCount(ArrivalDates[i], SendingDates[i]);
+      DayCounts[i]:= SQLite.LoadWorkDaysCountInPeriod(ArrivalDates[i], SendingDates[i]);
 
     VDim(DayCountsStrs{%H-}, Length(ArrivalDates));
     VDim(SendingDatesStrs{%H-}, Length(ArrivalDates));

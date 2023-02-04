@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
   Buttons, VirtualTrees, DividerBevel, DateTimePicker, fpspreadsheetgrid,
   DK_VSTTables, DK_SheetExporter, DK_DateUtils, UCalendar, USQLite, DK_Vector,
-  fpsTypes, LCLType, StdCtrls, ComCtrls, rxctrls, UCalendarEditForm, DK_Const,
+  LCLType, StdCtrls, ComCtrls, rxctrls, UCalendarEditForm, DK_Const,
   DateUtils, USheetUtils;
 
 type

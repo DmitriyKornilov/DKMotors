@@ -36,6 +36,8 @@ type
     //последняя дата срока, заданного в рабочих днях
     function LoadWorkDaysPeriodEndDate(const ABeginDate: TDate;
                               const AWorkDaysCount: Integer): TDate;
+    //количество рабочих дней за период
+    function LoadWorkDaysCountInPeriod(const ABeginDate, AEndDate: TDate): Integer;
 
     //справочники
     procedure NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
@@ -352,6 +354,25 @@ begin
     end;
   end;
   Result:= ED;
+end;
+
+function TSQLite.LoadWorkDaysCountInPeriod(const ABeginDate, AEndDate: TDate): Integer;
+var
+  Calendar: TCalendar;
+  D: TDate;
+begin
+  Result:= 0;
+  if ABeginDate=0 then Exit;
+
+  D:= AEndDate;
+  if D=0 then D:= Date;
+
+  Calendar:= SQLite.LoadCalendar(ABeginDate, D);
+  try
+    Result:= Calendar.WorkDaysCount;
+  finally
+    FreeAndNil(Calendar);
+  end;
 end;
 
 

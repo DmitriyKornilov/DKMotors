@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, rxctrls, fpspreadsheetgrid, DividerBevel, DateTimePicker,
-  DK_DateUtils, USheetUtils, USQLite, DK_SheetExporter, fpstypes, DK_Vector,
+  DK_DateUtils, USheetUtils, USQLite, DK_SheetExporter, DK_Vector,
   DK_Matrix;
 
 type
@@ -77,13 +77,10 @@ uses UMainForm;
 procedure TReportForm.ExportButtonClick(Sender: TObject);
 var
   Exporter: TGridExporter;
-  PageOrientation: TsPageOrientation;
 begin
   Exporter:= TGridExporter.Create(LogGrid);
   try
-    //Exporter.SheetName:= 'Отчет';
-    PageOrientation:= spoPortrait;
-    Exporter.PageSettings(PageOrientation, pfWidth);
+    Exporter.PageSettings(spoPortrait, pfWidth);
     Exporter.Save('Выполнено!');
   finally
     FreeAndNil(Exporter);
