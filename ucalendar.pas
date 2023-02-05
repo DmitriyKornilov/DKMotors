@@ -21,22 +21,23 @@ const
                                               'выходной',
                                               'предпраздничный',
                                               'рабочий');
-  COLOR_BEIGE       = $00D7F4FF;
-  COLOR_GRAY        = $00D6D6D6;
+
+  COLOR_GRAY        = $00E0E0E0;
   COLOR_BLACK       = $00000000;
   COLOR_WHITE       = $00FFFFFF;
   COLOR_ORANGE      = $0097CBFF;
   COLOR_GREEN       = $00CCE3CC;
-  COLOR_VIOLET      = $00FFCACA;
 
-  COLOR_CALENDAR_MONTHNAME = COLOR_BEIGE; //цвет ячейки с названием месяца
-  COLOR_CALENDAR_DAYNAME   = COLOR_GRAY;  //цвет ячеек с названиями дней недели
-
+  COLOR_CALENDAR_MONTHNAME = COLOR_WHITE;//COLOR_BEIGE; //цвет ячейки с названием месяца
+  COLOR_CALENDAR_DAYNAME   = COLOR_WHITE;//COLOR_GRAY;  //цвет ячеек с названиями дней недели
+  COLOR_CALENDAR_QUARTER   = COLOR_GRAY;
+  COLOR_CALENDAR_HALFYEAR  = COLOR_GREEN;
+  COLOR_CALENDAR_YEAR      = COLOR_ORANGE;
 
   COLORS_CALENDAR: array [0..4] of Integer = (COLOR_BLACK,   //неизвестный
                                               COLOR_ORANGE,  //праздничный
                                               COLOR_GREEN,   //выходной
-                                              COLOR_VIOLET,  //предпраздничный
+                                              COLOR_GRAY, //COLOR_VIOLET,  //предпраздничный
                                               COLOR_WHITE);  //рабочий
 
   MAIN_COLOR_INDEX      = TRANSPARENT_COLOR_INDEX;  //scTransparent
@@ -47,6 +48,9 @@ const
   MONTHNAME_COLOR_INDEX = 5;
   DAYNAME_COLOR_INDEX   = 6;
   HIGHLIGHT_COLOR_INDEX = 7;
+  QUARTER_COLOR_INDEX   = 8;
+  HALFYEAR_COLOR_INDEX  = 9;
+  YEAR_COLOR_INDEX      = 10;
 
   SHEET_FONT_NAME = 'Arial';
   SHEET_FONT_SIZE = 9;
@@ -528,6 +532,10 @@ begin
   R:= R+1;
   DrawLegendLine(R, C, WEEKDAY_COLOR_INDEX, 'Рабочий день');
   FWriter.SetAlignmentDefault;
+
+  //R:= R+2;
+  //FWriter.WritePNGFit(R, C, R+1, FWriter.ColCount, 'work\logo.png');
+  //FWriter.WriteImage(R, C, 'work\logo.png');
 end;
 
 procedure TCalendarSheet.DrawResumeTableCaption;
@@ -564,10 +572,6 @@ begin
   C:= C+1;
   FWriter.WriteText(R+1, C, R+3, C, '24-часовая' + SYMBOL_BREAK + 'рабочая' + SYMBOL_BREAK + 'неделя', cbtOuter);
   FWriter.AddCellBGColorIndex(R+1, C, MONTHNAME_COLOR_INDEX);
-  //глюк fpspreadsheet с границами в выходном файле
-  //FWriter.WorkSheet.WriteBorders(RESUME_FIRST_ROW+1, RESUME_FIRST_COL, [cbWest]);
-  //for C:= RESUME_FIRST_COL+2 to RESUME_FIRST_COL+6 do
-  //  FWriter.WorkSheet.WriteBorders(RESUME_FIRST_ROW+2, C, [cbWest, cbEast]);
   R:= RESUME_FIRST_ROW+4;
   C:= RESUME_FIRST_COL;
   FWriter.SetFont(FFontName, FFontSize, [], scBlack);
@@ -577,7 +581,7 @@ begin
   R:= R+3;
   FWriter.SetFont(FFontName, FFontSize, [fssBold], scBlack);
   FWriter.WriteText(R, C,   'I КВАРТАЛ', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, DAYNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, QUARTER_COLOR_INDEX);
   R:= R+1;
   FWriter.SetFont(FFontName, FFontSize, [], scBlack);
   FWriter.WriteText(R, C,   'Апрель', cbtOuter);
@@ -586,10 +590,10 @@ begin
   R:= R+3;
   FWriter.SetFont(FFontName, FFontSize, [fssBold], scBlack);
   FWriter.WriteText(R, C,   'II КВАРТАЛ', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, DAYNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, QUARTER_COLOR_INDEX);
   R:= R+1;
   FWriter.WriteText(R, C,   'I ПОЛУГОДИЕ', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, MONTHNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, HALFYEAR_COLOR_INDEX);
   R:= R+1;
   FWriter.SetFont(FFontName, FFontSize, [], scBlack);
   FWriter.WriteText(R, C,   'Июль', cbtOuter);
@@ -598,7 +602,7 @@ begin
   R:= R+3;
   FWriter.SetFont(FFontName, FFontSize, [fssBold], scBlack);
   FWriter.WriteText(R, C,   'III КВАРТАЛ', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, DAYNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, QUARTER_COLOR_INDEX);
   R:= R+1;
   FWriter.SetFont(FFontName, FFontSize, [], scBlack);
   FWriter.WriteText(R, C,   'Октябрь', cbtOuter);
@@ -607,13 +611,13 @@ begin
   R:= R+3;
   FWriter.SetFont(FFontName, FFontSize, [fssBold], scBlack);
   FWriter.WriteText(R, C,   'IV КВАРТАЛ', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, DAYNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, QUARTER_COLOR_INDEX);
   R:= R+1;
   FWriter.WriteText(R, C,   'II ПОЛУГОДИЕ', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, MONTHNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, HALFYEAR_COLOR_INDEX);
   R:= R+1;
   FWriter.WriteText(R, C,   IntToStr(FYear) + ' ГОД', cbtOuter);
-  FWriter.AddCellBGColorIndex(R, C, MONTHNAME_COLOR_INDEX);
+  FWriter.AddCellBGColorIndex(R, C, YEAR_COLOR_INDEX);
 
   R:= RESUME_FIRST_ROW;
   C:= RESUME_FIRST_COL;
@@ -650,7 +654,7 @@ begin
   FWriter.SetFont(FFontName, FFontSize, [fssBold], scBlack);
   R:= YEAR_RESUME_ROW;
   C:= RESUME_FIRST_COL+1;
-  DrawResumeLine(R,C, MONTHNAME_COLOR_INDEX, FCalendar);
+  DrawResumeLine(R,C, YEAR_COLOR_INDEX, FCalendar);
 end;
 
 procedure TCalendarSheet.DrawHalf(const AHalf: Byte);
@@ -666,7 +670,7 @@ begin
   HalfCalendar:= TCalendar.Create;
   try
     FCalendar.Cut(BD, ED, HalfCalendar);
-    DrawResumeLine(R,C, MONTHNAME_COLOR_INDEX, HalfCalendar);
+    DrawResumeLine(R,C, HALFYEAR_COLOR_INDEX, HalfCalendar);
   finally
     FreeAndNil(HalfCalendar);
   end;
@@ -685,7 +689,7 @@ begin
   QuarterCalendar:= TCalendar.Create;
   try
     FCalendar.Cut(BD, ED, QuarterCalendar);
-    DrawResumeLine(R,C, DAYNAME_COLOR_INDEX, QuarterCalendar);
+    DrawResumeLine(R,C, QUARTER_COLOR_INDEX, QuarterCalendar);
   finally
     FreeAndNil(QuarterCalendar);
   end;

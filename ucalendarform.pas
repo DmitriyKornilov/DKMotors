@@ -34,6 +34,7 @@ type
     CalendarGrid: TsWorksheetGrid;
     BeforeCountLabel: TLabel;
     Label1: TLabel;
+    Label10: TLabel;
     Label9: TLabel;
     WorkCountLabel: TLabel;
     NotWorkCountLabel: TLabel;
@@ -298,7 +299,7 @@ end;
 procedure TCalendarForm.LoadColors;
 begin
   ColorVector:= nil;
-  VDim(ColorVector, 8);
+  VDim(ColorVector, 11);
   ColorVector[HOLIDEY_COLOR_INDEX]:= COLORS_CALENDAR[HOLIDEY_COLOR_INDEX];
   ColorVector[OFFDAY_COLOR_INDEX]:= COLORS_CALENDAR[OFFDAY_COLOR_INDEX];
   ColorVector[BEFORE_COLOR_INDEX]:= COLORS_CALENDAR[BEFORE_COLOR_INDEX];
@@ -306,6 +307,10 @@ begin
   ColorVector[MONTHNAME_COLOR_INDEX]:= COLOR_CALENDAR_MONTHNAME;
   ColorVector[DAYNAME_COLOR_INDEX]:= COLOR_CALENDAR_DAYNAME;
   ColorVector[HIGHLIGHT_COLOR_INDEX]:= COLOR_BACKGROUND_SELECTED;
+
+  ColorVector[QUARTER_COLOR_INDEX]:= COLOR_CALENDAR_QUARTER;
+  ColorVector[HALFYEAR_COLOR_INDEX]:= COLOR_CALENDAR_HALFYEAR;
+  ColorVector[YEAR_COLOR_INDEX]:= COLOR_CALENDAR_YEAR;
 end;
 
 procedure TCalendarForm.LoadSpecDays(const ASelectedIndex: Integer = -1);

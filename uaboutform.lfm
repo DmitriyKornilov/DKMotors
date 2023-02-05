@@ -467,7 +467,7 @@ object AboutForm: TAboutForm
     BorderSpacing.Left = 12
     BorderSpacing.Top = 6
     BorderSpacing.Right = 6
-    Caption = 'DKMotors v1.0.0'
+    Caption = 'DKMotors v1.0.1'
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
