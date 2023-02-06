@@ -1,9 +1,9 @@
 object MainForm: TMainForm
-  Left = -7
+  Left = 332
   Height = 351
-  Top = 153
+  Top = 139
   Width = 1531
-  Caption = 'Учет производства и поставок электродвигателей ООО "Электрожелдормаш"'
+  Caption = 'Учет производства, поставок и рекламационных случаев электродвигателей ООО "Электрожелдормаш"'
   ClientHeight = 351
   ClientWidth = 1531
   OnCreate = FormCreate
