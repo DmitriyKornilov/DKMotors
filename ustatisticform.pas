@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils, LCLType,
   StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
-  USQLite, DK_Matrix, DK_SheetExporter, DK_StrUtils;
+  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils;
 
 type
 
@@ -403,8 +403,10 @@ begin
   for i:=0 to High(ParamNames) do
   begin
     W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+50;
+    W:= Round(W/DIMENTION_FACTOR);
     if W>ParamNameColumnWidth then
       ParamNameColumnWidth:= W;
+
   end;
 
   DrawStatistic;
