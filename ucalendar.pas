@@ -756,18 +756,28 @@ begin
   FGridLineColor:= clBlack;
   FFontName:= SHEET_FONT_NAME;
   FFontSize:= SHEET_FONT_SIZE;
-  FRowHeight:= SHeight('X', FFontName, FFontSize);
-  if FRowHeight<MINROWHEIGHT then FRowHeight:= MINROWHEIGHT;
+  //FRowHeight:= SHeight('X', FFontName, FFontSize);
+  //if FRowHeight<MINROWHEIGHT then FRowHeight:= MINROWHEIGHT;
 
   Widths:= nil;
   VDim(Widths, 32);
   W:= SWidth('00', FFontName, FFontSize) + DeltaW;
+  W:= Round(W/DIMENTION_FACTOR);
   for i:= 0 to 23 do Widths[i]:= W;
+
+  FRowHeight:= Round(0.7*W);
+  if FRowHeight<MINROWHEIGHT then FRowHeight:= MINROWHEIGHT;
+
   W:= SWidth('II ПОЛУГОДИЕ', FFontName, FFontSize) + DeltaW;
+  W:= Round(W/DIMENTION_FACTOR);
   Widths[24]:= W;
+
   W:= SWidth('Рабочих', FFontName, FFontSize) + DeltaW;
+  W:= Round(W/DIMENTION_FACTOR);
   for i:= 25 to 28 do Widths[i]:= W;
+
   W:= SWidth('40-часовая', FFontName, FFontSize) + DeltaW;
+  W:= Round(W/DIMENTION_FACTOR);
   for i:= 29 to 31 do Widths[i]:= W;
 
   FWriter:= TSheetWriter.Create(Widths, AWorksheet, AGrid);
