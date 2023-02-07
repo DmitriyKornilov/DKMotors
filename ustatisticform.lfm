@@ -1,12 +1,12 @@
 object StatisticForm: TStatisticForm
-  Left = 560
-  Height = 679
-  Top = 97
+  Left = 470
+  Height = 646
+  Top = 0
   Width = 955
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StatisticForm'
-  ClientHeight = 679
+  ClientHeight = 646
   ClientWidth = 955
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -342,21 +342,21 @@ object StatisticForm: TStatisticForm
   end
   object ClientPanel: TPanel
     Left = 0
-    Height = 645
+    Height = 612
     Top = 34
     Width = 955
     Align = alClient
-    ClientHeight = 645
+    ClientHeight = 612
     ClientWidth = 955
     TabOrder = 1
     object Panel1: TPanel
       Left = 1
-      Height = 643
+      Height = 610
       Top = 1
       Width = 320
       Align = alLeft
       BevelOuter = bvNone
-      ClientHeight = 643
+      ClientHeight = 610
       ClientWidth = 320
       TabOrder = 0
       object Panel2: TPanel
@@ -414,7 +414,7 @@ object StatisticForm: TStatisticForm
       end
       object Panel3: TPanel
         Left = 2
-        Height = 395
+        Height = 362
         Top = 246
         Width = 318
         Align = alClient
@@ -423,7 +423,7 @@ object StatisticForm: TStatisticForm
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
-        ClientHeight = 391
+        ClientHeight = 358
         ClientWidth = 314
         Color = clWindow
         ParentColor = False
@@ -563,25 +563,25 @@ object StatisticForm: TStatisticForm
     end
     object Splitter1: TSplitter
       Left = 321
-      Height = 643
+      Height = 610
       Top = 1
       Width = 5
       ResizeStyle = rsLine
     end
     object Panel4: TPanel
       Left = 326
-      Height = 643
+      Height = 610
       Top = 1
       Width = 628
       Align = alClient
       BevelOuter = bvNone
       Caption = 'Panel4'
-      ClientHeight = 643
+      ClientHeight = 610
       ClientWidth = 628
       TabOrder = 2
       object MainPanel: TPanel
         Left = 2
-        Height = 639
+        Height = 606
         Top = 2
         Width = 624
         Align = alClient
@@ -590,12 +590,12 @@ object StatisticForm: TStatisticForm
         BorderSpacing.Right = 2
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
-        ClientHeight = 639
+        ClientHeight = 606
         ClientWidth = 624
         TabOrder = 0
         object Panel7: TPanel
           Left = 0
-          Height = 607
+          Height = 574
           Top = 0
           Width = 624
           Align = alClient
@@ -603,12 +603,12 @@ object StatisticForm: TStatisticForm
           BevelOuter = bvNone
           BorderStyle = bsSingle
           Caption = 'Panel7'
-          ClientHeight = 603
+          ClientHeight = 570
           ClientWidth = 620
           TabOrder = 0
           object Grid1: TsWorksheetGrid
             Left = 0
-            Height = 603
+            Height = 570
             Top = 0
             Width = 620
             AutoExpand = []
@@ -645,7 +645,7 @@ object StatisticForm: TStatisticForm
         object Panel8: TPanel
           Left = 0
           Height = 30
-          Top = 609
+          Top = 576
           Width = 624
           Align = alBottom
           AutoSize = True
