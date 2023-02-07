@@ -403,7 +403,7 @@ begin
   for i:=0 to High(ParamNames) do
   begin
     W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+50;
-    W:= Round(W/DIMENTION_FACTOR);
+    //W:= Round(W/DIMENTION_FACTOR);
     if W>ParamNameColumnWidth then
       ParamNameColumnWidth:= W;
 
