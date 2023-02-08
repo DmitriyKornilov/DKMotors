@@ -1,14 +1,14 @@
 object MainForm: TMainForm
-  Left = -7
+  Left = -6
   Height = 351
-  Top = 140
+  Top = 112
   Width = 1273
   Caption = 'Учет производства, поставок и рекламационных случаев электродвигателей ООО "Электрожелдормаш"'
   ClientHeight = 351
   ClientWidth = 1273
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '2.2.2.0'
   WindowState = wsMaximized
   object ToolPanel: TPanel
     Left = 2
