@@ -746,9 +746,9 @@ end;
 
 constructor TCalendarSheet.Create(const AWorksheet: TsWorksheet;
   const AGrid: TsWorksheetGrid);
-const
-  DeltaW = 15;
-  MINROWHEIGHT = 23;
+//const
+//  DeltaW = 15;
+//  MINROWHEIGHT = 23;
 var
   i, W: Integer;
   Widths: TIntVector;

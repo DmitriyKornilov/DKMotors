@@ -926,7 +926,7 @@ var
     if FShowSecondColumn then
       W2:= 80
     else
-      W2:= 150;
+      W2:= 130;
 
 
     //пробегаем по всем периодам
@@ -962,7 +962,7 @@ var
     if FShowSecondColumn or FSeveralYears then
       W2:= 80
     else
-      W2:= 150;
+      W2:= 130;
 
 
     if FUsedReasons[0] then
