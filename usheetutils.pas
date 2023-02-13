@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid, fpspreadsheet,
   DK_Vector, DK_Matrix, DK_Fonts, Grids, Graphics, DK_SheetConst, DK_Const,
-  DateUtils, DK_DateUtils;
+  DateUtils, DK_DateUtils, DK_StatPlotter;
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;
@@ -95,6 +95,30 @@ type
 
   end;
 
+  { TStatisticReclamationSinglePeriodSheet }
+
+  TStatisticReclamationSinglePeriodSheet = class (TObject)
+  private
+    const
+      TOTAL_WIDTH = 1200;
+      PARAM_COLUMN_MIN_WIDTH = 240;
+    var
+      FWriter: TSheetWriter;
+      FFontName: String;
+      FFontSize: Single;
+  public
+    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
+                       const AUsedReasons: TBoolVector;
+                       const AShowPercentColumn: Boolean = False);
+    destructor  Destroy; override;
+    procedure Zoom(const APercents: Integer);
+    procedure Draw(const ABeginDate, AEndDate: TDate;
+                   const AReportName, AMotorNames, AParamCaption: String;
+                   const AParamNames, AReasonNames: TStrVector;
+                   const ACounts: TIntMatrix;
+                   const AResumeNeed: Boolean);
+  end;
+
   { TStatisticReclamationSheet }
 
   TStatisticReclamationSheet = class (TObject)
@@ -141,8 +165,13 @@ type
                              const AResumeNeed: Boolean);
     procedure DrawDataReason(const ARow, ACol: Integer; const ACounts: TIntMatrix3D;
                              const AResumeNeed: Boolean);
-    procedure DrawData(const ARow: Integer; const AParamNames: TStrVector;
-                       const ACounts: TIntMatrix3D;  const AResumeNeed: Boolean);
+    procedure DrawData(var ARow: Integer; const AParamNames: TStrVector;
+      const ACounts: TIntMatrix3D; const AResumeNeed: Boolean);
+
+    procedure DrawGraphics(const ARow: Integer;
+                           const AParamNames, AReasonNames: TStrVector;
+                           const ACounts: TIntMatrix3D);
+
     procedure CalcTotalForAllPeriods(const ACounts: TIntMatrix3D);
   public
     //AGroupType = 1 - группировка по годам, 2 - группировка по причинам неисправностей
@@ -336,6 +365,47 @@ type
   end;
 
 implementation
+
+{ TStatisticReclamationSinglePeriodSheet }
+
+constructor TStatisticReclamationSinglePeriodSheet.Create(
+  const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
+  const AUsedReasons: TBoolVector; const AShowPercentColumn: Boolean);
+var
+  ColWidths: TIntVector;
+  ColCount, W: Integer;
+begin
+  FFontName:= SHEET_FONT_NAME;
+  FFontSize:= SHEET_FONT_SIZE;
+
+
+  ColCount:= VCountIf(AUsedReasons, True) * (1 + Ord(AShowPercentColumn));
+  W:= (TOTAL_WIDTH - PARAM_COLUMN_MIN_WIDTH) div ColCount;
+  VDim(ColWidths, ColCount+1, W);
+  W:= TOTAL_WIDTH - W*ColCount;
+  ColWidths[0]:= W;
+
+  FWriter:= TSheetWriter.Create(ColWidths, AWorksheet, AGrid);
+end;
+
+destructor TStatisticReclamationSinglePeriodSheet.Destroy;
+begin
+  if Assigned(FWriter) then FreeAndNil(FWriter);
+  inherited Destroy;
+end;
+
+procedure TStatisticReclamationSinglePeriodSheet.Zoom(const APercents: Integer);
+begin
+  FWriter.SetZoom(APercents);
+end;
+
+procedure TStatisticReclamationSinglePeriodSheet.Draw(const ABeginDate,
+  AEndDate: TDate; const AReportName, AMotorNames, AParamCaption: String;
+  const AParamNames, AReasonNames: TStrVector; const ACounts: TIntMatrix;
+  const AResumeNeed: Boolean);
+begin
+
+end;
 
 { TControlSheet }
 
@@ -853,11 +923,11 @@ begin
     FTotal:= VSum(FTotal, ACounts[i, 0]);
 end;
 
-procedure TStatisticReclamationSheet.DrawData(const ARow: Integer;
+procedure TStatisticReclamationSheet.DrawData(var ARow: Integer;
   const AParamNames: TStrVector; const ACounts: TIntMatrix3D;
   const AResumeNeed: Boolean);
 var
-  i, R, C: Integer;
+  i, R, C, LastRow: Integer;
   //Total: TIntVector;
 begin
   //Total:= nil;
@@ -877,6 +947,8 @@ begin
     FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
     FWriter.WriteText(R, C, 'ИТОГО', cbtOuter, True, True);
   end;
+
+  LastRow:= R;
 
   FWriter.SetAlignment(haCenter, vaCenter);
   FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
@@ -905,7 +977,90 @@ begin
   if FGroupType=1 then
     DrawDataYear(R, C, ACounts, AResumeNeed)
   else if FGroupType=2 then
-    DrawDataReason(R, C, ACounts, AResumeNeed)
+    DrawDataReason(R, C, ACounts, AResumeNeed);
+
+  ARow:= LastRow + 1;
+end;
+
+procedure TStatisticReclamationSheet.DrawGraphics(const ARow: Integer;
+  const AParamNames, AReasonNames: TStrVector; const ACounts: TIntMatrix3D);
+var
+  SP: TStatPlotterVertHist;
+  Stream: TMemoryStream;
+  i, W, H, R: Integer;
+  //Scale: Double;
+  ScaleX, ScaleY: Double;
+begin
+  R:= ARow;
+  W:= 800;
+  H:= 400;
+  //Scale:= 1/FWriter.ScreenZoomFactor;
+  ScaleX:= 1/FWriter.ScreenScaleX;
+  ScaleY:= 1/FWriter.ScreenScaleY;
+
+  FWriter.WriteText(R,1, EmptyStr);
+  FWriter.SetRowHeight(R, 10);
+
+  R:= R + 1;
+  FWriter.WriteText(R,1, EmptyStr);
+  FWriter.SetRowHeight(R, Round(H*ScaleY{Scale}));
+
+  SP:= TStatPlotterVertHist.Create(W, H);
+  try
+    SP.FrameColor:= clBlack;
+    SP.FrameWidth:= 1;
+    SP.DataFrameColor:= clGray;
+    SP.TitleFont.Style:= [fsBold];
+    SP.Title:= 'Общее количество рекламационных случаев';
+    //SP.Legend:= AReasonNames;
+    SP.XTicks:= AParamNames;
+    SP.YSeriesAdd(ACounts[0,0]);
+    SP.Calc;
+    Stream:= TMemoryStream.Create;
+    try
+      SP.PNG.SaveToStream(Stream);
+      FWriter.WriteImage(R, 1, Stream, 0, 0, ScaleX, ScaleY);
+      if FWriter.HasGrid then
+        FWriter.Grid.Refresh;
+    finally
+      FreeAndNil(Stream);
+    end;
+  finally
+    FreeAndNil(SP);
+  end;
+
+  R:= R + 1;
+  FWriter.WriteText(R,1, EmptyStr);
+  FWriter.SetRowHeight(R, 10);
+
+  R:= R + 1;
+  FWriter.WriteText(R,1, EmptyStr);
+  FWriter.SetRowHeight(R, Round(H*ScaleY{Scale}));
+
+  SP:= TStatPlotterVertHist.Create(W, H);
+  try
+    SP.FrameColor:= clBlack;
+    SP.FrameWidth:= 1;
+    SP.DataFrameColor:= clGray;
+    SP.TitleFont.Style:= [fsBold];
+    SP.Title:= 'Количество рекламационных случаев';
+    SP.Legend:= VCut(AReasonNames, 1);
+    SP.XTicks:= AParamNames;
+    for i:= 1 to High(ACounts[0]) do
+      SP.YSeriesAdd(ACounts[0,i]);
+    SP.Calc;
+    Stream:= TMemoryStream.Create;
+    try
+      SP.PNG.SaveToStream(Stream);
+      FWriter.WriteImage(R, 1, Stream, 0, 0, ScaleX, ScaleY);
+      if FWriter.HasGrid then
+        FWriter.Grid.Refresh;
+    finally
+      FreeAndNil(Stream);
+    end;
+  finally
+    FreeAndNil(SP);
+  end;
 end;
 
 constructor TStatisticReclamationSheet.Create(const AGrid: TsWorksheetGrid;
@@ -920,11 +1075,11 @@ var
     i, j, W1, W2: Integer;
   begin
     if FShowSecondColumnForTotalCount then
-      W1:= 80
+      W1:= 60//80
     else
       W1:= 100;
     if FShowSecondColumn then
-      W2:= 80
+      W2:= 60//80
     else
       W2:= 130;
 
@@ -956,11 +1111,11 @@ var
     i, j, W1, W2: Integer;
   begin
     if FSeveralYears or FShowSecondColumnForTotalCount then
-      W1:= 80
+      W1:= 60//80
     else
       W1:= 100;
     if FShowSecondColumn or FSeveralYears then
-      W2:= 80
+      W2:= 60//80
     else
       W2:= 130;
 
@@ -1055,7 +1210,9 @@ begin
   DrawTableCaption(R, ABeginDate, AParamCaption, AReasonNames);
   FixedRowsCount:= R;
   DrawData(R, AParamNames, ACounts, AResumeNeed);
-  FWriter.SetFrozenRows(FixedRowsCount);
+  //FWriter.SetFrozenRows(FixedRowsCount);
+
+  DrawGraphics(R, AParamNames, AReasonNames, ACounts);
   FWriter.EndEdit;
 
 end;

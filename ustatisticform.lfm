@@ -1,21 +1,22 @@
 object StatisticForm: TStatisticForm
   Left = 470
-  Height = 646
+  Height = 808
   Top = 0
-  Width = 955
+  Width = 1194
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StatisticForm'
-  ClientHeight = 646
-  ClientWidth = 955
+  ClientHeight = 808
+  ClientWidth = 1194
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '2.2.2.0'
   object TopPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 951
+    Width = 1190
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -23,21 +24,21 @@ object StatisticForm: TStatisticForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 947
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1186
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
     object ReportPeriodPanel: TPanel
       Left = 0
-      Height = 28
+      Height = 36
       Top = 0
-      Width = 174
+      Width = 217
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 174
+      ClientHeight = 36
+      ClientWidth = 217
       ParentFont = False
       TabOrder = 0
       object DateTimePicker1: TDateTimePicker
@@ -45,16 +46,16 @@ object StatisticForm: TStatisticForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = ReportPeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 95
-        Height = 23
-        Top = 3
-        Width = 79
+        Left = 118
+        Height = 28
+        Top = 4
+        Width = 99
         CenturyFrom = 1941
         MaxDate = 2958465
         MinDate = -53780
         ParentFont = False
         TabOrder = 0
-        BorderSpacing.Left = 5
+        BorderSpacing.Left = 6
         TrailingSeparator = False
         TextForNullDate = 'NULL'
         LeadingZeros = True
@@ -74,9 +75,9 @@ object StatisticForm: TStatisticForm
         AnchorSideTop.Control = ReportPeriodPanel
         AnchorSideTop.Side = asrCenter
         Left = 1
-        Height = 23
-        Top = 3
-        Width = 79
+        Height = 28
+        Top = 4
+        Width = 99
         CenturyFrom = 1941
         MaxDate = 2958465
         MinDate = -53780
@@ -102,11 +103,11 @@ object StatisticForm: TStatisticForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = DateTimePicker2
         AnchorSideTop.Side = asrCenter
-        Left = 85
-        Height = 15
-        Top = 7
-        Width = 5
-        BorderSpacing.Left = 5
+        Left = 106
+        Height = 20
+        Top = 8
+        Width = 6
+        BorderSpacing.Left = 6
         Caption = '-'
         Font.Style = [fsBold]
         ParentColor = False
@@ -114,10 +115,10 @@ object StatisticForm: TStatisticForm
       end
     end
     object DividerBevel1: TDividerBevel
-      Left = 174
-      Height = 28
+      Left = 217
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Caption = 'DividerBevel1'
       Align = alLeft
       Font.Style = [fsBold]
@@ -125,24 +126,24 @@ object StatisticForm: TStatisticForm
       ParentFont = False
     end
     object Panel5: TPanel
-      Left = 189
-      Height = 28
+      Left = 237
+      Height = 36
       Top = 0
-      Width = 325
+      Width = 409
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 325
+      ClientHeight = 36
+      ClientWidth = 409
       TabOrder = 1
       object CheckBox1: TCheckBox
         AnchorSideLeft.Control = Panel5
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 19
-        Top = 5
-        Width = 167
+        Height = 24
+        Top = 6
+        Width = 211
         Align = alCustom
         Caption = 'Сопоставить с данными за'
         OnChange = CheckBox1Change
@@ -153,13 +154,13 @@ object StatisticForm: TStatisticForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 172
-        Height = 23
-        Top = 3
-        Width = 50
+        Left = 217
+        Height = 28
+        Top = 4
+        Width = 63
         Align = alCustom
         Alignment = taCenter
-        BorderSpacing.Left = 5
+        BorderSpacing.Left = 6
         Enabled = False
         MaxValue = 9
         MinValue = 1
@@ -172,11 +173,11 @@ object StatisticForm: TStatisticForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 227
-        Height = 15
-        Top = 7
-        Width = 98
-        BorderSpacing.Left = 5
+        Left = 286
+        Height = 20
+        Top = 8
+        Width = 123
+        BorderSpacing.Left = 6
         Caption = 'предыдущих года'
         ParentColor = False
       end
@@ -184,10 +185,10 @@ object StatisticForm: TStatisticForm
     object ExportButton: TRxSpeedButton
       AnchorSideLeft.Side = asrBottom
       Cursor = crHandPoint
-      Left = 529
-      Height = 28
+      Left = 666
+      Height = 36
       Top = 0
-      Width = 101
+      Width = 112
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -329,10 +330,10 @@ object StatisticForm: TStatisticForm
       ParentFont = False
     end
     object DividerBevel3: TDividerBevel
-      Left = 514
-      Height = 28
+      Left = 646
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Caption = 'DividerBevel3'
       Align = alLeft
       Font.Style = [fsBold]
@@ -342,43 +343,43 @@ object StatisticForm: TStatisticForm
   end
   object ClientPanel: TPanel
     Left = 0
-    Height = 612
-    Top = 34
-    Width = 955
+    Height = 766
+    Top = 42
+    Width = 1194
     Align = alClient
-    ClientHeight = 612
-    ClientWidth = 955
+    ClientHeight = 766
+    ClientWidth = 1194
     TabOrder = 1
     object Panel1: TPanel
       Left = 1
-      Height = 610
+      Height = 764
       Top = 1
-      Width = 320
+      Width = 400
       Align = alLeft
       BevelOuter = bvNone
-      ClientHeight = 610
-      ClientWidth = 320
+      ClientHeight = 764
+      ClientWidth = 400
       TabOrder = 0
       object Panel2: TPanel
         Left = 2
-        Height = 237
+        Height = 296
         Top = 2
-        Width = 318
+        Width = 398
         Align = alTop
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
-        ClientHeight = 233
-        ClientWidth = 314
+        ClientHeight = 292
+        ClientWidth = 394
         Color = clWindow
         ParentColor = False
         TabOrder = 0
         object VT1: TVirtualStringTree
           Left = 0
-          Height = 216
-          Top = 17
-          Width = 314
+          Height = 270
+          Top = 22
+          Width = 394
           Align = alClient
           BorderStyle = bsNone
           DefaultText = 'Node'
@@ -389,9 +390,9 @@ object StatisticForm: TStatisticForm
         end
         object Label1: TLabel
           Left = 2
-          Height = 15
+          Height = 20
           Top = 0
-          Width = 312
+          Width = 392
           Align = alTop
           BorderSpacing.Left = 2
           BorderSpacing.Bottom = 2
@@ -406,33 +407,33 @@ object StatisticForm: TStatisticForm
       object Splitter2: TSplitter
         Cursor = crVSplit
         Left = 0
-        Height = 5
-        Top = 239
-        Width = 320
+        Height = 6
+        Top = 298
+        Width = 400
         Align = alTop
         ResizeAnchor = akTop
       end
       object Panel3: TPanel
         Left = 2
-        Height = 362
-        Top = 246
-        Width = 318
+        Height = 456
+        Top = 306
+        Width = 398
         Align = alClient
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
-        ClientHeight = 358
-        ClientWidth = 314
+        ClientHeight = 452
+        ClientWidth = 394
         Color = clWindow
         ParentColor = False
         TabOrder = 2
         object VT2: TVirtualStringTree
           Left = 0
-          Height = 160
-          Top = 17
-          Width = 314
+          Height = 200
+          Top = 22
+          Width = 394
           Align = alTop
           BorderStyle = bsNone
           DefaultText = 'Node'
@@ -443,9 +444,9 @@ object StatisticForm: TStatisticForm
         end
         object Label2: TLabel
           Left = 2
-          Height = 15
+          Height = 20
           Top = 0
-          Width = 312
+          Width = 392
           Align = alTop
           BorderSpacing.Left = 2
           BorderSpacing.Bottom = 2
@@ -458,9 +459,9 @@ object StatisticForm: TStatisticForm
         end
         object Label7: TLabel
           Left = 2
-          Height = 15
-          Top = 177
-          Width = 312
+          Height = 20
+          Top = 222
+          Width = 392
           Align = alTop
           BorderSpacing.Left = 2
           BorderSpacing.Bottom = 2
@@ -472,34 +473,35 @@ object StatisticForm: TStatisticForm
           Transparent = False
         end
         object Panel9: TPanel
+          AnchorSideTop.Control = VT2
           Left = 0
-          Height = 38
-          Top = 194
-          Width = 314
+          Height = 48
+          Top = 244
+          Width = 394
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 38
-          ClientWidth = 314
+          ClientHeight = 48
+          ClientWidth = 394
           TabOrder = 1
           object CheckBox2: TCheckBox
-            Left = 5
-            Height = 19
+            Left = 6
+            Height = 24
             Top = 0
-            Width = 309
+            Width = 388
             Align = alTop
-            BorderSpacing.Left = 5
+            BorderSpacing.Left = 6
             Caption = '% от общего количества рекламаций за период '
             OnChange = CheckBox2Change
             TabOrder = 0
           end
           object CheckBox3: TCheckBox
-            Left = 5
-            Height = 19
-            Top = 19
-            Width = 309
+            Left = 6
+            Height = 24
+            Top = 24
+            Width = 388
             Align = alTop
-            BorderSpacing.Left = 5
+            BorderSpacing.Left = 6
             Caption = 'количество рекламаций за все периоды'
             OnChange = CheckBox3Change
             TabOrder = 1
@@ -507,24 +509,25 @@ object StatisticForm: TStatisticForm
           end
         end
         object Panel6: TPanel
+          AnchorSideTop.Control = Panel9
           Left = 0
-          Height = 71
-          Top = 232
-          Width = 314
+          Height = 90
+          Top = 292
+          Width = 394
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 71
-          ClientWidth = 314
+          ClientHeight = 90
+          ClientWidth = 394
           TabOrder = 2
           Visible = False
           object RadioButton1: TRadioButton
-            Left = 5
-            Height = 19
-            Top = 33
-            Width = 309
+            Left = 6
+            Height = 24
+            Top = 42
+            Width = 388
             Align = alTop
-            BorderSpacing.Left = 5
+            BorderSpacing.Left = 6
             Caption = 'по причине неисправности'
             Checked = True
             OnClick = RadioButton1Click
@@ -532,24 +535,24 @@ object StatisticForm: TStatisticForm
             TabStop = True
           end
           object RadioButton2: TRadioButton
-            Left = 5
-            Height = 19
-            Top = 52
-            Width = 309
+            Left = 6
+            Height = 24
+            Top = 66
+            Width = 388
             Align = alTop
-            BorderSpacing.Left = 5
+            BorderSpacing.Left = 6
             Caption = 'по отчетному периоду'
             OnClick = RadioButton2Click
             TabOrder = 1
           end
           object Label8: TLabel
             Left = 2
-            Height = 15
-            Top = 16
-            Width = 312
+            Height = 20
+            Top = 20
+            Width = 392
             Align = alTop
             BorderSpacing.Left = 2
-            BorderSpacing.Top = 16
+            BorderSpacing.Top = 20
             BorderSpacing.Bottom = 2
             Caption = 'Группировать данные:'
             Color = clWindow
@@ -562,55 +565,55 @@ object StatisticForm: TStatisticForm
       end
     end
     object Splitter1: TSplitter
-      Left = 321
-      Height = 610
+      Left = 401
+      Height = 764
       Top = 1
-      Width = 5
+      Width = 6
       ResizeStyle = rsLine
     end
     object Panel4: TPanel
-      Left = 326
-      Height = 610
+      Left = 407
+      Height = 764
       Top = 1
-      Width = 628
+      Width = 786
       Align = alClient
       BevelOuter = bvNone
       Caption = 'Panel4'
-      ClientHeight = 610
-      ClientWidth = 628
+      ClientHeight = 764
+      ClientWidth = 786
       TabOrder = 2
       object MainPanel: TPanel
         Left = 2
-        Height = 606
+        Height = 760
         Top = 2
-        Width = 624
+        Width = 782
         Align = alClient
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
         BorderSpacing.Right = 2
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
-        ClientHeight = 606
-        ClientWidth = 624
+        ClientHeight = 760
+        ClientWidth = 782
         TabOrder = 0
         object Panel7: TPanel
           Left = 0
-          Height = 574
+          Height = 722
           Top = 0
-          Width = 624
+          Width = 782
           Align = alClient
           BorderSpacing.Bottom = 2
           BevelOuter = bvNone
           BorderStyle = bsSingle
           Caption = 'Panel7'
-          ClientHeight = 570
-          ClientWidth = 620
+          ClientHeight = 718
+          ClientWidth = 778
           TabOrder = 0
           object Grid1: TsWorksheetGrid
             Left = 0
-            Height = 570
+            Height = 718
             Top = 0
-            Width = 620
+            Width = 778
             AutoExpand = []
             DisplayFixedColRow = False
             FrozenBorderPen.Style = psClear
@@ -644,45 +647,45 @@ object StatisticForm: TStatisticForm
         end
         object Panel8: TPanel
           Left = 0
-          Height = 30
-          Top = 576
-          Width = 624
+          Height = 36
+          Top = 724
+          Width = 782
           Align = alBottom
           AutoSize = True
           BevelOuter = bvNone
           BorderStyle = bsSingle
-          ClientHeight = 26
-          ClientWidth = 620
+          ClientHeight = 32
+          ClientWidth = 778
           TabOrder = 1
           object ZoomPanel: TPanel
-            Left = 338
-            Height = 16
-            Top = 5
-            Width = 282
+            Left = 438
+            Height = 20
+            Top = 6
+            Width = 340
             Align = alRight
             AutoSize = True
-            BorderSpacing.Top = 5
-            BorderSpacing.Bottom = 5
+            BorderSpacing.Top = 6
+            BorderSpacing.Bottom = 6
             BevelOuter = bvNone
-            ClientHeight = 16
-            ClientWidth = 282
-            Constraints.MaxHeight = 16
+            ClientHeight = 20
+            ClientWidth = 340
+            Constraints.MaxHeight = 20
             TabOrder = 0
             object ZoomCaptionLabel: TLabel
               Left = 2
-              Height = 16
+              Height = 20
               Top = 0
-              Width = 52
+              Width = 63
               Align = alRight
               BorderSpacing.Left = 2
               Caption = 'Масштаб'
               ParentColor = False
             end
             object ZoomTrackBar: TTrackBar
-              Left = 86
-              Height = 16
+              Left = 100
+              Height = 20
               Top = 0
-              Width = 120
+              Width = 150
               LineSize = 5
               Max = 150
               Min = 50
@@ -695,13 +698,13 @@ object StatisticForm: TStatisticForm
             end
             object ZoomOutButton: TSpeedButton
               Cursor = crHandPoint
-              Left = 66
-              Height = 16
+              Left = 80
+              Height = 20
               Top = 0
               Width = 20
               Align = alRight
               AutoSize = True
-              BorderSpacing.Left = 12
+              BorderSpacing.Left = 15
               Flat = True
               Glyph.Data = {
                 36040000424D3604000000000000360000002800000010000000100000000100
@@ -743,8 +746,8 @@ object StatisticForm: TStatisticForm
             end
             object ZoomInButton: TSpeedButton
               Cursor = crHandPoint
-              Left = 206
-              Height = 16
+              Left = 250
+              Height = 20
               Top = 0
               Width = 20
               Align = alRight
@@ -789,24 +792,24 @@ object StatisticForm: TStatisticForm
               OnClick = ZoomInButtonClick
             end
             object ZoomValuePanel: TPanel
-              Left = 226
-              Height = 16
+              Left = 270
+              Height = 20
               Top = 0
-              Width = 56
+              Width = 70
               Align = alRight
               BevelOuter = bvNone
-              ClientHeight = 16
-              ClientWidth = 56
+              ClientHeight = 20
+              ClientWidth = 70
               TabOrder = 1
               object ZoomValueLabel: TLabel
                 AnchorSideLeft.Side = asrBottom
-                Left = 20
-                Height = 16
+                Left = 24
+                Height = 20
                 Top = 0
-                Width = 31
+                Width = 40
                 Align = alRight
-                BorderSpacing.Left = 12
-                BorderSpacing.Right = 5
+                BorderSpacing.Left = 15
+                BorderSpacing.Right = 6
                 Caption = '100 %'
                 ParentColor = False
               end
