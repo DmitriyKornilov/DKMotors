@@ -95,9 +95,9 @@ type
 
   end;
 
-  { TStatisticReclamationSinglePeriodSheet }
+  { TStatisticSinglePeriodSheet }
 
-  TStatisticReclamationSinglePeriodSheet = class (TObject)
+  TStatisticSinglePeriodSheet = class (TObject)
   private
     const
       TOTAL_WIDTH = 1200;
@@ -106,6 +106,18 @@ type
       FWriter: TSheetWriter;
       FFontName: String;
       FFontSize: Single;
+
+      FUsedReasons: TBoolVector;
+      FShowPercentColumn, FResumeNeed: Boolean;
+      FBeginDate, FEndDate: TDate;
+      FMotorNames, FParamCaption: String;
+      FParamNames, FReasonNames: TStrVector;
+      FCounts: TIntMatrix;
+
+      procedure DrawTop(var ARow: Integer);
+      procedure DrawTable(var ARow: Integer);
+      procedure DrawData(var ARow: Integer);
+      procedure DrawGraph(var ARow: Integer);
   public
     constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
                        const AUsedReasons: TBoolVector;
@@ -113,10 +125,19 @@ type
     destructor  Destroy; override;
     procedure Zoom(const APercents: Integer);
     procedure Draw(const ABeginDate, AEndDate: TDate;
-                   const AReportName, AMotorNames, AParamCaption: String;
+                   const AMotorNames: String;
                    const AParamNames, AReasonNames: TStrVector;
                    const ACounts: TIntMatrix;
                    const AResumeNeed: Boolean);
+  end;
+
+  { TStatisticSinglePeriodAtMotoNamesSheet }
+
+  TStatisticSinglePeriodAtMotoNamesSheet = class (TStatisticSinglePeriodSheet)
+  public
+    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
+                       const AUsedReasons: TBoolVector;
+                       const AShowPercentColumn: Boolean = False);
   end;
 
   { TStatisticReclamationSheet }
@@ -366,9 +387,110 @@ type
 
 implementation
 
-{ TStatisticReclamationSinglePeriodSheet }
+{ TStatisticSinglePeriodAtMotoNamesSheet }
 
-constructor TStatisticReclamationSinglePeriodSheet.Create(
+constructor TStatisticSinglePeriodAtMotoNamesSheet.Create(
+  const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
+  const AUsedReasons: TBoolVector; const AShowPercentColumn: Boolean);
+begin
+  inherited Create(AWorksheet, AGrid, AUsedReasons, AShowPercentColumn);
+  FParamCaption:= 'Наименование';
+end;
+
+{ TStatisticSinglePeriodSheet }
+
+procedure TStatisticSinglePeriodSheet.DrawTop(var ARow: Integer);
+var
+  R, i: Integer;
+  S: String;
+begin
+  FWriter.SetAlignment(haCenter, vaCenter);
+
+  R:= ARow;
+  S:= 'Отчет по рекламационным случаям электродвигателей';
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  if FMotorNames<>EmptyStr then
+  begin
+    R:= R + 1;
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, 1, R, FWriter.ColCount, AMotorNames, cbtNone, True, True);
+  end;
+
+  R:= R + 1;
+  S:= 'за ';
+  if SameDate(FBeginDate, FEndDate) then
+    S:= S + FormatDateTime('dd.mm.yyyy', FBeginDate)
+  else
+    S:= S + 'период с ' +
+        FormatDateTime('dd.mm.yyyy', FBeginDate) + ' по ' +
+        FormatDateTime('dd.mm.yyyy', FEndDate);
+  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+
+  if AReportName<>EmptyStr then
+  begin
+    R:= R + 1;
+    S:= '(' + AReportName + ')';
+    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+  end;
+
+  //EmptyRow
+  R:= R + 1;
+  FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
+  FWriter.SetRowHeight(R, 10);
+
+  ARow:= R + 1;
+end;
+
+procedure TStatisticSinglePeriodSheet.DrawTable(var ARow: Integer);
+var
+  i, R1, R2, C1, C2: Integer;
+
+  procedure DrawCaption(const ACaption: String);
+  begin
+    C1:= C2 + 1;
+    C2:= C1 + Ord(FShowPercentColumn);
+    FWriter.WriteText(R1, C1, R1, C1, ACaption, cbtOuter, True, True);
+    if FShowPercentColumn then
+    begin
+      FWriter.WriteText(R2, C1, 'кол-во', cbtOuter, True, True);
+      FWriter.WriteText(R2, C1, '%', cbtOuter, True, True);
+    end;
+  end;
+
+begin
+  R1:= ARow;
+  R2:= R1 + Ord(FShowPercentColumn);
+  C1:= 1;
+  C2:= 1;
+  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+  FWriter.SetAlignment(haCenter, vaCenter);
+  FWriter.WriteText(R1, C1, R2, C2, FParamCaption, cbtOuter, True, True);
+
+  if FUsedReasons[0] then
+    DrawCaption('За период');
+  for i:= 1 to High(FReasonNames) do
+    if FUsedReasons[i] then
+      DrawCaption(FReasonNames[i]);
+
+  FWriter.DrawBorders(R1, 1, R2, FWriter.ColCount, cbtAll);
+  ARow:= R2;
+end;
+
+procedure TStatisticSinglePeriodSheet.DrawData(var ARow: Integer);
+begin
+
+end;
+
+procedure TStatisticSinglePeriodSheet.DrawGraph(var ARow: Integer);
+begin
+
+end;
+
+constructor TStatisticSinglePeriodSheet.Create(
   const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
   const AUsedReasons: TBoolVector; const AShowPercentColumn: Boolean);
 var
@@ -378,8 +500,10 @@ begin
   FFontName:= SHEET_FONT_NAME;
   FFontSize:= SHEET_FONT_SIZE;
 
+  FUsedReasons:= AUsedReasons;
+  FShowPercentColumn:= AShowPercentColumn;
 
-  ColCount:= VCountIf(AUsedReasons, True) * (1 + Ord(AShowPercentColumn));
+  ColCount:= VCountIf(FUsedReasons, True) * (1 + Ord(FShowPercentColumn));
   W:= (TOTAL_WIDTH - PARAM_COLUMN_MIN_WIDTH) div ColCount;
   VDim(ColWidths, ColCount+1, W);
   W:= TOTAL_WIDTH - W*ColCount;
@@ -388,23 +512,45 @@ begin
   FWriter:= TSheetWriter.Create(ColWidths, AWorksheet, AGrid);
 end;
 
-destructor TStatisticReclamationSinglePeriodSheet.Destroy;
+destructor TStatisticSinglePeriodSheet.Destroy;
 begin
   if Assigned(FWriter) then FreeAndNil(FWriter);
   inherited Destroy;
 end;
 
-procedure TStatisticReclamationSinglePeriodSheet.Zoom(const APercents: Integer);
+procedure TStatisticSinglePeriodSheet.Zoom(const APercents: Integer);
 begin
   FWriter.SetZoom(APercents);
 end;
 
-procedure TStatisticReclamationSinglePeriodSheet.Draw(const ABeginDate,
-  AEndDate: TDate; const AReportName, AMotorNames, AParamCaption: String;
-  const AParamNames, AReasonNames: TStrVector; const ACounts: TIntMatrix;
-  const AResumeNeed: Boolean);
+procedure TStatisticSinglePeriodSheet.Draw(
+                                 const ABeginDate, AEndDate: TDate;
+                                 const AMotorNames: String;
+                                 const AParamNames, AReasonNames: TStrVector;
+                                 const ACounts: TIntMatrix;
+                                 const AResumeNeed: Boolean);
+var
+  R: Integer;
 begin
+  FBeginDate:= ABeginDate;
+  FEndDate:= AEndDate;
+  FMotorNames:= AMotorNames;
+  FParamNames:= AParamNames;
+  FReasonNames:= AReasonNames;
+  FCounts:= ACounts;
+  FResumeNeed:= AResumeNeed;
 
+  if VIsNil(AParamNames) then Exit;
+
+  FWriter.BeginEdit;
+
+  R:= 1;
+  DrawTop(R);
+  DrawTable(R);
+  DrawData(R);
+  DrawGraph(R);
+
+  FWriter.EndEdit;
 end;
 
 { TControlSheet }
