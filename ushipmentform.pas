@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables, USQLite,
-  USheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid, DK_Dialogs,
-  DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter;
+  Spin, StdCtrls, ComCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables,
+  USQLite, USheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid,
+  DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter;
 
 type
 
@@ -16,20 +16,29 @@ type
 
   TShipmentForm = class(TForm)
     AddButton: TSpeedButton;
-    LogGrid: TsWorksheetGrid;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
     DividerBevel3: TDividerBevel;
     EditButton: TSpeedButton;
     EditButtonPanel: TPanel;
     ExportButton: TRxSpeedButton;
+    LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
+    Panel3: TPanel;
+    Panel6: TPanel;
     RxSpeedButton5: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
+    ZoomCaptionLabel: TLabel;
+    ZoomInButton: TSpeedButton;
+    ZoomOutButton: TSpeedButton;
+    ZoomPanel: TPanel;
+    ZoomTrackBar: TTrackBar;
+    ZoomValueLabel: TLabel;
+    ZoomValuePanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -40,6 +49,9 @@ type
     procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTClick(Sender: TObject);
+    procedure ZoomInButtonClick(Sender: TObject);
+    procedure ZoomOutButtonClick(Sender: TObject);
+    procedure ZoomTrackBarChange(Sender: TObject);
   private
     Months: TStrVector;
     Shipments: TStrMatrix;
@@ -48,8 +60,18 @@ type
     VST: TVSTCategoryRadioButtonTable;
     CargoSheet: TCargoSheet;
 
+    SendDate: TDate;
+    ReceiverName: String;
+    MotorNames: TStrVector;
+    MotorCounts: TIntVector;
+    MotorNums, Series: TStrMatrix;
+
     procedure OpenShipmentList(const ACargoID: Integer);
+
     function OpenShipment: Boolean;
+    function LoadShipment: Boolean;
+    procedure DrawShipment;
+    procedure ExportShipment;
 
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
     procedure SetButtonsEnabled(const AEnabled: Boolean);
@@ -87,17 +109,8 @@ begin
 end;
 
 procedure TShipmentForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TGridExporter;
 begin
-  Exporter:= TGridExporter.Create(LogGrid);
-  try
-    //Exporter.SheetName:= 'Отчет';
-    Exporter.PageSettings(spoPortrait, pfWidth);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
+  ExportShipment;
 end;
 
 procedure TShipmentForm.FormCreate(Sender: TObject);
@@ -111,7 +124,7 @@ begin
   VST.GridLinesVisible:= False;
   VST.AddColumn('Shipments');
 
-  CargoSheet:= TCargoSheet.Create(LogGrid);
+  CargoSheet:= TCargoSheet.Create(LogGrid.Worksheet, LogGrid);
 
   SpinEdit1.Value:= YearOfDate(Date);
 end;
@@ -153,6 +166,21 @@ begin
     OpenShipment;
 end;
 
+procedure TShipmentForm.ZoomInButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
+end;
+
+procedure TShipmentForm.ZoomOutButtonClick(Sender: TObject);
+begin
+  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
+end;
+
+procedure TShipmentForm.ZoomTrackBarChange(Sender: TObject);
+begin
+  DrawShipment;
+end;
+
 procedure TShipmentForm.OpenShipmentList(const ACargoID: Integer);
 var
   I1, I2: Integer;
@@ -180,18 +208,44 @@ begin
 end;
 
 function TShipmentForm.OpenShipment: Boolean;
-var
-  SendDate: TDate;
-  ReceiverName: String;
-  MotorNames: TStrVector;
-  MotorCounts: TIntVector;
-  MotorNums, Series: TStrMatrix;
+begin
+  Result:= LoadShipment;
+  DrawShipment;
+end;
+
+function TShipmentForm.LoadShipment: Boolean;
 begin
   Result:= SQLite.CargoLoad(CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2],
              SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
-  CargoSheet.Draw(
-             SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
+end;
 
+procedure TShipmentForm.DrawShipment;
+begin
+  CargoSheet.Zoom(ZoomTrackBar.Position);
+  CargoSheet.Draw(SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
+end;
+
+procedure TShipmentForm.ExportShipment;
+var
+  Drawer: TCargoSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetExporter;
+begin
+  Exporter:= TSheetExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    Drawer:= TCargoSheet.Create(Sheet);
+    try
+      Drawer.Draw(SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
+    finally
+      FreeAndNil(Drawer);
+    end;
+    Exporter.PageSettings(spoPortrait);
+
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
 end;
 
 procedure TShipmentForm.OpenCargoEditForm(const AEditMode: Byte);

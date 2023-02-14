@@ -124,6 +124,7 @@ type
     procedure CalcCalendar;
     procedure DrawCalendar;
     procedure RefreshCalendar;
+    procedure ExportCalendar;
 
     procedure CalcAndShowInfo;
     procedure CalcAndShowDaysCount;
@@ -354,6 +355,31 @@ begin
   CalcCalendar;
   DrawCalendar;
   CalcAndShowInfo;
+end;
+
+procedure TCalendarForm.ExportCalendar;
+var
+  Drawer: TCalendarSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetExporter;
+begin
+  Exporter:= TSheetExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    Drawer:= TCalendarSheet.Create(Sheet);
+    try
+      Drawer.Draw(YearCalendar, SelectedDates);
+      Drawer.UpdateColors(ColorVector);
+    finally
+      FreeAndNil(Drawer);
+    end;
+    Exporter.PageSettings(spoLandscape, pfOnePage);
+
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
+
 end;
 
 procedure TCalendarForm.CalcAndShowInfo;
@@ -631,16 +657,8 @@ begin
 end;
 
 procedure TCalendarForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TGridExporter;
 begin
-  Exporter:= TGridExporter.Create(CalendarGrid);
-  try
-    Exporter.PageSettings(spoLandScape, pfOnePage);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
+  ExportCalendar;
 end;
 
 end.

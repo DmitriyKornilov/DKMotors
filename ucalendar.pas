@@ -207,7 +207,7 @@ type
     procedure DrawHalf(const AHalf: Byte);
     procedure DrawYear;
   public
-    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid);
+    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid = nil);
     destructor  Destroy; override;
     procedure Zoom(const APercents: Integer);
     procedure Draw(const AYearCalendar: TCalendar; const AHighLightDays: TDateVector);
@@ -746,9 +746,6 @@ end;
 
 constructor TCalendarSheet.Create(const AWorksheet: TsWorksheet;
   const AGrid: TsWorksheetGrid);
-//const
-//  DeltaW = 15;
-//  MINROWHEIGHT = 23;
 var
   i, W: Integer;
   Widths: TIntVector;
@@ -757,25 +754,19 @@ begin
   FFontName:= SHEET_FONT_NAME;
   FFontSize:= SHEET_FONT_SIZE;
   FRowHeight:= 25;
-  //FRowHeight:= SHeight('X', FFontName, FFontSize);
-  //if FRowHeight<MINROWHEIGHT then FRowHeight:= MINROWHEIGHT;
 
   Widths:= nil;
   VDim(Widths, 32);
 
-  //W:= SWidth('00', FFontName, FFontSize) + DeltaW;
   W:= 30;
   for i:= 0 to 23 do Widths[i]:= W;
 
-  //W:= SWidth('II ПОЛУГОДИЕ', FFontName, FFontSize) + DeltaW;
   W:= 110;
   Widths[24]:= W;
 
-  //W:= SWidth('Рабочих', FFontName, FFontSize) + DeltaW;
   W:= 60;
   for i:= 25 to 28 do Widths[i]:= W;
 
-  //W:= SWidth('40-часовая', FFontName, FFontSize) + DeltaW;
   W:= 80;
   for i:= 29 to 31 do Widths[i]:= W;
 

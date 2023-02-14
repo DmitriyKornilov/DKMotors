@@ -78,15 +78,15 @@ type
     DefectNames, ReasonNames, RecNotes: TStrVector;
     MotorNames, MotorNums: TStrVector;
 
-    procedure ExportSheet;
-
     procedure SelectionClear;
     procedure SelectLine(const ARow: Integer);
 
     procedure DelRaclamation;
     procedure ReclamationEditFormOpen(const AEditType: Byte);
 
+    procedure LoadReclamation;
     procedure DrawReclamation;
+    procedure ExportReclamation;
 
   public
     procedure ShowReclamation;
@@ -103,25 +103,11 @@ uses UMainForm;
 
 { TReclamationForm }
 
-procedure TReclamationForm.ExportSheet;
-var
-  Exporter: TGridExporter;
-begin
-  Exporter:= TGridExporter.Create(LogGrid);
-  try
-    //Exporter.SheetName:= 'Отчет';
-    Exporter.PageSettings(spoLandscape, pfWidth);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
-end;
-
 procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   SelectedIndex:= -1;
-  ReclamationSheet:= TReclamationSheet.Create(LogGrid);
+  ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid);
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -163,8 +149,6 @@ procedure TReclamationForm.MotorNumOrderCheckBoxChange(Sender: TObject);
 begin
   ShowReclamation;
 end;
-
-
 
 procedure TReclamationForm.PlaceListButtonClick(Sender: TObject);
 begin
@@ -243,17 +227,25 @@ begin
 end;
 
 procedure TReclamationForm.ShowReclamation;
-var
-  BeginDate, EndDate: TDate;
 begin
   Screen.Cursor:= crHourGlass;
   try
     SelectionClear;
-    LogGrid.Clear;
-    BeginDate:= FirstDayInYear(SpinEdit1.Value);
-    EndDate:= LastDayInYear(SpinEdit1.Value);
+    LoadReclamation;
+    DrawReclamation;
+  finally
+    Screen.Cursor:= crDefault;
+  end;
+end;
 
-    SQLite.ReclamationListLoad(BeginDate, EndDate,
+procedure TReclamationForm.LoadReclamation;
+var
+  BeginDate, EndDate: TDate;
+begin
+  BeginDate:= FirstDayInYear(SpinEdit1.Value);
+  EndDate:= LastDayInYear(SpinEdit1.Value);
+
+  SQLite.ReclamationListLoad(BeginDate, EndDate,
                         MainForm.UsedNameIDs,
                         STrim(MotorNumEdit.Text),
                         MotorNumOrderCheckBox.Checked,
@@ -263,21 +255,42 @@ begin
                         PlaceNames, FactoryNames, Departures,
                         DefectNames, ReasonNames, RecNotes,
                         MotorNames, MotorNums);
-    DrawReclamation;
-  finally
-    Screen.Cursor:= crDefault;
-  end;
 end;
 
 procedure TReclamationForm.DrawReclamation;
 begin
   ReclamationSheet.Zoom(ZoomTrackBar.Position);
   ReclamationSheet.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
-                          Mileages, Opinions, ReasonColors, {Passports,}
+                          Mileages, Opinions, ReasonColors,
                           PlaceNames, FactoryNames, Departures, DefectNames,
                           ReasonNames, RecNotes, MotorNames, MotorNums);
 end;
 
+procedure TReclamationForm.ExportReclamation;
+var
+  Drawer: TReclamationSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetExporter;
+begin
+  Exporter:= TSheetExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    Drawer:= TReclamationSheet.Create(Sheet);
+    try
+      Drawer.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
+                          Mileages, Opinions, ReasonColors,
+                          PlaceNames, FactoryNames, Departures, DefectNames,
+                          ReasonNames, RecNotes, MotorNames, MotorNums);
+    finally
+      FreeAndNil(Drawer);
+    end;
+    Exporter.PageSettings(spoLandscape);
+
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
+end;
 
 procedure TReclamationForm.DelRaclamation;
 begin
@@ -305,8 +318,6 @@ begin
   ShowReclamation;
 end;
 
-
-
 procedure TReclamationForm.DelButtonClick(Sender: TObject);
 begin
   DelRaclamation;
@@ -324,7 +335,7 @@ end;
 
 procedure TReclamationForm.ExportButtonClick(Sender: TObject);
 begin
-  ExportSheet;
+  ExportReclamation;
 end;
 
 end.

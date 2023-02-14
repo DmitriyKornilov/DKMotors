@@ -100,8 +100,11 @@ type
     //1 - Распределение по неисправным элементам
     //2 - Распределение по предприятиям
     //3 - Распределение по месяцам
-    procedure Statistic(const AParamType: Integer);
-    procedure DrawStatistic;
+    procedure LoadStatistic(const AParamType: Integer);
+    procedure DrawStatistic(const AParamType: Integer);
+
+    procedure DrawStatisticSinglePeriodAtMotorNames;
+
   public
 
 
@@ -253,7 +256,7 @@ end;
 procedure TStatisticForm.ZoomTrackBarChange(Sender: TObject);
 begin
   ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
-  DrawStatistic;
+  DrawStatistic(SelectedIndex);
 end;
 
 procedure TStatisticForm.ShowStatistic;
@@ -264,7 +267,7 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     Grid1.Clear;
-    Statistic(SelectedIndex);
+    LoadStatistic(SelectedIndex);
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -337,95 +340,132 @@ begin
   ShowStatistic;
 end;
 
-procedure TStatisticForm.Statistic(const AParamType: Integer);
+procedure TStatisticForm.LoadStatistic(const AParamType: Integer);
 var
   BD, ED: TDate;
   i,W: Integer;
 begin
   if AParamType<0 then Exit;
-
   BD:= DateTimePicker2.Date;
   ED:= DateTimePicker1.Date;
-
-  //if RadioButton1.Checked then
-  GroupType:= 2;
-  if RadioButton2.Checked then
-    GroupType:= 1;
-
-  SecondColumnType:= 1;
-  if SelectedIndex=3 then
-    SecondColumnType:= 2;
-
-  AdditionYearsCount:= 0;
-  if CheckBox1.Checked then
-    AdditionYearsCount:= SpinEdit1.Value;
+  MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
 
   if AParamType=0 then
   begin
     SQLite.ReclamationMotorsWithReasonsLoad(BD, ED, AdditionYearsCount,
                                 MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-    ParamCaption:= 'Наименование';
-    ReportName:= 'распределение по наименованиям электродвигателей';
-  end
-  else if AParamType=1 then
-  begin
-    SQLite.ReclamationDefectsWithReasonsLoad(BD, ED, AdditionYearsCount,
-                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-    ParamCaption:= 'Неисправность';
-    ReportName:= 'распределение по неисправным элементам';
-  end
-  else if AParamType=2 then
-  begin
-    SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, AdditionYearsCount,
-                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-    ParamCaption:= 'Предприятие';
-    ReportName:= 'распределение по предприятиям';
-  end
-  else if AParamType=3 then
-  begin
-    SQLite.ReclamationMonthsWithReasonsLoad(BD, ED, AdditionYearsCount,
-                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-    ParamCaption:= 'Месяц';
-    ReportName:= 'распределение по месяцам';
-  end
-  else if AParamType=4 then
-  begin
-    SQLite.ReclamationMileagesWithReasonsLoad(BD, ED, AdditionYearsCount,
-                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-    ParamCaption:= 'Пробег локомотива, тыс. км';
-    ReportName:= 'распределение по пробегу локомотива';
   end;
 
-  MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
+  DrawStatistic(AParamType);
 
-  //ширина столбца с наименованиями параметра распределения
-  ParamNameColumnWidth:= 120;
-  for i:=0 to High(ParamNames) do
-  begin
-    W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+50;
-    //W:= Round(W/DIMENTION_FACTOR);
-    if W>ParamNameColumnWidth then
-      ParamNameColumnWidth:= W;
-
-  end;
-
-  DrawStatistic;
+  //if AParamType<0 then Exit;
+  //
+  //BD:= DateTimePicker2.Date;
+  //ED:= DateTimePicker1.Date;
+  //
+  //
+  //GroupType:= 2;
+  //if RadioButton2.Checked then
+  //  GroupType:= 1;
+  //
+  //SecondColumnType:= 1;
+  //if SelectedIndex=3 then
+  //  SecondColumnType:= 2;
+  //
+  //AdditionYearsCount:= 0;
+  //if CheckBox1.Checked then
+  //  AdditionYearsCount:= SpinEdit1.Value;
+  //
+  //if AParamType=0 then
+  //begin
+  //  SQLite.ReclamationMotorsWithReasonsLoad(BD, ED, AdditionYearsCount,
+  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  //  ParamCaption:= 'Наименование';
+  //  ReportName:= 'распределение по наименованиям электродвигателей';
+  //end
+  //else if AParamType=1 then
+  //begin
+  //  SQLite.ReclamationDefectsWithReasonsLoad(BD, ED, AdditionYearsCount,
+  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  //  ParamCaption:= 'Неисправность';
+  //  ReportName:= 'распределение по неисправным элементам';
+  //end
+  //else if AParamType=2 then
+  //begin
+  //  SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, AdditionYearsCount,
+  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  //  ParamCaption:= 'Предприятие';
+  //  ReportName:= 'распределение по предприятиям';
+  //end
+  //else if AParamType=3 then
+  //begin
+  //  SQLite.ReclamationMonthsWithReasonsLoad(BD, ED, AdditionYearsCount,
+  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  //  ParamCaption:= 'Месяц';
+  //  ReportName:= 'распределение по месяцам';
+  //end
+  //else if AParamType=4 then
+  //begin
+  //  SQLite.ReclamationMileagesWithReasonsLoad(BD, ED, AdditionYearsCount,
+  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  //  ParamCaption:= 'Пробег локомотива, тыс. км';
+  //  ReportName:= 'распределение по пробегу локомотива';
+  //end;
+  //
+  //MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
+  //
+  ////ширина столбца с наименованиями параметра распределения
+  //ParamNameColumnWidth:= 120;
+  //for i:=0 to High(ParamNames) do
+  //begin
+  //  W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+50;
+  //  //W:= Round(W/DIMENTION_FACTOR);
+  //  if W>ParamNameColumnWidth then
+  //    ParamNameColumnWidth:= W;
+  //
+  //end;
+  //
+  //DrawStatistic;
 end;
 
-procedure TStatisticForm.DrawStatistic;
+procedure TStatisticForm.DrawStatistic(const AParamType: Integer);
 var
   BD, ED: TDate;
-  Sheet: TStatisticReclamationSheet;
+  //Sheet: TStatisticReclamationSheet;
 begin
-  Sheet:= TStatisticReclamationSheet.Create(Grid1,
-                    ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount,
-                    ReasonList.Selected, CheckBox2.Checked, CheckBox3.Checked);
+  if MIsNil(Counts) then Exit;
+
+  if AParamType=0 then
+    DrawStatisticSinglePeriodAtMotorNames;
+
+  //Sheet:= TStatisticReclamationSheet.Create(Grid1,
+  //                  ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount,
+  //                  ReasonList.Selected, CheckBox2.Checked, CheckBox3.Checked);
+  //try
+  //  BD:= DateTimePicker2.Date;
+  //  ED:= DateTimePicker1.Date;
+  //  Sheet.Zoom(ZoomTrackBar.Position);
+  //  Sheet.Draw(BD, ED, ReportName, MotorNames, ParamCaption,
+  //           ParamNames, ReasonNames, Counts, True);
+  //finally
+  //  FreeAndNil(Sheet);
+  //end;
+end;
+
+procedure TStatisticForm.DrawStatisticSinglePeriodAtMotorNames;
+var
+  BD, ED: TDate;
+  Sheet: TStatisticSinglePeriodAtMotorNamesSheet;
+begin
+
+
+  Sheet:= TStatisticSinglePeriodAtMotorNamesSheet.Create(Grid1.Worksheet, Grid1,
+                    ReasonList.Selected, CheckBox2.Checked);
   try
     BD:= DateTimePicker2.Date;
     ED:= DateTimePicker1.Date;
     Sheet.Zoom(ZoomTrackBar.Position);
-    Sheet.Draw(BD, ED, ReportName, MotorNames, ParamCaption,
-             ParamNames, ReasonNames, Counts, True);
+    Sheet.Draw(BD, ED, MotorNames, ParamNames, ReasonNames, Counts[0], True);
   finally
     FreeAndNil(Sheet);
   end;

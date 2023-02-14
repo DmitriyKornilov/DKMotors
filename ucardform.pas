@@ -35,7 +35,18 @@ type
   private
     MotorCardSheet: TMotorCardSheet;
     MotorID: Integer;
+
+    BuildDate, SendDate: TDate;
+    MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
+    TestDates, RecDates, ArrivalDates, SendingDates: TDateVector;
+    TestResults, Mileages, Opinions, Passports, WorkDayCounts: TIntVector;
+    TestNotes, PlaceNames, FactoryNames, Departures,
+    DefectNames, ReasonNames, RecNotes, RepairNotes: TStrVector;
+
+
     procedure DrawCard;
+    procedure LoadCard;
+    procedure ExportCard;
   public
     procedure ShowCard(const AMotorID: Integer);
   end;
@@ -64,20 +75,12 @@ end;
 procedure TCardForm.FormCreate(Sender: TObject);
 begin
   MotorID:= 0;
-  MotorCardSheet:= TMotorCardSheet.Create(CardGrid);
+  MotorCardSheet:= TMotorCardSheet.Create(CardGrid.Worksheet, CardGrid);
 end;
 
 procedure TCardForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TGridExporter;
 begin
-  Exporter:= TGridExporter.Create(CardGrid);
-  try
-    Exporter.PageSettings(spoLandscape, pfOnePage);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
+  ExportCard;
 end;
 
 procedure TCardForm.FormDestroy(Sender: TObject);
@@ -101,13 +104,16 @@ begin
 end;
 
 procedure TCardForm.DrawCard;
-var
-  BuildDate, SendDate: TDate;
-  MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
-  TestDates, RecDates, ArrivalDates, SendingDates: TDateVector;
-  TestResults, Mileages, Opinions, Passports, WorkDayCounts: TIntVector;
-  TestNotes, PlaceNames, FactoryNames, Departures,
-  DefectNames, ReasonNames, RecNotes, RepairNotes: TStrVector;
+begin
+  MotorCardSheet.Zoom(ZoomTrackBar.Position);
+  MotorCardSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
+                      RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
+                      RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
+                      Departures, DefectNames, ReasonNames, RecNotes,
+                      ArrivalDates, SendingDates, Passports, WorkDayCounts, RepairNotes);
+end;
+
+procedure TCardForm.LoadCard;
 begin
   SQLite.MotorInfoLoad(MotorID, BuildDate, SendDate,
                 MotorName, MotorNum, Sers, RotorNum, ReceiverName,
@@ -120,13 +126,34 @@ begin
 
   SQLite.RepairListForMotorIDLoad(MotorID, ArrivalDates, SendingDates,
                       Passports, WorkDayCounts, RepairNotes);
+end;
 
-  MotorCardSheet.Zoom(ZoomTrackBar.Position);
-  MotorCardSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
-                      RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
-                      RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
-                      Departures, DefectNames, ReasonNames, RecNotes,
-                      ArrivalDates, SendingDates, Passports, WorkDayCounts, RepairNotes);
+procedure TCardForm.ExportCard;
+var
+  Drawer: TMotorCardSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetExporter;
+begin
+  Exporter:= TSheetExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    Drawer:= TMotorCardSheet.Create(Sheet);
+    try
+      Drawer.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
+                RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
+                RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
+                Departures, DefectNames, ReasonNames, RecNotes,
+                ArrivalDates, SendingDates, Passports, WorkDayCounts, RepairNotes);
+
+    finally
+      FreeAndNil(Drawer);
+    end;
+    Exporter.PageSettings(spoLandscape);
+
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
 end;
 
 procedure TCardForm.ShowCard(const AMotorID: Integer);
@@ -134,6 +161,7 @@ begin
   CardGrid.Clear;
   MotorID:= AMotorID;
   if MotorID<=0 then Exit;
+  LoadCard;
   DrawCard;
 end;
 
