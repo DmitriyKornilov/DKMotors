@@ -1,38 +1,39 @@
 object MainForm: TMainForm
-  Left = -6
+  Left = 132
   Height = 351
-  Top = 112
-  Width = 1273
+  Top = 146
+  Width = 1639
   Caption = 'Учет производства, поставок и рекламационных случаев электродвигателей ООО "Электрожелдормаш"'
   ClientHeight = 351
-  ClientWidth = 1273
+  ClientWidth = 1639
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.2.2.0'
   WindowState = wsMaximized
   object ToolPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 1269
+    Width = 1635
     Align = alTop
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 1265
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1631
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
     object BuildLogButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 225
-      Height = 28
+      Left = 260
+      Height = 36
       Top = 0
-      Width = 89
+      Width = 99
       Align = alLeft
       AutoSize = True
       Caption = 'Сборка'
@@ -45,10 +46,10 @@ object MainForm: TMainForm
     end
     object ShipmentButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 424
-      Height = 28
+      Left = 485
+      Height = 36
       Top = 0
-      Width = 97
+      Width = 109
       Align = alLeft
       AutoSize = True
       Caption = 'Отгрузка'
@@ -61,10 +62,10 @@ object MainForm: TMainForm
     end
     object ReclamationButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 721
-      Height = 28
+      Left = 820
+      Height = 36
       Top = 0
-      Width = 115
+      Width = 132
       Align = alLeft
       AutoSize = True
       Caption = 'Рекламация'
@@ -77,10 +78,10 @@ object MainForm: TMainForm
     end
     object DividerBevel4: TDividerBevel
       AnchorSideLeft.Side = asrBottom
-      Left = 1218
-      Height = 28
+      Left = 1571
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alRight
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -88,10 +89,10 @@ object MainForm: TMainForm
     end
     object StoreButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 625
-      Height = 28
+      Left = 712
+      Height = 36
       Top = 0
-      Width = 81
+      Width = 88
       Align = alLeft
       AutoSize = True
       Caption = 'Склад'
@@ -104,10 +105,10 @@ object MainForm: TMainForm
     end
     object TestLogButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 314
-      Height = 28
+      Left = 359
+      Height = 36
       Top = 0
-      Width = 110
+      Width = 126
       Align = alLeft
       AutoSize = True
       Caption = 'Испытания'
@@ -120,10 +121,10 @@ object MainForm: TMainForm
     end
     object ReportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 521
-      Height = 28
+      Left = 594
+      Height = 36
       Top = 0
-      Width = 89
+      Width = 98
       Align = alLeft
       AutoSize = True
       Caption = 'Отчеты'
@@ -136,36 +137,36 @@ object MainForm: TMainForm
     end
     object AboutButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1194
-      Height = 28
+      Left = 1531
+      Height = 36
       Top = 0
-      Width = 32
+      Width = 40
       Align = alRight
-      Constraints.MaxWidth = 32
-      Constraints.MinWidth = 32
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
       Images = ImageListCategory24
       ImageIndex = 15
       OnClick = AboutButtonClick
     end
     object ExitButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1233
-      Height = 28
+      Left = 1591
+      Height = 36
       Top = 0
-      Width = 32
+      Width = 40
       Align = alRight
-      Constraints.MaxWidth = 32
-      Constraints.MinWidth = 32
+      Constraints.MaxWidth = 40
+      Constraints.MinWidth = 40
       Images = ImageListCategory24
       ImageIndex = 13
       OnClick = ExitButtonClick
     end
     object StatisticButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 836
-      Height = 28
+      Left = 952
+      Height = 36
       Top = 0
-      Width = 180
+      Width = 213
       Align = alLeft
       AutoSize = True
       Caption = 'Статистика рекламаций'
@@ -179,9 +180,9 @@ object MainForm: TMainForm
     object MotorListButton: TRxSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 28
+      Height = 36
       Top = 0
-      Width = 109
+      Width = 125
       Align = alLeft
       AutoSize = True
       Caption = 'Продукция'
@@ -194,30 +195,30 @@ object MainForm: TMainForm
       ParentFont = False
     end
     object DividerBevel5: TDividerBevel
-      Left = 706
-      Height = 28
+      Left = 800
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
       ParentFont = False
     end
     object DividerBevel6: TDividerBevel
-      Left = 210
-      Height = 28
+      Left = 240
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
       ParentFont = False
     end
     object DividerBevel7: TDividerBevel
-      Left = 610
-      Height = 28
+      Left = 692
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -225,10 +226,10 @@ object MainForm: TMainForm
     end
     object ControlListButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 109
-      Height = 28
+      Left = 125
+      Height = 36
       Top = 0
-      Width = 101
+      Width = 115
       Align = alLeft
       AutoSize = True
       Caption = 'Контроль'
@@ -241,10 +242,10 @@ object MainForm: TMainForm
     end
     object RepairButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1031
-      Height = 28
+      Left = 1185
+      Height = 36
       Top = 0
-      Width = 89
+      Width = 99
       Align = alLeft
       AutoSize = True
       Caption = 'Ремонт'
@@ -256,10 +257,10 @@ object MainForm: TMainForm
       ParentFont = False
     end
     object DividerBevel8: TDividerBevel
-      Left = 1016
-      Height = 28
+      Left = 1165
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -267,10 +268,10 @@ object MainForm: TMainForm
     end
     object CalendarButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1120
-      Height = 28
+      Left = 1284
+      Height = 36
       Top = 0
-      Width = 106
+      Width = 123
       Align = alLeft
       AutoSize = True
       Caption = 'Календарь'
@@ -284,9 +285,9 @@ object MainForm: TMainForm
   end
   object MainPanel: TPanel
     Left = 0
-    Height = 249
-    Top = 102
-    Width = 1273
+    Height = 225
+    Top = 126
+    Width = 1639
     Align = alClient
     BevelOuter = bvNone
     ParentFont = False
@@ -297,9 +298,9 @@ object MainForm: TMainForm
     AnchorSideTop.Control = ToolPanel
     AnchorSideRight.Control = Owner
     Left = 2
-    Height = 32
-    Top = 36
-    Width = 1269
+    Height = 40
+    Top = 44
+    Width = 1635
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -307,21 +308,21 @@ object MainForm: TMainForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 1265
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1631
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 2
     OnClick = MotorNamesPanelClick
     object ChooseMotorNamesButton: TSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 28
+      Height = 36
       Top = 0
-      Width = 32
+      Width = 40
       Align = alLeft
       AutoSize = True
-      Constraints.MinWidth = 32
+      Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -464,11 +465,11 @@ object MainForm: TMainForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = MotorNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 37
-      Height = 15
-      Top = 7
-      Width = 103
-      BorderSpacing.Left = 5
+      Left = 46
+      Height = 20
+      Top = 8
+      Width = 129
+      BorderSpacing.Left = 6
       Caption = 'Электродвигатели:'
       ParentColor = False
       OnClick = Label2Click
@@ -480,13 +481,13 @@ object MainForm: TMainForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = MotorNamesPanel
       AnchorSideRight.Side = asrBottom
-      Left = 145
-      Height = 16
-      Top = 6
-      Width = 1118
+      Left = 181
+      Height = 20
+      Top = 8
+      Width = 1448
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
-      BorderSpacing.Left = 5
+      BorderSpacing.Left = 6
       BorderSpacing.Right = 2
       Caption = 'ВСЕ НАИМЕНОВАНИЯ'
       Font.Color = clNavy
@@ -502,9 +503,9 @@ object MainForm: TMainForm
     AnchorSideTop.Control = MotorNamesPanel
     AnchorSideRight.Control = Owner
     Left = 2
-    Height = 32
-    Top = 70
-    Width = 1269
+    Height = 40
+    Top = 86
+    Width = 1635
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -512,22 +513,22 @@ object MainForm: TMainForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 1265
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1631
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 3
     Visible = False
     OnClick = ReceiverNamesPanelClick
     object ChooseRecieverNamesButton: TSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 28
+      Height = 36
       Top = 0
-      Width = 32
+      Width = 40
       Align = alLeft
       AutoSize = True
-      Constraints.MinWidth = 32
+      Constraints.MinWidth = 40
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
         2000000000000010000064000000640000000000000000000000000000000000
@@ -670,11 +671,11 @@ object MainForm: TMainForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = ReceiverNamesPanel
       AnchorSideTop.Side = asrCenter
-      Left = 37
-      Height = 15
-      Top = 7
-      Width = 99
-      BorderSpacing.Left = 5
+      Left = 46
+      Height = 20
+      Top = 8
+      Width = 122
+      BorderSpacing.Left = 6
       Caption = 'Грузополучатели:'
       ParentColor = False
       OnClick = Label3Click
@@ -686,13 +687,13 @@ object MainForm: TMainForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = ReceiverNamesPanel
       AnchorSideRight.Side = asrBottom
-      Left = 146
-      Height = 16
-      Top = 6
-      Width = 1117
+      Left = 180
+      Height = 20
+      Top = 8
+      Width = 1449
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
-      BorderSpacing.Left = 10
+      BorderSpacing.Left = 12
       BorderSpacing.Right = 2
       Caption = 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ'
       Font.Color = clNavy
@@ -704,8 +705,8 @@ object MainForm: TMainForm
     end
   end
   object ImageList16: TImageList
-    Left = 104
-    Top = 223
+    Left = 130
+    Top = 279
     Bitmap = {
       4C7A0100000010000000100000007D0000000000000078DAA593410A80300C04
       977E487CAB9E05FFE4C10F7810FC83B2C882149316B6904B92D9266D02F09402
@@ -717,8 +718,8 @@ object MainForm: TMainForm
   object ImageListCategory24: TImageList
     Height = 24
     Width = 24
-    Left = 104
-    Top = 120
+    Left = 130
+    Top = 150
     Bitmap = {
       4C7A150000001800000018000000263600000000000078DAED9D093C54DFFBC7
       AFBD1012253B45AB2D514A28A994FAB6972D646B214BAB4AB46915ADDA579536
@@ -1159,8 +1160,8 @@ object MainForm: TMainForm
   object ImageListEdit24: TImageList
     Height = 24
     Width = 24
-    Left = 104
-    Top = 171
+    Left = 130
+    Top = 214
     Bitmap = {
       4C7A070000001800000018000000680600000000000078DAED9A096C154518C7
       FF5E20D2428BA582062DB7A0693142200A8A5CAD0987113CF00A6A4C684C1463

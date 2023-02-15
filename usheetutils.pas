@@ -77,12 +77,12 @@ type
   TStatisticSinglePeriodSheet = class (TObject)
   private
     const
-      TOTAL_WIDTH = 800;
+      TOTAL_WIDTH = 850;
       PARAM_COLUMN_MIN_WIDTH = 160;
     var
       FWriter: TSheetWriter;
       FFontName: String;
-      FFontSize: Single;
+      FFontSize: Integer;
 
       FUsedReasons: TBoolVector;
       FShowPercentColumn, FResumeNeed: Boolean;
@@ -363,6 +363,7 @@ var
   SP: TStatPlotterVertHist;
   Stream: TMemoryStream;
   i, W, H, R, Y: Integer;
+  FontHeight: Integer;
   ScaleX, ScaleY: Double;
 begin
   ScaleX:= 1/FWriter.ScreenScaleX;
@@ -373,6 +374,10 @@ begin
   H:= Round(0.5*TOTAL_WIDTH*FWriter.ScreenScaleY*FWriter.WorkSheet.ZoomFactor);
   Y:= Round(H*ScaleY/FWriter.WorkSheet.ZoomFactor);
 
+  FontHeight:= Trunc(GetFontHeight(FFontName, FFontSize)*FWriter.WorkSheet.ZoomFactor);
+
+
+
   if FUsedReasons[0] then
   begin
     R:= R + 1;
@@ -380,17 +385,16 @@ begin
     FWriter.SetRowHeight(R, 10);
     R:= R + 1;
     FWriter.WriteText(R,1, EmptyStr);
-    //FWriter.SetRowHeight(R, Round(H*ScaleY));
     FWriter.SetRowHeight(R, Y);
     SP:= TStatPlotterVertHist.Create(W, H);
     try
       SP.FrameColor:= clBlack;
       SP.FrameWidth:= 1;
       SP.DataFrameColor:= clGray;
-      SP.TitleFont.Size:= FFontSize;
+      SP.TitleFont.Height:= FontHeight;
       SP.TitleFont.Style:= [fsBold];
       SP.Title:= 'Общее количество рекламационных случаев';
-
+      SP.XTicksFont.Height:= FontHeight;
       SP.XTicks:= FParamNames;
       SP.YSeriesAdd(FCounts[0]);
       SP.Calc;
@@ -415,16 +419,19 @@ begin
     FWriter.SetRowHeight(R, 10);
     R:= R + 1;
     FWriter.WriteText(R,1, EmptyStr);
-    //FWriter.SetRowHeight(R, Round(H*ScaleY));
     FWriter.SetRowHeight(R, Y);
     SP:= TStatPlotterVertHist.Create(W, H);
     try
       SP.FrameColor:= clBlack;
       SP.FrameWidth:= 1;
       SP.DataFrameColor:= clGray;
+      SP.TitleFont.Height:= FontHeight;
       SP.TitleFont.Style:= [fsBold];
-      SP.Title:= 'Количество рекламационных случаев';
-      SP.Legend:= VCut(FReasonNames, 1);
+      SP.Title:= 'Распределение количества рекламационных случаев по ' +
+                 'причинам возникновения неисправности';
+      SP.LegendFont.Height:= FontHeight;
+      SP.Legend:=  VCut(FReasonNames, {FUsedReasons,}  1);
+      SP.XTicksFont.Height:= FontHeight;
       SP.XTicks:= FParamNames;
       for i:= 1 to High(FCounts) do
         if FUsedReasons[i] then
@@ -1441,7 +1448,7 @@ procedure TStatisticReclamationSheet.Draw(const ABeginDate, AEndDate: TDate;
   AReasonNames: TStrVector; const ACounts: TIntMatrix3D;
   const AResumeNeed: Boolean);
 var
-  R, FixedRowsCount: Integer;
+  R{, FixedRowsCount}: Integer;
 begin
   FGrid.Clear;
   if VIsNil(AParamNames) then Exit;
@@ -1451,7 +1458,7 @@ begin
   R:= 1;
   DrawTop(R, ABeginDate, AEndDate, AReportName, AMotorNames);
   DrawTableCaption(R, ABeginDate, AParamCaption, AReasonNames);
-  FixedRowsCount:= R;
+  //FixedRowsCount:= R;
   DrawData(R, AParamNames, ACounts, AResumeNeed);
   //FWriter.SetFrozenRows(FixedRowsCount);
 

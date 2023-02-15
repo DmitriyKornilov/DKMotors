@@ -2,12 +2,12 @@ object StatisticForm: TStatisticForm
   Left = 470
   Height = 808
   Top = 0
-  Width = 1194
+  Width = 1195
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StatisticForm'
   ClientHeight = 808
-  ClientWidth = 1194
+  ClientWidth = 1195
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -16,7 +16,7 @@ object StatisticForm: TStatisticForm
     Left = 2
     Height = 40
     Top = 2
-    Width = 1190
+    Width = 1191
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -25,7 +25,7 @@ object StatisticForm: TStatisticForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1186
+    ClientWidth = 1187
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 0
@@ -345,10 +345,10 @@ object StatisticForm: TStatisticForm
     Left = 0
     Height = 766
     Top = 42
-    Width = 1194
+    Width = 1195
     Align = alClient
     ClientHeight = 766
-    ClientWidth = 1194
+    ClientWidth = 1195
     TabOrder = 1
     object Panel1: TPanel
       Left = 1
@@ -575,18 +575,18 @@ object StatisticForm: TStatisticForm
       Left = 407
       Height = 764
       Top = 1
-      Width = 786
+      Width = 787
       Align = alClient
       BevelOuter = bvNone
       Caption = 'Panel4'
       ClientHeight = 764
-      ClientWidth = 786
+      ClientWidth = 787
       TabOrder = 2
       object MainPanel: TPanel
         Left = 2
         Height = 760
         Top = 2
-        Width = 782
+        Width = 783
         Align = alClient
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
@@ -594,26 +594,26 @@ object StatisticForm: TStatisticForm
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
         ClientHeight = 760
-        ClientWidth = 782
+        ClientWidth = 783
         TabOrder = 0
         object Panel7: TPanel
           Left = 0
           Height = 722
           Top = 0
-          Width = 782
+          Width = 783
           Align = alClient
           BorderSpacing.Bottom = 2
           BevelOuter = bvNone
           BorderStyle = bsSingle
           Caption = 'Panel7'
           ClientHeight = 718
-          ClientWidth = 778
+          ClientWidth = 779
           TabOrder = 0
           object Grid1: TsWorksheetGrid
             Left = 0
             Height = 718
             Top = 0
-            Width = 778
+            Width = 779
             AutoExpand = []
             DisplayFixedColRow = False
             FrozenBorderPen.Style = psClear
@@ -649,16 +649,16 @@ object StatisticForm: TStatisticForm
           Left = 0
           Height = 36
           Top = 724
-          Width = 782
+          Width = 783
           Align = alBottom
           AutoSize = True
           BevelOuter = bvNone
           BorderStyle = bsSingle
           ClientHeight = 32
-          ClientWidth = 778
+          ClientWidth = 779
           TabOrder = 1
           object ZoomPanel: TPanel
-            Left = 438
+            Left = 439
             Height = 20
             Top = 6
             Width = 340
