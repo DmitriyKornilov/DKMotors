@@ -23,6 +23,7 @@ type
     function ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName, ANameFieldName: String;
        const ABeginDate, AEndDate: TDate;
        const AAdditionYearsCount: Integer;
+       //const AIsZeroIDNeed: Boolean;
        const ANameIDs, AReasonIDs: TIntVector;
        out AParamNames: TStrVector; out AParamCounts: TIntMatrix3D): Boolean;
   public
@@ -255,15 +256,18 @@ type
     function ReclamationMotorsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const ANameIDs, AReasonIDs: TIntVector;
+                const AANEMAsSameName: Boolean;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntMatrix3D): Boolean;
     function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
+                //const AIsZeroIDNeed: Boolean;
                 const ANameIDs, AReasonIDs: TIntVector;
                 out ADefectNames: TStrVector;
                 out AMotorCounts: TIntMatrix3D): Boolean;
     function ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
+                //const AIsZeroIDNeed: Boolean;
                 const ANameIDs, AReasonIDs: TIntVector;
                 out APlaceNames: TStrVector;
                 out AMotorCounts: TIntMatrix3D): Boolean;
@@ -493,8 +497,9 @@ end;
 
 function TSQLite.ReclamationReportWithReasonsLoad(const ATableName,
   AIDFieldName, ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-  const AAdditionYearsCount: Integer; const ANameIDs, AReasonIDs: TIntVector;
-  out AParamNames: TStrVector; out AParamCounts: TIntMatrix3D): Boolean;
+  const AAdditionYearsCount: Integer; {const AIsZeroIDNeed: Boolean; }
+  const ANameIDs, AReasonIDs: TIntVector; out AParamNames: TStrVector; out
+  AParamCounts: TIntMatrix3D): Boolean;
 var
   ExistNameIDs: TIntVector;
   ParamCounts: TIntMatrix;
@@ -517,6 +522,9 @@ var
     WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
     if not VIsNil(ANameIDs) then
       WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
+
+    //if not AIsZeroIDNeed then
+    //  WhereStr:= WhereStr + 'AND (t3.' + KeyFieldName + '>0) ';
 
     QSetQuery(FQuery);
     QSetSQL(
@@ -2936,8 +2944,8 @@ end;
 
 function TSQLite.ReclamationMotorsWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
-  AReasonIDs: TIntVector; out AMotorNames: TStrVector; out
-  AMotorCounts: TIntMatrix3D): Boolean;
+  AReasonIDs: TIntVector; const AANEMAsSameName: Boolean;
+  out AMotorNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
 var
   ExistsNameIDs: TIntVector;
   MotorCounts: TIntMatrix;
@@ -3053,6 +3061,32 @@ var
     end;
   end;
 
+  procedure RecalcANEM;
+  var
+    n1, n2, i, j: Integer;
+  begin
+    n1:= VIndexOf(ExistsNameIDs, 1); //IM1001
+    n2:= VIndexOf(ExistsNameIDs, 2); //IM1002
+    if (n1<0) and (n2<0) then Exit;
+    if n1>=0 then
+    begin
+      //есть IM1001 - меняем имя в списке
+      AMotorNames[n1]:= 'АНЭМ225L4УХЛ2 IM1001/IM1002';
+      if n2>=0 then  //есть еще IM1002 - пересчет
+      begin
+        for i:= 0 to High(AMotorCounts) do
+          for j:= 0 to High(AMotorCounts[i]) do
+        begin
+          AMotorCounts[i, j, n1]:= AMotorCounts[i, j, n1] + AMotorCounts[i, j, n2];
+          VDel(AMotorCounts[i, j], n2);
+        end;
+        VDel(AMotorNames, n2);
+      end;
+    end
+    else //есть только IM1002 - только меняем имя в списке
+      AMotorNames[n2]:= 'АНЭМ225L4УХЛ2 IM1001/IM1002';
+  end;
+
 begin
   Result:= False;
   AMotorNames:= nil;
@@ -3075,6 +3109,9 @@ begin
     //итоговая матрица для всех периодов
     MAppend(AMotorCounts, MotorCounts);
   end;
+
+  if AANEMAsSameName then
+    RecalcANEM;
 
   Result:= True;
 end;
@@ -3125,24 +3162,24 @@ begin
 end;
 
 function TSQLite.ReclamationDefectsWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
-  AReasonIDs: TIntVector; out ADefectNames: TStrVector; out
-  AMotorCounts: TIntMatrix3D): Boolean;
+  AEndDate: TDate; const AAdditionYearsCount: Integer;
+  {const AIsZeroIDNeed: Boolean;} const ANameIDs, AReasonIDs: TIntVector; out
+  ADefectNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
 begin
   Result:= ReclamationReportWithReasonsLoad('RECLAMATIONDEFECTS',
              'DefectID', 'DefectName', ABeginDate, AEndDate, AAdditionYearsCount,
-             ANameIDs, AReasonIDs,
+             {AIsZeroIDNeed,} ANameIDs, AReasonIDs,
              ADefectNames, AMotorCounts);
 end;
 
 function TSQLite.ReclamationPlacesWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
-  AReasonIDs: TIntVector; out APlaceNames: TStrVector; out
-  AMotorCounts: TIntMatrix3D): Boolean;
+  AEndDate: TDate; const AAdditionYearsCount: Integer;
+  {const AIsZeroIDNeed: Boolean;} const ANameIDs, AReasonIDs: TIntVector; out
+  APlaceNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
 begin
   Result:= ReclamationReportWithReasonsLoad('RECLAMATIONPLACES',
              'PlaceID', 'PlaceName', ABeginDate, AEndDate, AAdditionYearsCount,
-             ANameIDs, AReasonIDs,
+             {AIsZeroIDNeed,} ANameIDs, AReasonIDs,
              APlaceNames, AMotorCounts);
 end;
 

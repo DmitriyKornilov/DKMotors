@@ -8,16 +8,19 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils, LCLType,
   StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
-  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils;
+  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst;
 
 type
 
   { TStatisticForm }
 
   TStatisticForm = class(TForm)
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
+    ANEMAsSameNameCheckBox: TCheckBox;
+    Label10: TLabel;
+    ANEMPanel: TPanel;
+    SeveralPeriodsCheckBox: TCheckBox;
+    ShowPercentCheckBox: TCheckBox;
+    TotalCountForUsedParamsOnlyCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     DividerBevel1: TDividerBevel;
@@ -29,21 +32,19 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label7: TLabel;
-    Label8: TLabel;
+    Label9: TLabel;
     MainPanel: TPanel;
     Panel1: TPanel;
+    Panel10: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
     Panel7: TPanel;
     Panel8: TPanel;
     Panel9: TPanel;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
     ReportPeriodPanel: TPanel;
-    SpinEdit1: TSpinEdit;
+    AdditionYearCountSpinEdit: TSpinEdit;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     TopPanel: TPanel;
@@ -57,17 +58,19 @@ type
     ZoomTrackBar: TTrackBar;
     ZoomValueLabel: TLabel;
     ZoomValuePanel: TPanel;
-    procedure CheckBox1Change(Sender: TObject);
-    procedure CheckBox2Change(Sender: TObject);
-    procedure CheckBox3Change(Sender: TObject);
+    procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
+    procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
+
+    procedure ShowPercentCheckBoxChange(Sender: TObject);
+
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DateTimePicker2Change(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure RadioButton1Click(Sender: TObject);
-    procedure RadioButton2Click(Sender: TObject);
-    procedure SpinEdit1Change(Sender: TObject);
+
+    procedure AdditionYearCountSpinEditChange(Sender: TObject);
+    procedure TotalCountForUsedParamsOnlyCheckBoxChange(Sender: TObject);
     procedure ZoomInButtonClick(Sender: TObject);
     procedure ZoomOutButtonClick(Sender: TObject);
     procedure ZoomTrackBarChange(Sender: TObject);
@@ -84,8 +87,9 @@ type
 
     ParamNames: TStrVector;
     Counts: TIntMatrix3D;
-    ParamCaption, ReportName, MotorNames: String;
-    ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount: Integer;
+    MotorNames: String;
+    AdditionYearsCount: Integer;
+
 
     procedure VerifyDates;
 
@@ -93,7 +97,7 @@ type
     procedure StatisticListSelectItem;
 
     procedure SetReasonList;
-    procedure ReasonListSelectItem(const AIndex: Integer; const AChecked: Boolean);
+    procedure ReasonListSelectItem(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
 
     //AParamType
     //0 - Распределение по наименованиям двигателей
@@ -101,13 +105,16 @@ type
     //2 - Распределение по предприятиям
     //3 - Распределение по месяцам
     procedure LoadStatistic(const AParamType: Integer);
-    procedure DrawStatistic(const AParamType: Integer);
 
-    procedure DrawStatisticSinglePeriodAtMotorNames;
+    procedure DrawStatistic(const AParamType: Integer);
+    procedure DrawStatisticForSinglePeriod(const AParamType: Integer);
+    procedure DrawStatisticForSeveralPeriods(const AParamType: Integer);
+
+    procedure ExportStatistic(const AParamType: Integer);
+    procedure ExportStatisticForSinglePeriod(const AParamType: Integer);
+    procedure ExportStatisticForSeveralPeriods(const AParamType: Integer);
 
   public
-
-
     procedure ShowStatistic;
   end;
 
@@ -146,19 +153,8 @@ begin
 end;
 
 procedure TStatisticForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TGridExporter;
-  PageOrientation: TsPageOrientation;
 begin
-  Exporter:= TGridExporter.Create(Grid1);
-  try
-    //Exporter.SheetName:= 'Отчет';
-    PageOrientation:= spoPortrait;
-    Exporter.PageSettings(PageOrientation, pfWidth);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
+  ExportStatistic(SelectedIndex);
 end;
 
 procedure TStatisticForm.DateTimePicker1Change(Sender: TObject);
@@ -185,7 +181,7 @@ begin
     BD:= DateTimePicker1.Date;
   end;
 
-  if CheckBox1.Checked or (SelectedIndex=3) then
+  if SeveralPeriodsCheckBox.Checked or (SelectedIndex=3) then
   begin
     if YearOfDate(BD)<>YearOfDate(ED) then
       ED:= LastDayInYear(BD);
@@ -197,24 +193,23 @@ begin
   CanShow:= True;
 end;
 
-procedure TStatisticForm.CheckBox1Change(Sender: TObject);
+procedure TStatisticForm.SeveralPeriodsCheckBoxChange(Sender: TObject);
 begin
-  SpinEdit1.Enabled:= CheckBox1.Checked;
-  CheckBox3.Visible:= CheckBox1.Checked;
-  Panel6.Visible:= CheckBox1.Checked;
-
+  AdditionYearCountSpinEdit.Enabled:= SeveralPeriodsCheckBox.Checked;
   ShowStatistic;
 end;
 
-procedure TStatisticForm.CheckBox2Change(Sender: TObject);
+procedure TStatisticForm.ANEMAsSameNameCheckBoxChange(Sender: TObject);
 begin
   ShowStatistic;
 end;
 
-procedure TStatisticForm.CheckBox3Change(Sender: TObject);
+procedure TStatisticForm.ShowPercentCheckBoxChange(Sender: TObject);
 begin
   ShowStatistic;
 end;
+
+
 
 procedure TStatisticForm.FormDestroy(Sender: TObject);
 begin
@@ -222,24 +217,21 @@ begin
   if Assigned(ReasonList) then FreeAndNil(ReasonList);
 end;
 
-procedure TStatisticForm.RadioButton1Click(Sender: TObject);
-begin
-  ShowStatistic;
-end;
 
-procedure TStatisticForm.RadioButton2Click(Sender: TObject);
+procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);
 begin
-  ShowStatistic;
-end;
-
-procedure TStatisticForm.SpinEdit1Change(Sender: TObject);
-begin
-  if SpinEdit1.Value=1 then
+  if AdditionYearCountSpinEdit.Value=1 then
     Label4.Caption:= 'предыдущий год'
-  else if (SpinEdit1.Value>1) and (SpinEdit1.Value<5) then
+  else if (AdditionYearCountSpinEdit.Value>1) and (AdditionYearCountSpinEdit.Value<5) then
     Label4.Caption:= 'предыдущиx года'
   else
     Label4.Caption:= 'предыдущиx лет';
+  ShowStatistic;
+end;
+
+procedure TStatisticForm.TotalCountForUsedParamsOnlyCheckBoxChange(
+  Sender: TObject);
+begin
   ShowStatistic;
 end;
 
@@ -300,10 +292,11 @@ procedure TStatisticForm.StatisticListSelectItem;
 begin
   if SelectedIndex=StatisticList.SelectedIndex then Exit;
   SelectedIndex:= StatisticList.SelectedIndex;
-  if SelectedIndex=3 then
-    CheckBox2.Caption:= 'накопление количества по месяцам'
-  else
-    CheckBox2.Caption:= '% от общего количества рекламаций';
+  ANEMPanel.Visible:= SelectedIndex=0;
+
+
+
+
   ShowStatistic;
 end;
 
@@ -343,138 +336,193 @@ end;
 procedure TStatisticForm.LoadStatistic(const AParamType: Integer);
 var
   BD, ED: TDate;
-  i,W: Integer;
 begin
+  if not ReasonList.IsSelected then Exit;
+
   if AParamType<0 then Exit;
   BD:= DateTimePicker2.Date;
   ED:= DateTimePicker1.Date;
   MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
 
-  if AParamType=0 then
-  begin
-    SQLite.ReclamationMotorsWithReasonsLoad(BD, ED, AdditionYearsCount,
+  AdditionYearsCount:= 0;
+  if SeveralPeriodsCheckBox.Checked then
+    AdditionYearsCount:= AdditionYearCountSpinEdit.Value;
+
+  case AParamType of
+  0: SQLite.ReclamationMotorsWithReasonsLoad(BD, ED, AdditionYearsCount,
+                                MainForm.UsedNameIDs, ReasonIDs,
+                                ANEMAsSameNameCheckBox.Checked, ParamNames, Counts);
+  1: SQLite.ReclamationDefectsWithReasonsLoad(BD, ED, AdditionYearsCount,
+                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  2: SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, AdditionYearsCount,
+                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  3: SQLite.ReclamationMonthsWithReasonsLoad(BD, ED, AdditionYearsCount,
+                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
+  4: SQLite.ReclamationMileagesWithReasonsLoad(BD, ED, AdditionYearsCount,
                                 MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
   end;
 
   DrawStatistic(AParamType);
-
-  //if AParamType<0 then Exit;
-  //
-  //BD:= DateTimePicker2.Date;
-  //ED:= DateTimePicker1.Date;
-  //
-  //
-  //GroupType:= 2;
-  //if RadioButton2.Checked then
-  //  GroupType:= 1;
-  //
-  //SecondColumnType:= 1;
-  //if SelectedIndex=3 then
-  //  SecondColumnType:= 2;
-  //
-  //AdditionYearsCount:= 0;
-  //if CheckBox1.Checked then
-  //  AdditionYearsCount:= SpinEdit1.Value;
-  //
-  //if AParamType=0 then
-  //begin
-  //  SQLite.ReclamationMotorsWithReasonsLoad(BD, ED, AdditionYearsCount,
-  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-  //  ParamCaption:= 'Наименование';
-  //  ReportName:= 'распределение по наименованиям электродвигателей';
-  //end
-  //else if AParamType=1 then
-  //begin
-  //  SQLite.ReclamationDefectsWithReasonsLoad(BD, ED, AdditionYearsCount,
-  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-  //  ParamCaption:= 'Неисправность';
-  //  ReportName:= 'распределение по неисправным элементам';
-  //end
-  //else if AParamType=2 then
-  //begin
-  //  SQLite.ReclamationPlacesWithReasonsLoad(BD, ED, AdditionYearsCount,
-  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-  //  ParamCaption:= 'Предприятие';
-  //  ReportName:= 'распределение по предприятиям';
-  //end
-  //else if AParamType=3 then
-  //begin
-  //  SQLite.ReclamationMonthsWithReasonsLoad(BD, ED, AdditionYearsCount,
-  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-  //  ParamCaption:= 'Месяц';
-  //  ReportName:= 'распределение по месяцам';
-  //end
-  //else if AParamType=4 then
-  //begin
-  //  SQLite.ReclamationMileagesWithReasonsLoad(BD, ED, AdditionYearsCount,
-  //                              MainForm.UsedNameIDs, ReasonIDs, ParamNames, Counts);
-  //  ParamCaption:= 'Пробег локомотива, тыс. км';
-  //  ReportName:= 'распределение по пробегу локомотива';
-  //end;
-  //
-  //MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
-  //
-  ////ширина столбца с наименованиями параметра распределения
-  //ParamNameColumnWidth:= 120;
-  //for i:=0 to High(ParamNames) do
-  //begin
-  //  W:= SWidth(ParamNames[i], SHEET_FONT_NAME, SHEET_FONT_SIZE)+50;
-  //  //W:= Round(W/DIMENTION_FACTOR);
-  //  if W>ParamNameColumnWidth then
-  //    ParamNameColumnWidth:= W;
-  //
-  //end;
-  //
-  //DrawStatistic;
 end;
 
-procedure TStatisticForm.DrawStatistic(const AParamType: Integer);
+procedure TStatisticForm.DrawStatisticForSinglePeriod(const AParamType: Integer);
 var
-  BD, ED: TDate;
-  //Sheet: TStatisticReclamationSheet;
+  Drawer: TStatisticSinglePeriodSheet;
 begin
-  if MIsNil(Counts) then Exit;
+  case AParamType of
+  0: Drawer:= TStatisticSinglePeriodAtMotorNamesSheet.Create(
+                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+  1: Drawer:= TStatisticSinglePeriodAtDefectNamesSheet.Create(
+                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+  2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
+                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+  3: Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
+                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+  4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
+                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+  end;
 
-  if AParamType=0 then
-    DrawStatisticSinglePeriodAtMotorNames;
-
-  //Sheet:= TStatisticReclamationSheet.Create(Grid1,
-  //                  ParamNameColumnWidth, GroupType, SecondColumnType, AdditionYearsCount,
-  //                  ReasonList.Selected, CheckBox2.Checked, CheckBox3.Checked);
-  //try
-  //  BD:= DateTimePicker2.Date;
-  //  ED:= DateTimePicker1.Date;
-  //  Sheet.Zoom(ZoomTrackBar.Position);
-  //  Sheet.Draw(BD, ED, ReportName, MotorNames, ParamCaption,
-  //           ParamNames, ReasonNames, Counts, True);
-  //finally
-  //  FreeAndNil(Sheet);
-  //end;
-end;
-
-procedure TStatisticForm.DrawStatisticSinglePeriodAtMotorNames;
-var
-  BD, ED: TDate;
-  Sheet: TStatisticSinglePeriodAtMotorNamesSheet;
-begin
-
-
-  Sheet:= TStatisticSinglePeriodAtMotorNamesSheet.Create(Grid1.Worksheet, Grid1,
-                    ReasonList.Selected, CheckBox2.Checked);
   try
-    BD:= DateTimePicker2.Date;
-    ED:= DateTimePicker1.Date;
-    Sheet.Zoom(ZoomTrackBar.Position);
-    Sheet.Draw(BD, ED, MotorNames, ParamNames, ReasonNames, Counts[0], True);
+    Drawer.Zoom(ZoomTrackBar.Position);
+    Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
+               MotorNames, ParamNames, ReasonNames, Counts[0],
+               TotalCountForUsedParamsOnlyCheckBox.Checked);
   finally
-    FreeAndNil(Sheet);
+    FreeAndNil(Drawer);
   end;
 end;
 
+procedure TStatisticForm.DrawStatisticForSeveralPeriods(const AParamType: Integer);
+var
+  Drawer: TStatisticSeveralPeriodsSheet;
+begin
+  case AParamType of
+  0: Drawer:= TStatisticSeveralPeriodsAtMotorNamesSheet.Create(
+                Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                ReasonList.Selected, ShowPercentCheckBox.Checked);
+  1: Drawer:= TStatisticSeveralPeriodsAtDefectNamesSheet.Create(
+                Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                ReasonList.Selected, ShowPercentCheckBox.Checked);
+  2: Drawer:= TStatisticSeveralPeriodsAtPlaceNamesSheet.Create(
+                Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                ReasonList.Selected, ShowPercentCheckBox.Checked);
+  3: Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
+                Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                ReasonList.Selected, ShowPercentCheckBox.Checked);
+  4: Drawer:= TStatisticSeveralPeriodsAtMileagesSheet.Create(
+                Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                ReasonList.Selected, ShowPercentCheckBox.Checked);
+ end;
 
+  try
+    Drawer.Zoom(ZoomTrackBar.Position);
+    Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
+               MotorNames, ParamNames, ReasonNames, Counts,
+               TotalCountForUsedParamsOnlyCheckBox.Checked);
+  finally
+    FreeAndNil(Drawer);
+  end;
 
+end;
 
+procedure TStatisticForm.DrawStatistic(const AParamType: Integer);
+begin
+  if MIsNil(Counts) then Exit;
+  if SeveralPeriodsCheckBox.Checked then
+    DrawStatisticForSeveralPeriods(AParamType)
+  else
+    DrawStatisticForSinglePeriod(AParamType);
+end;
 
+procedure TStatisticForm.ExportStatistic(const AParamType: Integer);
+begin
+  if MIsNil(Counts) then Exit;
+  if SeveralPeriodsCheckBox.Checked then
+    ExportStatisticForSeveralPeriods(AParamType)
+  else
+    ExportStatisticForSinglePeriod(AParamType);
+end;
+
+procedure TStatisticForm.ExportStatisticForSinglePeriod(const AParamType: Integer);
+var
+  Drawer: TStatisticSinglePeriodSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetExporter;
+begin
+  Exporter:= TSheetExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+
+    case AParamType of
+    0: Drawer:= TStatisticSinglePeriodAtMotorNamesSheet.Create(
+                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+    1: Drawer:= TStatisticSinglePeriodAtDefectNamesSheet.Create(
+                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+    2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
+                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+    3: Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
+                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+    4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
+                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+    end;
+
+    try
+      Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
+                  MotorNames, ParamNames, ReasonNames, Counts[0],
+                  TotalCountForUsedParamsOnlyCheckBox.Checked);
+
+    finally
+      FreeAndNil(Drawer);
+    end;
+    Exporter.PageSettings(spoPortrait);
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
+end;
+
+procedure TStatisticForm.ExportStatisticForSeveralPeriods(const AParamType: Integer);
+var
+  Drawer: TStatisticSeveralPeriodsSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetExporter;
+begin
+  Exporter:= TSheetExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+
+    case AParamType of
+    0: Drawer:= TStatisticSeveralPeriodsAtMotorNamesSheet.Create(
+                    Sheet, nil, AdditionYearCountSpinEdit.Value,
+                    ReasonList.Selected, ShowPercentCheckBox.Checked);
+    1: Drawer:= TStatisticSeveralPeriodsAtDefectNamesSheet.Create(
+                    Sheet, nil, AdditionYearCountSpinEdit.Value,
+                    ReasonList.Selected, ShowPercentCheckBox.Checked);
+    2: Drawer:= TStatisticSeveralPeriodsAtPlaceNamesSheet.Create(
+                    Sheet, nil, AdditionYearCountSpinEdit.Value,
+                    ReasonList.Selected, ShowPercentCheckBox.Checked);
+    3: Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
+                    Sheet, nil, AdditionYearCountSpinEdit.Value,
+                    ReasonList.Selected, ShowPercentCheckBox.Checked);
+    4: Drawer:= TStatisticSeveralPeriodsAtMileagesSheet.Create(
+                    Sheet, nil, AdditionYearCountSpinEdit.Value,
+                    ReasonList.Selected, ShowPercentCheckBox.Checked);
+    end;
+
+    try
+      Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
+                  MotorNames, ParamNames, ReasonNames, Counts,
+                  TotalCountForUsedParamsOnlyCheckBox.Checked);
+
+    finally
+      FreeAndNil(Drawer);
+    end;
+    Exporter.PageSettings(spoLandscape);
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
+end;
 
 end.
 
