@@ -996,7 +996,7 @@ begin
   R:= R1;
   DrawGraphsForParamCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
                                      'месяцам', EmptyStr, EmptyStr,
-                                 FParamNames, FCounts, UsedParams,
+                                 FParamNames, AccumCounts, UsedParams,
                                  dtVertical, taRightJustify);
 end;
 

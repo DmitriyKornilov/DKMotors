@@ -777,7 +777,7 @@ begin
     QParamDT('ED', LastDayInYear(ABuildYear));
   end
   else
-    QParamStr('NumberLike', ANumberLike+'%');
+    QParamStr('NumberLike', SUpper(ANumberLike)+'%');
 
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
@@ -1350,9 +1350,10 @@ begin
     'SELECT MotorID, BuildDate, MotorNum ' +
     'FROM MOTORLIST ' +
     'WHERE (NameID = :NameID) AND (OldMotor=0) AND ' +
-          '(UPPER(MotorNum) LIKE :NumberLike)');
+          '(UPPER(MotorNum) LIKE :NumberLike) ' +
+    'ORDER BY BuildDate DESC');
   QParamInt('NameID', ANameID);
-  QParamStr('NumberLike', ANumberLike+'%');
+  QParamStr('NumberLike', SUpper(ANumberLike)+'%');
   QOpen;
   if not QIsEmpty then
   begin
@@ -1463,7 +1464,7 @@ begin
     );
 
   if ANumberLike<>EmptyStr then
-    QParamStr('NumberLike', ANumberLike+'%');
+    QParamStr('NumberLike', SUpper(ANumberLike)+'%');
 
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
@@ -1545,7 +1546,7 @@ begin
           '(UPPER(MotorNum) LIKE :NumberLike) ' +
     'ORDER BY MotorNum'
     );
-  QParamStr('NumberLike', ANumberLike+'%');
+  QParamStr('NumberLike', SUpper(ANumberLike)+'%');
   QParamInt('NameID', ANameID);
   QOpen;
   if not QIsEmpty then
@@ -2040,7 +2041,7 @@ begin
     'WHERE (NameID = :NameID) AND (CargoID=0) AND (OldMotor=0) AND ' +
           '(UPPER(MotorNum) LIKE :NumberLike)');
   QParamInt('NameID', ANameID);
-  QParamStr('NumberLike', ANumberLike+'%');
+  QParamStr('NumberLike', SUpper(ANumberLike)+'%');
   QOpen;
   if not QIsEmpty then
   begin
@@ -2435,7 +2436,7 @@ begin
 
 
   if ANumberLike<>EmptyStr then
-    QParamStr('NumberLike', ANumberLike+'%')
+    QParamStr('NumberLike', SUpper(ANumberLike)+'%')
   else begin
     QParamDT('BD', ABeginDate);
     QParamDT('ED', AEndDate);
@@ -2505,7 +2506,7 @@ begin
     'WHERE (t1.NameID = :NameID) AND ' +
           '(UPPER(t1.MotorNum) LIKE :NumberLike)');
   QParamInt('NameID', ANameID);
-  QParamStr('NumberLike', ANumberLike+'%');
+  QParamStr('NumberLike', SUpper(ANumberLike)+'%');
   QOpen;
   if not QIsEmpty then
   begin
@@ -2705,7 +2706,7 @@ begin
     OrderStr);
 
   if ANumberLike<>EmptyStr then
-    QParamStr('NumberLike', ANumberLike+'%');
+    QParamStr('NumberLike', SUpper(ANumberLike)+'%');
 
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
@@ -2876,7 +2877,7 @@ begin
           '(UPPER(t2.MotorNum) LIKE :NumberLike) ' +
     'ORDER BY t2.MotorNum'
     );
-  QParamStr('NumberLike', AMotorNumberLike+'%');
+  QParamStr('NumberLike', SUpper(AMotorNumberLike)+'%');
   QParamInt('NameID', ANameID);
 
   QOpen;
