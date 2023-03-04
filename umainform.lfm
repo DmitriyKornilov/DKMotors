@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 132
+  Left = 312
   Height = 351
-  Top = 146
+  Top = 123
   Width = 1639
   Caption = 'Учет производства, поставок и рекламационных случаев электродвигателей ООО "Электрожелдормаш"'
   ClientHeight = 351

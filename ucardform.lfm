@@ -1,37 +1,38 @@
 object CardForm: TCardForm
   Left = 699
-  Height = 271
+  Height = 339
   Top = 244
-  Width = 640
+  Width = 800
   Align = alClient
   BorderStyle = bsNone
   Caption = 'CardForm'
-  ClientHeight = 271
-  ClientWidth = 640
+  ClientHeight = 339
+  ClientWidth = 800
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '2.2.2.0'
   object TopPanel: TPanel
     Left = 0
-    Height = 32
+    Height = 40
     Top = 0
-    Width = 640
+    Width = 800
     Align = alTop
     AutoSize = True
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 30
-    ClientWidth = 638
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 796
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 30
+      Height = 36
       Top = 0
-      Width = 111
+      Width = 112
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -174,45 +175,46 @@ object CardForm: TCardForm
   end
   object Panel6: TPanel
     Left = 0
-    Height = 32
-    Top = 237
-    Width = 640
+    Height = 38
+    Top = 299
+    Width = 800
     Align = alBottom
     AutoSize = True
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 30
-    ClientWidth = 638
+    ClientHeight = 34
+    ClientWidth = 796
     TabOrder = 1
     object ZoomPanel: TPanel
-      Left = 344
-      Height = 20
-      Top = 5
-      Width = 294
+      Left = 456
+      Height = 22
+      Top = 6
+      Width = 340
       Align = alRight
       AutoSize = True
-      BorderSpacing.Top = 5
-      BorderSpacing.Bottom = 5
+      BorderSpacing.Top = 6
+      BorderSpacing.Bottom = 6
       BevelOuter = bvNone
-      ClientHeight = 20
-      ClientWidth = 294
+      ClientHeight = 22
+      ClientWidth = 340
+      Constraints.MaxHeight = 22
       TabOrder = 0
       object ZoomCaptionLabel: TLabel
         Left = 2
-        Height = 20
+        Height = 22
         Top = 0
-        Width = 64
+        Width = 63
         Align = alRight
         BorderSpacing.Left = 2
         Caption = 'Масштаб'
         ParentColor = False
       end
       object ZoomTrackBar: TTrackBar
-        Left = 98
-        Height = 20
+        Left = 100
+        Height = 22
         Top = 0
-        Width = 120
+        Width = 150
         AutoSize = True
         LineSize = 5
         Max = 150
@@ -226,13 +228,13 @@ object CardForm: TCardForm
       end
       object ZoomOutButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 78
-        Height = 20
+        Left = 80
+        Height = 22
         Top = 0
         Width = 20
         Align = alRight
         AutoSize = True
-        BorderSpacing.Left = 12
+        BorderSpacing.Left = 15
         Flat = True
         Glyph.Data = {
           36040000424D3604000000000000360000002800000010000000100000000100
@@ -274,8 +276,8 @@ object CardForm: TCardForm
       end
       object ZoomInButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 218
-        Height = 20
+        Left = 250
+        Height = 22
         Top = 0
         Width = 20
         Align = alRight
@@ -320,24 +322,24 @@ object CardForm: TCardForm
         OnClick = ZoomInButtonClick
       end
       object ZoomValuePanel: TPanel
-        Left = 238
-        Height = 20
+        Left = 270
+        Height = 22
         Top = 0
-        Width = 56
+        Width = 70
         Align = alRight
         BevelOuter = bvNone
-        ClientHeight = 20
-        ClientWidth = 56
+        ClientHeight = 22
+        ClientWidth = 70
         TabOrder = 1
         object ZoomValueLabel: TLabel
           AnchorSideLeft.Side = asrBottom
-          Left = 11
-          Height = 20
+          Left = 24
+          Height = 22
           Top = 0
           Width = 40
           Align = alRight
-          BorderSpacing.Left = 12
-          BorderSpacing.Right = 5
+          BorderSpacing.Left = 15
+          BorderSpacing.Right = 6
           Caption = '100 %'
           ParentColor = False
         end
@@ -346,21 +348,21 @@ object CardForm: TCardForm
   end
   object CardPanel: TPanel
     Left = 0
-    Height = 201
-    Top = 34
-    Width = 640
+    Height = 255
+    Top = 42
+    Width = 800
     Align = alClient
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 199
-    ClientWidth = 638
+    ClientHeight = 251
+    ClientWidth = 796
     TabOrder = 2
     object CardGrid: TsWorksheetGrid
       Left = 0
-      Height = 199
+      Height = 251
       Top = 0
-      Width = 638
+      Width = 796
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
