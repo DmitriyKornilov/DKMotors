@@ -88,7 +88,7 @@ var
   v: TStrVector;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-  CardForm:= CrateCardForm(RepairForm, CardPanel);
+  CardForm:= CreateCardForm(RepairForm, CardPanel);
 
   VSTMotorsTable:= TVSTTable.Create(VT1);
   VSTMotorsTable.OnSelect:= @MotorSelect;

@@ -325,6 +325,7 @@ object CalendarForm: TCalendarForm
           Position = 100
           TickStyle = tsNone
           Align = alRight
+          Constraints.MinWidth = 150
           TabOrder = 0
         end
         object ZoomOutButton: TSpeedButton

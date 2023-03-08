@@ -94,6 +94,7 @@ type
       FUsedReasonsCount: Integer;
       FUsedReasons: TBoolVector;
       FShowPercentColumn: Boolean;
+      FShowGraphics: Boolean;
       FGraphWidth: Integer;
       FCalcTotalCountForUsedParamsOnly: Boolean;
       FBeginDate, FEndDate: TDate;
@@ -342,7 +343,8 @@ type
                    const AMotorNames: String;
                    const AParamNames, AReasonNames: TStrVector;
                    const ACounts: TIntMatrix3D;
-                   const ACalcTotalCountForUsedParamsOnly: Boolean);
+                   const ACalcTotalCountForUsedParamsOnly,
+                         AShowGraphics: Boolean);
   end;
 
   { TStatisticSeveralPeriodsAtMotorNamesSheet }
@@ -386,9 +388,10 @@ type
   TStatisticSinglePeriodSheet = class (TStatisticSheet)
   private
     const
-      TOTAL_WIDTH = 900;
+      TOTAL_WIDTH = 1080;//900;
     var
       FCounts: TIntMatrix;
+      FShowLinePercentColumn: Boolean;
 
     procedure DrawReportTitle(var ARow: Integer; const ATitle: String);
 
@@ -410,12 +413,14 @@ type
   public
     constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
                        const AUsedReasons: TBoolVector;
-                       const AShowPercentColumn: Boolean = False);
+                       const AShowPercentColumn: Boolean = False;
+                       const AShowLinePercentColumn: Boolean = False);
     procedure Draw(const ABeginDate, AEndDate: TDate;
                    const AMotorNames: String;
                    const AParamNames, AReasonNames: TStrVector;
                    const ACounts: TIntMatrix;
-                   const ACalcTotalCountForUsedParamsOnly: Boolean);
+                   const ACalcTotalCountForUsedParamsOnly,
+                         AShowGraphics: Boolean);
   end;
 
   { TStatisticSinglePeriodAtMotorNamesSheet }
@@ -890,34 +895,39 @@ begin
     TotalCount:= CalcTotalCount(FSumCounts, UsedParams); //от этого считаем процент
     DrawSinglePeriodDataTableValues(R, FSumCounts, UsedParams, TotalCount, True, haCenter);
 
-    R1:= R;
-    DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
-                              'величине пробега локомотива и '+
-                              'причинам возникновения неисправностей за ' + S,
-                           EmptyStr, 'Пробег локомотива, тыс.км',
-                           FParamNames, FSumCounts, nil{no sort}, UsedParams,
-                           dtVertical, taRightJustify);
-    R2:= R;
-    R:= R1;
-    DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'месяцам за ' + S,
-                          EmptyStr, 'Пробег локомотива, тыс.км',
-                          FParamNames, FSumCounts, nil{no sort}, UsedParams,
-                          dtVertical, taLeftJustify);
-    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              FSumCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-    R1:= Min(R, R2);
-    R2:= Max(R, R2);
-
-    for i:= R1 to R2+2 do
+    if FShowGraphics then
     begin
-      R:= i-1;
+      R1:= R;
+      DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
+                                'величине пробега локомотива и '+
+                                'причинам возникновения неисправностей за ' + S,
+                             EmptyStr, 'Пробег локомотива, тыс.км',
+                             FParamNames, FSumCounts, nil{no sort}, UsedParams,
+                             dtVertical, taRightJustify);
+      R2:= R;
+      R:= R1;
+      DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'месяцам за ' + S,
+                            EmptyStr, 'Пробег локомотива, тыс.км',
+                            FParamNames, FSumCounts, nil{no sort}, UsedParams,
+                            dtVertical, taLeftJustify);
+      DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                FSumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+      R1:= Min(R, R2);
+      R2:= Max(R, R2);
+
+      for i:= R1 to R2+2 do
+      begin
+        R:= i-1;
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
+    end
+    else //do not show graphics
       DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    end;
   end;
 
   UsedParams:= CalcUsedParams(FCounts, False {не показывать параметры, где все нули});
@@ -933,31 +943,31 @@ begin
   DrawSeveralPeriodsDataTableValues(R, FCounts, UsedParams, TotalCounts, True, haCenter);
 
 
+  if FShowGraphics then
+  begin
+    R1:= R;
+    DrawGraphForTotalCountsInTime(R,'Распределение количества рекламационных случаев по ' +
+                                    'величине пробега локомотива за ' + S,
+                                  EmptyStr, 'Пробег локомотива, тыс.км',
+                                  FParamNames, FCounts, nil{no sort}, UsedParams,
+                                  dtVertical, taLeftJustify);
+
+    DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
 
+    R:= R1;
+    DrawGraphsForParamCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
+                                       'величине пробега локомотива',
+                                       EmptyStr, 'Пробег локомотива, тыс.км',
+                                   FParamNames, FCounts, UsedParams,
+                                   dtVertical, taRightJustify);
 
-
-  R1:= R;
-  DrawGraphForTotalCountsInTime(R,'Распределение количества рекламационных случаев по ' +
-                                  'величине пробега локомотива за ' + S,
-                                EmptyStr, 'Пробег локомотива, тыс.км',
-                                FParamNames, FCounts, nil{no sort}, UsedParams,
-                                dtVertical, taLeftJustify);
-
-  DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              FCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-
-
-  R:= R1;
-  DrawGraphsForParamCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
-                                     'величине пробега локомотива',
-                                     EmptyStr, 'Пробег локомотива, тыс.км',
-                                 FParamNames, FCounts, UsedParams,
-                                 dtVertical, taRightJustify);
+  end;
 end;
 
 { TStatisticSeveralPeriodsAtMonthNamesSheet }
@@ -985,34 +995,39 @@ begin
     TotalCount:= CalcTotalCount(FSumCounts, UsedParams); //от этого считаем процент
     DrawSinglePeriodDataTableValues(R, FSumCounts, UsedParams, TotalCount, True, haCenter);
 
-    R1:= R;
-    DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
-                              ' месяцам и '+
-                              'причинам возникновения неисправностей за ' + S,
-                           EmptyStr, EmptyStr,
-                           FParamNames, FSumCounts, nil{no sort}, UsedParams,
-                           dtVertical, taRightJustify);
-    R2:= R;
-    R:= R1;
-    DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'месяцам за ' + S,
-                          EmptyStr, EmptyStr,
-                          FParamNames, FSumCounts, nil{no sort}, UsedParams,
-                          dtVertical, taLeftJustify);
-    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              FSumCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-    R1:= Min(R, R2);
-    R2:= Max(R, R2);
-
-    for i:= R1 to R2+2 do
+    if FShowGraphics then
     begin
-      R:= i-1;
+      R1:= R;
+      DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
+                                ' месяцам и '+
+                                'причинам возникновения неисправностей за ' + S,
+                             EmptyStr, EmptyStr,
+                             FParamNames, FSumCounts, nil{no sort}, UsedParams,
+                             dtVertical, taRightJustify);
+      R2:= R;
+      R:= R1;
+      DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'месяцам за ' + S,
+                            EmptyStr, EmptyStr,
+                            FParamNames, FSumCounts, nil{no sort}, UsedParams,
+                            dtVertical, taLeftJustify);
+      DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                FSumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+      R1:= Min(R, R2);
+      R2:= Max(R, R2);
+
+      for i:= R1 to R2+2 do
+      begin
+        R:= i-1;
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
+    end
+    else //do not show graphics
       DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    end;
   end;
 
   UsedParams:= CalcUsedParams(FCounts, False {не показывать параметры, где все нули});
@@ -1027,32 +1042,34 @@ begin
                                      'Месяц', 'Всего за период');
   DrawSeveralPeriodsDataTableValues(R, FCounts, UsedParams, TotalCounts, True, haCenter);
 
+  if FShowGraphics then
+  begin
+    R1:= R;
+    DrawGraphForTotalCountsInTime(R,'Распределение количества рекламационных случаев по ' +
+                                    'месяцам за ' + S,
+                                  EmptyStr, EmptyStr,
+                                  FParamNames, FCounts, nil{no sort}, UsedParams,
+                                  dtVertical, taLeftJustify);
 
-  R1:= R;
-  DrawGraphForTotalCountsInTime(R,'Распределение количества рекламационных случаев по ' +
-                                  'месяцам за ' + S,
+    DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
                                 EmptyStr, EmptyStr,
-                                FParamNames, FCounts, nil{no sort}, UsedParams,
-                                dtVertical, taLeftJustify);
-
-  DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              FCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
 
-  R2:= R;
-  R:= R1;
-  DrawGraphsForParamCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
-                                     'месяцам', EmptyStr, EmptyStr,
-                                 FParamNames, FCounts, UsedParams,
-                                 dtVertical, taRightJustify);
+    R2:= R;
+    R:= R1;
+    DrawGraphsForParamCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
+                                       'месяцам', EmptyStr, EmptyStr,
+                                   FParamNames, FCounts, UsedParams,
+                                   dtVertical, taRightJustify);
 
-  R:= Max(R, R2);
+    R:= Max(R, R2);
+    DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+  end;
 
-  DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
   DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
 
   SumAccumCounts:= CalcAccumCounts(FSumCounts);
@@ -1068,45 +1085,49 @@ begin
     TotalCount:= CalcTotalCount(SumAccumCounts, UsedParams); //от этого считаем процент
     DrawSinglePeriodDataTableValues(R, SumAccumCounts, UsedParams, TotalCount, False, haCenter);
 
-
-    R1:= R;
-    DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                           EmptyStr, EmptyStr,
-                           FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
-                           taRightJustify);
-    //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
-    //                          ' месяцам и '+
-    //                          'причинам возникновения неисправностей за ' + S,
-    //                       EmptyStr, EmptyStr,
-    //                       FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
-    //                       dtVertical, taRightJustify);
-    R2:= R;
-    R:= R1;
-    DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-                          'месяцам за ' + S,
-                          EmptyStr, EmptyStr,
-                          FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
-                          taLeftJustify);
-    //DrawGraphForTotalCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
-    //                          'месяцам за ' + S,
-    //                      EmptyStr, EmptyStr,
-    //                      FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
-    //                      dtVertical, taLeftJustify);
-    DrawGraphForSumReasonCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              SumAccumCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-    R1:= Min(R, R2);
-    R2:= Max(R, R2);
-
-    for i:= R1 to R2+2 do
+    if FShowGraphics then
     begin
-      R:= i-1;
+      R1:= R;
+      DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                             EmptyStr, EmptyStr,
+                             FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
+                             taRightJustify);
+      //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
+      //                          ' месяцам и '+
+      //                          'причинам возникновения неисправностей за ' + S,
+      //                       EmptyStr, EmptyStr,
+      //                       FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
+      //                       dtVertical, taRightJustify);
+      R2:= R;
+      R:= R1;
+      DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
+                            'месяцам за ' + S,
+                            EmptyStr, EmptyStr,
+                            FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
+                            taLeftJustify);
+      //DrawGraphForTotalCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
+      //                          'месяцам за ' + S,
+      //                      EmptyStr, EmptyStr,
+      //                      FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
+      //                      dtVertical, taLeftJustify);
+      DrawGraphForSumReasonCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                SumAccumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+      R1:= Min(R, R2);
+      R2:= Max(R, R2);
+
+      for i:= R1 to R2+2 do
+      begin
+        R:= i-1;
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
+    end
+    else //do not show graphics
       DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    end;
   end;
 
   UsedParams:= CalcUsedParams(AccumCounts, False {не показывать параметры, где все нули});
@@ -1121,35 +1142,37 @@ begin
                                      'Месяц', 'Всего за период');
   DrawSeveralPeriodsDataTableValues(R, AccumCounts, UsedParams, TotalCounts, False, haCenter);
 
+  if FShowGraphics then
+  begin
+    R1:= R;
+    DrawLinesForTotalCountsInTime(R,'Накопление количества рекламационных случаев по ' +
+                                    'месяцам за ' + S,
+                                  EmptyStr, EmptyStr,
+                                  FParamNames, AccumCounts, nil{no sort}, UsedParams,
+                                  taLeftJustify);
+    //DrawGraphForTotalCountsInTime(R,'Распределение накопленного количества рекламационных случаев по ' +
+    //                                'месяцам за ' + S,
+    //                              EmptyStr, EmptyStr,
+    //                              FParamNames, AccumCounts, nil{no sort}, UsedParams,
+    //                              dtVertical, taLeftJustify);
 
-  R1:= R;
-  DrawLinesForTotalCountsInTime(R,'Накопление количества рекламационных случаев по ' +
-                                  'месяцам за ' + S,
+    DrawGraphForSumReasonCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
                                 EmptyStr, EmptyStr,
-                                FParamNames, AccumCounts, nil{no sort}, UsedParams,
-                                taLeftJustify);
-  //DrawGraphForTotalCountsInTime(R,'Распределение накопленного количества рекламационных случаев по ' +
-  //                                'месяцам за ' + S,
-  //                              EmptyStr, EmptyStr,
-  //                              FParamNames, AccumCounts, nil{no sort}, UsedParams,
-  //                              dtVertical, taLeftJustify);
+                                AccumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
-  DrawGraphForSumReasonCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              AccumCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-
-  R:= R1;
-  DrawLinesForParamCountsInTime(R, 'Накопление количества рекламационных случаев по ' +
-                                     'месяцам', EmptyStr, EmptyStr,
-                                 FParamNames, AccumCounts, UsedParams,
-                                 taRightJustify);
-  //DrawGraphsForParamCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
-  //                                   'месяцам', EmptyStr, EmptyStr,
-  //                               FParamNames, AccumCounts, UsedParams,
-  //                               dtVertical, taRightJustify);
+    R:= R1;
+    DrawLinesForParamCountsInTime(R, 'Накопление количества рекламационных случаев по ' +
+                                       'месяцам', EmptyStr, EmptyStr,
+                                   FParamNames, AccumCounts, UsedParams,
+                                   taRightJustify);
+    //DrawGraphsForParamCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
+    //                                   'месяцам', EmptyStr, EmptyStr,
+    //                               FParamNames, AccumCounts, UsedParams,
+    //                               dtVertical, taRightJustify);
+  end;
 end;
 
 { TStatisticSeveralPeriodsAtPlaceNamesSheet }
@@ -1858,48 +1881,52 @@ begin
     TotalCount:= CalcTotalCount(FSumCounts, UsedParams); //от этого считаем процент
     DrawSinglePeriodDataTableValues(R, FSumCounts, UsedParams, TotalCount, True, haLeft);
 
-
-    R1:= R;
-    DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
-                              ATableTitlePart + ' и '+
-                              'причинам возникновения неисправностей за ' + S,
-                           EmptyStr, EmptyStr,
-                           FParamNames, FSumCounts, Indexes, UsedParams,
-                           dtHorizontal, taRightJustify);
-    R2:= R;
-    R:= R1;
-    DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              ATableTitlePart + ' за ' + S,
-                          EmptyStr, EmptyStr,
-                          FParamNames, FSumCounts, Indexes, UsedParams,
-                          dtHorizontal, taLeftJustify);
-
-    if FWriter.HasGrid and ((R-R1)>30) then
+    if FShowGraphics then
     begin
-      DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-      //DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    end;
+      R1:= R;
+      DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
+                                ATableTitlePart + ' и '+
+                                'причинам возникновения неисправностей за ' + S,
+                             EmptyStr, EmptyStr,
+                             FParamNames, FSumCounts, Indexes, UsedParams,
+                             dtHorizontal, taRightJustify);
+      R2:= R;
+      R:= R1;
+      DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                ATableTitlePart + ' за ' + S,
+                            EmptyStr, EmptyStr,
+                            FParamNames, FSumCounts, Indexes, UsedParams,
+                            dtHorizontal, taLeftJustify);
 
-    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              FSumCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-    R1:= Min(R, R2);
-    R2:= Max(R, R2);
+      if FWriter.HasGrid and ((R-R1)>30) then
+      begin
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+        //DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
 
-    for i:= R1 to R2+2 do
-    begin
-      R:= i-1;
-      DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    end;
+      DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                FSumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+      R1:= Min(R, R2);
+      R2:= Max(R, R2);
 
-    if FWriter.HasGrid then
-    begin
+      for i:= R1 to R2+2 do
+      begin
+        R:= i-1;
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
+
+      if FWriter.HasGrid then
+      begin
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+        //DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
+    end
+    else //do not show graphics
       DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-      //DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    end;
   end;
 
   UsedParams:= CalcUsedParams(FCounts, False {не показывать параметры, где все нули});
@@ -1914,31 +1941,34 @@ begin
                                      AParamColumnCaption, 'Всего за период');
   DrawSeveralPeriodsDataTableValues(R, FCounts, UsedParams, TotalCounts, True, haLeft);
 
-
-  R1:= R;
-  DrawGraphForTotalCountsInTime(R,'Распределение количества рекламационных случаев по ' +
-                                  ATableTitlePart + ' за ' + S,
-                                EmptyStr, EmptyStr,
-                                FParamNames, FCounts, Indexes, UsedParams,
-                                dtHorizontal, taLeftJustify);
-  R2:= R;
-  if FWriter.HasGrid and ((R2-R1)>30) then
+  if FShowGraphics then
   begin
-    DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-    //DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-  end;
-  DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей за ' + S,
-                              EmptyStr, EmptyStr,
-                              FCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taLeftJustify,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+    R1:= R;
+    DrawGraphForTotalCountsInTime(R,'Распределение количества рекламационных случаев по ' +
+                                    ATableTitlePart + ' за ' + S,
+                                  EmptyStr, EmptyStr,
+                                  FParamNames, FCounts, Indexes, UsedParams,
+                                  dtHorizontal, taLeftJustify);
+    R2:= R;
+    if FWriter.HasGrid and ((R2-R1)>30) then
+    begin
+      DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      //DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+    end;
+    DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
-  R:= R1;
-  DrawGraphsForParamCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
-                                     ATableTitlePart, EmptyStr, EmptyStr,
-                                 FParamNames, FCounts, UsedParams,
-                                 dtHorizontal, taRightJustify);
+    R:= R1;
+    DrawGraphsForParamCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
+                                       ATableTitlePart, EmptyStr, EmptyStr,
+                                   FParamNames, FCounts, UsedParams,
+                                   dtHorizontal, taRightJustify);
+
+  end;
 end;
 
 constructor TStatisticSeveralPeriodsSheet.Create(const AWorksheet: TsWorksheet;
@@ -1977,7 +2007,8 @@ procedure TStatisticSeveralPeriodsSheet.Draw(const ABeginDate, AEndDate: TDate;
                    const AMotorNames: String;
                    const AParamNames, AReasonNames: TStrVector;
                    const ACounts: TIntMatrix3D;
-                   const ACalcTotalCountForUsedParamsOnly: Boolean);
+                   const ACalcTotalCountForUsedParamsOnly,
+                         AShowGraphics: Boolean);
 begin
   if (FUsedReasonsCount=0) or VIsNil(AParamNames) or MIsNil(ACounts) then Exit;
 
@@ -1989,6 +2020,7 @@ begin
   FCounts:= ACounts;
   FSumCounts:= CalcSumCountMatrix(ACounts);
   FCalcTotalCountForUsedParamsOnly:= ACalcTotalCountForUsedParamsOnly;
+  FShowGraphics:= AShowGraphics;
   FWriter.BeginEdit;
   DrawReport;
   FWriter.EndEdit;
@@ -2671,6 +2703,7 @@ begin
   FUsedReasons:= AUsedReasons;
   FShowPercentColumn:= AShowPercentColumn;
   FUsedReasonsCount:= AUsedReasonsCount;
+  FShowGraphics:= False;
 
   FWriter:= TSheetWriter.Create(AColWidths, AWorksheet, AGrid);
 
@@ -2703,7 +2736,7 @@ procedure TStatisticSinglePeriodAtMileagesSheet.DrawReport;
 var
   R: Integer;
   UsedParams: TBoolVector;
-  TotalCount: Integer;
+  TotalCount, n, i, j: Integer;
 begin
   R:= 1;
   DrawReportTitle(R, 'Отчет по рекламационным случаям электродвигателей');
@@ -2712,30 +2745,46 @@ begin
                    'Пробег локомотива, тыс.км', 'Всего за период');
 
   UsedParams:= CalcUsedParams(FCounts, True {показывать параметры, где все нули});
+  i:= VIndexOf(FParamNames, 'Не указан');
+  n:= FCounts[0, i];
+  if n>0 then
+  begin
+    n:= 0;
+    for j:= 1 to High(FUsedReasons) do
+      if FUsedReasons[j] then
+        n:= n + FCounts[j, i];
+  end;
+  UsedParams[i]:= n>0;
+
+
   if VCountIf(UsedParams, True)=0 then Exit;
 
   TotalCount:= CalcTotalCount(FCounts, UsedParams); //от этого считаем процент
   DrawSinglePeriodDataTableValues(R, FCounts, UsedParams, TotalCount, True, haCenter);
 
-  DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по '+
-                          'величине пробега локомотива',
-                          EmptyStr, 'Пробег локомотива, тыс.км',
-                          FParamNames, FCounts, nil {нет сортировки}, UsedParams,
-                          dtVertical, taCenter);
+  if FShowGraphics then
+  begin
+    DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по '+
+                            'величине пробега локомотива',
+                            EmptyStr, 'Пробег локомотива, тыс.км',
+                            FParamNames, FCounts, nil {нет сортировки}, UsedParams,
+                            dtVertical, taCenter);
 
-  DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей',
-                              EmptyStr, EmptyStr,
-                              FCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taCenter,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей',
+                                EmptyStr, EmptyStr,
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taCenter,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
-  DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
-                              'величине пробега локомотива' +
-                              ' и причинам возникновения неисправностей',
-                           EmptyStr, 'Пробег локомотива, тыс.км',
-                           FParamNames, FCounts, nil {нет сортировки}, UsedParams,
-                           dtVertical, taCenter);
+    DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
+                                'величине пробега локомотива' +
+                                ' и причинам возникновения неисправностей',
+                             EmptyStr, 'Пробег локомотива, тыс.км',
+                             FParamNames, FCounts, nil {нет сортировки}, UsedParams,
+                             dtVertical, taCenter);
+
+  end;
 end;
 
 
@@ -2761,28 +2810,31 @@ begin
   TotalCount:= CalcTotalCount(FCounts, UsedParams); //от этого считаем процент
   DrawSinglePeriodDataTableValues(R, FCounts, UsedParams, TotalCount, True {показать итого}, haCenter);
 
+  if FShowGraphics then
+  begin
+    DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по '+
+                            'месяцам',
+                            EmptyStr, EmptyStr,
+                            FParamNames, FCounts, nil {нет сортировки}, UsedParams,
+                            dtVertical, taCenter);
 
-  DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по '+
-                          'месяцам',
-                          EmptyStr, EmptyStr,
-                          FParamNames, FCounts, nil {нет сортировки}, UsedParams,
-                          dtVertical, taCenter);
+    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей',
+                                EmptyStr, EmptyStr,
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taCenter,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
-  DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей',
-                              EmptyStr, EmptyStr,
-                              FCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taCenter,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+    DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
+                                'месяцам' +
+                                ' и причинам возникновения неисправностей',
+                             EmptyStr, EmptyStr,
+                             FParamNames, FCounts, nil {нет сортировки}, UsedParams,
+                             dtVertical, taCenter);
+    DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+  end;
 
-  DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
-                              'месяцам' +
-                              ' и причинам возникновения неисправностей',
-                           EmptyStr, EmptyStr,
-                           FParamNames, FCounts, nil {нет сортировки}, UsedParams,
-                           dtVertical, taCenter);
 
-  DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
   DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
 
   AccumCounts:= CalcAccumCounts(FCounts);
@@ -2790,27 +2842,30 @@ begin
                   'Месяц', 'Количество с накоплением');
   DrawSinglePeriodDataTableValues(R, AccumCounts, UsedParams, TotalCount, False {не показывать итого}, haCenter);
 
-  DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-                          'месяцам',
-                          EmptyStr, EmptyStr,
-                          FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-                          taCenter);
-  DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей',
-                           EmptyStr, EmptyStr,
-                           FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-                           taCenter);
+  if FShowGraphics then
+  begin
+    DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
+                            'месяцам',
+                            EmptyStr, EmptyStr,
+                            FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+                            taCenter);
+    DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей',
+                             EmptyStr, EmptyStr,
+                             FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+                             taCenter);
 
-  //DrawGraphForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-  //                        'месяцам',
-  //                        EmptyStr, EmptyStr,
-  //                        FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-  //                        dtVertical, taCenter);
-  //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
-  //                            'причинам возникновения неисправностей',
-  //                         EmptyStr, EmptyStr,
-  //                         FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-  //                         dtVertical, taCenter);
+    //DrawGraphForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
+    //                        'месяцам',
+    //                        EmptyStr, EmptyStr,
+    //                        FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+    //                        dtVertical, taCenter);
+    //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
+    //                            'причинам возникновения неисправностей',
+    //                         EmptyStr, EmptyStr,
+    //                         FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+    //                         dtVertical, taCenter);
+  end;
 
 end;
 
@@ -2878,7 +2933,7 @@ var
   procedure DrawCaption(const ACaption: String; const AIsLast: Boolean);
   begin
     C1:= C2 + 1;
-    C2:= C1 + Ord(FShowPercentColumn) + Ord(AIsLast);
+    C2:= C1 + Ord(FShowPercentColumn) + Ord(FShowLinePercentColumn) + Ord(AIsLast);
     FWriter.WriteText(R1, C1, R1, C2, ACaption, cbtOuter, True, True);
   end;
 
@@ -2938,7 +2993,7 @@ var
   end;
 
   procedure DrawParamValues(var ARowNum, AColNum: Integer;
-                            const AValue: Integer; const AIsLast: Boolean);
+                            const AValue, ALineTotalValue: Integer; const AIsLast: Boolean);
   var
     RR, C1, C2: Integer;
     DD: Double;
@@ -2946,30 +3001,48 @@ var
     RR:= ARowNum;
     C1:= AColNum + 1;
     C2:= C1;
-    if (not FShowPercentColumn) and AIsLast then
+    if (not FShowPercentColumn) and (not FShowLinePercentColumn) and AIsLast then
       C2:= C2 + 1;
     FWriter.SetAlignment(haCenter, vaCenter);
     FWriter.WriteNumber(RR, C1, RR, C2, AValue, cbtOuter);
     if FShowPercentColumn then
     begin
+      if FShowPercentColumn and FShowLinePercentColumn then
+        FWriter.SetBackground($00E9F5E8);
       C1:= C2 + 1;
-      C2:= C1 + Ord(AIsLast);
+      C2:= C1 + Ord(AIsLast)*Ord(not FShowLinePercentColumn);
       DD:= Part(AValue, ATotalCount);
       FWriter.WriteNumber(RR, C1, RR, C2, DD, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
     end;
+    if FShowLinePercentColumn then
+    begin
+      if FShowPercentColumn and FShowLinePercentColumn then
+        FWriter.SetBackground($00E1F8FF);
+      C1:= C2 + 1;
+      C2:= C1 + Ord(AIsLast);
+      if ALineTotalValue>0 then
+      begin
+        DD:= Part(AValue, ALineTotalValue);
+        FWriter.WriteNumber(RR, C1, RR, C2, DD, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
+      end
+      else
+        FWriter.WriteText(RR, C1, RR, C2, '–', cbtOuter);
+    end;
+    FWriter.SetBackgroundClear;
     ARowNum:= RR;
     AColNum:= C2;
   end;
 
   procedure DrawDataRow(var ARowNum: Integer; const AParamName: String; const AIndex: Integer);
   var
-    k, ReasonCount, RR, C, DataValue: Integer;
+    k, ReasonCount, RR, C, DataValue, LineTotalValue: Integer;
   begin
     if not AUsedParams[AIndex] then Exit;
     FWriter.SetFont(FFontName, FFontSize-1, [], clBlack);
     RR:= ARowNum + 1;
     C:= 1;
     DrawParamName(RR, C, AParamName);
+    LineTotalValue:= CalcSumCountForParam(ACounts, AUsedParams, AIndex);
     ReasonCount:= 0;
     for k:= 0 to High(FUsedReasons) do
     begin
@@ -2977,11 +3050,11 @@ var
       Inc(ReasonCount);
 
       if k=0 then
-        DataValue:= CalcSumCountForParam(ACounts, AUsedParams, AIndex)
+        DataValue:= LineTotalValue//CalcSumCountForParam(ACounts, AUsedParams, AIndex)
       else
         DataValue:= ACounts[k,AIndex];
 
-      DrawParamValues(RR, C, DataValue, ReasonCount=FUsedReasonsCount);
+      DrawParamValues(RR, C, DataValue, LineTotalValue, ReasonCount=FUsedReasonsCount);
     end;
     ARowNum:= RR;
   end;
@@ -3005,7 +3078,7 @@ var
         DataValue:= ATotalCount
       else
         DataValue:= CalcSumCountForReason(ACounts[k], AUsedParams);
-      DrawParamValues(RR, C, DataValue, ReasonCount=FUsedReasonsCount);
+      DrawParamValues(RR, C, DataValue, 0, ReasonCount=FUsedReasonsCount);
     end;
     ARowNum:= RR;
   end;
@@ -3039,38 +3112,43 @@ begin
   TotalCount:= CalcTotalCount(FCounts, UsedParams); //от этого считаем процент
   DrawSinglePeriodDataTableValues(R, FCounts, UsedParams, TotalCount, True, haLeft);
 
-  VSort(FCounts[0], Indexes); //в гистограммах сортировка по сумме случаев за период
+  if FShowGraphics then
+  begin
+    VSort(FCounts[0], Indexes); //в гистограммах сортировка по сумме случаев за период
 
-  DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              ATableTitlePart,
-                          EmptyStr, EmptyStr,
-                          FParamNames, FCounts, Indexes, UsedParams,
-                          dtHorizontal, taCenter);
-  DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
-                              'причинам возникновения неисправностей',
-                              EmptyStr, EmptyStr,
-                              FCounts, UsedParams, True{сортировка},
-                              dtHorizontal, taCenter,
-                              DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-  DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
-                              ATableTitlePart + ' и '+
-                              'причинам возникновения неисправностей',
-                           EmptyStr, EmptyStr,
-                           FParamNames, FCounts, Indexes, UsedParams,
-                           dtHorizontal, taCenter);
+    DrawGraphForTotalCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                ATableTitlePart,
+                            EmptyStr, EmptyStr,
+                            FParamNames, FCounts, Indexes, UsedParams,
+                            dtHorizontal, taCenter);
+    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей',
+                                EmptyStr, EmptyStr,
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taCenter,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+    DrawGraphForReasonCounts(R, 'Распределение количества рекламационных случаев по ' +
+                                ATableTitlePart + ' и '+
+                                'причинам возникновения неисправностей',
+                             EmptyStr, EmptyStr,
+                             FParamNames, FCounts, Indexes, UsedParams,
+                             dtHorizontal, taCenter);
+
+  end;
 end;
 
 constructor TStatisticSinglePeriodSheet.Create(
   const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
   const AUsedReasons: TBoolVector;
-  const AShowPercentColumn: Boolean = False);
+  const AShowPercentColumn: Boolean = False;
+  const AShowLinePercentColumn: Boolean = False);
 var
   ColWidths: TIntVector;
   ColCount, W, UsedReasonsCount: Integer;
 begin
   UsedReasonsCount:= VCountIf(AUsedReasons, True);
 
-  ColCount:= UsedReasonsCount * (1 + Ord(AShowPercentColumn));
+  ColCount:= UsedReasonsCount * (1 + Ord(AShowPercentColumn) + Ord(AShowLinePercentColumn));
   W:= (TOTAL_WIDTH - PARAM_COLUMN_MIN_WIDTH) div ColCount;
   VDim(ColWidths{%H-}, ColCount+1{param names column}+2{graph margin columns}, W);
   ColWidths[0]:= MARGIN_COLUMN_WIDTH;
@@ -3082,7 +3160,7 @@ begin
   inherited Create(AWorksheet, AGrid, ColWidths,
                    UsedReasonsCount, AUsedReasons, AShowPercentColumn);
 
-
+  FShowLinePercentColumn:= AShowLinePercentColumn;
 end;
 
 
@@ -3093,7 +3171,8 @@ procedure TStatisticSinglePeriodSheet.Draw(const ABeginDate, AEndDate: TDate;
   const AMotorNames: String;
   const AParamNames, AReasonNames: TStrVector;
   const ACounts: TIntMatrix;
-  const ACalcTotalCountForUsedParamsOnly: Boolean);
+  const ACalcTotalCountForUsedParamsOnly,
+        AShowGraphics: Boolean);
 begin
   if (FUsedReasonsCount=0) or VIsNil(AParamNames) or MIsNil(ACounts) then Exit;
 
@@ -3104,6 +3183,7 @@ begin
   FReasonNames:= AReasonNames;
   FCounts:= ACounts;
   FCalcTotalCountForUsedParamsOnly:= ACalcTotalCountForUsedParamsOnly;
+  FShowGraphics:= AShowGraphics;
   FWriter.BeginEdit;
   DrawReport;
   FWriter.EndEdit;

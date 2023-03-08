@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, Spin, EditBtn, ComCtrls, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
-  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite;
+  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm;
 
 type
 
@@ -16,18 +16,18 @@ type
 
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
-    ZoomValuePanel: TPanel;
-    ZoomCaptionLabel: TLabel;
+    CardPanel: TPanel;
+    DividerBevel10: TDividerBevel;
+    LogGrid: TsWorksheetGrid;
+    MotorCardCheckBox: TCheckBox;
     DefectListButton: TRxSpeedButton;
     DividerBevel8: TDividerBevel;
     DividerBevel9: TDividerBevel;
     FactoryListButton: TRxSpeedButton;
     Label2: TLabel;
-    LogGrid: TsWorksheetGrid;
     MotorNumEdit: TEditButton;
     MotorNumOrderCheckBox: TCheckBox;
     Panel2: TPanel;
-    Panel4: TPanel;
     DelButton: TSpeedButton;
     DividerBevel5: TDividerBevel;
     DividerBevel7: TDividerBevel;
@@ -36,18 +36,23 @@ type
     ExportButton: TRxSpeedButton;
     Panel1: TPanel;
     Panel3: TPanel;
+    Panel4: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
     Panel7: TPanel;
+    Panel8: TPanel;
     PlaceListButton: TRxSpeedButton;
     ReasonListButton: TRxSpeedButton;
-    ZoomOutButton: TSpeedButton;
-    ZoomInButton: TSpeedButton;
     SpinEdit1: TSpinEdit;
+    Splitter1: TSplitter;
     TopToolsPanel: TPanel;
+    ZoomCaptionLabel: TLabel;
+    ZoomInButton: TSpeedButton;
+    ZoomOutButton: TSpeedButton;
     ZoomPanel: TPanel;
     ZoomTrackBar: TTrackBar;
     ZoomValueLabel: TLabel;
+    ZoomValuePanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -58,6 +63,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure MotorNumOrderCheckBoxChange(Sender: TObject);
@@ -69,6 +75,8 @@ type
     procedure ZoomOutButtonClick(Sender: TObject);
     procedure ZoomTrackBarChange(Sender: TObject);
   private
+    CardForm: TCardForm;
+
     SelectedIndex: Integer;
     ReclamationSheet: TReclamationSheet;
 
@@ -105,6 +113,8 @@ uses UMainForm;
 
 procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
+  CardForm:= CreateCardForm(ReclamationForm, CardPanel);
+  MotorCardCheckBox.Checked:= False;
   MainForm.SetNamesPanelsVisible(True, False);
   SelectedIndex:= -1;
   ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid);
@@ -113,6 +123,7 @@ end;
 
 procedure TReclamationForm.FormDestroy(Sender: TObject);
 begin
+  if Assigned(CardForm) then FreeAndNil(CardForm);
   if Assigned(ReclamationSheet) then FReeAndNil(ReclamationSheet);
 end;
 
@@ -124,7 +135,7 @@ end;
 procedure TReclamationForm.LogGridMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  R,C: Integer;
+  R,C, MotorID: Integer;
 begin
   if Button=mbRight then
     SelectionClear;
@@ -132,6 +143,28 @@ begin
   begin
     LogGrid.MouseToCell(X,Y,C{%H-},R{%H-});
     SelectLine(R);
+  end;
+
+  MotorID:= 0;
+  if SelectedIndex>=0 then
+    MotorID:= MotorIDs[SelectedIndex];
+  CardForm.ShowCard(MotorID);
+end;
+
+procedure TReclamationForm.MotorCardCheckBoxChange(Sender: TObject);
+begin
+  if MotorCardCheckBox.Checked then
+  begin
+    Panel4.Align:= alCustom;
+    Splitter1.Visible:= True;
+    Splitter1.Align:= alTop;
+    CardPanel.Visible:= True;
+    Splitter1.Align:= alBottom;
+    Panel4.Align:= alClient;
+  end
+  else begin
+    CardPanel.Visible:= False;
+    Splitter1.Visible:= False;
   end;
 end;
 
@@ -230,6 +263,7 @@ procedure TReclamationForm.ShowReclamation;
 begin
   Screen.Cursor:= crHourGlass;
   try
+    CardForm.ShowCard(0);
     SelectionClear;
     LoadReclamation;
     DrawReclamation;

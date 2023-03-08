@@ -20,6 +20,8 @@ type
     ANEMPanel: TPanel;
     SeveralPeriodsCheckBox: TCheckBox;
     ShowPercentCheckBox: TCheckBox;
+    ShowGraphicsCheckBox: TCheckBox;
+    ShowLinePercentCheckBox: TCheckBox;
     TotalCountForUsedParamsOnlyCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
@@ -60,6 +62,8 @@ type
     ZoomValuePanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
     procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
+    procedure ShowGraphicsCheckBoxChange(Sender: TObject);
+    procedure ShowLinePercentCheckBoxChange(Sender: TObject);
 
     procedure ShowPercentCheckBoxChange(Sender: TObject);
 
@@ -196,6 +200,17 @@ end;
 procedure TStatisticForm.SeveralPeriodsCheckBoxChange(Sender: TObject);
 begin
   AdditionYearCountSpinEdit.Enabled:= SeveralPeriodsCheckBox.Checked;
+  ShowLinePercentCheckBox.Visible:= not SeveralPeriodsCheckBox.Checked;
+  ShowStatistic;
+end;
+
+procedure TStatisticForm.ShowGraphicsCheckBoxChange(Sender: TObject);
+begin
+  ShowStatistic;
+end;
+
+procedure TStatisticForm.ShowLinePercentCheckBoxChange(Sender: TObject);
+begin
   ShowStatistic;
 end;
 
@@ -209,14 +224,11 @@ begin
   ShowStatistic;
 end;
 
-
-
 procedure TStatisticForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(StatisticList) then FreeAndNil(StatisticList);
   if Assigned(ReasonList) then FreeAndNil(ReasonList);
 end;
-
 
 procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);
 begin
@@ -371,22 +383,28 @@ var
 begin
   case AParamType of
   0: Drawer:= TStatisticSinglePeriodAtMotorNamesSheet.Create(
-                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                Grid1.Worksheet, Grid1, ReasonList.Selected,
+                ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   1: Drawer:= TStatisticSinglePeriodAtDefectNamesSheet.Create(
-                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                Grid1.Worksheet, Grid1, ReasonList.Selected,
+                ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
-                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                Grid1.Worksheet, Grid1, ReasonList.Selected,
+                ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   3: Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
-                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                Grid1.Worksheet, Grid1, ReasonList.Selected,
+                ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
-                Grid1.Worksheet, Grid1, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                Grid1.Worksheet, Grid1, ReasonList.Selected,
+                ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   end;
 
   try
     Drawer.Zoom(ZoomTrackBar.Position);
     Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
                MotorNames, ParamNames, ReasonNames, Counts[0],
-               TotalCountForUsedParamsOnlyCheckBox.Checked);
+               TotalCountForUsedParamsOnlyCheckBox.Checked,
+               ShowGraphicsCheckBox.Checked);
   finally
     FreeAndNil(Drawer);
   end;
@@ -418,7 +436,8 @@ begin
     Drawer.Zoom(ZoomTrackBar.Position);
     Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
                MotorNames, ParamNames, ReasonNames, Counts,
-               TotalCountForUsedParamsOnlyCheckBox.Checked);
+               TotalCountForUsedParamsOnlyCheckBox.Checked,
+               ShowGraphicsCheckBox.Checked);
   finally
     FreeAndNil(Drawer);
   end;
@@ -455,21 +474,27 @@ begin
 
     case AParamType of
     0: Drawer:= TStatisticSinglePeriodAtMotorNamesSheet.Create(
-                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                  Sheet, nil, ReasonList.Selected,
+                  ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     1: Drawer:= TStatisticSinglePeriodAtDefectNamesSheet.Create(
-                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                  Sheet, nil, ReasonList.Selected,
+                  ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
-                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                  Sheet, nil, ReasonList.Selected,
+                  ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     3: Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
-                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                  Sheet, nil, ReasonList.Selected,
+                  ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
-                  Sheet, nil, ReasonList.Selected, ShowPercentCheckBox.Checked);
+                  Sheet, nil, ReasonList.Selected,
+                  ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     end;
 
     try
       Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
                   MotorNames, ParamNames, ReasonNames, Counts[0],
-                  TotalCountForUsedParamsOnlyCheckBox.Checked);
+                  TotalCountForUsedParamsOnlyCheckBox.Checked,
+                  ShowGraphicsCheckBox.Checked);
 
     finally
       FreeAndNil(Drawer);
@@ -512,7 +537,8 @@ begin
     try
       Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
                   MotorNames, ParamNames, ReasonNames, Counts,
-                  TotalCountForUsedParamsOnlyCheckBox.Checked);
+                  TotalCountForUsedParamsOnlyCheckBox.Checked,
+                  ShowGraphicsCheckBox.Checked);
 
     finally
       FreeAndNil(Drawer);

@@ -480,25 +480,47 @@ object StatisticForm: TStatisticForm
         object Panel9: TPanel
           AnchorSideTop.Control = VT2
           Left = 0
-          Height = 24
+          Height = 72
           Top = 310
           Width = 394
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 24
+          ClientHeight = 72
           ClientWidth = 394
           TabOrder = 1
           object ShowPercentCheckBox: TCheckBox
             Left = 6
             Height = 24
-            Top = 0
+            Top = 24
             Width = 388
             Align = alTop
             BorderSpacing.Left = 6
             Caption = '% от общего количества рекламаций за период '
             OnChange = ShowPercentCheckBoxChange
             TabOrder = 0
+          end
+          object ShowGraphicsCheckBox: TCheckBox
+            Left = 6
+            Height = 24
+            Top = 0
+            Width = 388
+            Align = alTop
+            BorderSpacing.Left = 6
+            Caption = 'графики и гистограммы'
+            OnChange = ShowGraphicsCheckBoxChange
+            TabOrder = 1
+          end
+          object ShowLinePercentCheckBox: TCheckBox
+            Left = 6
+            Height = 24
+            Top = 48
+            Width = 388
+            Align = alTop
+            BorderSpacing.Left = 6
+            Caption = '% от общего количества рекламаций в строке'
+            OnChange = ShowLinePercentCheckBoxChange
+            TabOrder = 2
           end
         end
         object Label9: TLabel
@@ -543,7 +565,7 @@ object StatisticForm: TStatisticForm
         object ANEMPanel: TPanel
           Left = 0
           Height = 66
-          Top = 334
+          Top = 382
           Width = 394
           Align = alTop
           AutoSize = True

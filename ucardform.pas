@@ -51,7 +51,7 @@ type
     procedure ShowCard(const AMotorID: Integer);
   end;
 
-  function CrateCardForm(AOwner: TComponent; AParent: TWinControl): TCardForm;
+  function CreateCardForm(AOwner: TComponent; AParent: TWinControl): TCardForm;
 
 var
   CardForm: TCardForm;
@@ -60,7 +60,7 @@ implementation
 
 {$R *.lfm}
 
-function CrateCardForm(AOwner: TComponent; AParent: TWinControl): TCardForm;
+function CreateCardForm(AOwner: TComponent; AParent: TWinControl): TCardForm;
 begin
   Result:= TCardForm.Create(AOwner);
   Result.Parent:= AParent;

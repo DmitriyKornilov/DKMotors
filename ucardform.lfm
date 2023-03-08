@@ -205,7 +205,7 @@ object CardForm: TCardForm
         AnchorSideTop.Control = ZoomPanel
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = ZoomOutButton
-        Left = 27
+        Left = 2
         Height = 20
         Top = 0
         Width = 63
@@ -220,10 +220,10 @@ object CardForm: TCardForm
         AnchorSideTop.Control = ZoomPanel
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = ZoomInButton
-        Left = 125
+        Left = 100
         Height = 20
         Top = 0
-        Width = 125
+        Width = 150
         AutoSize = True
         LineSize = 5
         Max = 150
@@ -235,6 +235,7 @@ object CardForm: TCardForm
         Align = alCustom
         Anchors = [akTop, akRight]
         Constraints.MaxHeight = 20
+        Constraints.MinWidth = 150
         TabOrder = 0
       end
       object ZoomOutButton: TSpeedButton
@@ -242,7 +243,7 @@ object CardForm: TCardForm
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = ZoomTrackBar
         Cursor = crHandPoint
-        Left = 105
+        Left = 80
         Height = 20
         Top = 0
         Width = 20

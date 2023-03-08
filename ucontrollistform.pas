@@ -68,7 +68,7 @@ uses UMainForm;
 procedure TControlListForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-  CardForm:= CrateCardForm(ControlListForm, CardPanel);
+  CardForm:= CreateCardForm(ControlListForm, CardPanel);
 
   VSTMotorsTable:= TVSTTable.Create(VT1);
   VSTMotorsTable.OnSelect:= @MotorSelect;
