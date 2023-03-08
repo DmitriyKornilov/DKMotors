@@ -1682,9 +1682,9 @@ begin
     end;
   end;
 
-  VReverse(ATestDates);
-  VReverse(AMotorNames);
-  VReverse(AMotorNums);
+  ATestDates:= VReverse(ATestDates);
+  AMotorNames:= VReverse(AMotorNames);
+  AMotorNums:= VReverse(AMotorNums);
 end;
 
 function TSQLite.StoreTotalLoad(const ANameIDs: TIntVector;
@@ -2794,8 +2794,14 @@ begin
       'WHERE RecID = :RecID'
       );
     QParamInt('RecID', ARecID);
-    QParamDT('ArrivalDate', AArrivalDate);
-    QParamDT('SendingDate', ASendingDate);
+    if AArrivalDate=0 then
+      QParamInt('ArrivalDate', 0)
+    else
+      QParamDT('ArrivalDate', AArrivalDate);
+    if ASendingDate=0 then
+      QParamInt('SendingDate', 0)
+    else
+      QParamDT('SendingDate', ASendingDate);
     QParamInt('Passport', APassport);
     QParamStr('RepairNote', ARepairNote);
     QExec;
