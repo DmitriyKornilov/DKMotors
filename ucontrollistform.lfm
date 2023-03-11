@@ -1,7 +1,7 @@
 object ControlListForm: TControlListForm
-  Left = 401
+  Left = 206
   Height = 492
-  Top = 250
+  Top = 184
   Width = 1098
   Align = alClient
   BorderStyle = bsNone
@@ -10,7 +10,8 @@ object ControlListForm: TControlListForm
   ClientWidth = 1098
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.4.0'
+  OnShow = FormShow
+  LCLVersion = '2.2.2.0'
   object TopToolsPanel: TPanel
     Left = 2
     Height = 32
@@ -24,18 +25,18 @@ object ControlListForm: TControlListForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 30
-    ClientWidth = 1092
+    ClientHeight = 28
+    ClientWidth = 1090
     Constraints.MaxHeight = 32
     Constraints.MinHeight = 32
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 654
-      Height = 30
+      Left = 565
+      Height = 28
       Top = 0
-      Width = 111
+      Width = 101
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -176,10 +177,10 @@ object ControlListForm: TControlListForm
       ParentFont = False
     end
     object Panel1: TPanel
-      Left = 653
-      Height = 30
+      Left = 565
+      Height = 28
       Top = 0
-      Width = 1
+      Width = 0
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
@@ -187,10 +188,10 @@ object ControlListForm: TControlListForm
       TabOrder = 0
     end
     object DividerBevel6: TDividerBevel
-      Left = 340
-      Height = 30
+      Left = 317
+      Height = 28
       Top = 0
-      Width = 19
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -198,20 +199,20 @@ object ControlListForm: TControlListForm
     end
     object Panel3: TPanel
       Left = 0
-      Height = 30
+      Height = 28
       Top = 0
-      Width = 115
+      Width = 111
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 30
-      ClientWidth = 115
+      ClientHeight = 28
+      ClientWidth = 111
       ParentFont = False
       TabOrder = 1
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 30
+        Height = 28
         Top = 0
         Width = 32
         Align = alLeft
@@ -357,7 +358,7 @@ object ControlListForm: TControlListForm
       object EditButton: TSpeedButton
         Cursor = crHandPoint
         Left = 64
-        Height = 30
+        Height = 28
         Top = 0
         Width = 32
         Align = alLeft
@@ -504,7 +505,7 @@ object ControlListForm: TControlListForm
       object DelButton: TSpeedButton
         Cursor = crHandPoint
         Left = 32
-        Height = 30
+        Height = 28
         Top = 0
         Width = 32
         Align = alLeft
@@ -650,9 +651,9 @@ object ControlListForm: TControlListForm
       end
       object DividerBevel5: TDividerBevel
         Left = 96
-        Height = 30
+        Height = 28
         Top = 0
-        Width = 19
+        Width = 15
         Align = alLeft
         Font.Style = [fsBold]
         Orientation = trVertical
@@ -660,10 +661,10 @@ object ControlListForm: TControlListForm
       end
     end
     object Panel5: TPanel
-      Left = 766
-      Height = 30
+      Left = 666
+      Height = 28
       Top = 0
-      Width = 1
+      Width = 0
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
@@ -671,24 +672,24 @@ object ControlListForm: TControlListForm
       TabOrder = 2
     end
     object Panel7: TPanel
-      Left = 115
-      Height = 30
+      Left = 111
+      Height = 28
       Top = 0
-      Width = 225
+      Width = 206
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 30
-      ClientWidth = 225
+      ClientHeight = 28
+      ClientWidth = 206
       TabOrder = 3
       object Label2: TLabel
         AnchorSideLeft.Control = Panel7
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 20
-        Top = 5
-        Width = 116
+        Height = 15
+        Top = 7
+        Width = 97
         Caption = 'Поиск по номеру'
         ParentColor = False
       end
@@ -698,9 +699,9 @@ object ControlListForm: TControlListForm
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         AnchorSideBottom.Side = asrBottom
-        Left = 122
-        Height = 29
-        Top = 1
+        Left = 103
+        Height = 23
+        Top = 3
         Width = 103
         BorderSpacing.Left = 6
         ButtonCursor = crHandPoint
@@ -709,25 +710,27 @@ object ControlListForm: TControlListForm
         ImageIndex = 0
         MaxLength = 0
         NumGlyphs = 1
+        OnButtonClick = MotorNumEditButtonClick
+        OnChange = MotorNumEditChange
         PasswordChar = #0
         TabOrder = 0
       end
     end
     object Panel2: TPanel
-      Left = 765
-      Height = 30
+      Left = 666
+      Height = 28
       Top = 0
-      Width = 1
+      Width = 0
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       TabOrder = 4
     end
     object MotorCardCheckBox: TCheckBox
-      Left = 359
-      Height = 30
+      Left = 332
+      Height = 28
       Top = 0
-      Width = 275
+      Width = 218
       Align = alLeft
       Caption = 'Учётная карточка электродвигателя'
       Checked = True
@@ -736,10 +739,10 @@ object ControlListForm: TControlListForm
       TabOrder = 5
     end
     object DividerBevel7: TDividerBevel
-      Left = 634
-      Height = 30
+      Left = 550
+      Height = 28
       Top = 0
-      Width = 19
+      Width = 15
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical

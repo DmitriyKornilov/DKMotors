@@ -47,6 +47,7 @@ type
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
@@ -94,13 +95,13 @@ begin
   VSTMotorsTable.OnSelect:= @MotorSelect;
   VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
-  VSTMotorsTable.AddColumn('№ п/п', 60);
-  VSTMotorsTable.AddColumn('Наименование', 250);
-  VSTMotorsTable.AddColumn('Номер', 150);
-  VSTMotorsTable.AddColumn('Наличие паспорта', 150);
-  VSTMotorsTable.AddColumn('Дата прибытия', 150);
-  VSTMotorsTable.AddColumn('Дата убытия', 150);
-  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 250);
+  VSTMotorsTable.AddColumn('№ п/п', 50);
+  VSTMotorsTable.AddColumn('Наименование', 200);
+  VSTMotorsTable.AddColumn('Номер', 100);
+  VSTMotorsTable.AddColumn('Наличие паспорта', 130);
+  VSTMotorsTable.AddColumn('Дата прибытия', 100);
+  VSTMotorsTable.AddColumn('Дата убытия', 100);
+  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 200);
   //VSTMotorsTable.AutosizeColumnDisable;
   VSTMotorsTable.AddColumn('Примечание');
   VSTMotorsTable.CanSelect:= True;
@@ -133,8 +134,6 @@ begin
   VSTTypeTable.Select(1);
   VSTOrderTable.Select(0);
   MotorCardCheckBox.Checked:= False;
-
-  ShowRepair;
 end;
 
 procedure TRepairForm.ExportButtonClick(Sender: TObject);
@@ -184,6 +183,11 @@ begin
   if Assigned(VSTTypeTable) then FreeAndNil(VSTTypeTable);
   if Assigned(VSTOrderTable) then FreeAndNil(VSTOrderTable);
   if Assigned(CardForm) then FreeAndNil(CardForm);
+end;
+
+procedure TRepairForm.FormShow(Sender: TObject);
+begin
+  ShowRepair;
 end;
 
 procedure TRepairForm.MotorCardCheckBoxChange(Sender: TObject);

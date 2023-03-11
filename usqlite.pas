@@ -1450,7 +1450,7 @@ begin
 
   WhereStr:= 'WHERE (t1.ControlNote IS NOT NULL) ';
   if ANumberLike<>EmptyStr then
-    WhereStr:= WhereStr + ' AND (UPPER(t1.MotorNum) LIKE :NumberLike)) ';
+    WhereStr:= WhereStr + ' AND (UPPER(t1.MotorNum) LIKE :NumberLike) ';
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
 

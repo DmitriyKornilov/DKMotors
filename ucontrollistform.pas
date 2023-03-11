@@ -40,7 +40,10 @@ type
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure MotorCardCheckBoxChange(Sender: TObject);
+    procedure MotorNumEditButtonClick(Sender: TObject);
+    procedure MotorNumEditChange(Sender: TObject);
   private
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
@@ -75,16 +78,14 @@ begin
   VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
   VSTMotorsTable.AddColumn('№ п/п', 60);
-  VSTMotorsTable.AddColumn('Наименование', 300);
-  VSTMotorsTable.AddColumn('Номер', 150);
-  VSTMotorsTable.AddColumn('Партия', 150);
+  VSTMotorsTable.AddColumn('Наименование', 200);
+  VSTMotorsTable.AddColumn('Номер', 100);
+  VSTMotorsTable.AddColumn('Партия', 100);
   VSTMotorsTable.AddColumn('Примечание');
   VSTMotorsTable.CanSelect:= True;
   VSTMotorsTable.Draw;
 
   MotorCardCheckBox.Checked:= False;
-
-  ShowControlList;
 end;
 
 procedure TControlListForm.DelButtonClick(Sender: TObject);
@@ -134,6 +135,11 @@ begin
   if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
+procedure TControlListForm.FormShow(Sender: TObject);
+begin
+  ShowControlList;
+end;
+
 procedure TControlListForm.MotorCardCheckBoxChange(Sender: TObject);
 begin
   If MotorCardCheckBox.Checked then
@@ -149,6 +155,16 @@ begin
     CardPanel.Visible:= False;
     Splitter2.Visible:= False;
   end;
+end;
+
+procedure TControlListForm.MotorNumEditButtonClick(Sender: TObject);
+begin
+  MotorNumEdit.Text:= EmptyStr;
+end;
+
+procedure TControlListForm.MotorNumEditChange(Sender: TObject);
+begin
+  ShowControlList;
 end;
 
 procedure TControlListForm.MotorSelect;
@@ -188,8 +204,6 @@ procedure TControlListForm.ShowControlList;
 var
   MotorNumberLike: String;
 begin
-
-
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);

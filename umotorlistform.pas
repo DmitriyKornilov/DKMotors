@@ -35,6 +35,7 @@ type
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     procedure CheckBox1Change(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure MoreInfoCheckBoxChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -75,10 +76,10 @@ begin
   VSTMotorsTable.OnSelect:= @MotorSelect;
   VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
-  VSTMotorsTable.AddColumn('Дата сборки', 150);
-  VSTMotorsTable.AddColumn('Наименование', 300);
-  VSTMotorsTable.AddColumn('Номер', 150);
-  VSTMotorsTable.AddColumn('Отгружен', 150);
+  VSTMotorsTable.AddColumn('Дата сборки', 100);
+  VSTMotorsTable.AddColumn('Наименование', 200);
+  VSTMotorsTable.AddColumn('Номер', 100);
+  VSTMotorsTable.AddColumn('Отгружен');
   VSTMotorsTable.CanSelect:= True;
   VSTMotorsTable.Draw;
 
@@ -97,8 +98,6 @@ begin
   SpinEdit1.Value:= YearOfDate(Date);
 
   VSTTypeTable.Select(0);
-
-  ShowMotorList;
 end;
 
 procedure TMotorListForm.FormDestroy(Sender: TObject);
@@ -145,7 +144,7 @@ begin
 
     VSTMotorsTable.ValuesClear;
     VSTMotorsTable.SetColumn('Дата сборки', ABuildDates);
-    VSTMotorsTable.SetColumn('Наименование', AMotorNames);
+    VSTMotorsTable.SetColumn('Наименование', AMotorNames, taLeftJustify);
     VSTMotorsTable.SetColumn('Номер', AMotorNums);
     VSTMotorsTable.SetColumn('Отгружен', AShippings, taLeftJustify);
     VSTMotorsTable.Draw;
@@ -170,6 +169,11 @@ begin
 end;
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
+begin
+  ShowMotorList;
+end;
+
+procedure TMotorListForm.FormShow(Sender: TObject);
 begin
   ShowMotorList;
 end;
