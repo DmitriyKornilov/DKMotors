@@ -375,6 +375,13 @@ type
     procedure DrawReport; override;
   end;
 
+  { TStatisticSeveralPeriodsAtMonthNamesSumSheet }
+
+  TStatisticSeveralPeriodsAtMonthNamesSumSheet = class (TStatisticSeveralPeriodsSheet)
+  private
+    procedure DrawReport; override;
+  end;
+
   { TStatisticSeveralPeriodsAtMileagesSheet }
 
   TStatisticSeveralPeriodsAtMileagesSheet = class (TStatisticSeveralPeriodsSheet)
@@ -447,6 +454,13 @@ type
   { TStatisticSinglePeriodAtMonthNamesSheet }
 
   TStatisticSinglePeriodAtMonthNamesSheet = class (TStatisticSinglePeriodSheet)
+  private
+    procedure DrawReport; override;
+  end;
+
+  { TStatisticSinglePeriodAtMonthNamesSumSheet }
+
+  TStatisticSinglePeriodAtMonthNamesSumSheet = class (TStatisticSinglePeriodSheet)
   private
     procedure DrawReport; override;
   end;
@@ -871,6 +885,182 @@ begin
   end;
 end;
 
+{ TStatisticSeveralPeriodsAtMonthNamesSumSheet }
+
+procedure TStatisticSeveralPeriodsAtMonthNamesSumSheet.DrawReport;
+var
+  R, R1, R2, i: Integer;
+  UsedParams: TBoolVector;
+  TotalCount: Integer;
+  TotalCounts: TIntVector;
+  S: String;
+  AccumCounts: TIntMatrix3D;
+  SumAccumCounts: TIntMatrix;
+begin
+  R:= 1;
+  DrawReportTitle(R, 'Отчет по рекламационным случаям электродвигателей');
+
+  SumAccumCounts:= CalcAccumCounts(FSumCounts);
+  AccumCounts:= CalcAccumCounts(FCounts);
+
+  UsedParams:= CalcUsedParams(SumAccumCounts, False {не показывать параметры, где все нули});
+  if VCountIf(UsedParams, True)>0 then
+  begin
+    i:= YearOf(FBeginDate);
+    S:= IntToStr(i-FAdditionYearCount) + '-' + IntToStr(i) + 'гг.';
+    DrawSinglePeriodDataTableTop(R, 'Накопление количества рекламационных случаев по ' +
+                   'месяцам', 'Месяц', 'Всего за ' + S);
+    TotalCount:= CalcTotalCount(SumAccumCounts, UsedParams); //от этого считаем процент
+    DrawSinglePeriodDataTableValues(R, SumAccumCounts, UsedParams, TotalCount, False, haCenter);
+
+    if FShowGraphics then
+    begin
+      R1:= R;
+      DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                             EmptyStr, EmptyStr,
+                             FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
+                             taRightJustify);
+      //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
+      //                          ' месяцам и '+
+      //                          'причинам возникновения неисправностей за ' + S,
+      //                       EmptyStr, EmptyStr,
+      //                       FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
+      //                       dtVertical, taRightJustify);
+      R2:= R;
+      R:= R1;
+      DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
+                            'месяцам за ' + S,
+                            EmptyStr, EmptyStr,
+                            FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
+                            taLeftJustify);
+      //DrawGraphForTotalCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
+      //                          'месяцам за ' + S,
+      //                      EmptyStr, EmptyStr,
+      //                      FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
+      //                      dtVertical, taLeftJustify);
+      DrawGraphForSumReasonCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                SumAccumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+      R1:= Min(R, R2);
+      R2:= Max(R, R2);
+
+      for i:= R1 to R2+2 do
+      begin
+        R:= i-1;
+        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+      end;
+    end
+    else //do not show graphics
+      DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+  end;
+
+  UsedParams:= CalcUsedParams(AccumCounts, False {не показывать параметры, где все нули});
+  if VCountIf(UsedParams, True)=0 then Exit;
+
+  VDim(TotalCounts{%H-}, Length(FCounts));
+  for i:= 0 to High(TotalCounts) do
+    TotalCounts[i]:= CalcTotalCount(AccumCounts[i], UsedParams); //от этого считаем процент в периоде
+
+  DrawSeveralPeriodsDataTableTop(R, 'Распределение накопленного количества рекламационных случаев по ' +
+                                     'временным периодам',
+                                     'Месяц', 'Всего за период');
+  DrawSeveralPeriodsDataTableValues(R, AccumCounts, UsedParams, TotalCounts, False, haCenter);
+
+  if FShowGraphics then
+  begin
+    R1:= R;
+    DrawLinesForTotalCountsInTime(R,'Накопление количества рекламационных случаев по ' +
+                                    'месяцам за ' + S,
+                                  EmptyStr, EmptyStr,
+                                  FParamNames, AccumCounts, nil{no sort}, UsedParams,
+                                  taLeftJustify);
+    //DrawGraphForTotalCountsInTime(R,'Распределение накопленного количества рекламационных случаев по ' +
+    //                                'месяцам за ' + S,
+    //                              EmptyStr, EmptyStr,
+    //                              FParamNames, AccumCounts, nil{no sort}, UsedParams,
+    //                              dtVertical, taLeftJustify);
+
+    DrawGraphForSumReasonCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей за ' + S,
+                                EmptyStr, EmptyStr,
+                                AccumCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taLeftJustify,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+
+    R:= R1;
+    DrawLinesForParamCountsInTime(R, 'Накопление количества рекламационных случаев по ' +
+                                       'месяцам', EmptyStr, EmptyStr,
+                                   FParamNames, AccumCounts, UsedParams,
+                                   taRightJustify);
+    //DrawGraphsForParamCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
+    //                                   'месяцам', EmptyStr, EmptyStr,
+    //                               FParamNames, AccumCounts, UsedParams,
+    //                               dtVertical, taRightJustify);
+    DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+  end;
+
+end;
+
+{ TStatisticSinglePeriodAtMonthNamesSumSheet }
+
+procedure TStatisticSinglePeriodAtMonthNamesSumSheet.DrawReport;
+var
+  R: Integer;
+  UsedParams: TBoolVector;
+  TotalCount: Integer;
+  AccumCounts: TIntMatrix;
+begin
+  R:= 1;
+  DrawReportTitle(R, 'Отчет по рекламационным случаям электродвигателей');
+
+  UsedParams:= CalcUsedParams(FCounts, True {показывать параметры, где все нули});
+  if VCountIf(UsedParams, True)=0 then Exit;
+
+  TotalCount:= CalcTotalCount(FCounts, UsedParams); //от этого считаем процент
+
+  AccumCounts:= CalcAccumCounts(FCounts);
+  DrawSinglePeriodDataTableTop(R, 'Накопление рекламационных случаев по месяцам ',
+                  'Месяц', 'Количество с накоплением');
+  DrawSinglePeriodDataTableValues(R, AccumCounts, UsedParams, TotalCount, False {не показывать итого}, haCenter);
+
+  if FShowGraphics then
+  begin
+    DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
+                            'месяцам',
+                            EmptyStr, EmptyStr,
+                            FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+                            taCenter);
+    DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей',
+                                EmptyStr, EmptyStr,
+                                FCounts, UsedParams, True{сортировка},
+                                dtHorizontal, taCenter,
+                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+
+    DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
+                                'причинам возникновения неисправностей',
+                             EmptyStr, EmptyStr,
+                             FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+                             taCenter);
+
+    //DrawGraphForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
+    //                        'месяцам',
+    //                        EmptyStr, EmptyStr,
+    //                        FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+    //                        dtVertical, taCenter);
+    //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
+    //                            'причинам возникновения неисправностей',
+    //                         EmptyStr, EmptyStr,
+    //                         FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
+    //                         dtVertical, taCenter);
+    DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
+  end;
+end;
+
 { TStatisticSeveralPeriodsAtMileagesSheet }
 
 procedure TStatisticSeveralPeriodsAtMileagesSheet.DrawReport;
@@ -979,8 +1169,6 @@ var
   TotalCount: Integer;
   TotalCounts: TIntVector;
   S: String;
-  AccumCounts: TIntMatrix3D;
-  SumAccumCounts: TIntMatrix;
 begin
   R:= 1;
   DrawReportTitle(R, 'Отчет по рекламационным случаям электродвигателей');
@@ -1068,110 +1256,6 @@ begin
 
     R:= Max(R, R2);
     DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-  end;
-
-  DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-
-  SumAccumCounts:= CalcAccumCounts(FSumCounts);
-  AccumCounts:= CalcAccumCounts(FCounts);
-
-  UsedParams:= CalcUsedParams(SumAccumCounts, False {не показывать параметры, где все нули});
-  if VCountIf(UsedParams, True)>0 then
-  begin
-    i:= YearOf(FBeginDate);
-    S:= IntToStr(i-FAdditionYearCount) + '-' + IntToStr(i) + 'гг.';
-    DrawSinglePeriodDataTableTop(R, 'Накопление количества рекламационных случаев по ' +
-                   'месяцам', 'Месяц', 'Всего за ' + S);
-    TotalCount:= CalcTotalCount(SumAccumCounts, UsedParams); //от этого считаем процент
-    DrawSinglePeriodDataTableValues(R, SumAccumCounts, UsedParams, TotalCount, False, haCenter);
-
-    if FShowGraphics then
-    begin
-      R1:= R;
-      DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
-                                'причинам возникновения неисправностей за ' + S,
-                             EmptyStr, EmptyStr,
-                             FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
-                             taRightJustify);
-      //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
-      //                          ' месяцам и '+
-      //                          'причинам возникновения неисправностей за ' + S,
-      //                       EmptyStr, EmptyStr,
-      //                       FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
-      //                       dtVertical, taRightJustify);
-      R2:= R;
-      R:= R1;
-      DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-                            'месяцам за ' + S,
-                            EmptyStr, EmptyStr,
-                            FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
-                            taLeftJustify);
-      //DrawGraphForTotalCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
-      //                          'месяцам за ' + S,
-      //                      EmptyStr, EmptyStr,
-      //                      FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
-      //                      dtVertical, taLeftJustify);
-      DrawGraphForSumReasonCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
-                                'причинам возникновения неисправностей за ' + S,
-                                EmptyStr, EmptyStr,
-                                SumAccumCounts, UsedParams, True{сортировка},
-                                dtHorizontal, taLeftJustify,
-                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-      R1:= Min(R, R2);
-      R2:= Max(R, R2);
-
-      for i:= R1 to R2+2 do
-      begin
-        R:= i-1;
-        DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-      end;
-    end
-    else //do not show graphics
-      DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-  end;
-
-  UsedParams:= CalcUsedParams(AccumCounts, False {не показывать параметры, где все нули});
-  if VCountIf(UsedParams, True)=0 then Exit;
-
-  VDim(TotalCounts{%H-}, Length(FCounts));
-  for i:= 0 to High(TotalCounts) do
-    TotalCounts[i]:= CalcTotalCount(AccumCounts[i], UsedParams); //от этого считаем процент в периоде
-
-  DrawSeveralPeriodsDataTableTop(R, 'Распределение накопленного количества рекламационных случаев по ' +
-                                     'временным периодам',
-                                     'Месяц', 'Всего за период');
-  DrawSeveralPeriodsDataTableValues(R, AccumCounts, UsedParams, TotalCounts, False, haCenter);
-
-  if FShowGraphics then
-  begin
-    R1:= R;
-    DrawLinesForTotalCountsInTime(R,'Накопление количества рекламационных случаев по ' +
-                                    'месяцам за ' + S,
-                                  EmptyStr, EmptyStr,
-                                  FParamNames, AccumCounts, nil{no sort}, UsedParams,
-                                  taLeftJustify);
-    //DrawGraphForTotalCountsInTime(R,'Распределение накопленного количества рекламационных случаев по ' +
-    //                                'месяцам за ' + S,
-    //                              EmptyStr, EmptyStr,
-    //                              FParamNames, AccumCounts, nil{no sort}, UsedParams,
-    //                              dtVertical, taLeftJustify);
-
-    DrawGraphForSumReasonCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
-                                'причинам возникновения неисправностей за ' + S,
-                                EmptyStr, EmptyStr,
-                                AccumCounts, UsedParams, True{сортировка},
-                                dtHorizontal, taLeftJustify,
-                                DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-
-    R:= R1;
-    DrawLinesForParamCountsInTime(R, 'Накопление количества рекламационных случаев по ' +
-                                       'месяцам', EmptyStr, EmptyStr,
-                                   FParamNames, AccumCounts, UsedParams,
-                                   taRightJustify);
-    //DrawGraphsForParamCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
-    //                                   'месяцам', EmptyStr, EmptyStr,
-    //                               FParamNames, AccumCounts, UsedParams,
-    //                               dtVertical, taRightJustify);
   end;
 end;
 
@@ -2796,7 +2880,6 @@ var
   R: Integer;
   UsedParams: TBoolVector;
   TotalCount: Integer;
-  AccumCounts: TIntMatrix;
 begin
   R:= 1;
   DrawReportTitle(R, 'Отчет по рекламационным случаям электродвигателей');
@@ -2833,40 +2916,6 @@ begin
                              dtVertical, taCenter);
     DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
   end;
-
-
-  DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
-
-  AccumCounts:= CalcAccumCounts(FCounts);
-  DrawSinglePeriodDataTableTop(R, 'Накопление рекламационных случаев по месяцам ',
-                  'Месяц', 'Количество с накоплением');
-  DrawSinglePeriodDataTableValues(R, AccumCounts, UsedParams, TotalCount, False {не показывать итого}, haCenter);
-
-  if FShowGraphics then
-  begin
-    DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-                            'месяцам',
-                            EmptyStr, EmptyStr,
-                            FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-                            taCenter);
-    DrawLinesForReasonCounts(R, 'Накопление количества рекламационных случаев по ' +
-                                'причинам возникновения неисправностей',
-                             EmptyStr, EmptyStr,
-                             FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-                             taCenter);
-
-    //DrawGraphForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-    //                        'месяцам',
-    //                        EmptyStr, EmptyStr,
-    //                        FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-    //                        dtVertical, taCenter);
-    //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
-    //                            'причинам возникновения неисправностей',
-    //                         EmptyStr, EmptyStr,
-    //                         FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-    //                         dtVertical, taCenter);
-  end;
-
 end;
 
 { TStatisticSinglePeriodAtDefectNamesSheet }

@@ -16,8 +16,12 @@ type
 
   TStatisticForm = class(TForm)
     ANEMAsSameNameCheckBox: TCheckBox;
+    MonthPanel: TPanel;
     Label10: TLabel;
     ANEMPanel: TPanel;
+    Label11: TLabel;
+    RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
     SeveralPeriodsCheckBox: TCheckBox;
     ShowPercentCheckBox: TCheckBox;
     ShowGraphicsCheckBox: TCheckBox;
@@ -61,6 +65,8 @@ type
     ZoomValueLabel: TLabel;
     ZoomValuePanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
+    procedure RadioButton1Click(Sender: TObject);
+    procedure RadioButton2Click(Sender: TObject);
     procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
     procedure ShowGraphicsCheckBoxChange(Sender: TObject);
     procedure ShowLinePercentCheckBoxChange(Sender: TObject);
@@ -219,6 +225,16 @@ begin
   ShowStatistic;
 end;
 
+procedure TStatisticForm.RadioButton1Click(Sender: TObject);
+begin
+  ShowStatistic;
+end;
+
+procedure TStatisticForm.RadioButton2Click(Sender: TObject);
+begin
+  ShowStatistic;
+end;
+
 procedure TStatisticForm.ShowPercentCheckBoxChange(Sender: TObject);
 begin
   ShowStatistic;
@@ -305,10 +321,7 @@ begin
   if SelectedIndex=StatisticList.SelectedIndex then Exit;
   SelectedIndex:= StatisticList.SelectedIndex;
   ANEMPanel.Visible:= SelectedIndex=0;
-
-
-
-
+  MonthPanel.Visible:= SelectedIndex=3;
   ShowStatistic;
 end;
 
@@ -391,7 +404,12 @@ begin
   2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
                 Grid1.Worksheet, Grid1, ReasonList.Selected,
                 ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
-  3: Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
+  3: if RadioButton1.Checked then
+       Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
+                Grid1.Worksheet, Grid1, ReasonList.Selected,
+                ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked)
+     else
+       Drawer:= TStatisticSinglePeriodAtMonthNamesSumSheet.Create(
                 Grid1.Worksheet, Grid1, ReasonList.Selected,
                 ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
@@ -424,7 +442,12 @@ begin
   2: Drawer:= TStatisticSeveralPeriodsAtPlaceNamesSheet.Create(
                 Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
                 ReasonList.Selected, ShowPercentCheckBox.Checked);
-  3: Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
+  3: if RadioButton1.Checked then
+       Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
+                Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                ReasonList.Selected, ShowPercentCheckBox.Checked)
+     else
+       Drawer:= TStatisticSeveralPeriodsAtMonthNamesSumSheet.Create(
                 Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
                 ReasonList.Selected, ShowPercentCheckBox.Checked);
   4: Drawer:= TStatisticSeveralPeriodsAtMileagesSheet.Create(
