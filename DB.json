@@ -102,7 +102,7 @@
       },
       "ReferenceFrom" : {
         "TableNames" : [
-          "CARGOITEMS"
+          "MOTORLIST"
         ],
         "FieldNames" : [
           "CargoID"
@@ -257,11 +257,9 @@
       "ReferenceFrom" : {
         "TableNames" : [
           "MOTORTEST",
-          "CARGOITEMS",
           "RECLAMATIONS"
         ],
         "FieldNames" : [
-          "MotorID",
           "MotorID",
           "MotorID"
         ]
@@ -1009,10 +1007,8 @@
       },
       "ReferenceFrom" : {
         "TableNames" : [
-          "RECLAMATIONREPAIRS"
         ],
         "FieldNames" : [
-          "RecID"
         ]
       }
     },
