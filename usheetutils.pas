@@ -939,12 +939,13 @@ begin
       //                      EmptyStr, EmptyStr,
       //                      FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
       //                      dtVertical, taLeftJustify);
-      DrawGraphForSumReasonCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
+      DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
                                 'причинам возникновения неисправностей за ' + S,
                                 EmptyStr, EmptyStr,
-                                SumAccumCounts, UsedParams, True{сортировка},
+                                FSumCounts, UsedParams, True{сортировка},
                                 dtHorizontal, taLeftJustify,
                                 DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
+
       R1:= Min(R, R2);
       R2:= Max(R, R2);
 
@@ -978,16 +979,10 @@ begin
                                   EmptyStr, EmptyStr,
                                   FParamNames, AccumCounts, nil{no sort}, UsedParams,
                                   taLeftJustify);
-    //DrawGraphForTotalCountsInTime(R,'Распределение накопленного количества рекламационных случаев по ' +
-    //                                'месяцам за ' + S,
-    //                              EmptyStr, EmptyStr,
-    //                              FParamNames, AccumCounts, nil{no sort}, UsedParams,
-    //                              dtVertical, taLeftJustify);
-
-    DrawGraphForSumReasonCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
+    DrawGraphForSumReasonCountsInTime(R, 'Распределение количества рекламационных случаев по ' +
                                 'причинам возникновения неисправностей за ' + S,
                                 EmptyStr, EmptyStr,
-                                AccumCounts, UsedParams, True{сортировка},
+                                FCounts, UsedParams, True{сортировка},
                                 dtHorizontal, taLeftJustify,
                                 DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
 
@@ -996,10 +991,6 @@ begin
                                        'месяцам', EmptyStr, EmptyStr,
                                    FParamNames, AccumCounts, UsedParams,
                                    taRightJustify);
-    //DrawGraphsForParamCountsInTime(R, 'Распределение накопленного количества рекламационных случаев по ' +
-    //                                   'месяцам', EmptyStr, EmptyStr,
-    //                               FParamNames, AccumCounts, UsedParams,
-    //                               dtVertical, taRightJustify);
     DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
   end;
 
@@ -3658,6 +3649,8 @@ begin
 
   FWriter.SetFrozenRows(FrozenCount);
   FWriter.SetRepeatedRows(FrozenCount,FrozenCount);
+  if R>FrozenCount then
+    FWriter.DrawBorders(FrozenCount+1, 1, R, FWriter.ColCount, cbtAll);
 
   FWriter.EndEdit;
 end;
@@ -4433,7 +4426,7 @@ begin
     85,  // Дата сборки
     85,  // Пробег, км
     150, // Предприятие
-    150,  // Завод
+    120,  // Завод
     120, // Выезд/ФИО
     120, // Неисправный элемент
     120, // Причина неисправности

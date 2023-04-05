@@ -748,7 +748,7 @@ begin
     OrderStr:= 'ORDER BY t1.OldMotor, t1.BuildDate, t1.MotorID ';
 
   if ANumberLike=EmptyStr then
-    WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) '
+    WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) AND (t1.OldMotor=0) '
   else
     WhereStr:= 'WHERE (UPPER(t1.MotorNum) LIKE :NumberLike) ';
 
