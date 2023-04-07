@@ -1,7 +1,7 @@
 object RepairForm: TRepairForm
-  Left = 28
+  Left = 365
   Height = 558
-  Top = 105
+  Top = 124
   Width = 1245
   Align = alClient
   BorderStyle = bsNone
@@ -11,7 +11,7 @@ object RepairForm: TRepairForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '2.2.4.0'
   object ToolPanel: TPanel
     Left = 2
     Height = 32
@@ -833,14 +833,13 @@ object RepairForm: TRepairForm
     Left = 196
     Height = 520
     Top = 36
-    Width = 1047
+    Width = 1049
     Align = alClient
     BorderSpacing.Top = 2
-    BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     ClientHeight = 520
-    ClientWidth = 1047
+    ClientWidth = 1049
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
@@ -848,6 +847,7 @@ object RepairForm: TRepairForm
       Top = 80
       Width = 1047
       Align = alBottom
+      BorderSpacing.Right = 2
       BevelOuter = bvNone
       TabOrder = 0
     end
@@ -857,7 +857,7 @@ object RepairForm: TRepairForm
       Left = 0
       Height = 5
       Top = 75
-      Width = 1047
+      Width = 1049
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
@@ -867,7 +867,7 @@ object RepairForm: TRepairForm
       Left = 0
       Height = 75
       Top = 0
-      Width = 1045
+      Width = 1047
       Align = alClient
       BorderSpacing.Right = 2
       DefaultNodeHeight = 20

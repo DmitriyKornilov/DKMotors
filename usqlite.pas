@@ -2690,9 +2690,9 @@ begin
     WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
 
   if AOrderType=1 then
-    OrderStr:= 'ORDER BY t1.ArrivalDate'
+    OrderStr:= 'ORDER BY t1.ArrivalDate, t2.MotorNum'
   else if AOrderType=2 then
-    OrderStr:= 'ORDER BY t2.MotorNum';
+    OrderStr:= 'ORDER BY t2.MotorNum, t1.ArrivalDate';
 
   QSetQuery(FQuery);
   QSetSQL(
