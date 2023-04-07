@@ -8,7 +8,8 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, Spin, EditBtn, ComCtrls, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
-  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm;
+  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm,
+  URepairEditForm;
 
 type
 
@@ -18,6 +19,7 @@ type
     AddButton: TSpeedButton;
     CardPanel: TPanel;
     DividerBevel10: TDividerBevel;
+    RepairButton: TSpeedButton;
     LogGrid: TsWorksheetGrid;
     MotorCardCheckBox: TCheckBox;
     DefectListButton: TRxSpeedButton;
@@ -70,6 +72,7 @@ type
     procedure PlaceListButtonClick(Sender: TObject);
     procedure DefectListButtonClick(Sender: TObject);
     procedure ReasonListButtonClick(Sender: TObject);
+    procedure RepairButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure ZoomInButtonClick(Sender: TObject);
     procedure ZoomOutButtonClick(Sender: TObject);
@@ -91,6 +94,8 @@ type
 
     procedure DelRaclamation;
     procedure ReclamationEditFormOpen(const AEditType: Byte);
+
+    procedure RepairEditFormOpen;
 
     procedure LoadReclamation;
     procedure DrawReclamation;
@@ -211,6 +216,11 @@ begin
       ShowReclamation;
 end;
 
+procedure TReclamationForm.RepairButtonClick(Sender: TObject);
+begin
+  RepairEditFormOpen;
+end;
+
 procedure TReclamationForm.SpinEdit1Change(Sender: TObject);
 begin
   ShowReclamation;
@@ -241,6 +251,7 @@ begin
   end;
   DelButton.Enabled:= False;
   EditButton.Enabled:= False;
+  RepairButton.Enabled:= False;
 end;
 
 procedure TReclamationForm.SelectLine(const ARow: Integer);
@@ -256,6 +267,7 @@ begin
     ReclamationSheet.DrawLine(SelectedIndex, True);
     DelButton.Enabled:= True;
     EditButton.Enabled:= True;
+    RepairButton.Enabled:= True;
   end;
 end;
 
@@ -350,6 +362,21 @@ begin
   end;
   SelectionClear;
   ShowReclamation;
+end;
+
+procedure TReclamationForm.RepairEditFormOpen;
+var
+  RepairEditForm: TRepairEditForm;
+begin
+  RepairEditForm:= TRepairEditForm.Create(ReclamationForm);
+  try
+    RepairEditForm.RecID:= RecIDs[SelectedIndex];
+    RepairEditForm.MotorName:= MotorNames[SelectedIndex];
+    RepairEditForm.MotorNum:= MotorNums[SelectedIndex];
+    if RepairEditForm.ShowModal = mrOK then ShowReclamation;
+  finally
+    FreeAndNil(RepairEditForm);
+  end;
 end;
 
 procedure TReclamationForm.DelButtonClick(Sender: TObject);

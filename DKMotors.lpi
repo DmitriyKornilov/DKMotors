@@ -254,6 +254,7 @@
         <Filename Value="urepaireditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="RepairEditForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="URepairEditForm"/>
       </Unit>

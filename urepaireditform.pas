@@ -114,7 +114,10 @@ begin
 
   if SQLite.RepairLoad(RecID, ArrivalDate, SendingDate, Passport, RepairNote) then
   begin
-    DateTimePicker1.Date:= ArrivalDate;
+    if ArrivalDate>0 then
+      DateTimePicker1.Date:= ArrivalDate
+    else
+      DateTimePicker1.Date:= Date;
     PassportCheckBox.Checked:= Passport>0;
     SendingCheckBox.Checked:= SendingDate>0;
     if SendingDate>0 then
