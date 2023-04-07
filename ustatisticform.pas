@@ -296,6 +296,7 @@ end;
 procedure TStatisticForm.SetStatisticList;
 var
   V: TStrVector;
+  i: Integer;
 begin
   V:= VCreateStr([
     'Распределение по наименованиям двигателей',
@@ -304,7 +305,9 @@ begin
     'Распределение по месяцам',
     'Распределение по пробегу локомотива'
   ]);
-
+  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  Panel2.Height:= Length(V)*i + Label1.Height + 10;
+  VT1.Height:= Length(V)*i;
   StatisticList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   StatisticList.HeaderVisible:= False;
   StatisticList.GridLinesVisible:= False;
@@ -326,6 +329,8 @@ begin
 end;
 
 procedure TStatisticForm.SetReasonList;
+var
+  i: Integer;
 begin
   ReasonIDs:= VCreateInt([
     -1,
@@ -336,14 +341,15 @@ begin
     4
   ]);
   ReasonNames:= VCreateStr([
-    'Общее количество за период',
-    'Не расследовано',
-    'Некачественные комплектующие',
-    'Дефект сборки / изготовления',
-    'Нарушение условий эксплуатации',
-    'Электродвигатель исправен'
+    'общее количество за период',
+    'не расследовано',
+    'некачественные комплектующие',
+    'дефект сборки / изготовления',
+    'нарушение условий эксплуатации',
+    'электродвигатель исправен'
   ]);
-
+  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  VT2.Height:= Length(ReasonNames)*i;
   ReasonList.GridLinesVisible:= False;
   ReasonList.HeaderVisible:= False;
   ReasonList.SelectedBGColor:= VT2.Color;

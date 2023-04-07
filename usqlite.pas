@@ -196,8 +196,8 @@ type
                           ADefectNames, AReasonNames,
                           ARecNotes: TStrVector): Boolean;
     function ReclamationListLoad(const ABeginDate, AEndDate: TDate;
-          const ANameIDs: TIntVector; const ANumberLike: String;
-          const AOrderByMotorNum: Boolean;
+          const ANameIDs, ADefectIDs, AReasonIDs: TIntVector;
+          const AOrderIndex: Integer; const ANumberLike: String;
           out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
           out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
           out APlaceNames, AFactoryNames, ADepartures,
@@ -220,6 +220,7 @@ type
                       out ANameID, AMotorID, AMileage, APlaceID, AFactoryID,
                           ADefectID, AReasonID, AOpinion, APassport: Integer;
                       out AMotorNum, ADeparture, ARecNote: String): Boolean;
+
     //ремонты
     function RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
           const AOrderType: Integer; //1 - по дате прибытия, 2 - по номеру
@@ -2374,8 +2375,8 @@ begin
 end;
 
 function TSQLite.ReclamationListLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; const ANumberLike: String;
-  const AOrderByMotorNum: Boolean;
+  const ANameIDs, ADefectIDs, AReasonIDs: TIntVector;
+  const AOrderIndex: Integer; const ANumberLike: String;
   out ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
   out ARecIDs, AMotorIDs, AMileages, AOpinions, AColors, APassports: TIntVector;
   out APlaceNames, AFactoryNames, ADepartures, ADefectNames, AReasonNames,
@@ -2404,18 +2405,27 @@ begin
   ASendingDates:= nil;
   APassports:= nil;
 
+  if VIsNil(ADefectIDs) or VIsNil(AReasonIDs) then Exit;
 
   if ANumberLike<>EmptyStr then
     WhereStr:= 'WHERE (UPPER(t6.MotorNum) LIKE :NumberLike) '
    else
     WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
-    WhereStr:= WhereStr + 'AND' + SqlIN('t6','NameID', Length(ANameIDs));
+    WhereStr:= WhereStr + 'AND' + SqlIN('t6','NameID', Length(ANameIDs), 'NameIDValue');
 
-  if AOrderByMotorNum then
-    OrderStr:= 'ORDER BY t6.MotorNum'
-  else
-    OrderStr:= 'ORDER BY t1.RecDate';
+  WhereStr:= WhereStr + 'AND' + SqlIN('t1','DefectID', Length(ADefectIDs), 'DefectIDValue');
+  WhereStr:= WhereStr + 'AND' + SqlIN('t1','ReasonID', Length(AReasonIDs), 'ReasonIDValue');
+
+  OrderStr:= EmptyStr;
+  case AOrderIndex of
+  0: OrderStr:= 'ORDER BY t1.RecDate, t6.MotorNum';
+  1: OrderStr:= 'ORDER BY t6.MotorNum, t1.RecDate';
+  2: OrderStr:= 'ORDER BY t6.BuildDate, t1.RecDate';
+  3: OrderStr:= 'ORDER BY t2.PlaceName, t1.RecDate';
+  4: OrderStr:= 'ORDER BY t4.DefectName, t1.RecDate';
+  5: OrderStr:= 'ORDER BY t5.ReasonName, t1.RecDate';
+  end;
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -2434,7 +2444,6 @@ begin
     WhereStr +
     OrderStr);
 
-
   if ANumberLike<>EmptyStr then
     QParamStr('NumberLike', SUpper(ANumberLike)+'%')
   else begin
@@ -2442,9 +2451,10 @@ begin
     QParamDT('ED', AEndDate);
   end;
 
-
   if not VIsNil(ANameIDs) then
-    QParamsInt(ANameIDs);
+    QParamsInt(ANameIDs, 'NameIDValue');
+  QParamsInt(ADefectIDs, 'DefectIDValue');
+  QParamsInt(AReasonIDs, 'ReasonIDValue');
 
   QOpen;
   if not QIsEmpty then

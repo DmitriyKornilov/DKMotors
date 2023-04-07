@@ -100,11 +100,13 @@ end;
 
 procedure TCardForm.ZoomTrackBarChange(Sender: TObject);
 begin
+  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
   DrawCard;
 end;
 
 procedure TCardForm.DrawCard;
 begin
+  if MotorID<=0 then Exit;
   MotorCardSheet.Zoom(ZoomTrackBar.Position);
   MotorCardSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
                       RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,

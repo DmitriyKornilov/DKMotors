@@ -91,7 +91,7 @@ begin
   VSTTypeTable.CanSelect:= True;
   VSTTypeTable.CanUnselect:= False;
   VSTTypeTable.AddColumn('Список');
-  V:= VCreateStr(['Все', 'Отгруженные', 'Неотгруженные']);
+  V:= VCreateStr(['все', 'отгруженные', 'неотгруженные']);
   VSTTypeTable.SetColumn('Список', V, taLeftJustify);
   VSTTypeTable.Draw;
 

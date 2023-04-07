@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Spin, EditBtn, ComCtrls, fpspreadsheetgrid, rxctrls,
+  StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
-  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm,
-  URepairEditForm;
+  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
+  URepairEditForm, DateTimePicker;
 
 type
 
@@ -18,9 +18,19 @@ type
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
     CardPanel: TPanel;
-    DividerBevel10: TDividerBevel;
-    RepairButton: TSpeedButton;
+    DateTimePicker1: TDateTimePicker;
+    DateTimePicker2: TDateTimePicker;
+    Label3: TLabel;
+    Label5: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    LeftPanel: TPanel;
     LogGrid: TsWorksheetGrid;
+    MainPanel: TPanel;
+    Panel4: TPanel;
+    Panel6: TPanel;
+    Panel8: TPanel;
+    RepairButton: TSpeedButton;
     MotorCardCheckBox: TCheckBox;
     DefectListButton: TRxSpeedButton;
     DividerBevel8: TDividerBevel;
@@ -28,7 +38,6 @@ type
     FactoryListButton: TRxSpeedButton;
     Label2: TLabel;
     MotorNumEdit: TEditButton;
-    MotorNumOrderCheckBox: TCheckBox;
     Panel2: TPanel;
     DelButton: TSpeedButton;
     DividerBevel5: TDividerBevel;
@@ -36,18 +45,18 @@ type
     EditButton: TSpeedButton;
     DividerBevel6: TDividerBevel;
     ExportButton: TRxSpeedButton;
-    Panel1: TPanel;
     Panel3: TPanel;
-    Panel4: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
     Panel7: TPanel;
-    Panel8: TPanel;
     PlaceListButton: TRxSpeedButton;
     ReasonListButton: TRxSpeedButton;
-    SpinEdit1: TSpinEdit;
+    ReportPeriodPanel: TPanel;
+    Splitter0: TSplitter;
     Splitter1: TSplitter;
     TopToolsPanel: TPanel;
+    VT1: TVirtualStringTree;
+    VT2: TVirtualStringTree;
+    VT3: TVirtualStringTree;
     ZoomCaptionLabel: TLabel;
     ZoomInButton: TSpeedButton;
     ZoomOutButton: TSpeedButton;
@@ -56,6 +65,8 @@ type
     ZoomValueLabel: TLabel;
     ZoomValuePanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
+    procedure DateTimePicker1Change(Sender: TObject);
+    procedure DateTimePicker2Change(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
@@ -68,17 +79,20 @@ type
     procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
-    procedure MotorNumOrderCheckBoxChange(Sender: TObject);
     procedure PlaceListButtonClick(Sender: TObject);
     procedure DefectListButtonClick(Sender: TObject);
     procedure ReasonListButtonClick(Sender: TObject);
     procedure RepairButtonClick(Sender: TObject);
-    procedure SpinEdit1Change(Sender: TObject);
     procedure ZoomInButtonClick(Sender: TObject);
     procedure ZoomOutButtonClick(Sender: TObject);
     procedure ZoomTrackBarChange(Sender: TObject);
   private
     CardForm: TCardForm;
+    VSTOrderList: TVSTTable;
+    VSTDefectList: TVSTCheckTable;
+    VSTReasonList: TVSTCheckTable;
+
+    CanShow: Boolean;
 
     SelectedIndex: Integer;
     ReclamationSheet: TReclamationSheet;
@@ -88,6 +102,10 @@ type
     PlaceNames, FactoryNames, Departures: TStrVector;
     DefectNames, ReasonNames, RecNotes: TStrVector;
     MotorNames, MotorNums: TStrVector;
+
+    ListReasonIDs: TIntVector;
+    ListDefectIDs: TIntVector;
+
 
     procedure SelectionClear;
     procedure SelectLine(const ARow: Integer);
@@ -101,6 +119,13 @@ type
     procedure DrawReclamation;
     procedure ExportReclamation;
 
+    procedure CreateOrderList;
+    procedure CreateDefectList;
+    procedure CreateReasonList;
+
+    procedure OrderSelect;
+    procedure DefectSelect(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
+    procedure ReasonSelect(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
   public
     procedure ShowReclamation;
   end;
@@ -118,18 +143,27 @@ uses UMainForm;
 
 procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
+  CanShow:= False;
   CardForm:= CreateCardForm(ReclamationForm, CardPanel);
   MotorCardCheckBox.Checked:= False;
   MainForm.SetNamesPanelsVisible(True, False);
   SelectedIndex:= -1;
   ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid);
-  SpinEdit1.Value:= YearOfDate(Date);
+
+  CreateOrderList;
+  CreateDefectList;
+  CreateReasonList;
+
+  DateTimePicker2.Date:= FirstDayInYear(Date);
+  CanShow:= True;
+  DateTimePicker1.Date:= LastDayInYear(Date);
 end;
 
 procedure TReclamationForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(CardForm) then FreeAndNil(CardForm);
   if Assigned(ReclamationSheet) then FReeAndNil(ReclamationSheet);
+  if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
 end;
 
 procedure TReclamationForm.FormShow(Sender: TObject);
@@ -183,11 +217,6 @@ begin
   ShowReclamation;
 end;
 
-procedure TReclamationForm.MotorNumOrderCheckBoxChange(Sender: TObject);
-begin
-  ShowReclamation;
-end;
-
 procedure TReclamationForm.PlaceListButtonClick(Sender: TObject);
 begin
   if SQLite.EditList('Предприятия (депо)',
@@ -219,11 +248,6 @@ end;
 procedure TReclamationForm.RepairButtonClick(Sender: TObject);
 begin
   RepairEditFormOpen;
-end;
-
-procedure TReclamationForm.SpinEdit1Change(Sender: TObject);
-begin
-  ShowReclamation;
 end;
 
 procedure TReclamationForm.ZoomInButtonClick(Sender: TObject);
@@ -273,6 +297,7 @@ end;
 
 procedure TReclamationForm.ShowReclamation;
 begin
+  if not CanShow then Exit;
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
@@ -286,15 +311,20 @@ end;
 
 procedure TReclamationForm.LoadReclamation;
 var
-  BeginDate, EndDate: TDate;
+  UsedReasonIDs: TIntVector;
+  UsedDefectIDs: TIntVector;
+  OrderIndex: Integer;
 begin
-  BeginDate:= FirstDayInYear(SpinEdit1.Value);
-  EndDate:= LastDayInYear(SpinEdit1.Value);
+  OrderIndex:= 0;
+  if VSTOrderList.IsSelected then
+    OrderIndex:= VSTOrderList.SelectedIndex;
 
-  SQLite.ReclamationListLoad(BeginDate, EndDate,
-                        MainForm.UsedNameIDs,
-                        STrim(MotorNumEdit.Text),
-                        MotorNumOrderCheckBox.Checked,
+  UsedReasonIDs:= VCut(ListReasonIDs, VSTReasonList.Selected);
+  UsedDefectIDs:= VCut(ListDefectIDs, VSTDefectList.Selected);
+
+  SQLite.ReclamationListLoad(DateTimePicker2.Date, DateTimePicker1.Date,
+                        MainForm.UsedNameIDs, UsedDefectIDs, UsedReasonIDs,
+                        OrderIndex, STrim(MotorNumEdit.Text),
                         RecDates, BuildDates, ArrivalDates, SendingDates,
                         RecIDs, MotorIDs, Mileages, Opinions,
                         ReasonColors, Passports,
@@ -336,6 +366,87 @@ begin
   finally
     FreeAndNil(Exporter);
   end;
+end;
+
+procedure TReclamationForm.CreateOrderList;
+var
+  V: TStrVector;
+  i: Integer;
+begin
+  VSTOrderList:= TVSTTable.Create(VT1);
+  VSTOrderList.OnSelect:= @OrderSelect;
+  VSTOrderList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  VSTOrderList.HeaderVisible:= False;
+  VSTOrderList.GridLinesVisible:= False;
+  VSTOrderList.CanSelect:= True;
+  VSTOrderList.CanUnselect:= False;
+  VSTOrderList.AddColumn('Список');
+  V:= VCreateStr(['дате уведомления', 'номеру двигателя', 'дате сборки',
+                  'предприятию', 'неисправному элементу', 'причине неисправности']);
+  i:= Round(VT1.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  VT1.Height:= Length(V)*i;
+  VSTOrderList.SetColumn('Список', V, taLeftJustify);
+  VSTOrderList.Draw;
+  VSTOrderList.Select(0);
+end;
+
+procedure TReclamationForm.CreateDefectList;
+var
+  V: TStrVector;
+  i: Integer;
+begin
+  VSTDefectList:= TVSTCheckTable.Create(VT2);
+  VSTDefectList.OnSelect:= @DefectSelect;
+  SQLite.KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
+                     ListDefectIDs, V, False, 'DefectName');
+  for i:= 0 to High(V) do
+    V[i]:= SFirstLower(V[i]);
+  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  VT2.Height:= Length(V)*i;
+  VSTDefectList.GridLinesVisible:= False;
+  VSTDefectList.HeaderVisible:= False;
+  VSTDefectList.SelectedBGColor:= VT2.Color;
+  VSTDefectList.AddColumn('Список');
+  VSTDefectList.SetColumn('Список', V, taLeftJustify);
+  VSTDefectList.Draw;
+  VSTDefectList.CheckAll(True);
+end;
+
+procedure TReclamationForm.CreateReasonList;
+var
+  V: TStrVector;
+  i: Integer;
+begin
+  VSTReasonList:= TVSTCheckTable.Create(VT3);
+  VSTReasonList.OnSelect:= @ReasonSelect;
+  SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
+                     ListReasonIDs, V);
+  for i:= 0 to High(V) do
+    V[i]:= SFirstLower(V[i]);
+  i:= Round(VT3.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  VT3.Height:= Length(V)*i;
+  VSTReasonList.GridLinesVisible:= False;
+  VSTReasonList.HeaderVisible:= False;
+  VSTReasonList.SelectedBGColor:= VT3.Color;
+  VSTReasonList.AddColumn('Список');
+  VSTReasonList.SetColumn('Список', V, taLeftJustify);
+  VSTReasonList.Draw;
+  VSTReasonList.CheckAll(True);
+end;
+
+procedure TReclamationForm.OrderSelect;
+begin
+  ShowReclamation;
+end;
+
+procedure TReclamationForm.DefectSelect(const AIndex: Integer; const AChecked: Boolean);
+begin
+  ShowReclamation;
+end;
+
+procedure TReclamationForm.ReasonSelect(const AIndex: Integer; const AChecked: Boolean);
+begin
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.DelRaclamation;
@@ -392,6 +503,18 @@ end;
 procedure TReclamationForm.AddButtonClick(Sender: TObject);
 begin
   ReclamationEditFormOpen(1);
+end;
+
+procedure TReclamationForm.DateTimePicker1Change(Sender: TObject);
+begin
+  if not LeftPanel.Visible then Exit;
+  ShowReclamation;
+end;
+
+procedure TReclamationForm.DateTimePicker2Change(Sender: TObject);
+begin
+  if not LeftPanel.Visible then Exit;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.ExportButtonClick(Sender: TObject);

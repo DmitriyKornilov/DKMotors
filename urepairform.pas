@@ -86,7 +86,8 @@ uses UMainForm;
 
 procedure TRepairForm.FormCreate(Sender: TObject);
 var
-  v: TStrVector;
+  V: TStrVector;
+  i: Integer;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(RepairForm, CardPanel);
@@ -115,7 +116,9 @@ begin
   VSTTypeTable.CanSelect:= True;
   VSTTypeTable.CanUnselect:= False;
   VSTTypeTable.AddColumn('Список');
-  V:= VCreateStr(['Все', 'В ремонте', 'Отремонтированные']);
+  V:= VCreateStr(['все', 'в ремонте', 'отремонтированные']);
+  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  VT2.Height:= Length(V)*i;
   VSTTypeTable.SetColumn('Список', V, taLeftJustify);
   VSTTypeTable.Draw;
 
@@ -127,7 +130,9 @@ begin
   VSTOrderTable.CanSelect:= True;
   VSTOrderTable.CanUnselect:= False;
   VSTOrderTable.AddColumn('Список');
-  V:= VCreateStr(['Дате прибытия', 'Номеру']);
+  V:= VCreateStr(['дате прибытия', 'номеру']);
+  i:= Round(VT3.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
+  VT3.Height:= Length(V)*i;
   VSTOrderTable.SetColumn('Список', V, taLeftJustify);
   VSTOrderTable.Draw;
 

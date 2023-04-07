@@ -1,7 +1,7 @@
 object RepairForm: TRepairForm
-  Left = 401
+  Left = 415
   Height = 558
-  Top = 112
+  Top = 238
   Width = 1245
   Align = alClient
   BorderStyle = bsNone
@@ -796,10 +796,11 @@ object RepairForm: TRepairForm
     object Label5: TLabel
       Left = 2
       Height = 15
-      Top = 118
+      Top = 134
       Width = 183
       Align = alTop
       BorderSpacing.Left = 2
+      BorderSpacing.Top = 16
       BorderSpacing.Bottom = 2
       Caption = 'Упорядочить по:'
       Color = clWindow
@@ -811,7 +812,7 @@ object RepairForm: TRepairForm
     object VT3: TVirtualStringTree
       Left = 0
       Height = 101
-      Top = 135
+      Top = 151
       Width = 185
       Align = alTop
       BorderStyle = bsNone

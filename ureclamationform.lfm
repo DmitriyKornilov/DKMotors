@@ -1,13 +1,13 @@
 object ReclamationForm: TReclamationForm
-  Left = 421
+  Left = 33
   Height = 510
-  Top = 208
-  Width = 1425
+  Top = 200
+  Width = 1500
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ReclamationForm'
   ClientHeight = 510
-  ClientWidth = 1425
+  ClientWidth = 1500
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -16,7 +16,7 @@ object ReclamationForm: TReclamationForm
     Left = 2
     Height = 32
     Top = 2
-    Width = 1421
+    Width = 1496
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -26,14 +26,14 @@ object ReclamationForm: TReclamationForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 28
-    ClientWidth = 1417
+    ClientWidth = 1492
     Constraints.MaxHeight = 32
     Constraints.MinHeight = 32
     ParentFont = False
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1341
+      Left = 1270
       Height = 28
       Top = 0
       Width = 101
@@ -176,42 +176,8 @@ object ReclamationForm: TReclamationForm
       OnClick = ExportButtonClick
       ParentFont = False
     end
-    object Panel1: TPanel
-      Left = 0
-      Height = 28
-      Top = 0
-      Width = 71
-      Align = alLeft
-      AutoSize = True
-      BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 71
-      ParentFont = False
-      TabOrder = 0
-      object SpinEdit1: TSpinEdit
-        AnchorSideLeft.Control = Panel1
-        AnchorSideTop.Control = Panel1
-        AnchorSideTop.Side = asrCenter
-        Left = 1
-        Height = 23
-        Top = 3
-        Width = 70
-        Align = alCustom
-        Alignment = taCenter
-        AutoSelect = False
-        BorderSpacing.Left = 1
-        Constraints.MinWidth = 70
-        EditorEnabled = False
-        MaxValue = 2999
-        MinValue = 2010
-        OnChange = SpinEdit1Change
-        ParentFont = False
-        TabOrder = 0
-        Value = 2015
-      end
-    end
     object DividerBevel6: TDividerBevel
-      Left = 435
+      Left = 538
       Height = 28
       Top = 0
       Width = 15
@@ -221,7 +187,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object DividerBevel7: TDividerBevel
-      Left = 1326
+      Left = 1255
       Height = 28
       Top = 0
       Width = 15
@@ -231,7 +197,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object Panel3: TPanel
-      Left = 86
+      Left = 189
       Height = 28
       Top = 0
       Width = 143
@@ -241,7 +207,7 @@ object ReclamationForm: TReclamationForm
       ClientHeight = 28
       ClientWidth = 143
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 0
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
@@ -842,7 +808,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel5: TPanel
-      Left = 857
+      Left = 786
       Height = 28
       Top = 0
       Width = 469
@@ -852,7 +818,7 @@ object ReclamationForm: TReclamationForm
       Caption = 'Panel5'
       ClientHeight = 28
       ClientWidth = 469
-      TabOrder = 2
+      TabOrder = 1
       object DefectListButton: TRxSpeedButton
         Cursor = crHandPoint
         Left = 0
@@ -918,7 +884,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object DividerBevel8: TDividerBevel
-      Left = 71
+      Left = 174
       Height = 28
       Top = 0
       Width = 15
@@ -928,7 +894,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object Panel7: TPanel
-      Left = 229
+      Left = 332
       Height = 28
       Top = 0
       Width = 206
@@ -937,7 +903,7 @@ object ReclamationForm: TReclamationForm
       BevelOuter = bvNone
       ClientHeight = 28
       ClientWidth = 206
-      TabOrder = 3
+      TabOrder = 2
       object Label2: TLabel
         AnchorSideLeft.Control = Panel7
         AnchorSideTop.Control = Panel7
@@ -973,30 +939,17 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel2: TPanel
-      Left = 450
+      Left = 771
       Height = 28
       Top = 0
-      Width = 159
+      Width = 0
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 159
-      TabOrder = 4
-      object MotorNumOrderCheckBox: TCheckBox
-        Left = 5
-        Height = 28
-        Top = 0
-        Width = 154
-        Align = alLeft
-        BorderSpacing.Left = 5
-        Caption = 'Упорядочить по номеру'
-        OnChange = MotorNumOrderCheckBoxChange
-        TabOrder = 0
-      end
+      TabOrder = 3
     end
     object DividerBevel9: TDividerBevel
-      Left = 842
+      Left = 771
       Height = 28
       Top = 0
       Width = 15
@@ -1006,7 +959,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object MotorCardCheckBox: TCheckBox
-      Left = 624
+      Left = 553
       Height = 28
       Top = 0
       Width = 218
@@ -1015,277 +968,475 @@ object ReclamationForm: TReclamationForm
       Checked = True
       OnChange = MotorCardCheckBoxChange
       State = cbChecked
-      TabOrder = 5
+      TabOrder = 4
     end
-    object DividerBevel10: TDividerBevel
-      Left = 609
+    object ReportPeriodPanel: TPanel
+      Left = 0
       Height = 28
       Top = 0
-      Width = 15
+      Width = 174
       Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
-    end
-  end
-  object Panel4: TPanel
-    Left = 0
-    Height = 187
-    Top = 36
-    Width = 1425
-    Align = alClient
-    BevelOuter = bvNone
-    ClientHeight = 187
-    ClientWidth = 1425
-    TabOrder = 1
-    object Panel6: TPanel
-      Left = 2
-      Height = 151
-      Top = 0
-      Width = 1421
-      Align = alClient
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      BorderSpacing.Bottom = 2
+      AutoSize = True
       BevelOuter = bvNone
-      BorderStyle = bsSingle
-      Caption = 'Panel6'
-      ClientHeight = 147
-      ClientWidth = 1417
-      TabOrder = 0
-      object LogGrid: TsWorksheetGrid
-        Left = 0
-        Height = 147
-        Top = 0
-        Width = 1417
-        AutoExpand = []
-        DisplayFixedColRow = False
-        FrozenBorderPen.Style = psClear
-        FrozenCols = 0
-        FrozenRows = 0
-        PageBreakPen.Color = clBlue
-        PageBreakPen.Style = psDash
-        ReadFormulas = False
-        SelectionPen.Color = clWindow
-        SelectionPen.Style = psClear
-        SelectionPen.Width = 0
-        ShowGridLines = False
-        ShowHeaders = False
-        WorkbookSource = LogGrid.internal
-        Align = alClient
-        AutoAdvance = aaNone
-        AutoEdit = False
-        BorderStyle = bsNone
-        Color = clWhite
-        DefaultColWidth = 40
-        DefaultRowHeight = 20
-        ExtendedSelect = False
-        Flat = True
-        MouseWheelOption = mwGrid
-        Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+      ClientHeight = 28
+      ClientWidth = 174
+      ParentFont = False
+      TabOrder = 5
+      object DateTimePicker1: TDateTimePicker
+        AnchorSideLeft.Control = Label3
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideTop.Side = asrCenter
+        Left = 95
+        Height = 23
+        Top = 3
+        Width = 79
+        CenturyFrom = 1941
+        MaxDate = 2958465
+        MinDate = -53780
         ParentFont = False
         TabOrder = 0
-        TabStop = False
-        TitleFont.Style = [fsBold]
-        OnMouseDown = LogGridMouseDown
+        BorderSpacing.Left = 5
+        TrailingSeparator = False
+        TextForNullDate = 'NULL'
+        LeadingZeros = True
+        Kind = dtkDate
+        TimeFormat = tf24
+        TimeDisplay = tdHMS
+        DateMode = dmComboBox
+        Date = 44514
+        Time = 0.36772234953969
+        UseDefaultSeparators = True
+        HideDateTimeParts = []
+        MonthNames = 'Long'
+        OnChange = DateTimePicker1Change
+      end
+      object DateTimePicker2: TDateTimePicker
+        AnchorSideLeft.Control = ReportPeriodPanel
+        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideTop.Side = asrCenter
+        Left = 1
+        Height = 23
+        Top = 3
+        Width = 79
+        CenturyFrom = 1941
+        MaxDate = 2958465
+        MinDate = -53780
+        ParentFont = False
+        TabOrder = 1
+        BorderSpacing.Left = 1
+        TrailingSeparator = False
+        TextForNullDate = 'NULL'
+        LeadingZeros = True
+        Kind = dtkDate
+        TimeFormat = tf24
+        TimeDisplay = tdHMS
+        DateMode = dmComboBox
+        Date = 44514
+        Time = 0.36772234953969
+        UseDefaultSeparators = True
+        HideDateTimeParts = []
+        MonthNames = 'Long'
+        OnChange = DateTimePicker2Change
+      end
+      object Label3: TLabel
+        AnchorSideLeft.Control = DateTimePicker2
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = DateTimePicker2
+        AnchorSideTop.Side = asrCenter
+        Left = 85
+        Height = 15
+        Top = 7
+        Width = 5
+        BorderSpacing.Left = 5
+        Caption = '-'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
       end
     end
-    object Panel8: TPanel
+  end
+  object LeftPanel: TPanel
+    Left = 2
+    Height = 472
+    Top = 36
+    Width = 250
+    Align = alLeft
+    BorderSpacing.Left = 2
+    BorderSpacing.Top = 2
+    BorderSpacing.Bottom = 2
+    BevelOuter = bvNone
+    BorderStyle = bsSingle
+    ClientHeight = 468
+    ClientWidth = 246
+    Color = clWindow
+    ParentColor = False
+    TabOrder = 1
+    object Label5: TLabel
       Left = 2
-      Height = 32
-      Top = 153
-      Width = 1421
-      Align = alBottom
-      AutoSize = True
+      Height = 15
+      Top = 0
+      Width = 244
+      Align = alTop
       BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
       BorderSpacing.Bottom = 2
-      BevelOuter = bvNone
-      BorderStyle = bsSingle
-      ClientHeight = 28
-      ClientWidth = 1417
+      Caption = 'Упорядочить по:'
+      Color = clWindow
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+      Transparent = False
+    end
+    object VT1: TVirtualStringTree
+      Left = 0
+      Height = 63
+      Top = 17
+      Width = 246
+      Align = alTop
+      BorderStyle = bsNone
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
+      TabOrder = 0
+    end
+    object Label7: TLabel
+      Left = 2
+      Height = 15
+      Top = 96
+      Width = 244
+      Align = alTop
+      BorderSpacing.Left = 2
+      BorderSpacing.Top = 16
+      BorderSpacing.Bottom = 2
+      Caption = 'Неисправный элемент:'
+      Color = clWindow
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+      Transparent = False
+    end
+    object VT2: TVirtualStringTree
+      Left = 0
+      Height = 63
+      Top = 113
+      Width = 246
+      Align = alTop
+      BorderStyle = bsNone
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
       TabOrder = 1
-      object ZoomPanel: TPanel
-        Left = 1135
-        Height = 18
-        Top = 5
-        Width = 282
-        Align = alRight
-        AutoSize = True
-        BorderSpacing.Top = 5
-        BorderSpacing.Bottom = 5
+    end
+    object Label8: TLabel
+      Left = 2
+      Height = 15
+      Top = 192
+      Width = 244
+      Align = alTop
+      BorderSpacing.Left = 2
+      BorderSpacing.Top = 16
+      BorderSpacing.Bottom = 2
+      Caption = 'Причина неисправности:'
+      Color = clWindow
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+      Transparent = False
+    end
+    object VT3: TVirtualStringTree
+      Left = 0
+      Height = 63
+      Top = 209
+      Width = 246
+      Align = alTop
+      BorderStyle = bsNone
+      DefaultText = 'Node'
+      Header.AutoSizeIndex = 0
+      Header.Columns = <>
+      Header.MainColumn = -1
+      TabOrder = 2
+    end
+  end
+  object Splitter0: TSplitter
+    Left = 252
+    Height = 474
+    Top = 36
+    Width = 5
+    ResizeStyle = rsLine
+  end
+  object MainPanel: TPanel
+    Left = 257
+    Height = 474
+    Top = 36
+    Width = 1243
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 474
+    ClientWidth = 1243
+    TabOrder = 3
+    object Panel4: TPanel
+      Left = 0
+      Height = 187
+      Top = 0
+      Width = 1243
+      Align = alClient
+      BevelOuter = bvNone
+      ClientHeight = 187
+      ClientWidth = 1243
+      TabOrder = 0
+      object Panel6: TPanel
+        Left = 2
+        Height = 151
+        Top = 0
+        Width = 1239
+        Align = alClient
+        BorderSpacing.Left = 2
+        BorderSpacing.Right = 2
+        BorderSpacing.Bottom = 2
         BevelOuter = bvNone
-        ClientHeight = 18
-        ClientWidth = 282
-        Constraints.MaxHeight = 18
+        BorderStyle = bsSingle
+        ClientHeight = 147
+        ClientWidth = 1235
+        Color = clWindow
+        ParentColor = False
         TabOrder = 0
-        object ZoomCaptionLabel: TLabel
-          Left = 2
-          Height = 18
+        object LogGrid: TsWorksheetGrid
+          Left = 0
+          Height = 147
           Top = 0
-          Width = 52
-          Align = alRight
-          BorderSpacing.Left = 2
-          Caption = 'Масштаб'
-          ParentColor = False
-        end
-        object ZoomTrackBar: TTrackBar
-          Left = 86
-          Height = 18
-          Top = 0
-          Width = 120
-          AutoSize = True
-          LineSize = 5
-          Max = 150
-          Min = 50
-          OnChange = ZoomTrackBarChange
-          PageSize = 5
-          Position = 100
-          TickStyle = tsNone
-          Align = alRight
-          Constraints.MinWidth = 120
+          Width = 1235
+          AutoExpand = []
+          DisplayFixedColRow = False
+          FrozenBorderPen.Style = psClear
+          FrozenCols = 0
+          FrozenRows = 0
+          PageBreakPen.Color = clBlue
+          PageBreakPen.Style = psDash
+          ReadFormulas = False
+          SelectionPen.Color = clWindow
+          SelectionPen.Style = psClear
+          SelectionPen.Width = 0
+          ShowGridLines = False
+          ShowHeaders = False
+          WorkbookSource = LogGrid.internal
+          Align = alClient
+          AutoAdvance = aaNone
+          AutoEdit = False
+          BorderStyle = bsNone
+          Color = clWhite
+          DefaultColWidth = 40
+          DefaultRowHeight = 20
+          ExtendedSelect = False
+          Flat = True
+          MouseWheelOption = mwGrid
+          Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+          ParentFont = False
           TabOrder = 0
+          TabStop = False
+          TitleFont.Style = [fsBold]
+          OnMouseDown = LogGridMouseDown
         end
-        object ZoomOutButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 66
+      end
+      object Panel8: TPanel
+        Left = 2
+        Height = 32
+        Top = 153
+        Width = 1239
+        Align = alBottom
+        AutoSize = True
+        BorderSpacing.Left = 2
+        BorderSpacing.Right = 2
+        BorderSpacing.Bottom = 2
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        ClientHeight = 28
+        ClientWidth = 1235
+        TabOrder = 1
+        object ZoomPanel: TPanel
+          Left = 953
           Height = 18
-          Top = 0
-          Width = 20
+          Top = 5
+          Width = 282
           Align = alRight
           AutoSize = True
-          BorderSpacing.Left = 12
-          Flat = True
-          Glyph.Data = {
-            36040000424D3604000000000000360000002800000010000000100000000100
-            2000000000000004000064000000640000000000000000000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
-            00B40000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000130000
-            00B50000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000
-          }
-          OnClick = ZoomOutButtonClick
-        end
-        object ZoomInButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 206
-          Height = 18
-          Top = 0
-          Width = 20
-          Align = alRight
-          AutoSize = True
-          Flat = True
-          Glyph.Data = {
-            36040000424D3604000000000000360000002800000010000000100000000100
-            2000000000000004000064000000640000000000000000000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
-            00B40000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000400000
-            00BF00000000000000000000000000000000000000000000005C0000005C0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000005D0000005C0000
-            000000000000000000000000000000000000000000BF00000040000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000130000
-            00B50000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000
-          }
-          OnClick = ZoomInButtonClick
-        end
-        object ZoomValuePanel: TPanel
-          Left = 226
-          Height = 18
-          Top = 0
-          Width = 56
-          Align = alRight
+          BorderSpacing.Top = 5
+          BorderSpacing.Bottom = 5
           BevelOuter = bvNone
           ClientHeight = 18
-          ClientWidth = 56
-          TabOrder = 1
-          object ZoomValueLabel: TLabel
-            AnchorSideLeft.Side = asrBottom
-            Left = 20
+          ClientWidth = 282
+          Constraints.MaxHeight = 18
+          TabOrder = 0
+          object ZoomCaptionLabel: TLabel
+            Left = 2
             Height = 18
             Top = 0
-            Width = 31
+            Width = 52
             Align = alRight
-            BorderSpacing.Left = 12
-            BorderSpacing.Right = 5
-            Caption = '100 %'
+            BorderSpacing.Left = 2
+            Caption = 'Масштаб'
             ParentColor = False
+          end
+          object ZoomTrackBar: TTrackBar
+            Left = 86
+            Height = 18
+            Top = 0
+            Width = 120
+            AutoSize = True
+            LineSize = 5
+            Max = 150
+            Min = 50
+            OnChange = ZoomTrackBarChange
+            PageSize = 5
+            Position = 100
+            TickStyle = tsNone
+            Align = alRight
+            Constraints.MinWidth = 120
+            TabOrder = 0
+          end
+          object ZoomOutButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 66
+            Height = 18
+            Top = 0
+            Width = 20
+            Align = alRight
+            AutoSize = True
+            BorderSpacing.Left = 12
+            Flat = True
+            Glyph.Data = {
+              36040000424D3604000000000000360000002800000010000000100000000100
+              2000000000000004000064000000640000000000000000000000000000000000
+              0000000000130000003600000040000000400000004000000040000000400000
+              0040000000400000004000000036000000130000000000000000000000000000
+              001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+              00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
+              00B40000006F0000000800000000000000000000000000000000000000000000
+              00000000000000000000000000080000006F000000B400000013000000360000
+              00CA000000080000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000008000000CA00000036000000400000
+              00BF000000000000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF000000000000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF000000000000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
+              007F0000007F0000005C0000000000000000000000BF00000040000000400000
+              00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
+              007F0000007F0000005C0000000000000000000000BF00000040000000400000
+              00BF000000000000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF000000000000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF000000000000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000000000000BF00000040000000360000
+              00CA000000080000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000008000000CA00000036000000130000
+              00B50000006F0000000800000000000000000000000000000000000000000000
+              00000000000000000000000000080000006F000000B400000013000000000000
+              001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+              00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
+              0000000000130000003600000040000000400000004000000040000000400000
+              0040000000400000004000000036000000130000000000000000
+            }
+            OnClick = ZoomOutButtonClick
+          end
+          object ZoomInButton: TSpeedButton
+            Cursor = crHandPoint
+            Left = 206
+            Height = 18
+            Top = 0
+            Width = 20
+            Align = alRight
+            AutoSize = True
+            Flat = True
+            Glyph.Data = {
+              36040000424D3604000000000000360000002800000010000000100000000100
+              2000000000000004000064000000640000000000000000000000000000000000
+              0000000000130000003600000040000000400000004000000040000000400000
+              0040000000400000004000000036000000130000000000000000000000000000
+              001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+              00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
+              00B40000006F0000000800000000000000000000000000000000000000000000
+              00000000000000000000000000080000006F000000B400000013000000360000
+              00CA000000080000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000008000000CA00000036000000400000
+              00BF00000000000000000000000000000000000000000000005C0000005C0000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF00000000000000000000000000000000000000000000007F0000007F0000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF00000000000000000000000000000000000000000000007F0000007F0000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
+              007F0000007F0000005C0000000000000000000000BF00000040000000400000
+              00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
+              007F0000007F0000005C0000000000000000000000BF00000040000000400000
+              00BF00000000000000000000000000000000000000000000007F0000007F0000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF00000000000000000000000000000000000000000000007F0000007F0000
+              000000000000000000000000000000000000000000BF00000040000000400000
+              00BF00000000000000000000000000000000000000000000005D0000005C0000
+              000000000000000000000000000000000000000000BF00000040000000360000
+              00CA000000080000000000000000000000000000000000000000000000000000
+              000000000000000000000000000000000008000000CA00000036000000130000
+              00B50000006F0000000800000000000000000000000000000000000000000000
+              00000000000000000000000000080000006F000000B400000013000000000000
+              001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
+              00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
+              0000000000130000003600000040000000400000004000000040000000400000
+              0040000000400000004000000036000000130000000000000000
+            }
+            OnClick = ZoomInButtonClick
+          end
+          object ZoomValuePanel: TPanel
+            Left = 226
+            Height = 18
+            Top = 0
+            Width = 56
+            Align = alRight
+            BevelOuter = bvNone
+            ClientHeight = 18
+            ClientWidth = 56
+            TabOrder = 1
+            object ZoomValueLabel: TLabel
+              AnchorSideLeft.Side = asrBottom
+              Left = 20
+              Height = 18
+              Top = 0
+              Width = 31
+              Align = alRight
+              BorderSpacing.Left = 12
+              BorderSpacing.Right = 5
+              Caption = '100 %'
+              ParentColor = False
+            end
           end
         end
       end
     end
-  end
-  object CardPanel: TPanel
-    Left = 2
-    Height = 280
-    Top = 228
-    Width = 1421
-    Align = alBottom
-    BorderSpacing.Left = 2
-    BorderSpacing.Right = 2
-    BorderSpacing.Bottom = 2
-    BevelOuter = bvNone
-    TabOrder = 2
-  end
-  object Splitter1: TSplitter
-    Cursor = crVSplit
-    Left = 0
-    Height = 5
-    Top = 223
-    Width = 1425
-    Align = alBottom
-    ResizeAnchor = akBottom
+    object CardPanel: TPanel
+      Left = 2
+      Height = 280
+      Top = 194
+      Width = 1239
+      Align = alBottom
+      BorderSpacing.Left = 2
+      BorderSpacing.Top = 2
+      BorderSpacing.Right = 2
+      BevelOuter = bvNone
+      TabOrder = 1
+    end
+    object Splitter1: TSplitter
+      Cursor = crVSplit
+      Left = 0
+      Height = 5
+      Top = 187
+      Width = 1243
+      Align = alBottom
+      ResizeAnchor = akBottom
+      ResizeStyle = rsLine
+    end
   end
 end
