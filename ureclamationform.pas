@@ -371,10 +371,10 @@ end;
 procedure TReclamationForm.CreateOrderList;
 var
   V: TStrVector;
-  i: Integer;
 begin
   VSTOrderList:= TVSTTable.Create(VT1);
   VSTOrderList.OnSelect:= @OrderSelect;
+  VSTOrderList.AutoHeight:= True;
   VSTOrderList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTOrderList.HeaderVisible:= False;
   VSTOrderList.GridLinesVisible:= False;
@@ -383,8 +383,6 @@ begin
   VSTOrderList.AddColumn('Список');
   V:= VCreateStr(['дате уведомления', 'номеру двигателя', 'дате сборки',
                   'предприятию', 'неисправному элементу', 'причине неисправности']);
-  i:= Round(VT1.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  VT1.Height:= Length(V)*i;
   VSTOrderList.SetColumn('Список', V, taLeftJustify);
   VSTOrderList.Draw;
   VSTOrderList.Select(0);
@@ -397,12 +395,12 @@ var
 begin
   VSTDefectList:= TVSTCheckTable.Create(VT2);
   VSTDefectList.OnSelect:= @DefectSelect;
+  VSTDefectList.AutoHeight:= True;
   SQLite.KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
                      ListDefectIDs, V, False, 'DefectName');
   for i:= 0 to High(V) do
     V[i]:= SFirstLower(V[i]);
-  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  VT2.Height:= Length(V)*i;
+
   VSTDefectList.GridLinesVisible:= False;
   VSTDefectList.HeaderVisible:= False;
   VSTDefectList.SelectedBGColor:= VT2.Color;
@@ -419,12 +417,12 @@ var
 begin
   VSTReasonList:= TVSTCheckTable.Create(VT3);
   VSTReasonList.OnSelect:= @ReasonSelect;
+  VSTReasonList.AutoHeight:= True;
   SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
                      ListReasonIDs, V);
   for i:= 0 to High(V) do
     V[i]:= SFirstLower(V[i]);
-  i:= Round(VT3.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  VT3.Height:= Length(V)*i;
+
   VSTReasonList.GridLinesVisible:= False;
   VSTReasonList.HeaderVisible:= False;
   VSTReasonList.SelectedBGColor:= VT3.Color;

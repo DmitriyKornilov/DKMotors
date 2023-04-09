@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils, LCLType,
   StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
-  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst;
+  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils;
 
 type
 
@@ -296,7 +296,6 @@ end;
 procedure TStatisticForm.SetStatisticList;
 var
   V: TStrVector;
-  i: Integer;
 begin
   V:= VCreateStr([
     'Распределение по наименованиям двигателей',
@@ -305,9 +304,8 @@ begin
     'Распределение по месяцам',
     'Распределение по пробегу локомотива'
   ]);
-  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  Panel2.Height:= Length(V)*i + Label1.Height + 10;
-  VT1.Height:= Length(V)*i;
+
+  StatisticList.AutoHeight:= True;
   StatisticList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   StatisticList.HeaderVisible:= False;
   StatisticList.GridLinesVisible:= False;
@@ -317,6 +315,7 @@ begin
   StatisticList.SetColumn('Список', V, taLeftJustify);
   StatisticList.Draw;
   StatisticList.Select(0);
+  Panel2.Height:= StatisticList.NeededHeight + Label1.Height + 10;
 end;
 
 procedure TStatisticForm.StatisticListSelectItem;
@@ -331,6 +330,7 @@ end;
 procedure TStatisticForm.SetReasonList;
 var
   i: Integer;
+  V: TStrVector;
 begin
   ReasonIDs:= VCreateInt([
     -1,
@@ -341,20 +341,23 @@ begin
     4
   ]);
   ReasonNames:= VCreateStr([
-    'общее количество за период',
-    'не расследовано',
-    'некачественные комплектующие',
-    'дефект сборки / изготовления',
-    'нарушение условий эксплуатации',
-    'электродвигатель исправен'
+    'Общее количество за период',
+    'Не расследовано',
+    'Некачественные комплектующие',
+    'Дефект сборки / изготовления',
+    'Нарушение условий эксплуатации',
+    'Электродвигатель исправен'
   ]);
-  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  VT2.Height:= Length(ReasonNames)*i;
+  VDim(V{%H-}, Length(ReasonNames));
+  for i:= 0 to High(ReasonNames) do
+    V[i]:= SFirstLower(ReasonNames[i]);
+
+  ReasonList.AutoHeight:= True;
   ReasonList.GridLinesVisible:= False;
   ReasonList.HeaderVisible:= False;
   ReasonList.SelectedBGColor:= VT2.Color;
   ReasonList.AddColumn('Список');
-  ReasonList.SetColumn('Список', ReasonNames, taLeftJustify);
+  ReasonList.SetColumn('Список', V, taLeftJustify);
   ReasonList.Draw;
   ReasonList.CheckAll(True);
 end;

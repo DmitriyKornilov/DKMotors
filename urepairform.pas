@@ -87,7 +87,6 @@ uses UMainForm;
 procedure TRepairForm.FormCreate(Sender: TObject);
 var
   V: TStrVector;
-  i: Integer;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(RepairForm, CardPanel);
@@ -110,6 +109,7 @@ begin
 
   VSTTypeTable:= TVSTTable.Create(VT2);
   VSTTypeTable.OnSelect:= @TypeSelect;
+  VSTTypeTable.AutoHeight:= True;
   VSTTypeTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTypeTable.HeaderVisible:= False;
   VSTTypeTable.GridLinesVisible:= False;
@@ -117,13 +117,12 @@ begin
   VSTTypeTable.CanUnselect:= False;
   VSTTypeTable.AddColumn('Список');
   V:= VCreateStr(['все', 'в ремонте', 'отремонтированные']);
-  i:= Round(VT2.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  VT2.Height:= Length(V)*i;
   VSTTypeTable.SetColumn('Список', V, taLeftJustify);
   VSTTypeTable.Draw;
 
   VSTOrderTable:= TVSTTable.Create(VT3);
   VSTOrderTable.OnSelect:= @OrderSelect;
+  VSTOrderTable.AutoHeight:= True;
   VSTOrderTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTOrderTable.HeaderVisible:= False;
   VSTOrderTable.GridLinesVisible:= False;
@@ -131,8 +130,6 @@ begin
   VSTOrderTable.CanUnselect:= False;
   VSTOrderTable.AddColumn('Список');
   V:= VCreateStr(['дате прибытия', 'номеру']);
-  i:= Round(VT3.DefaultNodeHeight*96/ScreenInfo.PixelsPerInchY);
-  VT3.Height:= Length(V)*i;
   VSTOrderTable.SetColumn('Список', V, taLeftJustify);
   VSTOrderTable.Draw;
 
