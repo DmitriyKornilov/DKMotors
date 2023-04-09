@@ -20,8 +20,6 @@ type
     Label10: TLabel;
     ANEMPanel: TPanel;
     Label11: TLabel;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
     SeveralPeriodsCheckBox: TCheckBox;
     ShowPercentCheckBox: TCheckBox;
     ShowGraphicsCheckBox: TCheckBox;
@@ -57,6 +55,7 @@ type
     ClientPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
+    VT3: TVirtualStringTree;
     ZoomCaptionLabel: TLabel;
     ZoomInButton: TSpeedButton;
     ZoomOutButton: TSpeedButton;
@@ -65,14 +64,10 @@ type
     ZoomValueLabel: TLabel;
     ZoomValuePanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
-    procedure RadioButton1Click(Sender: TObject);
-    procedure RadioButton2Click(Sender: TObject);
     procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
     procedure ShowGraphicsCheckBoxChange(Sender: TObject);
     procedure ShowLinePercentCheckBoxChange(Sender: TObject);
-
     procedure ShowPercentCheckBoxChange(Sender: TObject);
-
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DateTimePicker2Change(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
@@ -94,6 +89,7 @@ type
     ReasonList: TVSTCheckTable;
 
     StatisticList: TVSTTable;
+    MonthReportTypeList: TVSTTable;
 
     ParamNames: TStrVector;
     Counts: TIntMatrix3D;
@@ -108,6 +104,9 @@ type
 
     procedure SetReasonList;
     procedure ReasonListSelectItem(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
+
+    procedure SetMonthReportTypeList;
+    procedure MonthReportTypeListSelectItem;
 
     //AParamType
     //0 - Распределение по наименованиям двигателей
@@ -154,6 +153,10 @@ begin
   StatisticList:= TVSTTable.Create(VT1);
   StatisticList.OnSelect:= @StatisticListSelectItem;
   SetStatisticList;
+
+  MonthReportTypeList:= TVSTTable.Create(VT3);
+  MonthReportTypeList.OnSelect:= @MonthReportTypeListSelectItem;
+  SetMonthReportTypeList;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
   CanShow:= True;
@@ -225,16 +228,6 @@ begin
   ShowStatistic;
 end;
 
-procedure TStatisticForm.RadioButton1Click(Sender: TObject);
-begin
-  ShowStatistic;
-end;
-
-procedure TStatisticForm.RadioButton2Click(Sender: TObject);
-begin
-  ShowStatistic;
-end;
-
 procedure TStatisticForm.ShowPercentCheckBoxChange(Sender: TObject);
 begin
   ShowStatistic;
@@ -244,6 +237,7 @@ procedure TStatisticForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(StatisticList) then FreeAndNil(StatisticList);
   if Assigned(ReasonList) then FreeAndNil(ReasonList);
+  if Assigned(MonthReportTypeList) then FreeAndNil(MonthReportTypeList);
 end;
 
 procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);
@@ -367,6 +361,33 @@ begin
   ShowStatistic;
 end;
 
+procedure TStatisticForm.SetMonthReportTypeList;
+var
+  V: TStrVector;
+begin
+  V:= VCreateStr([
+    'распределение количества рекламаций',
+    'накопление количества рекламаций'
+  ]);
+
+  MonthReportTypeList.AutoHeight:= True;
+  MonthReportTypeList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
+  MonthReportTypeList.HeaderVisible:= False;
+  MonthReportTypeList.GridLinesVisible:= False;
+  MonthReportTypeList.CanSelect:= True;
+  MonthReportTypeList.CanUnselect:= False;
+  MonthReportTypeList.AddColumn('Список');
+  MonthReportTypeList.SetColumn('Список', V, taLeftJustify);
+  MonthReportTypeList.Draw;
+  MonthReportTypeList.Select(0);
+  MonthPanel.Height:= MonthReportTypeList.NeededHeight + Label11.Height;
+end;
+
+procedure TStatisticForm.MonthReportTypeListSelectItem;
+begin
+  ShowStatistic;
+end;
+
 procedure TStatisticForm.LoadStatistic(const AParamType: Integer);
 var
   BD, ED: TDate;
@@ -413,7 +434,7 @@ begin
   2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
                 Grid1.Worksheet, Grid1, ReasonList.Selected,
                 ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
-  3: if RadioButton1.Checked then
+  3: if MonthReportTypeList.SelectedIndex=0 then
        Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
                 Grid1.Worksheet, Grid1, ReasonList.Selected,
                 ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked)
@@ -451,7 +472,7 @@ begin
   2: Drawer:= TStatisticSeveralPeriodsAtPlaceNamesSheet.Create(
                 Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
                 ReasonList.Selected, ShowPercentCheckBox.Checked);
-  3: if RadioButton1.Checked then
+  3: if MonthReportTypeList.SelectedIndex=0 then
        Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
                 Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
                 ReasonList.Selected, ShowPercentCheckBox.Checked)

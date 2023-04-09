@@ -398,7 +398,7 @@ object StatisticForm: TStatisticForm
           Align = alTop
           BorderSpacing.Left = 2
           BorderSpacing.Bottom = 2
-          Caption = 'Вид отчёта:'
+          Caption = 'Статистика:'
           Color = clWindow
           Font.Style = [fsBold]
           ParentColor = False
@@ -611,57 +611,44 @@ object StatisticForm: TStatisticForm
         end
         object MonthPanel: TPanel
           Left = 0
-          Height = 96
-          Top = 352
+          Height = 60
+          Top = 372
           Width = 394
           Align = alTop
-          AutoSize = True
+          BorderSpacing.Top = 20
           BevelOuter = bvNone
-          ClientHeight = 96
+          ClientHeight = 60
           ClientWidth = 394
           TabOrder = 4
           Visible = False
           object Label11: TLabel
             Left = 2
             Height = 20
-            Top = 20
+            Top = 0
             Width = 392
             Align = alTop
             BorderSpacing.Left = 2
-            BorderSpacing.Top = 20
             BorderSpacing.Bottom = 2
-            Caption = 'Вид отчета:'
+            Caption = 'Вид отчёта:'
             Color = clWindow
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
             Transparent = False
           end
-          object RadioButton1: TRadioButton
-            Left = 6
-            Height = 24
-            Top = 44
-            Width = 388
+          object VT3: TVirtualStringTree
+            Left = 0
+            Height = 42
+            Top = 22
+            Width = 394
             Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            BorderSpacing.Bottom = 4
-            Caption = ' распределение количества рекламаций'
-            Checked = True
-            OnClick = RadioButton1Click
-            TabOrder = 1
-            TabStop = True
-          end
-          object RadioButton2: TRadioButton
-            Left = 6
-            Height = 24
-            Top = 72
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            Caption = ' накопление количества рекламаций'
-            OnClick = RadioButton2Click
+            BorderStyle = bsNone
+            DefaultNodeHeight = 25
+            DefaultText = 'Node'
+            Header.AutoSizeIndex = 0
+            Header.Columns = <>
+            Header.Height = 20
+            Header.MainColumn = -1
             TabOrder = 0
           end
         end
