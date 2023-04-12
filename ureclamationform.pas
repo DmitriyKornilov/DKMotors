@@ -9,7 +9,7 @@ uses
   StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
   DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
-  URepairEditForm, DateTimePicker;
+  URepairEditForm, DateTimePicker, UControlListEditForm;
 
 type
 
@@ -50,6 +50,7 @@ type
     Panel7: TPanel;
     PlaceListButton: TRxSpeedButton;
     ReasonListButton: TRxSpeedButton;
+    ControlButton: TSpeedButton;
     ReportPeriodPanel: TPanel;
     Splitter0: TSplitter;
     Splitter1: TSplitter;
@@ -65,6 +66,7 @@ type
     ZoomValueLabel: TLabel;
     ZoomValuePanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
+    procedure ControlButtonClick(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DateTimePicker2Change(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
@@ -114,6 +116,7 @@ type
     procedure ReclamationEditFormOpen(const AEditType: Byte);
 
     procedure RepairEditFormOpen;
+    procedure ControlEditFormOpen;
 
     procedure LoadReclamation;
     procedure DrawReclamation;
@@ -276,6 +279,7 @@ begin
   DelButton.Enabled:= False;
   EditButton.Enabled:= False;
   RepairButton.Enabled:= False;
+  ControlButton.Enabled:= False;
 end;
 
 procedure TReclamationForm.SelectLine(const ARow: Integer);
@@ -292,6 +296,7 @@ begin
     DelButton.Enabled:= True;
     EditButton.Enabled:= True;
     RepairButton.Enabled:= True;
+    ControlButton.Enabled:= True;
   end;
 end;
 
@@ -488,6 +493,21 @@ begin
   end;
 end;
 
+procedure TReclamationForm.ControlEditFormOpen;
+var
+  ControlListEditForm: TControlListEditForm;
+begin
+  ControlListEditForm:= TControlListEditForm.Create(ReclamationForm);
+  try
+    ControlListEditForm.MotorID:= MotorIDs[SelectedIndex];
+    ControlListEditForm.MotorName:= MotorNames[SelectedIndex];
+    ControlListEditForm.MotorNum:= MotorNums[SelectedIndex];
+    ControlListEditForm.ShowModal;
+  finally
+    FreeAndNil(ControlListEditForm);
+  end;
+end;
+
 procedure TReclamationForm.DelButtonClick(Sender: TObject);
 begin
   DelRaclamation;
@@ -501,6 +521,11 @@ end;
 procedure TReclamationForm.AddButtonClick(Sender: TObject);
 begin
   ReclamationEditFormOpen(1);
+end;
+
+procedure TReclamationForm.ControlButtonClick(Sender: TObject);
+begin
+  ControlEditFormOpen;
 end;
 
 procedure TReclamationForm.DateTimePicker1Change(Sender: TObject);

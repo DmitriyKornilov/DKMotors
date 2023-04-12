@@ -197,7 +197,6 @@ begin
   finally
     FreeAndNil(ControlListEditForm);
   end;
-
 end;
 
 procedure TControlListForm.ShowControlList;

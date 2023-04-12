@@ -262,6 +262,7 @@
         <Filename Value="ucontrollisteditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ControlListEditForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UControlListEditForm"/>
       </Unit>
