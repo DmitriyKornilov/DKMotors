@@ -33,7 +33,7 @@ object ReclamationForm: TReclamationForm
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 1358
+      Left = 1302
       Height = 28
       Top = 0
       Width = 101
@@ -177,7 +177,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object DividerBevel6: TDividerBevel
-      Left = 626
+      Left = 570
       Height = 28
       Top = 0
       Width = 15
@@ -187,7 +187,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object DividerBevel7: TDividerBevel
-      Left = 1343
+      Left = 1287
       Height = 28
       Top = 0
       Width = 15
@@ -200,11 +200,12 @@ object ReclamationForm: TReclamationForm
       Left = 189
       Height = 28
       Top = 0
-      Width = 231
+      Width = 175
       Align = alLeft
+      AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 28
-      ClientWidth = 231
+      ClientWidth = 175
       ParentFont = False
       TabOrder = 0
       object AddButton: TSpeedButton
@@ -955,7 +956,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel5: TPanel
-      Left = 874
+      Left = 818
       Height = 28
       Top = 0
       Width = 469
@@ -1041,7 +1042,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object Panel7: TPanel
-      Left = 420
+      Left = 364
       Height = 28
       Top = 0
       Width = 206
@@ -1086,7 +1087,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel2: TPanel
-      Left = 874
+      Left = 818
       Height = 28
       Top = 0
       Width = 0
@@ -1096,7 +1097,7 @@ object ReclamationForm: TReclamationForm
       TabOrder = 3
     end
     object DividerBevel9: TDividerBevel
-      Left = 859
+      Left = 803
       Height = 28
       Top = 0
       Width = 15
@@ -1106,7 +1107,7 @@ object ReclamationForm: TReclamationForm
       ParentFont = False
     end
     object MotorCardCheckBox: TCheckBox
-      Left = 641
+      Left = 585
       Height = 28
       Top = 0
       Width = 218
