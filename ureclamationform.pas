@@ -127,8 +127,6 @@ type
     procedure CreateReasonList;
 
     procedure OrderSelect;
-    procedure DefectSelect(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
-    procedure ReasonSelect(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
   public
     procedure ShowReclamation;
   end;
@@ -399,7 +397,7 @@ var
   i: Integer;
 begin
   VSTDefectList:= TVSTCheckTable.Create(VT2);
-  VSTDefectList.OnSelect:= @DefectSelect;
+  VSTDefectList.OnSelect:= @ShowReclamation;
   VSTDefectList.AutoHeight:= True;
   SQLite.KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
                      ListDefectIDs, V, False, 'DefectName');
@@ -421,7 +419,7 @@ var
   i: Integer;
 begin
   VSTReasonList:= TVSTCheckTable.Create(VT3);
-  VSTReasonList.OnSelect:= @ReasonSelect;
+  VSTReasonList.OnSelect:= @ShowReclamation;
   VSTReasonList.AutoHeight:= True;
   SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
                      ListReasonIDs, V);
@@ -438,16 +436,6 @@ begin
 end;
 
 procedure TReclamationForm.OrderSelect;
-begin
-  ShowReclamation;
-end;
-
-procedure TReclamationForm.DefectSelect(const AIndex: Integer; const AChecked: Boolean);
-begin
-  ShowReclamation;
-end;
-
-procedure TReclamationForm.ReasonSelect(const AIndex: Integer; const AChecked: Boolean);
 begin
   ShowReclamation;
 end;

@@ -103,7 +103,6 @@ type
     procedure StatisticListSelectItem;
 
     procedure SetReasonList;
-    procedure ReasonListSelectItem(const {%H-}AIndex: Integer; const {%H-}AChecked: Boolean);
 
     procedure SetMonthReportTypeList;
     procedure MonthReportTypeListSelectItem;
@@ -147,7 +146,7 @@ begin
 
 
   ReasonList:= TVSTCheckTable.Create(VT2);
-  ReasonList.OnSelect:= @ReasonListSelectItem;
+  ReasonList.OnSelect:= @ShowStatistic;;
   SetReasonList;
 
   StatisticList:= TVSTTable.Create(VT1);
@@ -354,11 +353,6 @@ begin
   ReasonList.SetColumn('Список', V, taLeftJustify);
   ReasonList.Draw;
   ReasonList.CheckAll(True);
-end;
-
-procedure TStatisticForm.ReasonListSelectItem(const AIndex: Integer; const AChecked: Boolean);
-begin
-  ShowStatistic;
 end;
 
 procedure TStatisticForm.SetMonthReportTypeList;
