@@ -138,7 +138,7 @@ begin
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @Draw, True);
 
   ReasonList:= TVSTCheckTable.Create(VT2);
-  ReasonList.OnSelect:= @ShowStatistic;;
+  ReasonList.OnSelect:= @ShowStatistic;
   SetReasonList;
 
   StatisticList:= TVSTTable.Create(VT1);
