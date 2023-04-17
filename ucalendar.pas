@@ -532,10 +532,6 @@ begin
   R:= R+1;
   DrawLegendLine(R, C, WEEKDAY_COLOR_INDEX, 'Рабочий день');
   FWriter.SetAlignmentDefault;
-
-  //R:= R+2;
-  //FWriter.WritePNGFit(R, C, R+1, FWriter.ColCount, 'work\logo.png');
-  //FWriter.WriteImage(R, C, 'work\logo.png');
 end;
 
 procedure TCalendarSheet.DrawResumeTableCaption;
@@ -803,7 +799,8 @@ begin
   DrawYear;
   FWriter.WriteText(13,25, EmptyStr);
 
-  for i:= 2 to FWriter.RowCount-1 do
+  FWriter.SetRowHeight(2, FRowHeight-4);
+  for i:= 3 to FWriter.RowCount-1 do
     FWriter.SetRowHeight(i, FRowHeight);
 
   FWriter.EndEdit;

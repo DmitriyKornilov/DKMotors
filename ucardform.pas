@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls,
-  StdCtrls, Buttons, rxctrls, fpspreadsheetgrid, USQLite, USheetUtils,
-  DK_Vector, DK_SheetExporter;
+  Buttons, rxctrls, fpspreadsheetgrid, USQLite, USheetUtils,
+  DK_Vector, DK_SheetExporter, DK_Zoom;
 
 type
 
@@ -17,25 +17,15 @@ type
     CardPanel: TPanel;
     ExportButton: TRxSpeedButton;
     CardGrid: TsWorksheetGrid;
-    Panel6: TPanel;
     TopPanel: TPanel;
-    ZoomCaptionLabel: TLabel;
-    ZoomInButton: TSpeedButton;
-    ZoomOutButton: TSpeedButton;
     ZoomPanel: TPanel;
-    ZoomTrackBar: TTrackBar;
-    ZoomValueLabel: TLabel;
-    ZoomValuePanel: TPanel;
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure ZoomInButtonClick(Sender: TObject);
-    procedure ZoomOutButtonClick(Sender: TObject);
-    procedure ZoomTrackBarChange(Sender: TObject);
   private
     MotorCardSheet: TMotorCardSheet;
     MotorID: Integer;
-
+    ZoomPercent: Integer;
     BuildDate, SendDate: TDate;
     MotorName, MotorNum, RotorNum, ReceiverName, Sers, ControlNote: String;
     TestDates, RecDates, ArrivalDates, SendingDates: TDateVector;
@@ -43,8 +33,7 @@ type
     TestNotes, PlaceNames, FactoryNames, Departures,
     DefectNames, ReasonNames, RecNotes, RepairNotes: TStrVector;
 
-
-    procedure DrawCard;
+    procedure DrawCard(const AZoomPercent: Integer);
     procedure LoadCard;
     procedure ExportCard;
   public
@@ -75,6 +64,8 @@ end;
 procedure TCardForm.FormCreate(Sender: TObject);
 begin
   MotorID:= 0;
+  ZoomPercent:= 100;
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawCard, True);
   MotorCardSheet:= TMotorCardSheet.Create(CardGrid.Worksheet, CardGrid);
 end;
 
@@ -88,26 +79,11 @@ begin
   if Assigned(MotorCardSheet) then FreeAndNil(MotorCardSheet);
 end;
 
-procedure TCardForm.ZoomInButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
-end;
-
-procedure TCardForm.ZoomOutButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
-end;
-
-procedure TCardForm.ZoomTrackBarChange(Sender: TObject);
-begin
-  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
-  DrawCard;
-end;
-
-procedure TCardForm.DrawCard;
+procedure TCardForm.DrawCard(const AZoomPercent: Integer);
 begin
   if MotorID<=0 then Exit;
-  MotorCardSheet.Zoom(ZoomTrackBar.Position);
+  ZoomPercent:= AZoomPercent;
+  MotorCardSheet.Zoom(ZoomPercent);
   MotorCardSheet.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
                       RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
                       RecDates, Mileages, Opinions, PlaceNames, FactoryNames,
@@ -164,7 +140,7 @@ begin
   MotorID:= AMotorID;
   if MotorID<=0 then Exit;
   LoadCard;
-  DrawCard;
+  DrawCard(ZoomPercent);
 end;
 
 end.

@@ -9,7 +9,7 @@ uses
   StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
   DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
-  URepairEditForm, DateTimePicker, UControlListEditForm;
+  URepairEditForm, DateTimePicker, UControlListEditForm, DK_Zoom;
 
 type
 
@@ -28,8 +28,6 @@ type
     LogGrid: TsWorksheetGrid;
     MainPanel: TPanel;
     Panel4: TPanel;
-    Panel6: TPanel;
-    Panel8: TPanel;
     RepairButton: TSpeedButton;
     MotorCardCheckBox: TCheckBox;
     DefectListButton: TRxSpeedButton;
@@ -58,13 +56,7 @@ type
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     VT3: TVirtualStringTree;
-    ZoomCaptionLabel: TLabel;
-    ZoomInButton: TSpeedButton;
-    ZoomOutButton: TSpeedButton;
     ZoomPanel: TPanel;
-    ZoomTrackBar: TTrackBar;
-    ZoomValueLabel: TLabel;
-    ZoomValuePanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure ControlButtonClick(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
@@ -85,9 +77,6 @@ type
     procedure DefectListButtonClick(Sender: TObject);
     procedure ReasonListButtonClick(Sender: TObject);
     procedure RepairButtonClick(Sender: TObject);
-    procedure ZoomInButtonClick(Sender: TObject);
-    procedure ZoomOutButtonClick(Sender: TObject);
-    procedure ZoomTrackBarChange(Sender: TObject);
   private
     CardForm: TCardForm;
     VSTOrderList: TVSTTable;
@@ -95,6 +84,8 @@ type
     VSTReasonList: TVSTCheckTable;
 
     CanShow: Boolean;
+
+    ZoomPercent: Integer;
 
     SelectedIndex: Integer;
     ReclamationSheet: TReclamationSheet;
@@ -119,7 +110,7 @@ type
     procedure ControlEditFormOpen;
 
     procedure LoadReclamation;
-    procedure DrawReclamation;
+    procedure DrawReclamation(const AZoomPercent: Integer);
     procedure ExportReclamation;
 
     procedure CreateOrderList;
@@ -151,6 +142,10 @@ begin
   MotorCardCheckBox.Checked:= False;
   MainForm.SetNamesPanelsVisible(True, False);
   SelectedIndex:= -1;
+
+  ZoomPercent:= 100;
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawReclamation, True);
+
   ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid);
 
   CreateOrderList;
@@ -253,22 +248,6 @@ begin
   RepairEditFormOpen;
 end;
 
-procedure TReclamationForm.ZoomInButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
-end;
-
-procedure TReclamationForm.ZoomOutButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
-end;
-
-procedure TReclamationForm.ZoomTrackBarChange(Sender: TObject);
-begin
-  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
-  DrawReclamation;
-end;
-
 procedure TReclamationForm.SelectionClear;
 begin
   if SelectedIndex>-1 then
@@ -308,7 +287,7 @@ begin
     CardForm.ShowCard(0);
     SelectionClear;
     LoadReclamation;
-    DrawReclamation;
+    DrawReclamation(ZoomPercent);
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -338,9 +317,10 @@ begin
                         MotorNames, MotorNums);
 end;
 
-procedure TReclamationForm.DrawReclamation;
+procedure TReclamationForm.DrawReclamation(const AZoomPercent: Integer);
 begin
-  ReclamationSheet.Zoom(ZoomTrackBar.Position);
+  ZoomPercent:= AZoomPercent;
+  ReclamationSheet.Zoom(ZoomPercent);
   ReclamationSheet.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
                           Mileages, Opinions, ReasonColors,
                           PlaceNames, FactoryNames, Departures, DefectNames,

@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, StdCtrls, ComCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables,
+  Spin, ComCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables,
   USQLite, USheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid,
-  DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter;
+  DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, DK_Zoom;
 
 type
 
@@ -25,20 +25,12 @@ type
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
-    Panel3: TPanel;
-    Panel6: TPanel;
     RxSpeedButton5: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
-    ZoomCaptionLabel: TLabel;
-    ZoomInButton: TSpeedButton;
-    ZoomOutButton: TSpeedButton;
     ZoomPanel: TPanel;
-    ZoomTrackBar: TTrackBar;
-    ZoomValueLabel: TLabel;
-    ZoomValuePanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -49,13 +41,12 @@ type
     procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure VTClick(Sender: TObject);
-    procedure ZoomInButtonClick(Sender: TObject);
-    procedure ZoomOutButtonClick(Sender: TObject);
-    procedure ZoomTrackBarChange(Sender: TObject);
   private
     Months: TStrVector;
     Shipments: TStrMatrix;
     CargoIDs: TIntMatrix;
+
+    ZoomPercent: Integer;
 
     VST: TVSTCategoryRadioButtonTable;
     CargoSheet: TCargoSheet;
@@ -70,7 +61,7 @@ type
 
     function OpenShipment: Boolean;
     function LoadShipment: Boolean;
-    procedure DrawShipment;
+    procedure DrawShipment(const AZoomPercent: Integer);
     procedure ExportShipment;
 
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
@@ -116,6 +107,9 @@ end;
 procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(False, True);
+
+  ZoomPercent:= 100;
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawShipment, True);
 
   VST:= TVSTCategoryRadioButtonTable.Create(VT);
   VST.SelectedFont.Style:= [fsBold];
@@ -166,21 +160,6 @@ begin
     OpenShipment;
 end;
 
-procedure TShipmentForm.ZoomInButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
-end;
-
-procedure TShipmentForm.ZoomOutButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
-end;
-
-procedure TShipmentForm.ZoomTrackBarChange(Sender: TObject);
-begin
-  DrawShipment;
-end;
-
 procedure TShipmentForm.OpenShipmentList(const ACargoID: Integer);
 var
   I1, I2: Integer;
@@ -210,7 +189,7 @@ end;
 function TShipmentForm.OpenShipment: Boolean;
 begin
   Result:= LoadShipment;
-  DrawShipment;
+  DrawShipment(ZoomPercent);
 end;
 
 function TShipmentForm.LoadShipment: Boolean;
@@ -219,9 +198,10 @@ begin
              SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
 end;
 
-procedure TShipmentForm.DrawShipment;
+procedure TShipmentForm.DrawShipment(const AZoomPercent: Integer);
 begin
-  CargoSheet.Zoom(ZoomTrackBar.Position);
+  ZoomPercent:= AZoomPercent;
+  CargoSheet.Zoom(ZoomPercent);
   CargoSheet.Draw(SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
 end;
 

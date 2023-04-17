@@ -225,20 +225,19 @@ object CalendarForm: TCalendarForm
     TabOrder = 2
     object Panel7: TPanel
       Left = 0
-      Height = 489
+      Height = 523
       Top = 0
       Width = 504
       Align = alClient
-      BorderSpacing.Bottom = 2
       BevelOuter = bvNone
       BorderStyle = bsSingle
       Caption = 'Panel7'
-      ClientHeight = 485
+      ClientHeight = 519
       ClientWidth = 500
       TabOrder = 0
       object CalendarGrid: TsWorksheetGrid
         Left = 0
-        Height = 485
+        Height = 501
         Top = 0
         Width = 500
         AutoExpand = []
@@ -273,178 +272,16 @@ object CalendarForm: TCalendarForm
         OnDblClick = CalendarGridDblClick
         OnMouseDown = CalendarGridMouseDown
       end
-    end
-    object Panel8: TPanel
-      Left = 0
-      Height = 32
-      Top = 491
-      Width = 504
-      Align = alBottom
-      AutoSize = True
-      BevelOuter = bvNone
-      BorderStyle = bsSingle
-      ClientHeight = 28
-      ClientWidth = 500
-      TabOrder = 1
       object ZoomPanel: TPanel
-        Left = 218
+        Left = 0
         Height = 18
-        Top = 5
-        Width = 282
-        Align = alRight
-        AutoSize = True
-        BorderSpacing.Top = 5
-        BorderSpacing.Bottom = 5
+        Top = 501
+        Width = 500
+        Align = alBottom
         BevelOuter = bvNone
-        ClientHeight = 18
-        ClientWidth = 282
-        Constraints.MaxHeight = 18
-        TabOrder = 0
-        object ZoomCaptionLabel: TLabel
-          Left = 2
-          Height = 18
-          Top = 0
-          Width = 52
-          Align = alRight
-          BorderSpacing.Left = 2
-          Caption = 'Масштаб'
-          ParentColor = False
-        end
-        object ZoomTrackBar: TTrackBar
-          Left = 86
-          Height = 18
-          Top = 0
-          Width = 120
-          AutoSize = True
-          LineSize = 5
-          Max = 150
-          Min = 50
-          OnChange = ZoomTrackBarChange
-          PageSize = 5
-          Position = 100
-          TickStyle = tsNone
-          Align = alRight
-          Constraints.MinWidth = 120
-          TabOrder = 0
-        end
-        object ZoomOutButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 66
-          Height = 18
-          Top = 0
-          Width = 20
-          Align = alRight
-          AutoSize = True
-          BorderSpacing.Left = 12
-          Flat = True
-          Glyph.Data = {
-            36040000424D3604000000000000360000002800000010000000100000000100
-            2000000000000004000064000000640000000000000000000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
-            00B40000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF000000000000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000000000000BF00000040000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000130000
-            00B50000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000
-          }
-          OnClick = ZoomOutButtonClick
-        end
-        object ZoomInButton: TSpeedButton
-          Cursor = crHandPoint
-          Left = 206
-          Height = 18
-          Top = 0
-          Width = 20
-          Align = alRight
-          AutoSize = True
-          Flat = True
-          Glyph.Data = {
-            36040000424D3604000000000000360000002800000010000000100000000100
-            2000000000000004000064000000640000000000000000000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B40000001C00000000000000130000
-            00B40000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000400000
-            00BF00000000000000000000000000000000000000000000005C0000005C0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005C0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF00000000000000000000005D0000007F0000007F000000BF000000BF0000
-            007F0000007F0000005C0000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000007F0000007F0000
-            000000000000000000000000000000000000000000BF00000040000000400000
-            00BF00000000000000000000000000000000000000000000005D0000005C0000
-            000000000000000000000000000000000000000000BF00000040000000360000
-            00CA000000080000000000000000000000000000000000000000000000000000
-            000000000000000000000000000000000008000000CA00000036000000130000
-            00B50000006F0000000800000000000000000000000000000000000000000000
-            00000000000000000000000000080000006F000000B400000013000000000000
-            001C000000B4000000CA000000BF000000BF000000BF000000BF000000BF0000
-            00BF000000BF000000BF000000CA000000B50000001C00000000000000000000
-            0000000000130000003600000040000000400000004000000040000000400000
-            0040000000400000004000000036000000130000000000000000
-          }
-          OnClick = ZoomInButtonClick
-        end
-        object ZoomValuePanel: TPanel
-          Left = 226
-          Height = 18
-          Top = 0
-          Width = 56
-          Align = alRight
-          BevelOuter = bvNone
-          ClientHeight = 18
-          ClientWidth = 56
-          TabOrder = 1
-          object ZoomValueLabel: TLabel
-            AnchorSideLeft.Side = asrBottom
-            Left = 20
-            Height = 18
-            Top = 0
-            Width = 31
-            Align = alRight
-            BorderSpacing.Left = 12
-            BorderSpacing.Right = 5
-            Caption = '100 %'
-            ParentColor = False
-          end
-        end
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 1
       end
     end
   end
@@ -487,21 +324,21 @@ object CalendarForm: TCalendarForm
         TabOrder = 0
         object DateEditPanel: TPanel
           Left = 0
-          Height = 32
+          Height = 28
           Top = 0
           Width = 242
           Align = alTop
           AutoSize = True
           BorderSpacing.Bottom = 1
           BevelOuter = bvNone
-          ClientHeight = 32
+          ClientHeight = 28
           ClientWidth = 242
-          Constraints.MinHeight = 32
+          Constraints.MinHeight = 28
           TabOrder = 0
           object AddDateButton: TSpeedButton
             Cursor = crHandPoint
             Left = 0
-            Height = 32
+            Height = 28
             Hint = 'Записать'
             Top = 0
             Width = 32
@@ -518,7 +355,7 @@ object CalendarForm: TCalendarForm
           object DelDateButton: TSpeedButton
             Cursor = crHandPoint
             Left = 32
-            Height = 32
+            Height = 28
             Hint = 'Удалить'
             Top = 0
             Width = 32
@@ -536,7 +373,7 @@ object CalendarForm: TCalendarForm
           object EditDateButton: TSpeedButton
             Cursor = crHandPoint
             Left = 64
-            Height = 32
+            Height = 28
             Hint = 'Изменить'
             Top = 0
             Width = 32
@@ -554,7 +391,7 @@ object CalendarForm: TCalendarForm
           object CopyDateButton: TSpeedButton
             Cursor = crHandPoint
             Left = 96
-            Height = 32
+            Height = 28
             Hint = 'Копировать'
             Top = 0
             Width = 32
@@ -572,8 +409,8 @@ object CalendarForm: TCalendarForm
         end
         object VT1: TVirtualStringTree
           Left = 1
-          Height = 40
-          Top = 33
+          Height = 44
+          Top = 29
           Width = 240
           Align = alClient
           BorderSpacing.Left = 1
@@ -605,21 +442,21 @@ object CalendarForm: TCalendarForm
         Visible = False
         object CopyEditPanel: TPanel
           Left = 0
-          Height = 32
+          Height = 28
           Top = 0
           Width = 242
           Align = alTop
           AutoSize = True
           BorderSpacing.Bottom = 1
           BevelOuter = bvNone
-          ClientHeight = 32
+          ClientHeight = 28
           ClientWidth = 242
-          Constraints.MinHeight = 32
+          Constraints.MinHeight = 28
           TabOrder = 0
           object SaveCopyButton: TSpeedButton
             Cursor = crHandPoint
             Left = 0
-            Height = 32
+            Height = 28
             Hint = 'Сохранить'
             Top = 0
             Width = 32
@@ -637,7 +474,7 @@ object CalendarForm: TCalendarForm
           object DelCopyButton: TSpeedButton
             Cursor = crHandPoint
             Left = 32
-            Height = 32
+            Height = 28
             Hint = 'Удалить'
             Top = 0
             Width = 32
@@ -655,7 +492,7 @@ object CalendarForm: TCalendarForm
           object CancelCopyButton: TSpeedButton
             Cursor = crHandPoint
             Left = 64
-            Height = 32
+            Height = 28
             Hint = 'Отмена'
             Top = 0
             Width = 32
@@ -672,8 +509,8 @@ object CalendarForm: TCalendarForm
         end
         object VT2: TVirtualStringTree
           Left = 1
-          Height = 71
-          Top = 33
+          Height = 75
+          Top = 29
           Width = 240
           Align = alClient
           BorderSpacing.Left = 1

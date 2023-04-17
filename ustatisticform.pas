@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils, LCLType,
   StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
-  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils;
+  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils, DK_Zoom;
 
 type
 
@@ -45,7 +45,6 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     Panel7: TPanel;
-    Panel8: TPanel;
     Panel9: TPanel;
     ReportPeriodPanel: TPanel;
     AdditionYearCountSpinEdit: TSpinEdit;
@@ -56,13 +55,7 @@ type
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     VT3: TVirtualStringTree;
-    ZoomCaptionLabel: TLabel;
-    ZoomInButton: TSpeedButton;
-    ZoomOutButton: TSpeedButton;
     ZoomPanel: TPanel;
-    ZoomTrackBar: TTrackBar;
-    ZoomValueLabel: TLabel;
-    ZoomValuePanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
     procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
     procedure ShowGraphicsCheckBoxChange(Sender: TObject);
@@ -73,13 +66,8 @@ type
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-
     procedure AdditionYearCountSpinEditChange(Sender: TObject);
     procedure TotalCountForUsedParamsOnlyCheckBoxChange(Sender: TObject);
-    procedure ZoomInButtonClick(Sender: TObject);
-    procedure ZoomOutButtonClick(Sender: TObject);
-    procedure ZoomTrackBarChange(Sender: TObject);
-
   private
     SelectedIndex: Integer;
     CanShow: Boolean;
@@ -96,6 +84,7 @@ type
     MotorNames: String;
     AdditionYearsCount: Integer;
 
+    ZoomPercent: Integer;
 
     procedure VerifyDates;
 
@@ -115,6 +104,7 @@ type
     //3 - Распределение по месяцам
     procedure LoadStatistic(const AParamType: Integer);
 
+    procedure Draw(const AZoomPercent: Integer);
     procedure DrawStatistic(const AParamType: Integer);
     procedure DrawStatisticForSinglePeriod(const AParamType: Integer);
     procedure DrawStatisticForSeveralPeriods(const AParamType: Integer);
@@ -145,6 +135,8 @@ begin
   SelectedIndex:= -1;
   MainForm.SetNamesPanelsVisible(True, False);
 
+  ZoomPercent:= 100;
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @Draw, True);
 
   ReasonList:= TVSTCheckTable.Create(VT2);
   ReasonList.OnSelect:= @ReasonListSelectItem;
@@ -255,22 +247,6 @@ procedure TStatisticForm.TotalCountForUsedParamsOnlyCheckBoxChange(
   Sender: TObject);
 begin
   ShowStatistic;
-end;
-
-procedure TStatisticForm.ZoomInButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
-end;
-
-procedure TStatisticForm.ZoomOutButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
-end;
-
-procedure TStatisticForm.ZoomTrackBarChange(Sender: TObject);
-begin
-  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
-  DrawStatistic(SelectedIndex);
 end;
 
 procedure TStatisticForm.ShowStatistic;
@@ -420,6 +396,12 @@ begin
   DrawStatistic(AParamType);
 end;
 
+procedure TStatisticForm.Draw(const AZoomPercent: Integer);
+begin
+  ZoomPercent:= AZoomPercent;
+  DrawStatistic(SelectedIndex);
+end;
+
 procedure TStatisticForm.DrawStatisticForSinglePeriod(const AParamType: Integer);
 var
   Drawer: TStatisticSinglePeriodSheet;
@@ -448,7 +430,7 @@ begin
   end;
 
   try
-    Drawer.Zoom(ZoomTrackBar.Position);
+    Drawer.Zoom(ZoomPercent);
     Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
                MotorNames, ParamNames, ReasonNames, Counts[0],
                TotalCountForUsedParamsOnlyCheckBox.Checked,
@@ -486,7 +468,7 @@ begin
  end;
 
   try
-    Drawer.Zoom(ZoomTrackBar.Position);
+    Drawer.Zoom(ZoomPercent);
     Drawer.Draw(DateTimePicker2.Date, DateTimePicker1.Date,
                MotorNames, ParamNames, ReasonNames, Counts,
                TotalCountForUsedParamsOnlyCheckBox.Checked,

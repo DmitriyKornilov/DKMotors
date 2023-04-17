@@ -9,7 +9,7 @@ uses
   Buttons, VirtualTrees, DividerBevel, DateTimePicker, fpspreadsheetgrid,
   DK_VSTTables, DK_SheetExporter, DK_DateUtils, UCalendar, USQLite, DK_Vector,
   LCLType, StdCtrls, ComCtrls, rxctrls, UCalendarEditForm, DK_Const,
-  DateUtils, USheetUtils;
+  DateUtils, USheetUtils, DK_Zoom;
 
 type
 
@@ -36,6 +36,7 @@ type
     Label1: TLabel;
     Label10: TLabel;
     Label9: TLabel;
+    ZoomPanel: TPanel;
     WorkCountLabel: TLabel;
     NotWorkCountLabel: TLabel;
     OffDayCountLabel: TLabel;
@@ -57,7 +58,6 @@ type
     Panel1: TPanel;
     Panel2: TPanel;
     Panel7: TPanel;
-    Panel8: TPanel;
     DividerBevel1: TDividerBevel;
     PeriodPanel: TPanel;
     SaveCopyButton: TSpeedButton;
@@ -68,13 +68,6 @@ type
     VT2: TVirtualStringTree;
     YearSpinEdit: TSpinEdit;
     Splitter1: TSplitter;
-    ZoomCaptionLabel: TLabel;
-    ZoomInButton: TSpeedButton;
-    ZoomOutButton: TSpeedButton;
-    ZoomPanel: TPanel;
-    ZoomTrackBar: TTrackBar;
-    ZoomValueLabel: TLabel;
-    ZoomValuePanel: TPanel;
     procedure AddDateButtonClick(Sender: TObject);
     procedure CalendarGridDblClick(Sender: TObject);
     procedure CalendarGridMouseDown(Sender: TObject; {%H-}Button: TMouseButton;
@@ -101,9 +94,7 @@ type
     procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
     procedure YearSpinEditChange(Sender: TObject);
-    procedure ZoomInButtonClick(Sender: TObject);
-    procedure ZoomOutButtonClick(Sender: TObject);
-    procedure ZoomTrackBarChange(Sender: TObject);
+
   private
     YearCalendar: TCalendar;
     VSTDays: TVSTTable;
@@ -115,6 +106,8 @@ type
     SelectedStatusStr: String;
     SelectedStatus: Integer;
 
+    ZoomPercent: Integer;
+
     SpecDays: TCalendarSpecDays;
 
     IsCopyDates: Boolean;
@@ -122,7 +115,7 @@ type
     procedure LoadColors;
     procedure LoadSpecDays(const ASelectedIndex: Integer=-1);
     procedure CalcCalendar;
-    procedure DrawCalendar;
+    procedure DrawCalendar(const AZoomPercent: Integer);
     procedure RefreshCalendar;
     procedure ExportCalendar;
 
@@ -169,6 +162,9 @@ var
 begin
   MainForm.SetNamesPanelsVisible(False, False);
 
+  ZoomPercent:= 100;
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawCalendar, True);
+
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= Date;
   DateTimePicker3.Date:= Date;
@@ -184,14 +180,12 @@ begin
   VSTDays:= TVSTTable.Create(VT1);
   VSTDays.CanSelect:= True;
   VSTDays.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  //DefaultVSTTablesSettings(VSTDays);
   VSTDays.AddColumn('Дата', W1);
   VSTDays.AddColumn('Статус', W2);
   VSTDays.Draw;
 
   VSTCopy:= TVSTTable.Create(VT2);
   VSTCopy.CanSelect:= True;
-  //DefaultVSTTablesSettings(VSTCopy);
   VSTCopy.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTCopy.AddColumn('Дата', W1);
   VSTCopy.AddColumn('Статус', W2);
@@ -281,22 +275,6 @@ begin
   RefreshCalendar;
 end;
 
-procedure TCalendarForm.ZoomInButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position + 5;
-end;
-
-procedure TCalendarForm.ZoomOutButtonClick(Sender: TObject);
-begin
-  ZoomTrackBar.Position:= ZoomTrackBar.Position - 5;
-end;
-
-procedure TCalendarForm.ZoomTrackBarChange(Sender: TObject);
-begin
-  ZoomValueLabel.Caption:= IntToStr(ZoomTrackBar.Position) + ' %';
-  DrawCalendar;
-end;
-
 procedure TCalendarForm.LoadColors;
 begin
   ColorVector:= nil;
@@ -341,9 +319,10 @@ begin
   YearCalendar.Calc(BD, ED, SpecDays);
 end;
 
-procedure TCalendarForm.DrawCalendar;
+procedure TCalendarForm.DrawCalendar(const AZoomPercent: Integer);
 begin
-  CalendarSheet.Zoom(ZoomTrackBar.Position);
+  ZoomPercent:= AZoomPercent;
+  CalendarSheet.Zoom(ZoomPercent);
   CalendarSheet.Draw(YearCalendar, SelectedDates);
   CalendarSheet.UpdateColors(ColorVector);
 end;
@@ -353,7 +332,7 @@ begin
   SelectedDates:= nil;
   LoadSpecDays;
   CalcCalendar;
-  DrawCalendar;
+  DrawCalendar(ZoomPercent);
   CalcAndShowInfo;
 end;
 
@@ -448,7 +427,7 @@ begin
 
   LoadSpecDays(Ind);
   CalcCalendar;
-  DrawCalendar;
+  DrawCalendar(ZoomPercent);
 
   ChangeListSelection;
 end;
@@ -461,7 +440,7 @@ begin
   VDel(SelectedDates, Ind);
 
   LoadCopyList(Ind);
-  DrawCalendar;
+  DrawCalendar(ZoomPercent);
 
   DelCopyButton.Enabled:= VSTCopy.IsSelected;
 end;
@@ -502,7 +481,7 @@ begin
     else
       SelectedDates:= nil;
   end;
-  DrawCalendar;
+  DrawCalendar(ZoomPercent);
 
   //VT1.SetFocus;
 end;
@@ -535,7 +514,7 @@ begin
     end
     else begin
       SelectedDates:= nil;
-      DrawCalendar;
+      DrawCalendar(ZoomPercent);
     end;
 
   finally
@@ -555,7 +534,7 @@ begin
   SelectedStatusStr:= DayStatusToStr(SelectedStatus);
 
   SelectedDates:= nil;
-  DrawCalendar;
+  DrawCalendar(ZoomPercent);
   VSTDays.UnSelect;
   SetEditButtonsEnabled;
 end;
@@ -571,7 +550,7 @@ begin
     end
     else begin
       SelectedDates:= nil;
-      DrawCalendar;
+      DrawCalendar(ZoomPercent);
     end;
     VSTCopy.ValuesClear;
   end;
@@ -583,8 +562,6 @@ begin
 
   IsCopyDates:= False;
 end;
-
-
 
 procedure TCalendarForm.CopyDateButtonClick(Sender: TObject);
 begin
