@@ -6,7 +6,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
-  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables,
+  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables, DK_VSTTools,
   DK_Dialogs, DK_Const, UBuildAddForm, UBuildEditForm,
   USheetUtils, fpspreadsheetgrid;
 
@@ -42,13 +42,11 @@ type
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNamesButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure VTClick(Sender: TObject);
   private
     Months: TStrVector;
     Dates: TDateMatrix;
-    StrDates: TStrMatrix;
 
-    VST: TVSTCategoryRadioButtonTable;
+    VSTDatesList: TVSTCategoryDatesList;
     MotorBuildSheet: TMotorBuildSheet;
 
     MotorIDs, NameIDs, OldMotors: TIntVector;
@@ -77,25 +75,16 @@ uses UMainForm;
 procedure TBuildLogForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-
   SelectedIndex:= -1;
-
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
-
-  VST:= TVSTCategoryRadioButtonTable.Create(VT);
-  VST.SelectedFont.Style:= [fsBold];
-  VST.CanUnselect:= False;
-  VST.HeaderVisible:= False;
-  VST.GridLinesVisible:= False;
-  VST.AddColumn('Dates');
-
+  VSTDatesList:= TVSTCategoryDatesList.Create(VT, EmptyStr, @ShowBuildLog);
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
 procedure TBuildLogForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(MotorBuildSheet) then FreeAndNil(MotorBuildSheet);
-  if Assigned(VST) then FreeAndNil(VST);
+  if Assigned(VSTDatesList) then FreeAndNil(VSTDatesList);
 end;
 
 procedure TBuildLogForm.FormShow(Sender: TObject);
@@ -129,12 +118,6 @@ begin
   OpenDatesList(LastDayInYear(SpinEdit1.Value));
 end;
 
-procedure TBuildLogForm.VTClick(Sender: TObject);
-begin
-  if VST.IsSelected then
-    ShowBuildLog;
-end;
-
 procedure TBuildLogForm.ClearSelection;
 begin
   if SelectedIndex>-1 then
@@ -163,29 +146,10 @@ begin
 end;
 
 procedure TBuildLogForm.OpenDatesList(const ASelectDate: TDate);
-var
-  I1, I2: Integer;
 begin
   LogGrid.Clear;
-  VST.ValuesClear;
-
-  if not SQLite.MonthAndDatesForBuildLogLoad(SpinEdit1.Value, Months, Dates) then Exit;
-
-  StrDates:= MFormatDateTime('dd.mm.yyyy', Dates);
-  VST.SetCategories(Months);
-  VST.SetColumn('Dates', StrDates, taLeftJustify);
-  VST.Draw;
-
-  if MIndexOfDate(Dates, ASelectDate, I1, I2) then
-  begin
-    VST.Select(I1, I2);
-    VST.Show(I1, I2);
-  end
-  else begin
-    VST.Select(0, 0);
-    VST.Show(0, 0);
-  end;
-  ShowBuildLog;
+  SQLite.MonthAndDatesForBuildLogLoad(SpinEdit1.Value, Months, Dates);
+  VSTDatesList.Update(Months, Dates, ASelectDate);
 end;
 
 procedure TBuildLogForm.ShowBuildLog;
@@ -194,9 +158,9 @@ var
   D: TDate;
 begin
   ClearSelection;
-  if not VST.IsSelected then Exit;
+  if not VSTDatesList.IsSelected then Exit;
 
-  D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
+  D:= Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2];
   SQLite.BuildListLoad(D, D, MainForm.UsedNameIDs,
                     CheckBox1.Checked, MotorIDs, NameIDs, OldMotors,
                     Tmp, MotorNames, MotorNums, RotorNums);
@@ -213,7 +177,7 @@ begin
                  '?') then Exit;
   SQLite.Delete('MOTORLIST', 'MotorID', MotorIDs[SelectedIndex]);
 
-  OpenDatesList(Dates[VST.SelectedIndex1, VST.SelectedIndex2]);
+  OpenDatesList(Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2]);
 end;
 
 procedure TBuildLogForm.EditButtonClick(Sender: TObject);
@@ -223,7 +187,7 @@ var
 begin
   BuildEditForm:= TBuildEditForm.Create(BuildLogForm);
   try
-    BuildEditForm.DateTimePicker1.Date:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
+    BuildEditForm.DateTimePicker1.Date:= Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2];
     BuildEditForm.MotorID:= MotorIDs[SelectedIndex];
     BuildEditForm.OldNameID:= NameIDs[SelectedIndex];
     BuildEditForm.MotorNumEdit.Text:= MotorNums[SelectedIndex];
@@ -249,8 +213,8 @@ var
 begin
   BuildAddForm:= TBuildAddForm.Create(BuildLogForm);
   try
-    if VST.IsSelected then
-      BuildAddForm.DateTimePicker1.Date:= Dates[VST.SelectedIndex1, VST.SelectedIndex2]
+    if VSTDatesList.IsSelected then
+      BuildAddForm.DateTimePicker1.Date:= Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2]
     else
       BuildAddForm.DateTimePicker1.Date:= Date;
     BuildAddForm.ShowModal;
