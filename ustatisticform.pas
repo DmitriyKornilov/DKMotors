@@ -8,7 +8,8 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils, LCLType,
   StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
-  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils, DK_Zoom;
+  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils, DK_Zoom,
+  DK_VSTTools;
 
 type
 
@@ -31,8 +32,6 @@ type
     DividerBevel3: TDividerBevel;
     ExportButton: TRxSpeedButton;
     Grid1: TsWorksheetGrid;
-    Label1: TLabel;
-    Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label7: TLabel;
@@ -74,9 +73,13 @@ type
 
     ReasonIDs: TIntVector;
     ReasonNames: TStrVector;
-    ReasonList: TVSTCheckTable;
 
-    StatisticList: TVSTTable;
+    //ReasonList: TVSTCheckTable;
+    ReasonList: TVSTCheckList;
+
+    //StatisticList: TVSTTable;
+    StatisticList: TVSTStringList;
+
     MonthReportTypeList: TVSTTable;
 
     ParamNames: TStrVector;
@@ -89,7 +92,7 @@ type
     procedure VerifyDates;
 
     procedure SetStatisticList;
-    procedure StatisticListSelectItem;
+    procedure StatisticListSelect;
 
     procedure SetReasonList;
 
@@ -137,12 +140,7 @@ begin
   ZoomPercent:= 100;
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @Draw, True);
 
-  ReasonList:= TVSTCheckTable.Create(VT2);
-  ReasonList.OnSelect:= @ShowStatistic;
   SetReasonList;
-
-  StatisticList:= TVSTTable.Create(VT1);
-  StatisticList.OnSelect:= @StatisticListSelectItem;
   SetStatisticList;
 
   MonthReportTypeList:= TVSTTable.Create(VT3);
@@ -150,8 +148,8 @@ begin
   SetMonthReportTypeList;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
-  CanShow:= True;
   DateTimePicker1.Date:= LastDayInMonth(Date);
+  CanShow:= True;
 
   ShowStatistic;
 end;
@@ -264,8 +262,10 @@ end;
 
 procedure TStatisticForm.SetStatisticList;
 var
+  S: String;
   V: TStrVector;
 begin
+  S:= 'Статистика:';
   V:= VCreateStr([
     'Распределение по наименованиям двигателей',
     'Распределение по неисправным элементам',
@@ -273,21 +273,12 @@ begin
     'Распределение по месяцам',
     'Распределение по пробегу локомотива'
   ]);
-
-  StatisticList.AutoHeight:= True;
-  StatisticList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  StatisticList.HeaderVisible:= False;
-  StatisticList.GridLinesVisible:= False;
-  StatisticList.CanSelect:= True;
-  StatisticList.CanUnselect:= False;
-  StatisticList.AddColumn('Список');
-  StatisticList.SetColumn('Список', V, taLeftJustify);
-  StatisticList.Draw;
-  StatisticList.Select(0);
-  Panel2.Height:= StatisticList.NeededHeight + Label1.Height + 10;
+  StatisticList:= TVSTStringList.Create(VT1, S, V, @StatisticListSelect);
+  SelectedIndex:= 0;
+  Panel2.Height:= StatisticList.NeededHeight + 10;
 end;
 
-procedure TStatisticForm.StatisticListSelectItem;
+procedure TStatisticForm.StatisticListSelect;
 begin
   if SelectedIndex=StatisticList.SelectedIndex then Exit;
   SelectedIndex:= StatisticList.SelectedIndex;
@@ -299,6 +290,7 @@ end;
 procedure TStatisticForm.SetReasonList;
 var
   i: Integer;
+  S: String;
   V: TStrVector;
 begin
   ReasonIDs:= VCreateInt([
@@ -320,15 +312,8 @@ begin
   VDim(V{%H-}, Length(ReasonNames));
   for i:= 0 to High(ReasonNames) do
     V[i]:= SFirstLower(ReasonNames[i]);
-
-  ReasonList.AutoHeight:= True;
-  ReasonList.GridLinesVisible:= False;
-  ReasonList.HeaderVisible:= False;
-  ReasonList.SelectedBGColor:= VT2.Color;
-  ReasonList.AddColumn('Список');
-  ReasonList.SetColumn('Список', V, taLeftJustify);
-  ReasonList.Draw;
-  ReasonList.CheckAll(True);
+  S:= 'Включать в отчёт:';
+  ReasonList:= TVSTCheckList.Create(VT2, S, V, @ShowStatistic);
 end;
 
 procedure TStatisticForm.SetMonthReportTypeList;
