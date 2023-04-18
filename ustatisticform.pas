@@ -17,10 +17,8 @@ type
 
   TStatisticForm = class(TForm)
     ANEMAsSameNameCheckBox: TCheckBox;
-    MonthPanel: TPanel;
     Label10: TLabel;
     ANEMPanel: TPanel;
-    Label11: TLabel;
     SeveralPeriodsCheckBox: TCheckBox;
     ShowPercentCheckBox: TCheckBox;
     ShowGraphicsCheckBox: TCheckBox;
@@ -74,13 +72,9 @@ type
     ReasonIDs: TIntVector;
     ReasonNames: TStrVector;
 
-    //ReasonList: TVSTCheckTable;
     ReasonList: TVSTCheckList;
-
-    //StatisticList: TVSTTable;
     StatisticList: TVSTStringList;
-
-    MonthReportTypeList: TVSTTable;
+    MonthReportTypeList: TVSTStringList;
 
     ParamNames: TStrVector;
     Counts: TIntMatrix3D;
@@ -91,13 +85,13 @@ type
 
     procedure VerifyDates;
 
-    procedure SetStatisticList;
-    procedure StatisticListSelect;
+    procedure CreateStatisticList;
+    procedure SelectStatistic;
 
-    procedure SetReasonList;
+    procedure CreateReasonList;
 
-    procedure SetMonthReportTypeList;
-    procedure MonthReportTypeListSelectItem;
+    procedure CreateMonthReportTypeList;
+    procedure SelectMonthReportType;
 
     //AParamType
     //0 - Распределение по наименованиям двигателей
@@ -140,12 +134,9 @@ begin
   ZoomPercent:= 100;
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @Draw, True);
 
-  SetReasonList;
-  SetStatisticList;
-
-  MonthReportTypeList:= TVSTTable.Create(VT3);
-  MonthReportTypeList.OnSelect:= @MonthReportTypeListSelectItem;
-  SetMonthReportTypeList;
+  CreateReasonList;
+  CreateStatisticList;
+  CreateMonthReportTypeList;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
   DateTimePicker1.Date:= LastDayInMonth(Date);
@@ -260,7 +251,7 @@ begin
   end;
 end;
 
-procedure TStatisticForm.SetStatisticList;
+procedure TStatisticForm.CreateStatisticList;
 var
   S: String;
   V: TStrVector;
@@ -273,21 +264,21 @@ begin
     'Распределение по месяцам',
     'Распределение по пробегу локомотива'
   ]);
-  StatisticList:= TVSTStringList.Create(VT1, S, V, @StatisticListSelect);
+  StatisticList:= TVSTStringList.Create(VT1, S, V, @SelectStatistic);
   SelectedIndex:= 0;
   Panel2.Height:= StatisticList.NeededHeight + 10;
 end;
 
-procedure TStatisticForm.StatisticListSelect;
+procedure TStatisticForm.SelectStatistic;
 begin
   if SelectedIndex=StatisticList.SelectedIndex then Exit;
   SelectedIndex:= StatisticList.SelectedIndex;
   ANEMPanel.Visible:= SelectedIndex=0;
-  MonthPanel.Visible:= SelectedIndex=3;
+  VT3.Visible:= SelectedIndex=3;
   ShowStatistic;
 end;
 
-procedure TStatisticForm.SetReasonList;
+procedure TStatisticForm.CreateReasonList;
 var
   i: Integer;
   S: String;
@@ -316,29 +307,20 @@ begin
   ReasonList:= TVSTCheckList.Create(VT2, S, V, @ShowStatistic);
 end;
 
-procedure TStatisticForm.SetMonthReportTypeList;
+procedure TStatisticForm.CreateMonthReportTypeList;
 var
+  S: String;
   V: TStrVector;
 begin
+  S:= 'Вид отчёта:';
   V:= VCreateStr([
     'распределение количества рекламаций',
     'накопление количества рекламаций'
   ]);
-
-  MonthReportTypeList.AutoHeight:= True;
-  MonthReportTypeList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  MonthReportTypeList.HeaderVisible:= False;
-  MonthReportTypeList.GridLinesVisible:= False;
-  MonthReportTypeList.CanSelect:= True;
-  MonthReportTypeList.CanUnselect:= False;
-  MonthReportTypeList.AddColumn('Список');
-  MonthReportTypeList.SetColumn('Список', V, taLeftJustify);
-  MonthReportTypeList.Draw;
-  MonthReportTypeList.Select(0);
-  MonthPanel.Height:= MonthReportTypeList.NeededHeight + Label11.Height;
+  MonthReportTypeList:= TVSTStringList.Create(VT3, S, V, @SelectMonthReportType);
 end;
 
-procedure TStatisticForm.MonthReportTypeListSelectItem;
+procedure TStatisticForm.SelectMonthReportType;
 begin
   ShowStatistic;
 end;

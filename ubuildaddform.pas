@@ -87,7 +87,6 @@ end;
 procedure TBuildAddForm.FormShow(Sender: TObject);
 begin
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTable.AddColumn('№ п/п', 60);
   VSTTable.AddColumn('Наименование', 220);
   VSTTable.AddColumn('Номер', 100);
@@ -286,7 +285,6 @@ begin
   end;
 
   DelButton.Enabled:= VSTTable.IsSelected;
-
 end;
 
 end.

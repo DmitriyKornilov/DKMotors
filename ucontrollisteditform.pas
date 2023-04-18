@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, USQLite, DK_VSTTables, USheetUtils, VirtualTrees, DK_Vector,
-  DividerBevel, DK_Dialogs, DK_StrUtils;
+  DividerBevel, DK_Dialogs, DK_StrUtils, DK_Const;
 
 type
 
@@ -88,7 +88,6 @@ end;
 procedure TControlListEditForm.FormShow(Sender: TObject);
 begin
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTable.AddColumn('Номер', 200);
   VSTTable.AddColumn('Партия', 200);
   VSTTable.AutosizeColumnDisable;
@@ -135,7 +134,6 @@ begin
   VSTTable.SetColumn('Номер', MotorNums);
   VSTTable.SetColumn('Партия', Series);
   VSTTable.Draw;
-
 end;
 
 procedure TControlListEditForm.LoadControl;

@@ -9,7 +9,8 @@ uses
   StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid, rxctrls,
   DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
   DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
-  URepairEditForm, DateTimePicker, UControlListEditForm, DK_Zoom;
+  URepairEditForm, DateTimePicker, UControlListEditForm, DK_Zoom, DK_Const,
+  DK_VSTTools;
 
 type
 
@@ -21,9 +22,6 @@ type
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     Label3: TLabel;
-    Label5: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
     LeftPanel: TPanel;
     LogGrid: TsWorksheetGrid;
     MainPanel: TPanel;
@@ -79,8 +77,8 @@ type
     procedure RepairButtonClick(Sender: TObject);
   private
     CardForm: TCardForm;
-    VSTOrderList: TVSTTable;
-    VSTDefectList: TVSTCheckTable;
+    VSTOrderList: TVSTStringList;
+    VSTDefectList: TVSTCheckList;
     VSTReasonList: TVSTCheckTable;
 
     CanShow: Boolean;
@@ -99,25 +97,24 @@ type
     ListReasonIDs: TIntVector;
     ListDefectIDs: TIntVector;
 
-
-    procedure SelectionClear;
+    procedure ClearSelection;
     procedure SelectLine(const ARow: Integer);
 
-    procedure DelRaclamation;
-    procedure ReclamationEditFormOpen(const AEditType: Byte);
+    procedure DeleteRaclamation;
+    procedure OpenReclamationEditForm(const AEditType: Byte);
 
-    procedure RepairEditFormOpen;
-    procedure ControlEditFormOpen;
+    procedure OpenRepairEditForm;
+    procedure OpenControlEditForm;
 
     procedure LoadReclamation;
     procedure DrawReclamation(const AZoomPercent: Integer);
     procedure ExportReclamation;
 
     procedure CreateOrderList;
+    procedure SelectOrder;
+
     procedure CreateDefectList;
     procedure CreateReasonList;
-
-    procedure OrderSelect;
   public
     procedure ShowReclamation;
   end;
@@ -151,8 +148,10 @@ begin
   CreateReasonList;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
-  CanShow:= True;
   DateTimePicker1.Date:= LastDayInYear(Date);
+
+  CanShow:= True;
+  ShowReclamation;
 end;
 
 procedure TReclamationForm.FormDestroy(Sender: TObject);
@@ -160,6 +159,8 @@ begin
   if Assigned(CardForm) then FreeAndNil(CardForm);
   if Assigned(ReclamationSheet) then FReeAndNil(ReclamationSheet);
   if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
+  if Assigned(VSTDefectList) then FreeAndNil(VSTDefectList);
+  if Assigned(VSTReasonList) then FreeAndNil(VSTReasonList);
 end;
 
 procedure TReclamationForm.FormShow(Sender: TObject);
@@ -173,7 +174,7 @@ var
   R,C, MotorID: Integer;
 begin
   if Button=mbRight then
-    SelectionClear;
+    ClearSelection;
   if Button=mbLeft  then
   begin
     LogGrid.MouseToCell(X,Y,C{%H-},R{%H-});
@@ -243,10 +244,10 @@ end;
 
 procedure TReclamationForm.RepairButtonClick(Sender: TObject);
 begin
-  RepairEditFormOpen;
+  OpenRepairEditForm;
 end;
 
-procedure TReclamationForm.SelectionClear;
+procedure TReclamationForm.ClearSelection;
 begin
   if SelectedIndex>-1 then
   begin
@@ -283,7 +284,7 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
-    SelectionClear;
+    ClearSelection;
     LoadReclamation;
     DrawReclamation(ZoomPercent);
   finally
@@ -353,83 +354,64 @@ end;
 
 procedure TReclamationForm.CreateOrderList;
 var
+  S: String;
   V: TStrVector;
 begin
-  VSTOrderList:= TVSTTable.Create(VT1);
-  VSTOrderList.OnSelect:= @OrderSelect;
-  VSTOrderList.AutoHeight:= True;
-  VSTOrderList.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTOrderList.HeaderVisible:= False;
-  VSTOrderList.GridLinesVisible:= False;
-  VSTOrderList.CanSelect:= True;
-  VSTOrderList.CanUnselect:= False;
-  VSTOrderList.AddColumn('Список');
-  V:= VCreateStr(['дате уведомления', 'номеру двигателя', 'дате сборки',
-                  'предприятию', 'неисправному элементу', 'причине неисправности']);
-  VSTOrderList.SetColumn('Список', V, taLeftJustify);
-  VSTOrderList.Draw;
-  VSTOrderList.Select(0);
+  S:= 'Упорядочить по:';
+  V:= VCreateStr([
+    'дате уведомления',
+    'номеру двигателя',
+    'дате сборки',
+    'предприятию',
+    'неисправному элементу',
+    'причине неисправности'
+  ]);
+  VSTOrderList:= TVSTStringList.Create(VT1, S, V, @SelectOrder);
 end;
 
 procedure TReclamationForm.CreateDefectList;
 var
+  S: String;
   V: TStrVector;
   i: Integer;
 begin
-  VSTDefectList:= TVSTCheckTable.Create(VT2);
-  VSTDefectList.OnSelect:= @ShowReclamation;
-  VSTDefectList.AutoHeight:= True;
+  S:= 'Неисправный элемент:';
   SQLite.KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
                      ListDefectIDs, V, False, 'DefectName');
   for i:= 0 to High(V) do
     V[i]:= SFirstLower(V[i]);
-
-  VSTDefectList.GridLinesVisible:= False;
-  VSTDefectList.HeaderVisible:= False;
-  VSTDefectList.SelectedBGColor:= VT2.Color;
-  VSTDefectList.AddColumn('Список');
-  VSTDefectList.SetColumn('Список', V, taLeftJustify);
-  VSTDefectList.Draw;
-  VSTDefectList.CheckAll(True);
+  VSTDefectList:= TVSTCheckList.Create(VT2, S, V, @ShowReclamation);
 end;
 
 procedure TReclamationForm.CreateReasonList;
 var
+  S: String;
   V: TStrVector;
   i: Integer;
 begin
-  VSTReasonList:= TVSTCheckTable.Create(VT3);
-  VSTReasonList.OnSelect:= @ShowReclamation;
-  VSTReasonList.AutoHeight:= True;
+  S:= 'Причина неисправности:';
   SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
                      ListReasonIDs, V);
   for i:= 0 to High(V) do
     V[i]:= SFirstLower(V[i]);
-
-  VSTReasonList.GridLinesVisible:= False;
-  VSTReasonList.HeaderVisible:= False;
-  VSTReasonList.SelectedBGColor:= VT3.Color;
-  VSTReasonList.AddColumn('Список');
-  VSTReasonList.SetColumn('Список', V, taLeftJustify);
-  VSTReasonList.Draw;
-  VSTReasonList.CheckAll(True);
+  VSTReasonList:= TVSTCheckList.Create(VT3, S, V, @ShowReclamation);
 end;
 
-procedure TReclamationForm.OrderSelect;
+procedure TReclamationForm.SelectOrder;
 begin
   ShowReclamation;
 end;
 
-procedure TReclamationForm.DelRaclamation;
+procedure TReclamationForm.DeleteRaclamation;
 begin
   if SelectedIndex<0 then Exit;
   if not Confirm('Удалить рекламацию?') then Exit;
   SQLite.Delete('RECLAMATIONS', 'RecID', RecIDs[SelectedIndex]);
-  SelectionClear;
+  ClearSelection;
   ShowReclamation;
 end;
 
-procedure TReclamationForm.ReclamationEditFormOpen(const AEditType: Byte);
+procedure TReclamationForm.OpenReclamationEditForm(const AEditType: Byte);
 var
   ReclamationEditForm: TReclamationEditForm;
 begin
@@ -442,11 +424,11 @@ begin
   finally
     FreeAndNil(ReclamationEditForm);
   end;
-  SelectionClear;
+  ClearSelection;
   ShowReclamation;
 end;
 
-procedure TReclamationForm.RepairEditFormOpen;
+procedure TReclamationForm.OpenRepairEditForm;
 var
   RepairEditForm: TRepairEditForm;
 begin
@@ -461,7 +443,7 @@ begin
   end;
 end;
 
-procedure TReclamationForm.ControlEditFormOpen;
+procedure TReclamationForm.OpenControlEditForm;
 var
   ControlListEditForm: TControlListEditForm;
 begin
@@ -478,22 +460,22 @@ end;
 
 procedure TReclamationForm.DelButtonClick(Sender: TObject);
 begin
-  DelRaclamation;
+  DeleteRaclamation;
 end;
 
 procedure TReclamationForm.EditButtonClick(Sender: TObject);
 begin
-  ReclamationEditFormOpen(2);
+  OpenReclamationEditForm(2);
 end;
 
 procedure TReclamationForm.AddButtonClick(Sender: TObject);
 begin
-  ReclamationEditFormOpen(1);
+  OpenReclamationEditForm(1);
 end;
 
 procedure TReclamationForm.ControlButtonClick(Sender: TObject);
 begin
-  ControlEditFormOpen;
+  OpenControlEditForm;
 end;
 
 procedure TReclamationForm.DateTimePicker1Change(Sender: TObject);

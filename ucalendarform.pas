@@ -9,7 +9,7 @@ uses
   Buttons, VirtualTrees, DividerBevel, DateTimePicker, fpspreadsheetgrid,
   DK_VSTTables, DK_SheetExporter, DK_DateUtils, UCalendar, USQLite, DK_Vector,
   LCLType, StdCtrls, ComCtrls, rxctrls, UCalendarEditForm, DK_Const,
-  DateUtils, USheetUtils, DK_Zoom;
+  DateUtils, DK_Zoom;
 
 type
 
@@ -123,7 +123,6 @@ type
     procedure CalcAndShowDaysCount;
     procedure CalcAndShowWorkDaysEnd;
 
-
     procedure LoadCopyList(const ASelectedIndex: Integer=-1);
 
     procedure SetEditButtonsEnabled;
@@ -139,8 +138,6 @@ type
 
     procedure BeginCopy;
     procedure EndCopy;
-
-
   public
 
   end;
@@ -179,14 +176,12 @@ begin
 
   VSTDays:= TVSTTable.Create(VT1);
   VSTDays.CanSelect:= True;
-  VSTDays.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTDays.AddColumn('Дата', W1);
   VSTDays.AddColumn('Статус', W2);
   VSTDays.Draw;
 
   VSTCopy:= TVSTTable.Create(VT2);
   VSTCopy.CanSelect:= True;
-  VSTCopy.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTCopy.AddColumn('Дата', W1);
   VSTCopy.AddColumn('Статус', W2);
   VSTCopy.Draw;
@@ -285,7 +280,7 @@ begin
   ColorVector[WEEKDAY_COLOR_INDEX]:= COLORS_CALENDAR[WEEKDAY_COLOR_INDEX];
   ColorVector[MONTHNAME_COLOR_INDEX]:= COLOR_CALENDAR_MONTHNAME;
   ColorVector[DAYNAME_COLOR_INDEX]:= COLOR_CALENDAR_DAYNAME;
-  ColorVector[HIGHLIGHT_COLOR_INDEX]:= COLOR_BACKGROUND_SELECTED;
+  ColorVector[HIGHLIGHT_COLOR_INDEX]:= DefaultSelectionBGColor;
 
   ColorVector[QUARTER_COLOR_INDEX]:= COLOR_CALENDAR_QUARTER;
   ColorVector[HALFYEAR_COLOR_INDEX]:= COLOR_CALENDAR_HALFYEAR;

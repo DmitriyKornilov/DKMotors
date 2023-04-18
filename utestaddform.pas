@@ -75,7 +75,6 @@ type
     procedure ShowTestList(const ANeedSelect: Boolean);
 
     procedure LoadMotors;
-
   end;
 
 var
@@ -90,7 +89,6 @@ implementation
 procedure TTestAddForm.LoadMotorNames;
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
-
   if VIsNil(NameIDs) then
     ShowInfo('Отсутствует список наименований двигателей!');
 end;
@@ -98,7 +96,6 @@ end;
 procedure TTestAddForm.FormShow(Sender: TObject);
 begin
   VSTViewTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTViewTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTViewTable.AddColumn('Дата сборки', 100);
   VSTViewTable.AddColumn('Номер', 100);
   VSTViewTable.AddColumn('Испытания',50);
@@ -106,7 +103,6 @@ begin
   VSTViewTable.Draw;
 
   VSTTestTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTestTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTestTable.AddColumn('№ п/п', 60);
   VSTTestTable.AddColumn('Наименование', 220);
   VSTTestTable.AddColumn('Номер', 100);

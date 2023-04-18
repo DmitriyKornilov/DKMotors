@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   StdCtrls, DateTimePicker, VirtualTrees, USQLite, DK_Vector, DK_Dialogs,
-  DK_VSTTables, DK_StrUtils, USheetUtils, Buttons, DividerBevel;
+  DK_VSTTables, DK_StrUtils, DK_Const, USheetUtils, Buttons, DividerBevel;
 
 type
 
@@ -66,7 +66,6 @@ type
     NameIDs, PlaceIDs, FactoryIDs, DefectIDs, ReasonIDs: TIntVector;
     PlaceNames, FactoryNames, DefectNames, ReasonNames: TStrVector;
 
-
     procedure LoadNames;
     procedure LoadMotors;
     procedure LoadRec;
@@ -100,8 +99,6 @@ end;
 procedure TReclamationEditForm.FormShow(Sender: TObject);
 begin
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  //VSTTable.SelectedFont.Style:= [fsBold];
   VSTTable.AddColumn('Дата сборки', 100);
   VSTTable.AddColumn('Номер', 100);
   VSTTable.AddColumn('Отгружен',50);
@@ -232,7 +229,6 @@ begin
                  ReasonIDs, ReasonNames, False, 'ReasonName');
   VToStrings(ReasonNames, ReasonNameComboBox.Items);
   ReasonNameComboBox.ItemIndex:= 0;
-
 end;
 
 procedure TReclamationEditForm.LoadMotors;

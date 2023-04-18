@@ -1,7 +1,7 @@
 object MotorListForm: TMotorListForm
-  Left = 294
+  Left = 442
   Height = 521
-  Top = 150
+  Top = 211
   Width = 1023
   Align = alClient
   BorderStyle = bsNone
@@ -11,7 +11,7 @@ object MotorListForm: TMotorListForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '2.2.4.0'
   object ToolPanel: TPanel
     Left = 2
     Height = 32
@@ -170,25 +170,10 @@ object MotorListForm: TMotorListForm
     Color = clWindow
     ParentColor = False
     TabOrder = 1
-    object Label4: TLabel
-      Left = 2
-      Height = 15
-      Top = 0
-      Width = 164
-      Align = alTop
-      BorderSpacing.Left = 2
-      BorderSpacing.Bottom = 2
-      Caption = 'Отображать:'
-      Color = clWindow
-      Font.Style = [fsBold]
-      ParentColor = False
-      ParentFont = False
-      Transparent = False
-    end
     object VT2: TVirtualStringTree
       Left = 0
-      Height = 462
-      Top = 17
+      Height = 479
+      Top = 0
       Width = 166
       Align = alClient
       BorderStyle = bsNone

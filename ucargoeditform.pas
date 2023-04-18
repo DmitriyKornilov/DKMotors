@@ -114,7 +114,6 @@ end;
 procedure TCargoEditForm.FormShow(Sender: TObject);
 begin
   VSTViewTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTViewTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTViewTable.AddColumn('Дата сборки', 100);
   VSTViewTable.AddColumn('Номер', 100);
   VSTViewTable.AddColumn('Партия',50);
@@ -122,7 +121,6 @@ begin
   VSTViewTable.Draw;
 
   VSTCargoTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTCargoTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTCargoTable.AddColumn('№ п/п', 60);
   VSTCargoTable.AddColumn('Наименование', 220);
   VSTCargoTable.AddColumn('Номер', 100);
@@ -392,8 +390,6 @@ begin
 
   ShowCargoList(False);
 end;
-
-
 
 end.
 

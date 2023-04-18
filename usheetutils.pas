@@ -12,7 +12,7 @@ uses
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;
-  COLOR_BACKGROUND_SELECTED   = $00FBDEBB;
+  //COLOR_BACKGROUND_SELECTED   = $00FBDEBB;
 
   SHEET_FONT_NAME = 'Arial';//'Times New Roman';
   SHEET_FONT_SIZE = 9;
@@ -4049,7 +4049,7 @@ begin
   R:= AIndex + 3;
 
   if ASelected then
-    FWriter.SetBackground(COLOR_BACKGROUND_SELECTED)
+    FWriter.SetBackground(DefaultSelectionBGColor)
   else
     FWriter.SetBackgroundClear;
 
@@ -4263,7 +4263,7 @@ begin
 
   FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
   if ASelected then
-    FWriter.SetBackground(COLOR_BACKGROUND_SELECTED)
+    FWriter.SetBackground(DefaultSelectionBGColor)
   else
     FWriter.SetBackgroundClear;
 
@@ -4464,7 +4464,7 @@ begin
 
   if ASelected then
   begin
-    FWriter.SetBackground(COLOR_BACKGROUND_SELECTED);
+    FWriter.SetBackground(DefaultSelectionBGColor);
     FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
   end
   else begin

@@ -55,7 +55,7 @@ type
     MotorNames, MotorNums, RotorNums: TStrVector;
 
     SelectedIndex: Integer;
-    procedure SelectionClear;
+    procedure ClearSelection;
     procedure SelectLine(const ARow: Integer);
 
     procedure OpenDatesList(const ASelectDate: TDate);
@@ -109,7 +109,7 @@ var
   R,C: Integer;
 begin
   if Button=mbRight then
-    SelectionClear;
+    ClearSelection;
   if Button=mbLeft  then
   begin
     (Sender As TsWorksheetGrid).MouseToCell(X,Y,C{%H-},R{%H-});
@@ -135,7 +135,7 @@ begin
     ShowBuildLog;
 end;
 
-procedure TBuildLogForm.SelectionClear;
+procedure TBuildLogForm.ClearSelection;
 begin
   if SelectedIndex>-1 then
   begin
@@ -193,7 +193,7 @@ var
   Tmp: TDateVector;
   D: TDate;
 begin
-  SelectionClear;
+  ClearSelection;
   if not VST.IsSelected then Exit;
 
   D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];

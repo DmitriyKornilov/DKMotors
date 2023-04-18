@@ -44,17 +44,14 @@ type
     procedure RadioButton1Click(Sender: TObject);
     procedure RadioButton2Click(Sender: TObject);
     procedure RadioButton3Click(Sender: TObject);
-
   private
     MotorBuildSheet: TMotorBuildSheet;
     MotorTestSheet: TMotorTestSheet;
     ReportShipmentSheet: TReportShipmentSheet;
 
-
     procedure ShowBuildReport;
     procedure ShowTestReport;
     procedure ShowShipmentReport;
-
 
     procedure FreeSheets;
 
@@ -163,7 +160,6 @@ begin
   try
     LogGrid.Clear;
     FreeSheets;
-
     if RadioButton1.Checked then
       ShowBuildReport
     else if RadioButton2.Checked then
@@ -239,7 +235,6 @@ var
 
   ListSendDates: TDateVector;
   ListMotorNames, ListMotorNums, ListReceiverNames: TStrVector;
-
 begin
   ED:= DateTimePicker1.Date;
   BD:= DateTimePicker2.Date;
@@ -258,11 +253,7 @@ begin
                 BD, ED, TotalMotorNames, TotalMotorCounts,
                 RecieverNames, RecieverMotorNames, RecieverMotorCounts,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);
-
 end;
-
-
-
 
 end.
 

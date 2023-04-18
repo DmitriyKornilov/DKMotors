@@ -61,7 +61,7 @@ type
     BeforeTestSheet: TBeforeTestSheet;
     MotorTestSheet: TMotorTestSheet;
 
-    procedure SelectionClear;
+    procedure ClearSelection;
     procedure SelectLine(const ARow: Integer);
 
     procedure OpenBeforeTestList;
@@ -119,7 +119,6 @@ begin
   VST.GridLinesVisible:= False;
   VST.AddColumn('Dates');
 
-
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
   MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
   SpinEdit1.Value:= YearOfDate(Date);
@@ -155,7 +154,7 @@ var
   R,C: Integer;
 begin
   if Button=mbRight then
-    SelectionClear;
+    ClearSelection;
   if Button=mbLeft  then
   begin
     (Sender As TsWorksheetGrid).MouseToCell(X,Y,C{%H-},R{%H-});
@@ -169,7 +168,7 @@ begin
     OpenTestsList;
 end;
 
-procedure TTestLogForm.SelectionClear;
+procedure TTestLogForm.ClearSelection;
 begin
   if SelectedIndex>-1 then
   begin
@@ -226,7 +225,7 @@ var
   X: TDateVector;
   D: TDate;
 begin
-  SelectionClear;
+  ClearSelection;
   if not VST.IsSelected then Exit;
 
   D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];

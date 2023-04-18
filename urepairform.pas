@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, EditBtn, VirtualTrees, DividerBevel, DK_VSTTables, USheetUtils,
-  rxctrls, DK_Vector, USQLite, DK_StrUtils, DK_Dialogs,
-  DK_SheetExporter, UCalendar, UCardForm, URepairEditForm;
+  rxctrls, DK_Vector, USQLite, DK_StrUtils, DK_Dialogs, DK_Const,
+  DK_SheetExporter, UCalendar, UCardForm, URepairEditForm, DK_VSTTools;
 
 type
 
@@ -23,8 +23,6 @@ type
     EditButton: TSpeedButton;
     ExportButton: TRxSpeedButton;
     Label2: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
     MotorCardCheckBox: TCheckBox;
     MotorNumEdit: TEditButton;
     Panel1: TPanel;
@@ -54,21 +52,21 @@ type
   private
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
-    VSTTypeTable: TVSTTable;
-    VSTOrderTable: TVSTTable;
+    VSTTypeList: TVSTStringList;
+    VSTOrderList: TVSTTable;
     RecIDs, MotorIDs: TIntVector;
 
     ArrivalDates, SendingDates: TDateVector;
     Passports, DayCounts: TIntVector;
     MotorNames, MotorNums, RepairNotes: TStrVector;
 
+    procedure CreateMotorsTable;
+    procedure SelectMotor;
 
+    procedure CreateTypeList;
+    procedure CreateOrderList;
 
-    procedure TypeSelect;
-    procedure OrderSelect;
-    procedure MotorSelect;
-
-    procedure RepairEditFormOpen(const AEditType: Byte);
+    procedure OpenRepairEditForm(const AEditType: Byte);
   public
     procedure ShowRepair;
   end;
@@ -85,56 +83,12 @@ uses UMainForm;
 { TRepairForm }
 
 procedure TRepairForm.FormCreate(Sender: TObject);
-var
-  V: TStrVector;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(RepairForm, CardPanel);
-
-  VSTMotorsTable:= TVSTTable.Create(VT1);
-  VSTMotorsTable.OnSelect:= @MotorSelect;
-  VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTMotorsTable.HeaderFont.Style:= [fsBold];
-  VSTMotorsTable.AddColumn('№ п/п', 50);
-  VSTMotorsTable.AddColumn('Наименование', 200);
-  VSTMotorsTable.AddColumn('Номер', 100);
-  VSTMotorsTable.AddColumn('Наличие паспорта', 130);
-  VSTMotorsTable.AddColumn('Дата прибытия', 100);
-  VSTMotorsTable.AddColumn('Дата убытия', 100);
-  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 200);
-  //VSTMotorsTable.AutosizeColumnDisable;
-  VSTMotorsTable.AddColumn('Примечание');
-  VSTMotorsTable.CanSelect:= True;
-  VSTMotorsTable.Draw;
-
-  VSTTypeTable:= TVSTTable.Create(VT2);
-  VSTTypeTable.OnSelect:= @TypeSelect;
-  VSTTypeTable.AutoHeight:= True;
-  VSTTypeTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTTypeTable.HeaderVisible:= False;
-  VSTTypeTable.GridLinesVisible:= False;
-  VSTTypeTable.CanSelect:= True;
-  VSTTypeTable.CanUnselect:= False;
-  VSTTypeTable.AddColumn('Список');
-  V:= VCreateStr(['все', 'в ремонте', 'отремонтированные']);
-  VSTTypeTable.SetColumn('Список', V, taLeftJustify);
-  VSTTypeTable.Draw;
-
-  VSTOrderTable:= TVSTTable.Create(VT3);
-  VSTOrderTable.OnSelect:= @OrderSelect;
-  VSTOrderTable.AutoHeight:= True;
-  VSTOrderTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTOrderTable.HeaderVisible:= False;
-  VSTOrderTable.GridLinesVisible:= False;
-  VSTOrderTable.CanSelect:= True;
-  VSTOrderTable.CanUnselect:= False;
-  VSTOrderTable.AddColumn('Список');
-  V:= VCreateStr(['дате прибытия', 'номеру']);
-  VSTOrderTable.SetColumn('Список', V, taLeftJustify);
-  VSTOrderTable.Draw;
-
-  VSTTypeTable.Select(1);
-  VSTOrderTable.Select(0);
+  CreateMotorsTable;
+  CreateTypeList;
+  CreateOrderList;
   MotorCardCheckBox.Checked:= False;
 end;
 
@@ -163,7 +117,7 @@ end;
 
 procedure TRepairForm.AddButtonClick(Sender: TObject);
 begin
-  RepairEditFormOpen(1);
+  OpenRepairEditForm(1);
 end;
 
 procedure TRepairForm.DelButtonClick(Sender: TObject);
@@ -176,14 +130,14 @@ end;
 
 procedure TRepairForm.EditButtonClick(Sender: TObject);
 begin
-  RepairEditFormOpen(2);
+  OpenRepairEditForm(2);
 end;
 
 procedure TRepairForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
-  if Assigned(VSTTypeTable) then FreeAndNil(VSTTypeTable);
-  if Assigned(VSTOrderTable) then FreeAndNil(VSTOrderTable);
+  if Assigned(VSTTypeList) then FreeAndNil(VSTTypeList);
+  if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
   if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
@@ -219,17 +173,24 @@ begin
   ShowRepair;
 end;
 
-procedure TRepairForm.TypeSelect;
+procedure TRepairForm.CreateMotorsTable;
 begin
-  ShowRepair;
+  VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.OnSelect:= @SelectMotor;
+  VSTMotorsTable.HeaderFont.Style:= [fsBold];
+  VSTMotorsTable.AddColumn('№ п/п', 50);
+  VSTMotorsTable.AddColumn('Наименование', 200);
+  VSTMotorsTable.AddColumn('Номер', 100);
+  VSTMotorsTable.AddColumn('Наличие паспорта', 130);
+  VSTMotorsTable.AddColumn('Дата прибытия', 100);
+  VSTMotorsTable.AddColumn('Дата убытия', 100);
+  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 200);
+  VSTMotorsTable.AddColumn('Примечание');
+  VSTMotorsTable.CanSelect:= True;
+  VSTMotorsTable.Draw;
 end;
 
-procedure TRepairForm.OrderSelect;
-begin
-  ShowRepair;
-end;
-
-procedure TRepairForm.MotorSelect;
+procedure TRepairForm.SelectMotor;
 var
   MotorID: Integer;
 begin
@@ -242,7 +203,34 @@ begin
   CardForm.ShowCard(MotorID);
 end;
 
-procedure TRepairForm.RepairEditFormOpen(const AEditType: Byte);
+procedure TRepairForm.CreateTypeList;
+var
+  S: String;
+  V: TStrVector;
+begin
+  S:= 'Отображать:';
+  V:= VCreateStr([
+    'все',
+    'в ремонте',
+    'отремонтированные'
+  ]);
+  VSTTypeList:= TVSTStringList.Create(VT2, S, V, @ShowRepair, 1);
+end;
+
+procedure TRepairForm.CreateOrderList;
+var
+  S: String;
+  V: TStrVector;
+begin
+  S:= 'Упорядочить по:';
+  V:= VCreateStr([
+    'дате прибытия',
+    'номеру'
+  ]);
+  VSTOrderList:= TVSTStringList.Create(VT3, S, V, @ShowRepair);
+end;
+
+procedure TRepairForm.OpenRepairEditForm(const AEditType: Byte);
 var
   RepairEditForm: TRepairEditForm;
 begin
@@ -267,7 +255,7 @@ var
   i: Integer;
   PassStrs, DayCountsStrs, SendingDatesStrs, ArrivalDatesStrs: TStrVector;
 begin
-  if (not VSTTypeTable.IsSelected) or (not VSTOrderTable.IsSelected) then Exit;
+  if (not VSTTypeList.IsSelected) or (not VSTOrderList.IsSelected) then Exit;
 
   Screen.Cursor:= crHourGlass;
   try
@@ -275,7 +263,7 @@ begin
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
     SQLite.RepairListLoad(MainForm.UsedNameIDs, MotorNumberLike,
-                          VSTOrderTable.SelectedIndex+1, VSTTypeTable.SelectedIndex,
+                          VSTOrderList.SelectedIndex+1, VSTTypeList.SelectedIndex,
                           ArrivalDates, SendingDates,
                           RecIDs, MotorIDs, Passports, DayCounts,
                           MotorNames, MotorNums, RepairNotes);
@@ -301,8 +289,6 @@ begin
   finally
     Screen.Cursor:= crDefault;
   end;
-
-
 end;
 
 end.

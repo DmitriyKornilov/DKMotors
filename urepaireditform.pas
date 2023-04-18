@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, DateTimePicker, USQLite, DK_VSTTables, USheetUtils, VirtualTrees,
-  DK_Vector, DividerBevel, DK_StrUtils, DK_Dialogs, DateUtils;
+  DK_Vector, DividerBevel, DK_StrUtils, DK_Const, DK_Dialogs, DateUtils;
 
 type
 
@@ -86,7 +86,6 @@ begin
   VSTTable.SetColumn('Дата уведомления', VFormatDateTime('dd.mm.yyyy', RecDates));
   VSTTable.SetColumn('Предприятие', PlaceNames, taLeftJustify);
   VSTTable.Draw;
-
 end;
 
 procedure TRepairEditForm.LoadRepair;
@@ -158,7 +157,6 @@ end;
 procedure TRepairEditForm.FormShow(Sender: TObject);
 begin
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
   VSTTable.AddColumn('Дата сборки', 120);
   VSTTable.AddColumn('Номер', 100);
   VSTTable.AddColumn('Дата уведомления', 160);
@@ -199,8 +197,6 @@ begin
   end;
   if RecID=0 then
     RecID:= RecIDs[VSTTable.SelectedIndex];
-
-
 
   CanFormClose:= SQLite.RepairUpdate(RecID, ArrivalDate, SendingDate,
                                      Ord(PassportCheckBox.Checked),

@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, fpspreadsheetgrid, USheetUtils, USQLite,
-  DividerBevel,  DK_Vector, LCLType, EditBtn, Spin, DK_StrUtils, DK_DateUtils,
-  VirtualTrees, DK_VSTTables, UCardForm;
+  Buttons, fpspreadsheetgrid, USQLite, DividerBevel,  DK_Vector, LCLType,
+  EditBtn, Spin, DK_StrUtils, DK_DateUtils, VirtualTrees, DK_VSTTables,
+  UCardForm, DK_Const, DK_VSTTools;
 
 type
 
@@ -16,7 +16,6 @@ type
 
   TMotorListForm = class(TForm)
     CheckBox1: TCheckBox;
-    Label4: TLabel;
     MoreInfoCheckBox: TCheckBox;
     DividerBevel3: TDividerBevel;
     DividerBevel4: TDividerBevel;
@@ -45,11 +44,13 @@ type
   private
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
-    VSTTypeTable: TVSTTable;
+    VSTTypesList: TVSTStringList;
     MotorIDs: TIntVector;
 
-    procedure TypeSelect;
-    procedure MotorSelect;
+    procedure CreateMotorsTable;
+    procedure SelectMotor;
+
+    procedure CreateTypesList;
   public
     procedure ShowMotorList;
   end;
@@ -66,44 +67,18 @@ uses UMainForm;
 { TMotorListForm }
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
-var
-  V: TStrVector;
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(MotorListForm, CardPanel);
-
-  VSTMotorsTable:= TVSTTable.Create(VT1);
-  VSTMotorsTable.OnSelect:= @MotorSelect;
-  VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTMotorsTable.HeaderFont.Style:= [fsBold];
-  VSTMotorsTable.AddColumn('Дата сборки', 100);
-  VSTMotorsTable.AddColumn('Наименование', 200);
-  VSTMotorsTable.AddColumn('Номер', 100);
-  VSTMotorsTable.AddColumn('Отгружен');
-  VSTMotorsTable.CanSelect:= True;
-  VSTMotorsTable.Draw;
-
-  VSTTypeTable:= TVSTTable.Create(VT2);
-  VSTTypeTable.OnSelect:= @TypeSelect;
-  VSTTypeTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTTypeTable.HeaderVisible:= False;
-  VSTTypeTable.GridLinesVisible:= False;
-  VSTTypeTable.CanSelect:= True;
-  VSTTypeTable.CanUnselect:= False;
-  VSTTypeTable.AddColumn('Список');
-  V:= VCreateStr(['все', 'отгруженные', 'неотгруженные']);
-  VSTTypeTable.SetColumn('Список', V, taLeftJustify);
-  VSTTypeTable.Draw;
-
+  CreateMotorsTable;
+  CreateTypesList;
   SpinEdit1.Value:= YearOfDate(Date);
-
-  VSTTypeTable.Select(0);
 end;
 
 procedure TMotorListForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
-  if Assigned(VSTTypeTable) then FreeAndNil(VSTTypeTable);
+  if Assigned(VSTTypesList) then FreeAndNil(VSTTypesList);
   if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
@@ -122,13 +97,40 @@ begin
   ShowMotorList;
 end;
 
+procedure TMotorListForm.CreateMotorsTable;
+begin
+  VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.OnSelect:= @SelectMotor;
+  VSTMotorsTable.HeaderFont.Style:= [fsBold];
+  VSTMotorsTable.AddColumn('Дата сборки', 100);
+  VSTMotorsTable.AddColumn('Наименование', 200);
+  VSTMotorsTable.AddColumn('Номер', 100);
+  VSTMotorsTable.AddColumn('Отгружен');
+  VSTMotorsTable.CanSelect:= True;
+  VSTMotorsTable.Draw;
+end;
+
+procedure TMotorListForm.CreateTypesList;
+var
+  S: String;
+  V: TStrVector;
+begin
+  S:= 'Отображать:';
+  V:= VCreateStr([
+    'все',
+    'отгруженные',
+    'неотгруженные'
+  ]);
+  VSTTypesList:= TVSTStringList.Create(VT2, S, V, @ShowMotorList);
+end;
+
 procedure TMotorListForm.ShowMotorList;
 var
   MotorNumberLike: String;
 
   ABuildDates, AMotorNames, AMotorNums, AShippings: TStrVector;
 begin
-   if not VSTTypeTable.IsSelected then Exit;
+   if not VSTTypesList.IsSelected then Exit;
 
   Screen.Cursor:= crHourGlass;
   try
@@ -137,7 +139,7 @@ begin
     MotorNumberLike:= STrim(MotorNumEdit.Text);
 
     SQLite.MotorListLoad(SpinEdit1.Value,
-                        VSTTypeTable.SelectedIndex, MainForm.UsedNameIDs,
+                        VSTTypesList.SelectedIndex, MainForm.UsedNameIDs,
                         MotorNumberLike, Checkbox1.Checked,
                         MotorIDs, ABuildDates,
                         AMotorNames, AMotorNums, AShippings);
@@ -153,12 +155,7 @@ begin
   end;
 end;
 
-procedure TMotorListForm.TypeSelect;
-begin
-  ShowMotorList;
-end;
-
-procedure TMotorListForm.MotorSelect;
+procedure TMotorListForm.SelectMotor;
 var
   MotorID: Integer;
 begin

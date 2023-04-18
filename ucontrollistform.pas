@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   EditBtn, StdCtrls, rxctrls, VirtualTrees, DividerBevel, DK_VSTTables,
   UCardForm, DK_Vector, USheetUtils, DK_StrUtils, USQLite, UControlListEditForm,
-  DK_Dialogs, DK_SheetExporter;
+  DK_Dialogs, DK_SheetExporter, DK_Const;
 
 type
 
@@ -51,8 +51,9 @@ type
     MotorIDs: TIntVector;
     MotorNames, MotorNums, Series, Notes: TStrVector;
 
-    procedure MotorSelect;
-    procedure ControlListEditFormOpen(const AEditType: Byte);
+    procedure CreateMotorsTable;
+    procedure SelectMotor;
+    procedure OpenControlListEditForm(const AEditType: Byte);
   public
     procedure ShowControlList;
   end;
@@ -72,19 +73,7 @@ procedure TControlListForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(ControlListForm, CardPanel);
-
-  VSTMotorsTable:= TVSTTable.Create(VT1);
-  VSTMotorsTable.OnSelect:= @MotorSelect;
-  VSTMotorsTable.SelectedBGColor:= COLOR_BACKGROUND_SELECTED;
-  VSTMotorsTable.HeaderFont.Style:= [fsBold];
-  VSTMotorsTable.AddColumn('№ п/п', 60);
-  VSTMotorsTable.AddColumn('Наименование', 200);
-  VSTMotorsTable.AddColumn('Номер', 100);
-  VSTMotorsTable.AddColumn('Партия', 100);
-  VSTMotorsTable.AddColumn('Примечание');
-  VSTMotorsTable.CanSelect:= True;
-  VSTMotorsTable.Draw;
-
+  CreateMotorsTable;
   MotorCardCheckBox.Checked:= False;
 end;
 
@@ -98,7 +87,7 @@ end;
 
 procedure TControlListForm.EditButtonClick(Sender: TObject);
 begin
-  ControlListEditFormOpen(2);
+  OpenControlListEditForm(2);
 end;
 
 procedure TControlListForm.ExportButtonClick(Sender: TObject);
@@ -126,7 +115,7 @@ end;
 
 procedure TControlListForm.AddButtonClick(Sender: TObject);
 begin
-  ControlListEditFormOpen(1);
+  OpenControlListEditForm(1);
 end;
 
 procedure TControlListForm.FormDestroy(Sender: TObject);
@@ -167,7 +156,21 @@ begin
   ShowControlList;
 end;
 
-procedure TControlListForm.MotorSelect;
+procedure TControlListForm.CreateMotorsTable;
+begin
+  VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.OnSelect:= @SelectMotor;
+  VSTMotorsTable.HeaderFont.Style:= [fsBold];
+  VSTMotorsTable.AddColumn('№ п/п', 60);
+  VSTMotorsTable.AddColumn('Наименование', 200);
+  VSTMotorsTable.AddColumn('Номер', 100);
+  VSTMotorsTable.AddColumn('Партия', 100);
+  VSTMotorsTable.AddColumn('Примечание');
+  VSTMotorsTable.CanSelect:= True;
+  VSTMotorsTable.Draw;
+end;
+
+procedure TControlListForm.SelectMotor;
 var
   MotorID: Integer;
 begin
@@ -180,7 +183,7 @@ begin
   CardForm.ShowCard(MotorID);
 end;
 
-procedure TControlListForm.ControlListEditFormOpen(const AEditType: Byte);
+procedure TControlListForm.OpenControlListEditForm(const AEditType: Byte);
 var
   ControlListEditForm: TControlListEditForm;
 begin

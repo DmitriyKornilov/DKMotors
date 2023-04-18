@@ -9,7 +9,7 @@ uses
   StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls, USQLite3ListForm,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
-  UControlListForm, UCalendarForm, USQLite, USheetUtils;
+  UControlListForm, UCalendarForm, USQLite, DK_Const;
 
 type
 
@@ -83,29 +83,27 @@ type
     ControlListForm: TControlListForm;
     CalendarForm: TCalendarForm;
 
-    procedure DBConnect;
+    procedure ConnectDB;
     procedure Choose;
     procedure FreeForms;
     procedure SetFormPosition(AForm: TForm);
-    procedure BuildLogFormOpen;
-    procedure TestFormOpen;
-    procedure ShipmentFormOpen;
-    procedure ReclamationFormOpen;
-    procedure StoreFormOpen;
-    procedure MotorListFormOpen;
-    procedure ReportFormOpen;
-    procedure StatisticFormOpen;
-    procedure RepairFormOpen;
-    procedure ControlListFormOpen;
-    procedure CalendarFormOpen;
+    procedure OpenBuildLogForm;
+    procedure OpenTestForm;
+    procedure OpenShipmentForm;
+    procedure OpenReclamationForm;
+    procedure OpenStoreForm;
+    procedure OpenMotorListForm;
+    procedure OpenReportForm;
+    procedure OpenStatisticForm;
+    procedure OpenRepairForm;
+    procedure OpenControlListForm;
+    procedure OpenCalendarForm;
 
     procedure ChangeUsedMotorList;
     procedure ChangeUsedReceiverList;
 
     procedure ShowData;
   public
-
-
     UsedNameIDs: TIntVector;
     UsedNames: TStrVector;
 
@@ -128,8 +126,8 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   USQLite3ListForm.ImageList:= ImageListEdit24;
   SQLite:= TSQLite.Create;
-  SQLite.SetEditListSettings(COLOR_BACKGROUND_SELECTED, clWindowText);
-  DBConnect;
+  SQLite.SetEditListSettings(DefaultSelectionBGColor, clWindowText);
+  ConnectDB;
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
   SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
   Choose;
@@ -250,7 +248,7 @@ begin
   if not Assigned(StatisticForm) then Choose;
 end;
 
-procedure TMainForm.DBConnect;
+procedure TMainForm.ConnectDB;
 var
   ProgPath, DBName, DDLName: String;
 begin
@@ -266,17 +264,17 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     FreeForms;
-    if BuildLogButton.Down       then BuildLogFormOpen
-    else if ShipmentButton.Down  then ShipmentFormOpen
-    else if ReclamationButton.Down  then ReclamationFormOpen
-    else if StoreButton.Down  then StoreFormOpen
-    else if TestLogButton.Down  then TestFormOpen
-    else if ReportButton.Down  then ReportFormOpen
-    else if StatisticButton.Down then StatisticFormOpen
-    else if MotorListButton.Down then MotorListFormOpen
-    else if RepairButton.Down then RepairFormOpen
-    else if ControlListButton.Down then ControlListFormOpen
-    else if CalendarButton.Down then CalendarFormOpen;
+    if BuildLogButton.Down       then OpenBuildLogForm
+    else if ShipmentButton.Down  then OpenShipmentForm
+    else if ReclamationButton.Down  then OpenReclamationForm
+    else if StoreButton.Down  then OpenStoreForm
+    else if TestLogButton.Down  then OpenTestForm
+    else if ReportButton.Down  then OpenReportForm
+    else if StatisticButton.Down then OpenStatisticForm
+    else if MotorListButton.Down then OpenMotorListForm
+    else if RepairButton.Down then OpenRepairForm
+    else if ControlListButton.Down then OpenControlListForm
+    else if CalendarButton.Down then OpenCalendarForm;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -305,77 +303,77 @@ begin
   AForm.MakeFullyVisible();
 end;
 
-procedure TMainForm.BuildLogFormOpen;
+procedure TMainForm.OpenBuildLogForm;
 begin
   BuildLogForm:= TBuildLogForm.Create(MainForm);
   SetFormPosition(TForm(BuildLogForm));
   BuildLogForm.Show;
 end;
 
-procedure TMainForm.TestFormOpen;
+procedure TMainForm.OpenTestForm;
 begin
   TestLogForm:= TTestLogForm.Create(MainForm);
   SetFormPosition(TForm(TestLogForm));
   TestLogForm.Show;
 end;
 
-procedure TMainForm.ShipmentFormOpen;
+procedure TMainForm.OpenShipmentForm;
 begin
   ShipmentForm:= TShipmentForm.Create(MainForm);
   SetFormPosition(TForm(ShipmentForm));
   ShipmentForm.Show;
 end;
 
-procedure TMainForm.ReclamationFormOpen;
+procedure TMainForm.OpenReclamationForm;
 begin
   ReclamationForm:= TReclamationForm.Create(MainForm);
   SetFormPosition(TForm(ReclamationForm));
   ReclamationForm.Show;
 end;
 
-procedure TMainForm.StoreFormOpen;
+procedure TMainForm.OpenStoreForm;
 begin
   StoreForm:= TStoreForm.Create(MainForm);
   SetFormPosition(TForm(StoreForm));
   StoreForm.Show;
 end;
 
-procedure TMainForm.MotorListFormOpen;
+procedure TMainForm.OpenMotorListForm;
 begin
   MotorListForm:= TMotorListForm.Create(MainForm);
   SetFormPosition(TForm(MotorListForm));
   MotorListForm.Show;
 end;
 
-procedure TMainForm.ReportFormOpen;
+procedure TMainForm.OpenReportForm;
 begin
   ReportForm:= TReportForm.Create(MainForm);
   SetFormPosition(TForm(ReportForm));
   ReportForm.Show;
 end;
 
-procedure TMainForm.StatisticFormOpen;
+procedure TMainForm.OpenStatisticForm;
 begin
   StatisticForm:= TStatisticForm.Create(MainForm);
   SetFormPosition(TForm(StatisticForm));
   StatisticForm.Show;
 end;
 
-procedure TMainForm.RepairFormOpen;
+procedure TMainForm.OpenRepairForm;
 begin
   RepairForm:= TRepairForm.Create(MainForm);
   SetFormPosition(TForm(RepairForm));
   RepairForm.Show;
 end;
 
-procedure TMainForm.ControlListFormOpen;
+procedure TMainForm.OpenControlListForm;
 begin
   ControlListForm:= TControlListForm.Create(MainForm);
   SetFormPosition(TForm(ControlListForm));
   ControlListForm.Show;
 end;
 
-procedure TMainForm.CalendarFormOpen;
+procedure TMainForm.OpenCalendarForm;
 begin
   CalendarForm:= TCalendarForm.Create(MainForm);
   SetFormPosition(TForm(CalendarForm));
@@ -414,7 +412,6 @@ begin
   MotorNamesPanel.Visible:= AMotorNamesPanelVisible;
   ReceiverNamesPanel.Visible:= AReceiverNamesPanelVisible;
 end;
-
 
 end.
 
