@@ -1,7 +1,7 @@
 object ShipmentForm: TShipmentForm
-  Left = 553
+  Left = 554
   Height = 325
-  Top = 205
+  Top = 206
   Width = 850
   Align = alClient
   BorderStyle = bsNone
@@ -855,7 +855,6 @@ object ShipmentForm: TShipmentForm
       TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes, toAutoChangeScale]
       TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
-      OnClick = VTClick
     end
   end
   object Splitter1: TSplitter

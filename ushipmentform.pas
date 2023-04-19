@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, ComCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTables,
+  Spin, ComCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTools,
   USQLite, USheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid,
   DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, DK_Zoom;
 
@@ -40,7 +40,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure VTClick(Sender: TObject);
   private
     Months: TStrVector;
     Shipments: TStrMatrix;
@@ -48,7 +47,7 @@ type
 
     ZoomPercent: Integer;
 
-    VST: TVSTCategoryRadioButtonTable;
+    VSTCargoList: TVSTCategoryIDList;
     CargoSheet: TCargoSheet;
 
     SendDate: TDate;
@@ -59,8 +58,8 @@ type
 
     procedure OpenShipmentList(const ACargoID: Integer);
 
-    function OpenShipment: Boolean;
-    function LoadShipment: Boolean;
+    procedure SelectShipment;
+
     procedure DrawShipment(const AZoomPercent: Integer);
     procedure ExportShipment;
 
@@ -89,8 +88,8 @@ end;
 procedure TShipmentForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить отгрузку ' +  SYMBOL_BREAK +
-                  Shipments[VST.SelectedIndex1, VST.SelectedIndex2] + '?') then Exit;
-  SQLite.Delete('CARGOLIST', 'CargoID', CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2]);
+                  Shipments[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2] + '?') then Exit;
+  SQLite.Delete('CARGOLIST', 'CargoID', CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2]);
   OpenShipmentList(0);
 end;
 
@@ -111,15 +110,8 @@ begin
   ZoomPercent:= 100;
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawShipment, True);
 
-  VST:= TVSTCategoryRadioButtonTable.Create(VT);
-  VST.SelectedFont.Style:= [fsBold];
-  VST.CanUnselect:= False;
-  VST.HeaderVisible:= False;
-  VST.GridLinesVisible:= False;
-  VST.AddColumn('Shipments');
-
+  VSTCargoList:= TVSTCategoryIDList.Create(VT, EmptyStr, @SelectShipment);
   CargoSheet:= TCargoSheet.Create(LogGrid.Worksheet, LogGrid);
-
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -131,7 +123,7 @@ end;
 procedure TShipmentForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(CargoSheet) then FReeAndNil(CargoSheet);
-  if Assigned(VST) then FReeAndNil(VST);
+  if Assigned(VSTCargoList) then FReeAndNil(VSTCargoList);
 end;
 
 procedure TShipmentForm.FormShow(Sender: TObject);
@@ -145,7 +137,7 @@ begin
     'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then
   begin
     SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs);
-    OpenShipment;
+    SelectShipment;
   end;
 end;
 
@@ -154,48 +146,21 @@ begin
   OpenShipmentList(0);
 end;
 
-procedure TShipmentForm.VTClick(Sender: TObject);
-begin
-  if VST.IsSelected then
-    OpenShipment;
-end;
-
 procedure TShipmentForm.OpenShipmentList(const ACargoID: Integer);
-var
-  I1, I2: Integer;
 begin
   LogGrid.Clear;
-  VST.ValuesClear;
-  SetButtonsEnabled(False);
-  if not SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value,
-                                 Months, Shipments, CargoIDs) then Exit;
-  VST.SetCategories(Months);
-  VST.SetColumn('Shipments', Shipments, taLeftJustify);
-  VST.Draw;
-
-  if MIndexOf(CargoIDs, ACargoID, I1, I2) then
-  begin
-    VST.Select(I1, I2);
-    VST.Show(I1, I2);
-  end
-  else begin
-    VST.Select(0, 0);
-    VST.Show(0, 0);
-  end;
-  SetButtonsEnabled(True);
-  OpenShipment;
+  SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value,
+                          Months, Shipments, CargoIDs);
+  VSTCargoList.Update(Months, Shipments, CargoIDs, ACargoID);
 end;
 
-function TShipmentForm.OpenShipment: Boolean;
+procedure TShipmentForm.SelectShipment;
 begin
-  Result:= LoadShipment;
-  DrawShipment(ZoomPercent);
-end;
-
-function TShipmentForm.LoadShipment: Boolean;
-begin
-  Result:= SQLite.CargoLoad(CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2],
+  LogGrid.Clear;
+  if not VSTCargoList.IsSelected then Exit;
+  SQLite.CargoLoad(CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2],
              SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
+  DrawShipment(ZoomPercent);
 end;
 
 procedure TShipmentForm.DrawShipment(const AZoomPercent: Integer);
@@ -237,7 +202,7 @@ begin
   try
     CargoEditForm.CargoID:= 0;
     if AEditMode=2 then
-      CargoEditForm.CargoID:= CargoIDs[VST.SelectedIndex1, VST.SelectedIndex2];
+      CargoEditForm.CargoID:= CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2];
     CargoEditForm.ShowModal;
     ID:= CargoEditForm.CargoID;
   finally

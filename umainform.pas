@@ -124,6 +124,10 @@ implementation
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  //for normal form maximizing
+  Height:= 300;
+  Width:= 500;
+
   USQLite3ListForm.ImageList:= ImageListEdit24;
   SQLite:= TSQLite.Create;
   SQLite.SetEditListSettings(DefaultSelectionBGColor, clWindowText);

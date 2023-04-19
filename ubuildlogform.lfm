@@ -1,7 +1,7 @@
 object BuildLogForm: TBuildLogForm
-  Left = 460
+  Left = 215
   Height = 458
-  Top = 154
+  Top = 155
   Width = 1125
   Align = alClient
   BorderStyle = bsNone

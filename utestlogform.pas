@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
-  DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables,
+  DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTools,
   DK_Dialogs, DK_Const, UTestAddForm, fpspreadsheetgrid,
   USheetUtils;
 
@@ -49,9 +49,8 @@ type
   private
     Months: TStrVector;
     Dates: TDateMatrix;
-    StrDates: TStrMatrix;
 
-    VST: TVSTCategoryRadioButtonTable;
+    VSTDateList: TVSTCategoryDateList;
 
     TestIDs, TestResults: TIntVector;
     MotorNames, MotorNums, TestNotes: TStrVector;
@@ -109,16 +108,8 @@ end;
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-
   SelectedIndex:= -1;
-
-  VST:= TVSTCategoryRadioButtonTable.Create(VT);
-  VST.SelectedFont.Style:= [fsBold];
-  VST.CanUnselect:= False;
-  VST.HeaderVisible:= False;
-  VST.GridLinesVisible:= False;
-  VST.AddColumn('Dates');
-
+  VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @ShowTestLog);
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
   MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
   SpinEdit1.Value:= YearOfDate(Date);
@@ -134,7 +125,7 @@ procedure TTestLogForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(BeforeTestSheet) then FreeAndNil(BeforeTestSheet);
   if Assigned(MotorTestSheet) then FreeAndNil(MotorTestSheet);
-  if Assigned(VST) then FreeAndNil(VST);
+  if Assigned(VSTDateList) then FreeAndNil(VSTDateList);
 end;
 
 procedure TTestLogForm.FormShow(Sender: TObject);
@@ -164,7 +155,7 @@ end;
 
 procedure TTestLogForm.VTClick(Sender: TObject);
 begin
-  if VST.IsSelected then
+  if VSTDateList.IsSelected then
     OpenTestsList;
 end;
 
@@ -194,28 +185,10 @@ begin
 end;
 
 procedure TTestLogForm.OpenDatesList(const ASelectDate: TDate);
-var
-  I1, I2: Integer;
 begin
   TestGrid.Clear;
-  VST.ValuesClear;
-
-  if not SQLite.MonthAndDatesForTestLogLoad(SpinEdit1.Value, Months, Dates) then Exit;
-  StrDates:= MFormatDateTime('dd.mm.yyyy', Dates);
-  VST.SetCategories(Months);
-  VST.SetColumn('Dates', StrDates, taLeftJustify);
-  VST.Draw;
-
-  if MIndexOfDate(Dates, ASelectDate, I1, I2) then
-  begin
-    VST.Select(I1, I2);
-    VST.Show(I1, I2);
-  end
-  else begin
-    VST.Select(0, 0);
-    VST.Show(0, 0);
-  end;
-  OpenTestsList;
+  SQLite.MonthAndDatesForTestLogLoad(SpinEdit1.Value, Months, Dates);
+  VSTDateList.Update(Months, Dates, ASelectDate);
 end;
 
 procedure TTestLogForm.OpenTestsList;
@@ -226,9 +199,9 @@ var
   D: TDate;
 begin
   ClearSelection;
-  if not VST.IsSelected then Exit;
+  if not VSTDateList.IsSelected then Exit;
 
-  D:= Dates[VST.SelectedIndex1, VST.SelectedIndex2];
+  D:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
 
   SQLite.TestListLoad(D,D, MainForm.UsedNameIDs,
                     CheckBox1.Checked, TestIDs, TestResults, X,
@@ -243,7 +216,7 @@ procedure TTestLogForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить результаты испытаний?') then Exit;
   SQLite.Delete('MOTORTEST', 'TestID', TestIDs[SelectedIndex]);
-  OpenDatesList(Dates[VST.SelectedIndex1, VST.SelectedIndex2]);
+  OpenDatesList(Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]);
   OpenBeforeTestList;
 end;
 
@@ -266,8 +239,8 @@ var
 begin
   TestAddForm:= TTestAddForm.Create(TestLogForm);
   try
-    if VST.IsSelected then
-      TestAddForm.DateTimePicker1.Date:= Dates[VST.SelectedIndex1, VST.SelectedIndex2]
+    if VSTDateList.IsSelected then
+      TestAddForm.DateTimePicker1.Date:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]
     else
       TestAddForm.DateTimePicker1.Date:= Date;
     TestAddForm.ShowModal;

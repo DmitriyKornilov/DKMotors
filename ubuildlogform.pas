@@ -6,7 +6,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
-  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTables, DK_VSTTools,
+  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTools,
   DK_Dialogs, DK_Const, UBuildAddForm, UBuildEditForm,
   USheetUtils, fpspreadsheetgrid;
 
@@ -46,7 +46,7 @@ type
     Months: TStrVector;
     Dates: TDateMatrix;
 
-    VSTDatesList: TVSTCategoryDatesList;
+    VSTDateList: TVSTCategoryDateList;
     MotorBuildSheet: TMotorBuildSheet;
 
     MotorIDs, NameIDs, OldMotors: TIntVector;
@@ -77,14 +77,14 @@ begin
   MainForm.SetNamesPanelsVisible(True, False);
   SelectedIndex:= -1;
   MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
-  VSTDatesList:= TVSTCategoryDatesList.Create(VT, EmptyStr, @ShowBuildLog);
+  VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @ShowBuildLog);
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
 procedure TBuildLogForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(MotorBuildSheet) then FreeAndNil(MotorBuildSheet);
-  if Assigned(VSTDatesList) then FreeAndNil(VSTDatesList);
+  if Assigned(VSTDateList) then FreeAndNil(VSTDateList);
 end;
 
 procedure TBuildLogForm.FormShow(Sender: TObject);
@@ -149,7 +149,7 @@ procedure TBuildLogForm.OpenDatesList(const ASelectDate: TDate);
 begin
   LogGrid.Clear;
   SQLite.MonthAndDatesForBuildLogLoad(SpinEdit1.Value, Months, Dates);
-  VSTDatesList.Update(Months, Dates, ASelectDate);
+  VSTDateList.Update(Months, Dates, ASelectDate);
 end;
 
 procedure TBuildLogForm.ShowBuildLog;
@@ -158,9 +158,9 @@ var
   D: TDate;
 begin
   ClearSelection;
-  if not VSTDatesList.IsSelected then Exit;
+  if not VSTDateList.IsSelected then Exit;
 
-  D:= Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2];
+  D:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
   SQLite.BuildListLoad(D, D, MainForm.UsedNameIDs,
                     CheckBox1.Checked, MotorIDs, NameIDs, OldMotors,
                     Tmp, MotorNames, MotorNums, RotorNums);
@@ -177,7 +177,7 @@ begin
                  '?') then Exit;
   SQLite.Delete('MOTORLIST', 'MotorID', MotorIDs[SelectedIndex]);
 
-  OpenDatesList(Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2]);
+  OpenDatesList(Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]);
 end;
 
 procedure TBuildLogForm.EditButtonClick(Sender: TObject);
@@ -187,7 +187,7 @@ var
 begin
   BuildEditForm:= TBuildEditForm.Create(BuildLogForm);
   try
-    BuildEditForm.DateTimePicker1.Date:= Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2];
+    BuildEditForm.DateTimePicker1.Date:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
     BuildEditForm.MotorID:= MotorIDs[SelectedIndex];
     BuildEditForm.OldNameID:= NameIDs[SelectedIndex];
     BuildEditForm.MotorNumEdit.Text:= MotorNums[SelectedIndex];
@@ -213,8 +213,8 @@ var
 begin
   BuildAddForm:= TBuildAddForm.Create(BuildLogForm);
   try
-    if VSTDatesList.IsSelected then
-      BuildAddForm.DateTimePicker1.Date:= Dates[VSTDatesList.SelectedIndex1, VSTDatesList.SelectedIndex2]
+    if VSTDateList.IsSelected then
+      BuildAddForm.DateTimePicker1.Date:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]
     else
       BuildAddForm.DateTimePicker1.Date:= Date;
     BuildAddForm.ShowModal;
