@@ -6,13 +6,12 @@ interface
 
 uses
   Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid, fpspreadsheet,
-  DK_Vector, DK_Matrix, DK_Fonts, Graphics, DK_SheetConst, DK_Const,
+  DK_Vector, DK_Matrix, DK_Fonts, Graphics, DK_SheetConst, DK_Const, DK_PPI,
   DateUtils, DK_DateUtils, DK_StatPlotter, DK_Math, DK_StrUtils, DK_Graph,
   DK_SheetUtils;
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;
-  //COLOR_BACKGROUND_SELECTED   = $00FBDEBB;
 
   SHEET_FONT_NAME = 'Arial';//'Times New Roman';
   SHEET_FONT_SIZE = 9;
@@ -2106,22 +2105,12 @@ end;
 procedure TStatisticSheet.CalcHistCommonParams(const AAlignment: TAlignment;
                                                out AWidth, AFontHeight: Integer);
 begin
-  FGraphWidth:= FWriter.ColsWidth(2, FWriter.ColCount-1); //VSum(AColWidths, 1, High(AColWidths)-1);
+  FGraphWidth:= FWriter.ColsWidth(2, FWriter.ColCount-1);
   if AAlignment<>taCenter then
     FGraphWidth:= (FGraphWidth div 2) - 2{1????}*MARGIN_COLUMN_WIDTH;
-  AWidth:= Round(FGraphWidth*FWriter.ScreenScaleX*FWriter.Worksheet.ZoomFactor);
-  AFontHeight:= Trunc(GetFontHeight(FFontName, FFontSize)*FWriter.Worksheet.ZoomFactor);
-
+  AWidth:= WidthFromDefaultToScreen(FWriter.ApplyZoom(FGraphWidth));
+  AFontHeight:= FWriter.ApplyZoom(GetFontHeight(FFontName, FFontSize));
 end;
-
-//procedure TStatisticSheet.CalcHistCommonParams(out AWidth, AFontHeight: Integer;
-//                                               out AScaleX, AScaleY: Double);
-//begin
-//  AWidth:= Round(FGraphWidth*FWriter.ScreenScaleX*FWriter.Worksheet.ZoomFactor);
-//  AFontHeight:= Trunc(GetFontHeight(FFontName, FFontSize)*FWriter.Worksheet.ZoomFactor);
-//  AScaleX:= 1/FWriter.ScreenScaleX;
-//  AScaleY:= 1/FWriter.ScreenScaleY;
-//end;
 
 procedure TStatisticSheet.CalcHorizHistHeightParams(out AHeight, ARowHeight: Integer;
                                         const ARowCount: Integer;
@@ -2132,13 +2121,13 @@ begin
   H:= Round(ADataInRowCount*HORIZ_HIST_DATAROW_HEIGHT*0.45);
   H:= Max(H, HORIZ_HIST_DATAROW_HEIGHT);
   ARowHeight:= ARowCount*H + HORIZ_HIST_ADDITION_HEIGHT;
-  AHeight:= Round(ARowHeight*FWriter.ScreenScaleY*FWriter.Worksheet.ZoomFactor);
+  AHeight:= HeightFromDefaultToScreen(FWriter.ApplyZoom(ARowHeight));
 end;
 
 procedure TStatisticSheet.CalcVertHistHeightParams(out AHeight, ARowHeight: Integer);
 begin
   ARowHeight:= Round(0.4*FGraphWidth);
-  AHeight:= Round(ARowHeight*FWriter.ScreenScaleY*FWriter.Worksheet.ZoomFactor);
+  AHeight:= HeightFromDefaultToScreen(FWriter.ApplyZoom(ARowHeight));
 end;
 
 procedure TStatisticSheet.DrawEmptyRow(var ARow: Integer; const AHeight: Integer = EMPTY_ROW_HEIGHT);
@@ -2370,15 +2359,15 @@ var
 
   procedure CalcParams;
   begin
-    ScaleX:= 1/FWriter.ScreenScaleX;
-    ScaleY:= 1/FWriter.ScreenScaleY;
+    ScaleX:= XFactorDefaultDivScreen;
+    ScaleY:= YFactorDefaultDivScreen;
     OffsetX:= 0;
     OffsetY:= 0;
     ColNum:= 2;
     if AAlignment=taRightJustify then
     begin
       ColNum:= FWriter.ColCount;
-      x:= - PixelToMillimeter(FGraphWidth*FWriter.Worksheet.ZoomFactor);
+      x:= - PixelToMillimeter(FWriter.ApplyZoom(FGraphWidth));
       if FWriter.HasGrid then
         OffsetX:= x
       else
