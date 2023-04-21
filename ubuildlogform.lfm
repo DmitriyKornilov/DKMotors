@@ -1,7 +1,7 @@
 object BuildLogForm: TBuildLogForm
-  Left = 215
+  Left = 477
   Height = 458
-  Top = 155
+  Top = 184
   Width = 1125
   Align = alClient
   BorderStyle = bsNone
@@ -751,7 +751,7 @@ object BuildLogForm: TBuildLogForm
     TabOrder = 3
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 416
+      Height = 176
       Top = 0
       Width = 912
       AutoExpand = []
@@ -768,6 +768,42 @@ object BuildLogForm: TBuildLogForm
       ShowGridLines = False
       ShowHeaders = False
       WorkbookSource = LogGrid.internal
+      Align = alTop
+      AutoAdvance = aaNone
+      AutoEdit = False
+      BorderStyle = bsNone
+      Color = clWhite
+      DefaultColWidth = 40
+      DefaultRowHeight = 20
+      ExtendedSelect = False
+      Flat = True
+      MouseWheelOption = mwGrid
+      Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
+      ParentFont = False
+      TabOrder = 1
+      TabStop = False
+      TitleFont.Style = [fsBold]
+      OnMouseDown = LogGridMouseDown
+    end
+    object Grid1: TsWorksheetGrid
+      Left = 0
+      Height = 240
+      Top = 176
+      Width = 912
+      AutoExpand = []
+      DisplayFixedColRow = False
+      FrozenBorderPen.Style = psClear
+      FrozenCols = 0
+      FrozenRows = 0
+      PageBreakPen.Color = clBlue
+      PageBreakPen.Style = psDash
+      ReadFormulas = False
+      SelectionPen.Color = clWindow
+      SelectionPen.Style = psClear
+      SelectionPen.Width = 0
+      ShowGridLines = False
+      ShowHeaders = False
+      WorkbookSource = Grid1.internal
       Align = alClient
       AutoAdvance = aaNone
       AutoEdit = False
@@ -783,7 +819,6 @@ object BuildLogForm: TBuildLogForm
       TabOrder = 0
       TabStop = False
       TitleFont.Style = [fsBold]
-      OnMouseDown = LogGridMouseDown
     end
   end
 end
