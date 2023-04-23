@@ -43,30 +43,21 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
-    procedure TestGridMouseDown(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; X, Y: Integer);
-    procedure VTClick(Sender: TObject);
   private
     Months: TStrVector;
     Dates: TDateMatrix;
-
-    VSTDateList: TVSTCategoryDateList;
-
     TestIDs, TestResults: TIntVector;
     MotorNames, MotorNums, TestNotes: TStrVector;
 
-    SelectedIndex: Integer;
-
+    VSTDateList: TVSTCategoryDateList;
+    TestLog: TTestLogTable;
     BeforeTestSheet: TBeforeTestSheet;
-    MotorTestSheet: TMotorTestSheet;
 
-    procedure ClearSelection;
-    procedure SelectLine(const ARow: Integer);
+    procedure SelectMotor;
 
     procedure OpenBeforeTestList;
     procedure OpenDatesList(const ASelectDate: TDate);
     procedure OpenTestsList;
-
   public
     procedure ShowTestLog;
   end;
@@ -108,10 +99,9 @@ end;
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-  SelectedIndex:= -1;
   VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @ShowTestLog);
+  TestLog:= TTestLogTable.Create(TestGrid, @SelectMotor);
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
-  MotorTestSheet:= TMotorTestSheet.Create(TestGrid);
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -123,8 +113,8 @@ end;
 
 procedure TTestLogForm.FormDestroy(Sender: TObject);
 begin
+  if Assigned(TestLog) then FreeAndNil(TestLog);
   if Assigned(BeforeTestSheet) then FreeAndNil(BeforeTestSheet);
-  if Assigned(MotorTestSheet) then FreeAndNil(MotorTestSheet);
   if Assigned(VSTDateList) then FreeAndNil(VSTDateList);
 end;
 
@@ -139,49 +129,9 @@ begin
   OpenDatesList(LastDayInYear(SpinEdit1.Value));
 end;
 
-procedure TTestLogForm.TestGridMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  R,C: Integer;
+procedure TTestLogForm.SelectMotor;
 begin
-  if Button=mbRight then
-    ClearSelection;
-  if Button=mbLeft  then
-  begin
-    (Sender As TsWorksheetGrid).MouseToCell(X,Y,C{%H-},R{%H-});
-    SelectLine(R);
-  end;
-end;
-
-procedure TTestLogForm.VTClick(Sender: TObject);
-begin
-  if VSTDateList.IsSelected then
-    OpenTestsList;
-end;
-
-procedure TTestLogForm.ClearSelection;
-begin
-  if SelectedIndex>-1 then
-  begin
-    MotorTestSheet.DrawLine(SelectedIndex, False);
-    SelectedIndex:= -1;
-  end;
-  DelButton.Enabled:= False;
-end;
-
-procedure TTestLogForm.SelectLine(const ARow: Integer);
-const
-  FirstRow = 3;
-begin
-  if VIsNil(MotorNames) then Exit;
-  if (ARow>=FirstRow) and (ARow<TestGrid.RowCount-1-1 {минус строка итогов}) then  //клик ниже заголовка
-  begin
-    if SelectedIndex>-1 then
-      MotorTestSheet.DrawLine(SelectedIndex, False);
-    SelectedIndex:= ARow - FirstRow;
-    MotorTestSheet.DrawLine(SelectedIndex, True);
-    DelButton.Enabled:= True;
-  end;
+  DelButton.Enabled:= TestLog.IsSelected;
 end;
 
 procedure TTestLogForm.OpenDatesList(const ASelectDate: TDate);
@@ -198,7 +148,7 @@ var
   X: TDateVector;
   D: TDate;
 begin
-  ClearSelection;
+  TestGrid.CLear;
   if not VSTDateList.IsSelected then Exit;
 
   D:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
@@ -208,14 +158,15 @@ begin
                     MotorNames, MotorNums, TestNotes);
   SQLite.TestTotalLoad(D,D, MainForm.UsedNameIDs, TotalMotorNames,
                        TotalMotorCounts, TotalFailCounts);
-  MotorTestSheet.Draw(D, MotorNames, MotorNums, TestNotes, TestResults,
-                      TotalMotorCounts, TotalFailCounts);
+
+  TestLog.Update(D, TestResults, MotorNames, MotorNums, TestNotes,
+                 VSum(TotalMotorCounts), VSum(TotalFailCounts));
 end;
 
 procedure TTestLogForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить результаты испытаний?') then Exit;
-  SQLite.Delete('MOTORTEST', 'TestID', TestIDs[SelectedIndex]);
+  SQLite.Delete('MOTORTEST', 'TestID', TestIDs[TestLog.SelectedIndex]);
   OpenDatesList(Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]);
   OpenBeforeTestList;
 end;

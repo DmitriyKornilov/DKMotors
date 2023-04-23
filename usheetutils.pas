@@ -22,12 +22,30 @@ const
 
 type
 
-  { TBuildLogTable }
+  { TLogTable }
 
-  TBuildLogTable = class(TSheetTable)
+  TLogTable = class(TSheetTable)
   public
     constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
-    procedure Update(const ADate: TDate; const AMotorNames, AMotorNums, ARotorNums: TStrVector);
+  end;
+
+  { TBuildLogTable }
+
+  TBuildLogTable = class(TLogTable)
+  public
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
+    procedure Update(const ADate: TDate;
+            const AMotorNames, AMotorNums, ARotorNums: TStrVector);
+  end;
+
+  { TTestLogTable }
+
+  TTestLogTable = class(TLogTable)
+  public
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
+    procedure Update(const ADate: TDate; const ATestResults: TIntVector;
+            const AMotorNames, AMotorNums, ATestNotes: TStrVector;
+            const ATotalCount, AFailCount: Integer);
   end;
 
   { TMotorBuildSheet }
@@ -892,9 +910,9 @@ begin
   end;
 end;
 
-{ TBuildLogTable }
+{ TLogTable }
 
-constructor TBuildLogTable.Create(const AGrid: TsWorksheetGrid;
+constructor TLogTable.Create(const AGrid: TsWorksheetGrid;
   const AOnSelect: TSheetSelectEvent);
 begin
   inherited Create(AGrid);
@@ -903,8 +921,62 @@ begin
   RowBeforeFont.Size:= SHEET_FONT_SIZE + 2;
   RowBeforeFont.Style:= [fsBold];
   HeaderFont.Style:= [fsBold];
-
+  RowAfterFont.Style:= [fsBold];
   OnSelect:= AOnSelect;
+end;
+
+{ TTestLogTable }
+
+constructor TTestLogTable.Create(const AGrid: TsWorksheetGrid;
+  const AOnSelect: TSheetSelectEvent);
+begin
+  inherited Create(AGrid, AOnSelect);
+  AddColumn('№ п/п', 50);
+  AddColumn('Наименование двигателя', 300);
+  AddColumn('Номер двигателя', 150);
+  AddColumn('Результат испытаний', 150);
+  AddColumn('Примечание', 200, haLeft);
+  AddToHeader(2, 1, '№ п/п');
+  AddToHeader(2, 2, 'Наименование двигателя');
+  AddToHeader(2, 3, 'Номер двигателя');
+  AddToHeader(2, 4, 'Результат испытаний');
+  AddToHeader(2, 5, 'Примечание');
+  SetExtraFont('Результат испытаний', 'Результат испытаний', 'брак',
+               ValuesFont.Name, ValuesFont.Size, ValuesFont.Style, clRed);
+  SetExtraFont('Примечание', 'Результат испытаний', 'брак',
+               ValuesFont.Name, ValuesFont.Size, ValuesFont.Style, clRed);
+end;
+
+procedure TTestLogTable.Update(const ADate: TDate; const ATestResults: TIntVector;
+            const AMotorNames, AMotorNums, ATestNotes: TStrVector;
+            const ATotalCount, AFailCount: Integer);
+var
+  S: String;
+  TestResults: TStrVector;
+begin
+  TestResults:= VIntToStr(ATestResults);
+  VChangeIf(TestResults, '0', 'норма');
+  VChangeIf(TestResults, '1', 'брак');
+
+  S:= 'Журнал испытаний за ' + FormatDateTime('dd.mm.yyyy', ADate);
+  SetRowBefore(S, haLeft);
+  SetColumnOrder('№ п/п');
+  SetColumnString('Наименование двигателя', AMotorNames);
+  SetColumnString('Номер двигателя', AMotorNums);
+  SetColumnString('Результат испытаний', TestResults);
+  SetColumnString('Примечание', ATestNotes);
+  S:= 'Норма: ' + IntToStr(ATotalCount-AFailCount) + ' / ' +
+      'Брак: ' + IntToStr(AFailCount);
+  SetRowAfter(S, haLeft);
+  Draw;
+end;
+
+{ TBuildLogTable }
+
+constructor TBuildLogTable.Create(const AGrid: TsWorksheetGrid;
+  const AOnSelect: TSheetSelectEvent);
+begin
+  inherited Create(AGrid, AOnSelect);
   AddColumn('№ п/п', 50);
   AddColumn('Наименование двигателя', 300);
   AddColumn('Номер двигателя', 150);
