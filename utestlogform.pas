@@ -131,6 +131,7 @@ end;
 
 procedure TTestLogForm.SelectMotor;
 begin
+  if not Assigned(TestLog) then Exit;
   DelButton.Enabled:= TestLog.IsSelected;
 end;
 

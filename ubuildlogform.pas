@@ -101,6 +101,7 @@ end;
 
 procedure TBuildLogForm.SelectMotor;
 begin
+  if not Assigned(BuildLog) then Exit;
   DelButton.Enabled:= BuildLog.IsSelected;
   EditButton.Enabled:= DelButton.Enabled;
 end;
