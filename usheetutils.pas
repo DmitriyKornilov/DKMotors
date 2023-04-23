@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid, fpspreadsheet,
   DK_Vector, DK_Matrix, DK_Fonts, Graphics, DK_SheetConst, DK_Const, DK_PPI,
   DateUtils, DK_DateUtils, DK_StatPlotter, DK_Math, DK_StrUtils, DK_Graph,
-  DK_SheetUtils;
+  DK_SheetUtils, DK_SheetTables;
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;
@@ -21,6 +21,14 @@ const
   PERCENT_FRAC_DIGITS = 1;
 
 type
+
+  { TBuildLogTable }
+
+  TBuildLogTable = class(TSheetTable)
+  public
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
+    procedure Update(const ADate: TDate; const AMotorNames, AMotorNums, ARotorNums: TStrVector);
+  end;
 
   { TMotorBuildSheet }
 
@@ -882,6 +890,43 @@ begin
   except
     FreeAndNil(Result);
   end;
+end;
+
+{ TBuildLogTable }
+
+constructor TBuildLogTable.Create(const AGrid: TsWorksheetGrid;
+  const AOnSelect: TSheetSelectEvent);
+begin
+  inherited Create(AGrid);
+  SetFontsName(SHEET_FONT_NAME);
+  SetFontsSize(SHEET_FONT_SIZE);
+  RowBeforeFont.Size:= SHEET_FONT_SIZE + 2;
+  RowBeforeFont.Style:= [fsBold];
+  HeaderFont.Style:= [fsBold];
+
+  OnSelect:= AOnSelect;
+  AddColumn('№ п/п', 50);
+  AddColumn('Наименование двигателя', 300);
+  AddColumn('Номер двигателя', 150);
+  AddColumn('Номер ротора', 150);
+  AddToHeader(2, 1, '№ п/п');
+  AddToHeader(2, 2, 'Наименование двигателя');
+  AddToHeader(2, 3, 'Номер двигателя');
+  AddToHeader(2, 4, 'Номер ротора');
+end;
+
+procedure TBuildLogTable.Update(const ADate: TDate;
+                   const AMotorNames, AMotorNums, ARotorNums: TStrVector);
+var
+  S: String;
+begin
+  S:= 'Журнал сборки за ' + FormatDateTime('dd.mm.yyyy', ADate);
+  SetRowBefore(S, haLeft);
+  SetColumnOrder('№ п/п');
+  SetColumnString('Наименование двигателя', AMotorNames);
+  SetColumnString('Номер двигателя', AMotorNums);
+  SetColumnString('Номер ротора', ARotorNums);
+  Draw;
 end;
 
 { TStatisticSeveralPeriodsAtMonthNamesSumSheet }

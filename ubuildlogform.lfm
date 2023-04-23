@@ -1,22 +1,23 @@
 object BuildLogForm: TBuildLogForm
   Left = 477
-  Height = 458
+  Height = 572
   Top = 184
-  Width = 1125
+  Width = 1406
   Align = alClient
   BorderStyle = bsNone
   Caption = 'BuildLogForm'
-  ClientHeight = 458
-  ClientWidth = 1125
+  ClientHeight = 572
+  ClientWidth = 1406
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '2.2.6.0'
   object ToolPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 1121
+    Width = 1402
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -24,20 +25,20 @@ object BuildLogForm: TBuildLogForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 1117
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1398
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
     object SpinEdit1: TSpinEdit
       Left = 1
-      Height = 23
-      Top = 3
-      Width = 56
+      Height = 30
+      Top = 4
+      Width = 70
       Align = alLeft
       Alignment = taCenter
       BorderSpacing.Left = 1
-      BorderSpacing.Top = 3
+      BorderSpacing.Top = 4
       BorderSpacing.Bottom = 2
       MinValue = 2010
       OnChange = SpinEdit1Change
@@ -45,30 +46,30 @@ object BuildLogForm: TBuildLogForm
       Value = 2022
     end
     object DividerBevel1: TDividerBevel
-      Left = 57
-      Height = 28
+      Left = 71
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
       ParentFont = False
     end
     object CheckBox1: TCheckBox
-      Left = 183
-      Height = 28
+      Left = 231
+      Height = 36
       Top = 0
-      Width = 154
+      Width = 195
       Align = alLeft
       Caption = 'Упорядочить по номеру'
       OnChange = CheckBox1Change
       TabOrder = 1
     end
     object DividerBevel2: TDividerBevel
-      Left = 168
-      Height = 28
+      Left = 211
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -76,26 +77,26 @@ object BuildLogForm: TBuildLogForm
     end
     object EditButtonPanel: TPanel
       AnchorSideLeft.Side = asrBottom
-      Left = 72
-      Height = 28
+      Left = 91
+      Height = 36
       Top = 0
-      Width = 96
+      Width = 120
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 96
+      ClientHeight = 36
+      ClientWidth = 120
       ParentFont = False
       TabOrder = 2
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 28
+        Height = 36
         Top = 0
-        Width = 32
+        Width = 40
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 32
+        Constraints.MinWidth = 40
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -235,13 +236,13 @@ object BuildLogForm: TBuildLogForm
       end
       object DelButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 32
-        Height = 28
+        Left = 40
+        Height = 36
         Top = 0
-        Width = 32
+        Width = 40
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 32
+        Constraints.MinWidth = 40
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -381,13 +382,13 @@ object BuildLogForm: TBuildLogForm
       end
       object EditButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 64
-        Height = 28
+        Left = 80
+        Height = 36
         Top = 0
-        Width = 32
+        Width = 40
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 32
+        Constraints.MinWidth = 40
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -527,10 +528,10 @@ object BuildLogForm: TBuildLogForm
       end
     end
     object DividerBevel3: TDividerBevel
-      Left = 337
-      Height = 28
+      Left = 426
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -538,10 +539,10 @@ object BuildLogForm: TBuildLogForm
     end
     object MotorNamesButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 352
-      Height = 28
+      Left = 446
+      Height = 36
       Top = 0
-      Width = 195
+      Width = 237
       Align = alLeft
       AutoSize = True
       Caption = 'Наименования двигателей'
@@ -685,35 +686,35 @@ object BuildLogForm: TBuildLogForm
     end
   end
   object Splitter1: TSplitter
-    Left = 202
-    Height = 424
-    Top = 34
-    Width = 5
+    Left = 252
+    Height = 530
+    Top = 42
+    Width = 6
     ResizeStyle = rsLine
   end
   object Panel1: TPanel
     Left = 2
-    Height = 420
-    Top = 36
-    Width = 200
+    Height = 526
+    Top = 44
+    Width = 250
     Align = alLeft
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 416
-    ClientWidth = 196
+    ClientHeight = 522
+    ClientWidth = 246
     TabOrder = 2
     object VT: TVirtualStringTree
       Left = 0
-      Height = 416
+      Height = 522
       Top = 0
-      Width = 196
+      Width = 246
       Align = alClient
       BorderStyle = bsNone
       Colors.GridLineColor = clSilver
-      DefaultNodeHeight = 20
+      DefaultNodeHeight = 25
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
       Header.Columns = <      
@@ -723,9 +724,9 @@ object BuildLogForm: TBuildLogForm
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable]
           Position = 0
           Text = 'Документ'
-          Width = 196
+          Width = 246
         end>
-      Header.Height = 26
+      Header.Height = 32
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
       LineStyle = lsSolid
       ParentFont = False
@@ -736,24 +737,24 @@ object BuildLogForm: TBuildLogForm
     end
   end
   object Panel2: TPanel
-    Left = 207
-    Height = 420
-    Top = 36
-    Width = 916
+    Left = 258
+    Height = 526
+    Top = 44
+    Width = 1146
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 416
-    ClientWidth = 912
+    ClientHeight = 522
+    ClientWidth = 1142
     TabOrder = 3
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 176
+      Height = 522
       Top = 0
-      Width = 912
+      Width = 1142
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear
@@ -768,42 +769,6 @@ object BuildLogForm: TBuildLogForm
       ShowGridLines = False
       ShowHeaders = False
       WorkbookSource = LogGrid.internal
-      Align = alTop
-      AutoAdvance = aaNone
-      AutoEdit = False
-      BorderStyle = bsNone
-      Color = clWhite
-      DefaultColWidth = 40
-      DefaultRowHeight = 20
-      ExtendedSelect = False
-      Flat = True
-      MouseWheelOption = mwGrid
-      Options = [goFixedVertLine, goFixedHorzLine, goSmoothScroll]
-      ParentFont = False
-      TabOrder = 1
-      TabStop = False
-      TitleFont.Style = [fsBold]
-      OnMouseDown = LogGridMouseDown
-    end
-    object Grid1: TsWorksheetGrid
-      Left = 0
-      Height = 240
-      Top = 176
-      Width = 912
-      AutoExpand = []
-      DisplayFixedColRow = False
-      FrozenBorderPen.Style = psClear
-      FrozenCols = 0
-      FrozenRows = 0
-      PageBreakPen.Color = clBlue
-      PageBreakPen.Style = psDash
-      ReadFormulas = False
-      SelectionPen.Color = clWindow
-      SelectionPen.Style = psClear
-      SelectionPen.Width = 0
-      ShowGridLines = False
-      ShowHeaders = False
-      WorkbookSource = Grid1.internal
       Align = alClient
       AutoAdvance = aaNone
       AutoEdit = False

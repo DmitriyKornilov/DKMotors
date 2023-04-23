@@ -8,7 +8,7 @@ uses
   Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
   rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTools,
   DK_Dialogs, DK_Const, UBuildAddForm, UBuildEditForm,
-  USheetUtils, fpspreadsheetgrid, DK_SheetTables;
+  USheetUtils, fpspreadsheetgrid;
 
 type
 
@@ -24,7 +24,6 @@ type
     EditButtonPanel: TPanel;
     DividerBevel1: TDividerBevel;
     LogGrid: TsWorksheetGrid;
-    Grid1: TsWorksheetGrid;
     MotorNamesButton: TRxSpeedButton;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -39,8 +38,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorNamesButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
@@ -48,16 +45,12 @@ type
     Dates: TDateMatrix;
 
     VSTDateList: TVSTCategoryDateList;
-    MotorBuildSheet: TMotorBuildSheet;
-
-    Test: TSheetTable;
+    BuildLog: TBuildLogTable;
 
     MotorIDs, NameIDs, OldMotors: TIntVector;
     MotorNames, MotorNums, RotorNums: TStrVector;
 
-    SelectedIndex: Integer;
-    procedure ClearSelection;
-    procedure SelectLine(const ARow: Integer);
+    procedure SelectMotor;
 
     procedure OpenDatesList(const ASelectDate: TDate);
   public
@@ -78,47 +71,20 @@ uses UMainForm;
 procedure TBuildLogForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-  SelectedIndex:= -1;
-  MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
-
-  Test:= TSheetTable.Create(Grid1);
-  Test.AddColumn('№ п/п', 50);
-  Test.AddColumn('Наименование двигателя', 250);
-  Test.AddColumn('Номер двигателя', 150);
-  Test.AddColumn('Номер ротора', 100);
-  Test.AddToHeader(1, 1, 1, 1, '№ п/п');
-  Test.AddToHeader(1, 2, 1, 2, 'Наименование двигателя');
-  Test.AddToHeader(1, 3, 1, 3, 'Номер двигателя');
-  Test.AddToHeader(1, 4, 1, 4, 'Номер ротора');
-
+  BuildLog:= TBuildLogTable.Create(LogGrid, @SelectMotor);
   VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @ShowBuildLog);
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
 procedure TBuildLogForm.FormDestroy(Sender: TObject);
 begin
-  if Assigned(MotorBuildSheet) then FreeAndNil(MotorBuildSheet);
   if Assigned(VSTDateList) then FreeAndNil(VSTDateList);
-  if Assigned(Test) then FreeAndNil(Test);
+  if Assigned(BuildLog) then FreeAndNil(BuildLog);
 end;
 
 procedure TBuildLogForm.FormShow(Sender: TObject);
 begin
   OpenDatesList(Date);
-end;
-
-procedure TBuildLogForm.LogGridMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  R,C: Integer;
-begin
-  if Button=mbRight then
-    ClearSelection;
-  if Button=mbLeft  then
-  begin
-    (Sender As TsWorksheetGrid).MouseToCell(X,Y,C{%H-},R{%H-});
-    SelectLine(R);
-  end;
 end;
 
 procedure TBuildLogForm.MotorNamesButtonClick(Sender: TObject);
@@ -133,31 +99,10 @@ begin
   OpenDatesList(LastDayInYear(SpinEdit1.Value));
 end;
 
-procedure TBuildLogForm.ClearSelection;
+procedure TBuildLogForm.SelectMotor;
 begin
-  if SelectedIndex>-1 then
-  begin
-    MotorBuildSheet.DrawLine(SelectedIndex, False);
-    SelectedIndex:= -1;
-  end;
-  DelButton.Enabled:= False;
+  DelButton.Enabled:= BuildLog.IsSelected;
   EditButton.Enabled:= DelButton.Enabled;
-end;
-
-procedure TBuildLogForm.SelectLine(const ARow: Integer);
-const
-  FirstRow = 3;
-begin
-  if VIsNil(MotorNames) then Exit;
-  if (ARow>=FirstRow) and (ARow<LogGrid.RowCount-1) then  //клик ниже заголовка
-  begin
-    if SelectedIndex>-1 then
-      MotorBuildSheet.DrawLine(SelectedIndex, False);
-    SelectedIndex:= ARow - FirstRow;
-    MotorBuildSheet.DrawLine(SelectedIndex, True);
-    DelButton.Enabled:= True;
-    EditButton.Enabled:= DelButton.Enabled;
-  end;
 end;
 
 procedure TBuildLogForm.OpenDatesList(const ASelectDate: TDate);
@@ -172,32 +117,24 @@ var
   Tmp: TDateVector;
   D: TDate;
 begin
-  ClearSelection;
+  LogGrid.Clear;
   if not VSTDateList.IsSelected then Exit;
 
   D:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
   SQLite.BuildListLoad(D, D, MainForm.UsedNameIDs,
                     CheckBox1.Checked, MotorIDs, NameIDs, OldMotors,
                     Tmp, MotorNames, MotorNums, RotorNums);
-
-  MotorBuildSheet.Draw(D, MotorNames, MotorNums, RotorNums);
-
-
-  Test.SetColumnOrder('№ п/п');
-  Test.SetColumnString('Наименование двигателя', MotorNames);
-  Test.SetColumnString('Номер двигателя', MotorNums);
-  Test.SetColumnString('Номер ротора', RotorNums);
-  Test.Draw;
+  BuildLog.Update(D, MotorNames, MotorNums, RotorNums);
 end;
 
 procedure TBuildLogForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить двигатель ' +  SYMBOL_BREAK +
-                  MotorNames[SelectedIndex] +
+                  MotorNames[BuildLog.SelectedIndex] +
                  ' № ' +
-                  MotorNums[SelectedIndex] +
+                  MotorNums[BuildLog.SelectedIndex] +
                  '?') then Exit;
-  SQLite.Delete('MOTORLIST', 'MotorID', MotorIDs[SelectedIndex]);
+  SQLite.Delete('MOTORLIST', 'MotorID', MotorIDs[BuildLog.SelectedIndex]);
 
   OpenDatesList(Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]);
 end;
@@ -210,11 +147,11 @@ begin
   BuildEditForm:= TBuildEditForm.Create(BuildLogForm);
   try
     BuildEditForm.DateTimePicker1.Date:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
-    BuildEditForm.MotorID:= MotorIDs[SelectedIndex];
-    BuildEditForm.OldNameID:= NameIDs[SelectedIndex];
-    BuildEditForm.MotorNumEdit.Text:= MotorNums[SelectedIndex];
-    BuildEditForm.RotorNumEdit.Text:= RotorNums[SelectedIndex];
-    BuildEditForm.OldMotorCheckBox.Checked:= OldMotors[SelectedIndex]=1;
+    BuildEditForm.MotorID:= MotorIDs[BuildLog.SelectedIndex];
+    BuildEditForm.OldNameID:= NameIDs[BuildLog.SelectedIndex];
+    BuildEditForm.MotorNumEdit.Text:= MotorNums[BuildLog.SelectedIndex];
+    BuildEditForm.RotorNumEdit.Text:= RotorNums[BuildLog.SelectedIndex];
+    BuildEditForm.OldMotorCheckBox.Checked:= OldMotors[BuildLog.SelectedIndex]=1;
     BuildEditForm.ShowModal;
     D:= BuildEditForm.DateTimePicker1.Date;
   finally
