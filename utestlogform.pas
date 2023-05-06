@@ -46,6 +46,7 @@ type
   private
     Months: TStrVector;
     Dates: TDateMatrix;
+    SelectedDate: TDate;
     TestIDs, TestResults: TIntVector;
     MotorNames, MotorNums, TestNotes: TStrVector;
 
@@ -54,10 +55,11 @@ type
     BeforeTestSheet: TBeforeTestSheet;
 
     procedure SelectMotor;
+    procedure SelectDate;
 
     procedure OpenBeforeTestList;
-    procedure OpenDatesList(const ASelectDate: TDate);
-    procedure OpenTestsList;
+    procedure OpenDatesList(const ASelectedDate: TDate);
+
   public
     procedure ShowTestLog;
   end;
@@ -99,15 +101,16 @@ end;
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
-  VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @ShowTestLog);
+  VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @SelectDate);
   TestLog:= TTestLogTable.Create(TestGrid, @SelectMotor);
   BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
+  SelectedDate:= Date;
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
 procedure TTestLogForm.ShowTestLog;
 begin
-  OpenTestsList;
+  OpenDatesList(SelectedDate);
   OpenBeforeTestList;
 end;
 
@@ -120,8 +123,7 @@ end;
 
 procedure TTestLogForm.FormShow(Sender: TObject);
 begin
-  OpenDatesList(Date);
-  OpenBeforeTestList;
+  ShowTestLog;
 end;
 
 procedure TTestLogForm.SpinEdit1Change(Sender: TObject);
@@ -135,32 +137,31 @@ begin
   DelButton.Enabled:= TestLog.IsSelected;
 end;
 
-procedure TTestLogForm.OpenDatesList(const ASelectDate: TDate);
+procedure TTestLogForm.OpenDatesList(const ASelectedDate: TDate);
 begin
   TestGrid.Clear;
-  SQLite.MonthAndDatesForTestLogLoad(SpinEdit1.Value, Months, Dates);
-  VSTDateList.Update(Months, Dates, ASelectDate);
+  SQLite.MonthAndDatesForTestLogLoad(SpinEdit1.Value, MainForm.UsedNameIDs, Months, Dates);
+  VSTDateList.Update(Months, Dates, ASelectedDate);
 end;
 
-procedure TTestLogForm.OpenTestsList;
+procedure TTestLogForm.SelectDate;
 var
   TotalMotorNames: TStrVector;
   TotalMotorCounts, TotalFailCounts: TIntVector;
   X: TDateVector;
-  D: TDate;
 begin
   TestGrid.CLear;
   if not VSTDateList.IsSelected then Exit;
 
-  D:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
+  SelectedDate:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
 
-  SQLite.TestListLoad(D,D, MainForm.UsedNameIDs,
+  SQLite.TestListLoad(SelectedDate,SelectedDate, MainForm.UsedNameIDs,
                     CheckBox1.Checked, TestIDs, TestResults, X,
                     MotorNames, MotorNums, TestNotes);
-  SQLite.TestTotalLoad(D,D, MainForm.UsedNameIDs, TotalMotorNames,
+  SQLite.TestTotalLoad(SelectedDate,SelectedDate, MainForm.UsedNameIDs, TotalMotorNames,
                        TotalMotorCounts, TotalFailCounts);
 
-  TestLog.Update(D, TestResults, MotorNames, MotorNums, TestNotes,
+  TestLog.Update(SelectedDate, TestResults, MotorNames, MotorNums, TestNotes,
                  VSum(TotalMotorCounts), VSum(TotalFailCounts));
 end;
 
@@ -168,13 +169,12 @@ procedure TTestLogForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить результаты испытаний?') then Exit;
   SQLite.Delete('MOTORTEST', 'TestID', TestIDs[TestLog.SelectedIndex]);
-  OpenDatesList(Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]);
-  OpenBeforeTestList;
+  ShowTestLog;
 end;
 
 procedure TTestLogForm.CheckBox1Change(Sender: TObject);
 begin
-  OpenTestsList;
+  SelectDate;
   OpenBeforeTestList;
 end;
 

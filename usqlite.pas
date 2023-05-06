@@ -14,8 +14,6 @@ type
 
   TSQLite = class (TSQLite3)
   private
-    function MonthAndDatesForLogLoad(const ATableName, AFieldName: String;
-       const AYear: Word; out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
     function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
        const ABeginDate, AEndDate: TDate; const ANameIDs: TIntVector;
        out AExistsIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector): Boolean;
@@ -54,8 +52,10 @@ type
 
     //дерево месяцы-даты для журналов учета
     function MonthAndDatesForBuildLogLoad(const AYear: Word;
+                  const AUsedNameIDs: TIntVector;
                   out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
     function MonthAndDatesForTestLogLoad(const AYear: Word;
+                  const AUsedNameIDs: TIntVector;
                   out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
 
     //список двигателей
@@ -446,56 +446,6 @@ begin
                   AKeyValueNotZero, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ');
 end;
 
-
-
-function TSQLite.MonthAndDatesForLogLoad(const ATableName, AFieldName: String;
-  const AYear: Word; out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
-var
-  i: Integer;
-  BD, ED: TDate;
-  Dates: TDateVector;
-  FieldName: String;
-begin
-  Result:= False;
-  AMonths:= nil;
-  ADates:= nil;
-
-  FieldName:= SqlEsc(AFieldName);
-  QSetQuery(FQuery);
-  QSetSQL(
-    'SELECT DISTINCT' + FieldName +
-    'FROM' + SqlEsc(ATableName) +
-    'WHERE' +  FieldName + 'BETWEEN :BD AND :ED ' +
-    'ORDER BY' + FieldName + 'DESC');
-  for i:= 12 downto 1 do
-  begin
-    Dates:= nil;
-    BD:= FirstDayInMonth(i, AYear);
-    ED:= LastDayInMonth(i, AYear);
-    QParamDT('BD', BD);
-    QParamDT('ED', ED);
-    QOpen;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      while not QEOF do
-      begin
-        VAppend(Dates, QFieldDT(AFieldName));
-        QNext;
-      end;
-    end;
-    QClose;
-    if not VIsNil(Dates) then
-    begin
-      VAppend(AMonths, FormatDateTime('mmmm yyyy', Dates[0]));
-      MAppend(ADates, Dates);
-    end;
-  end;
-  Result:= not VIsNil(AMonths);
-end;
-
-
-
 function TSQLite.ReclamationReportWithReasonsLoad(const ATableName,
   AIDFieldName, ANameFieldName: String; const ABeginDate, AEndDate: TDate;
   const AAdditionYearsCount: Integer; {const AIsZeroIDNeed: Boolean; }
@@ -712,16 +662,113 @@ begin
   QClose;
 end;
 
-function TSQLite.MonthAndDatesForBuildLogLoad(const AYear: Word; out
-  AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
+function TSQLite.MonthAndDatesForBuildLogLoad(const AYear: Word;
+  const AUsedNameIDs: TIntVector;
+  out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
+var
+  i: Integer;
+  BD, ED: TDate;
+  Dates: TDateVector;
+  WhereStr: String;
 begin
-  Result:= MonthAndDatesForLogLoad('MOTORLIST', 'BuildDate', AYear, AMonths, ADates);
+  Result:= False;
+  AMonths:= nil;
+  ADates:= nil;
+
+  WhereStr:= 'WHERE (BuildDate BETWEEN :BD AND :ED) ';
+  if not VIsNil(AUsedNameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('','NameID', Length(AUsedNameIDs));
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT DISTINCT BuildDate ' +
+    'FROM MOTORLIST ' +
+    WhereStr +
+    'ORDER BY BuildDate DESC');
+
+  if not VIsNil(AUsedNameIDs) then
+    QParamsInt(AUsedNameIDs);
+
+  for i:= 12 downto 1 do
+  begin
+    Dates:= nil;
+    BD:= FirstDayInMonth(i, AYear);
+    ED:= LastDayInMonth(i, AYear);
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        VAppend(Dates, QFieldDT('BuildDate'));
+        QNext;
+      end;
+    end;
+    QClose;
+    if not VIsNil(Dates) then
+    begin
+      VAppend(AMonths, FormatDateTime('mmmm yyyy', Dates[0]));
+      MAppend(ADates, Dates);
+    end;
+  end;
+  Result:= not VIsNil(AMonths);
 end;
 
-function TSQLite.MonthAndDatesForTestLogLoad(const AYear: Word; out
-  AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
+function TSQLite.MonthAndDatesForTestLogLoad(const AYear: Word;
+  const AUsedNameIDs: TIntVector;
+  out AMonths: TStrVector; out ADates: TDateMatrix): Boolean;
+var
+  i: Integer;
+  BD, ED: TDate;
+  Dates: TDateVector;
+  WhereStr: String;
 begin
-  Result:= MonthAndDatesForLogLoad('MOTORTEST', 'TestDate', AYear, AMonths, ADates);
+  Result:= False;
+  AMonths:= nil;
+  ADates:= nil;
+
+  WhereStr:= 'WHERE (t1.TestDate BETWEEN :BD AND :ED) ';
+  if not VIsNil(AUsedNameIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(AUsedNameIDs));
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT DISTINCT t1.TestDate ' +
+    'FROM MOTORTEST t1 ' +
+    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+    WhereStr +
+    'ORDER BY t1.TestDate DESC');
+
+  if not VIsNil(AUsedNameIDs) then
+    QParamsInt(AUsedNameIDs);
+
+  for i:= 12 downto 1 do
+  begin
+    Dates:= nil;
+    BD:= FirstDayInMonth(i, AYear);
+    ED:= LastDayInMonth(i, AYear);
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        VAppend(Dates, QFieldDT('TestDate'));
+        QNext;
+      end;
+    end;
+    QClose;
+    if not VIsNil(Dates) then
+    begin
+      VAppend(AMonths, FormatDateTime('mmmm yyyy', Dates[0]));
+      MAppend(ADates, Dates);
+    end;
+  end;
+  Result:= not VIsNil(AMonths);
 end;
 
 function TSQLite.MotorListLoad(const ABuildYear, AShippedType: Integer;
