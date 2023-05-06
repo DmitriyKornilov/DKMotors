@@ -4511,10 +4511,7 @@ begin
   FWriter.WriteText(R, 12, 'Особое мнение', cbtOuter, True, True);
   FWriter.WriteText(R, 13, 'Примечание', cbtOuter, True, True);
   FWriter.WriteText(R, 14, 'Прибыл в ремонт', cbtOuter, True, True);
-  //FWriter.WriteText(R, 15, 'Наличие паспорта', cbtOuter, True, True);
   FWriter.WriteText(R, 15, 'Убыл из ремонта', cbtOuter, True, True);
-  //FWriter.WriteText(R, 17, 'Срок, дней', cbtOuter, True, True);
-
 end;
 
 constructor TReclamationSheet.Create(const AWorksheet: TsWorksheet;
@@ -4568,7 +4565,6 @@ begin
   FWriter.SetBackground(FReasonColors[AIndex]);
   FWriter.WriteNumber(R, 1, AIndex+1, cbtOuter);
 
-
   if ASelected then
   begin
     FWriter.SetBackground(DefaultSelectionBGColor);
@@ -4578,7 +4574,6 @@ begin
     FWriter.SetBackgroundClear;
     FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
   end;
-
 
   FWriter.WriteDate(R, 2, FRecDates[AIndex], cbtOuter);
   FWriter.SetAlignment(haLeft, vaTop);
