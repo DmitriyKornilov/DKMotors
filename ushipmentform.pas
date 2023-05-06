@@ -152,6 +152,7 @@ begin
   SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value,
                           Months, Shipments, CargoIDs);
   VSTCargoList.Update(Months, Shipments, CargoIDs, ACargoID);
+  SetButtonsEnabled(VSTCargoList.IsSelected);
 end;
 
 procedure TShipmentForm.SelectShipment;

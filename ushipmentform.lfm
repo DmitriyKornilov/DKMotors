@@ -1,22 +1,23 @@
 object ShipmentForm: TShipmentForm
   Left = 554
-  Height = 325
+  Height = 406
   Top = 206
-  Width = 850
+  Width = 1062
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ShipmentForm'
-  ClientHeight = 325
-  ClientWidth = 850
+  ClientHeight = 406
+  ClientWidth = 1062
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '2.2.6.0'
   object ToolPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 846
+    Width = 1058
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -25,20 +26,20 @@ object ShipmentForm: TShipmentForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 842
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1054
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
     object SpinEdit1: TSpinEdit
       Left = 1
-      Height = 23
-      Top = 3
-      Width = 56
+      Height = 30
+      Top = 4
+      Width = 70
       Align = alLeft
       Alignment = taCenter
       BorderSpacing.Left = 1
-      BorderSpacing.Top = 3
+      BorderSpacing.Top = 4
       BorderSpacing.Bottom = 2
       MinValue = 2010
       OnChange = SpinEdit1Change
@@ -46,10 +47,10 @@ object ShipmentForm: TShipmentForm
       Value = 2022
     end
     object DividerBevel1: TDividerBevel
-      Left = 57
-      Height = 28
+      Left = 71
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -57,26 +58,26 @@ object ShipmentForm: TShipmentForm
     end
     object EditButtonPanel: TPanel
       AnchorSideLeft.Side = asrBottom
-      Left = 72
-      Height = 28
+      Left = 91
+      Height = 36
       Top = 0
-      Width = 96
+      Width = 120
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 96
+      ClientHeight = 36
+      ClientWidth = 120
       ParentFont = False
       TabOrder = 1
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 28
+        Height = 36
         Top = 0
-        Width = 32
+        Width = 40
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 32
+        Constraints.MinWidth = 40
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -216,13 +217,14 @@ object ShipmentForm: TShipmentForm
       end
       object DelButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 32
-        Height = 28
+        Left = 40
+        Height = 36
         Top = 0
-        Width = 32
+        Width = 40
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 32
+        Constraints.MinWidth = 40
+        Enabled = False
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -362,13 +364,14 @@ object ShipmentForm: TShipmentForm
       end
       object EditButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 64
-        Height = 28
+        Left = 80
+        Height = 36
         Top = 0
-        Width = 32
+        Width = 40
         Align = alLeft
         AutoSize = True
-        Constraints.MinWidth = 32
+        Constraints.MinWidth = 40
+        Enabled = False
         Glyph.Data = {
           36100000424D3610000000000000360000002800000020000000200000000100
           2000000000000010000064000000640000000000000000000000000000000000
@@ -508,10 +511,10 @@ object ShipmentForm: TShipmentForm
       end
     end
     object DividerBevel3: TDividerBevel
-      Left = 168
-      Height = 28
+      Left = 211
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 20
       Align = alLeft
       Font.Style = [fsBold]
       Orientation = trVertical
@@ -519,13 +522,13 @@ object ShipmentForm: TShipmentForm
     end
     object RxSpeedButton5: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 183
-      Height = 28
+      Left = 231
+      Height = 36
       Top = 0
-      Width = 140
+      Width = 175
       Align = alLeft
       AutoSize = True
-      Constraints.MinWidth = 140
+      Constraints.MinWidth = 175
       Caption = 'Грузополучатели'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -667,10 +670,10 @@ object ShipmentForm: TShipmentForm
     end
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
-      Left = 323
-      Height = 28
+      Left = 406
+      Height = 36
       Top = 0
-      Width = 101
+      Width = 112
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -815,27 +818,27 @@ object ShipmentForm: TShipmentForm
   end
   object Panel1: TPanel
     Left = 2
-    Height = 287
-    Top = 36
-    Width = 400
+    Height = 360
+    Top = 44
+    Width = 500
     Align = alLeft
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 283
-    ClientWidth = 396
+    ClientHeight = 356
+    ClientWidth = 496
     TabOrder = 1
     object VT: TVirtualStringTree
       Left = 0
-      Height = 283
+      Height = 356
       Top = 0
-      Width = 396
+      Width = 496
       Align = alClient
       BorderStyle = bsNone
       Colors.GridLineColor = clSilver
-      DefaultNodeHeight = 20
+      DefaultNodeHeight = 25
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
       Header.Columns = <      
@@ -845,9 +848,9 @@ object ShipmentForm: TShipmentForm
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable]
           Position = 0
           Text = 'Документ'
-          Width = 396
+          Width = 496
         end>
-      Header.Height = 26
+      Header.Height = 32
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
       LineStyle = lsSolid
       ParentFont = False
@@ -858,31 +861,31 @@ object ShipmentForm: TShipmentForm
     end
   end
   object Splitter1: TSplitter
-    Left = 402
-    Height = 289
-    Top = 36
-    Width = 5
+    Left = 502
+    Height = 362
+    Top = 44
+    Width = 6
     ResizeStyle = rsLine
   end
   object Panel2: TPanel
-    Left = 407
-    Height = 287
-    Top = 36
-    Width = 441
+    Left = 508
+    Height = 360
+    Top = 44
+    Width = 552
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 283
-    ClientWidth = 437
+    ClientHeight = 356
+    ClientWidth = 548
     TabOrder = 3
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 265
+      Height = 334
       Top = 0
-      Width = 437
+      Width = 548
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
@@ -914,9 +917,9 @@ object ShipmentForm: TShipmentForm
     end
     object ZoomPanel: TPanel
       Left = 0
-      Height = 18
-      Top = 265
-      Width = 437
+      Height = 22
+      Top = 334
+      Width = 548
       Align = alBottom
       BevelOuter = bvNone
       Color = clWindow

@@ -3675,6 +3675,7 @@ var
   R, N, i, j, FrozenCount: Integer;
   S: String;
 begin
+  FWriter.Clear;
   if VIsNil(ABuildDates) then Exit;
 
   FWriter.BeginEdit;
