@@ -264,8 +264,9 @@ begin
     'Распределение по месяцам',
     'Распределение по пробегу локомотива'
   ]);
-  StatisticList:= TVSTStringList.Create(VT1, S, V, @SelectStatistic);
   SelectedIndex:= 0;
+  StatisticList:= TVSTStringList.Create(VT1, S, @SelectStatistic);
+  StatisticList.Update(V, SelectedIndex);
   Panel2.Height:= StatisticList.NeededHeight + 10;
 end;
 
@@ -317,7 +318,8 @@ begin
     'распределение количества рекламаций',
     'накопление количества рекламаций'
   ]);
-  MonthReportTypeList:= TVSTStringList.Create(VT3, S, V, @SelectMonthReportType);
+  MonthReportTypeList:= TVSTStringList.Create(VT3, S, @SelectMonthReportType);
+  MonthReportTypeList.Update(V);
 end;
 
 procedure TStatisticForm.SelectMonthReportType;

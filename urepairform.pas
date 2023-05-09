@@ -53,7 +53,7 @@ type
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
     VSTTypeList: TVSTStringList;
-    VSTOrderList: TVSTTable;
+    VSTOrderList: TVSTStringList;
     RecIDs, MotorIDs: TIntVector;
 
     ArrivalDates, SendingDates: TDateVector;
@@ -214,7 +214,8 @@ begin
     'в ремонте',
     'отремонтированные'
   ]);
-  VSTTypeList:= TVSTStringList.Create(VT2, S, V, @ShowRepair, 1);
+  VSTTypeList:= TVSTStringList.Create(VT2, S, @ShowRepair);
+  VSTTypeList.Update(V, 1);
 end;
 
 procedure TRepairForm.CreateOrderList;
@@ -227,7 +228,8 @@ begin
     'дате прибытия',
     'номеру'
   ]);
-  VSTOrderList:= TVSTStringList.Create(VT3, S, V, @ShowRepair);
+  VSTOrderList:= TVSTStringList.Create(VT3, S, @ShowRepair);
+  VSTOrderList.Update(V);
 end;
 
 procedure TRepairForm.OpenRepairEditForm(const AEditType: Byte);

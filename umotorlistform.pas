@@ -121,7 +121,8 @@ begin
     'отгруженные',
     'неотгруженные'
   ]);
-  VSTTypesList:= TVSTStringList.Create(VT2, S, V, @ShowMotorList);
+  VSTTypesList:= TVSTStringList.Create(VT2, S, @ShowMotorList);
+  VSTTypesList.Update(V);
 end;
 
 procedure TMotorListForm.ShowMotorList;

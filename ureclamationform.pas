@@ -336,18 +336,14 @@ begin
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TReclamationSheet.Create(Sheet);
-    try
-      Drawer.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
-                          Mileages, Opinions, ReasonColors,
-                          PlaceNames, FactoryNames, Departures, DefectNames,
-                          ReasonNames, RecNotes, MotorNames, MotorNums);
-    finally
-      FreeAndNil(Drawer);
-    end;
+    Drawer.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
+                        Mileages, Opinions, ReasonColors,
+                        PlaceNames, FactoryNames, Departures, DefectNames,
+                        ReasonNames, RecNotes, MotorNames, MotorNums);
     Exporter.PageSettings(spoLandscape);
-
     Exporter.Save('Выполнено!');
   finally
+    FreeAndNil(Drawer);
     FreeAndNil(Exporter);
   end;
 end;
@@ -366,7 +362,8 @@ begin
     'неисправному элементу',
     'причине неисправности'
   ]);
-  VSTOrderList:= TVSTStringList.Create(VT1, S, V, @SelectOrder);
+  VSTOrderList:= TVSTStringList.Create(VT1, S, @SelectOrder);
+  VSTOrderList.Update(V);
 end;
 
 procedure TReclamationForm.CreateDefectList;
