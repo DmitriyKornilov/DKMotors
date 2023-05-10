@@ -16,6 +16,7 @@ type
 
   TShipmentForm = class(TForm)
     AddButton: TSpeedButton;
+    Bevel1: TBevel;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
     DividerBevel3: TDividerBevel;

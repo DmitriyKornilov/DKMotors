@@ -18,6 +18,7 @@ type
 
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
+    Bevel1: TBevel;
     CardPanel: TPanel;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;

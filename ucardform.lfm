@@ -1,38 +1,37 @@
 object CardForm: TCardForm
   Left = 699
-  Height = 339
+  Height = 271
   Top = 244
-  Width = 800
+  Width = 640
   Align = alClient
   BorderStyle = bsNone
   Caption = 'CardForm'
-  ClientHeight = 339
-  ClientWidth = 800
-  DesignTimePPI = 120
+  ClientHeight = 271
+  ClientWidth = 640
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '2.2.4.0'
   object TopPanel: TPanel
     Left = 0
-    Height = 40
+    Height = 32
     Top = 0
-    Width = 800
+    Width = 640
     Align = alTop
     AutoSize = True
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 796
-    Constraints.MaxHeight = 40
-    Constraints.MinHeight = 40
+    ClientHeight = 28
+    ClientWidth = 636
+    Constraints.MaxHeight = 32
+    Constraints.MinHeight = 32
     TabOrder = 0
     object ExportButton: TRxSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 112
+      Width = 101
       Align = alLeft
       AutoSize = True
       Caption = 'Экспорт'
@@ -175,20 +174,20 @@ object CardForm: TCardForm
   end
   object CardPanel: TPanel
     Left = 0
-    Height = 297
-    Top = 42
-    Width = 800
+    Height = 237
+    Top = 34
+    Width = 640
     Align = alClient
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 293
-    ClientWidth = 796
+    ClientHeight = 233
+    ClientWidth = 636
     TabOrder = 1
     object CardGrid: TsWorksheetGrid
       Left = 0
-      Height = 271
+      Height = 213
       Top = 0
-      Width = 796
+      Width = 636
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
@@ -220,14 +219,23 @@ object CardForm: TCardForm
     end
     object ZoomPanel: TPanel
       Left = 0
-      Height = 22
-      Top = 271
-      Width = 796
+      Height = 18
+      Top = 215
+      Width = 636
       Align = alBottom
       BevelOuter = bvNone
       Color = clWindow
       ParentColor = False
       TabOrder = 1
+    end
+    object Bevel1: TBevel
+      Left = 0
+      Height = 2
+      Top = 213
+      Width = 636
+      Align = alBottom
+      Shape = bsBottomLine
+      Style = bsRaised
     end
   end
 end

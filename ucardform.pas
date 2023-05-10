@@ -14,6 +14,7 @@ type
   { TCardForm }
 
   TCardForm = class(TForm)
+    Bevel1: TBevel;
     CardPanel: TPanel;
     ExportButton: TRxSpeedButton;
     CardGrid: TsWorksheetGrid;

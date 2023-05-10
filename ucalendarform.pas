@@ -17,6 +17,7 @@ type
 
   TCalendarForm = class(TForm)
     AddDateButton: TSpeedButton;
+    Bevel1: TBevel;
     CancelCopyButton: TSpeedButton;
     CopyDateButton: TSpeedButton;
     CopyEditPanel: TPanel;

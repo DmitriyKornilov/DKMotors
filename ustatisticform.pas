@@ -17,6 +17,7 @@ type
 
   TStatisticForm = class(TForm)
     ANEMAsSameNameCheckBox: TCheckBox;
+    Bevel1: TBevel;
     Label10: TLabel;
     ANEMPanel: TPanel;
     SeveralPeriodsCheckBox: TCheckBox;

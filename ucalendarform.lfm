@@ -237,7 +237,7 @@ object CalendarForm: TCalendarForm
       TabOrder = 0
       object CalendarGrid: TsWorksheetGrid
         Left = 0
-        Height = 501
+        Height = 499
         Top = 0
         Width = 500
         AutoExpand = []
@@ -282,6 +282,15 @@ object CalendarForm: TCalendarForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+      end
+      object Bevel1: TBevel
+        Left = 0
+        Height = 2
+        Top = 499
+        Width = 500
+        Align = alBottom
+        Shape = bsBottomLine
+        Style = bsRaised
       end
     end
   end
