@@ -105,7 +105,7 @@ end;
 
 procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
-  MainForm.SetNamesPanelsVisible(False, True);
+  MainForm.SetNamesPanelsVisible(True, True);
 
   ZoomPercent:= 100;
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawShipment, True);
@@ -136,7 +136,8 @@ begin
   if SQLite.EditList('Грузополучатели',
     'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then
   begin
-    SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value, Months, Shipments, CargoIDs);
+    SQLite.ShipmentListLoad(MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
+                            SpinEdit1.Value, Months, Shipments, CargoIDs);
     SelectShipment;
   end;
 end;
@@ -149,8 +150,8 @@ end;
 procedure TShipmentForm.OpenShipmentList(const ACargoID: Integer);
 begin
   LogGrid.Clear;
-  SQLite.ShipmentListLoad(MainForm.UsedReceiverIDs, SpinEdit1.Value,
-                          Months, Shipments, CargoIDs);
+  SQLite.ShipmentListLoad(MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
+                          SpinEdit1.Value, Months, Shipments, CargoIDs);
   VSTCargoList.Update(Months, Shipments, CargoIDs, ACargoID);
   SetButtonsEnabled(VSTCargoList.IsSelected);
 end;

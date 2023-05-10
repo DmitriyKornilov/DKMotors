@@ -142,7 +142,7 @@ type
                              out AMotorCounts: TIntVector): Boolean;
 
     //отгрузки
-    function ShipmentListLoad(const AReceiverIDs: TIntVector;
+    function ShipmentListLoad(const ANameIDs, AReceiverIDs: TIntVector;
                              const AYear: Word; out AMonths: TStrVector;
                           out AShipments: TStrMatrix;
                           out ACargoIDs: TIntMatrix): Boolean;
@@ -160,7 +160,7 @@ type
                 out AReceiverNames: TStrVector;
                 out AMotorNames: TStrMatrix;
                 out AMotorCounts: TIntMatrix): Boolean;
-    function CargoListLoad(const AReceiverIDs: TIntVector;
+    function CargoListLoad(const ANameIDs, AReceiverIDs: TIntVector;
                          const ABeginDate, AEndDate: TDate;
                          out ACargoIDs: TIntVector;
                          out ASendDates: TDateVector;
@@ -1782,7 +1782,7 @@ begin
   QClose;
 end;
 
-function TSQLite.ShipmentListLoad(const AReceiverIDs: TIntVector;
+function TSQLite.ShipmentListLoad(const ANameIDs, AReceiverIDs: TIntVector;
   const AYear: Word; out AMonths: TStrVector; out AShipments: TStrMatrix; out
   ACargoIDs: TIntMatrix): Boolean;
 var
@@ -1803,7 +1803,7 @@ begin
     Shipments:= nil;
     BD:= FirstDayInMonth(i, AYear);
     ED:= LastDayInMonth(i, AYear);
-    CargoListLoad(AReceiverIDs, BD, ED, CargoIDs, SendDates, ReceiverNames);
+    CargoListLoad(ANameIDs, AReceiverIDs, BD, ED, CargoIDs, SendDates, ReceiverNames);
     if not VIsNil(SendDates) then
     begin
       for j:= 0 to High(SendDates) do
@@ -2024,21 +2024,75 @@ begin
   end;
 end;
 
-function TSQLite.CargoListLoad(const AReceiverIDs: TIntVector;
+function TSQLite.CargoListLoad(const ANameIDs, AReceiverIDs: TIntVector;
   const ABeginDate, AEndDate: TDate; out ACargoIDs: TIntVector; out
   ASendDates: TDateVector; out AReceiverNames: TStrVector): Boolean;
 var
+  i: Integer;
   WhereStr: String;
+  CargoIDs: TIntVector;
+  SendDates: TDateVector;
+  ReceiverNames: TStrVector;
+
+  function IsCargoHasMotorNames(const ACargoID: Integer): Boolean;
+  var
+    S: String;
+  begin
+    S:= 'WHERE (CargoID=:CargoID) ';
+    S:= S + 'AND' + SqlIN('','NameID', Length(ANameIDs));
+    QSetSQL(
+      'SELECT MotorID FROM MOTORLIST ' +
+      S
+      );
+    QParamInt('CargoID', ACargoID);
+    QParamsInt(ANameIDs);
+    QOpen;
+    Result:= not QIsEmpty;
+    QClose;
+  end;
+
 begin
   Result:= False;
   ACargoIDs:= nil;
   ASendDates:= nil;
   AReceiverNames:= nil;
 
+  //WhereStr:= 'WHERE (t1.SendDate >= :BeginDate) AND (t1.SendDate <= :EndDate) ';
+  //if not VIsNil(AReceiverIDs) then
+  //  WhereStr:= WhereStr + 'AND' + SqlIN('t1','ReceiverID', Length(AReceiverIDs));
+  //QSetQuery(FQuery);
+  //QClose;
+  //QSetSQL(
+  //  'SELECT t1.CargoID, t1.SendDate, t2.ReceiverName ' +
+  //  'FROM CARGOLIST t1 ' +
+  //  'INNER JOIN CARGORECEIVERS t2 ON (t1.ReceiverID=t2.ReceiverID) ' +
+  //  WhereStr +
+  //  'ORDER BY t1.SendDate DESC');
+  //QParamDT('BeginDate', ABeginDate);
+  //QParamDT('EndDate', AEndDate);
+  //if not VIsNil(AReceiverIDs) then
+  //  QParamsInt(AReceiverIDs);
+  //QOpen;
+  //if not QIsEmpty then
+  //begin
+  //  QFirst;
+  //  while not QEOF do
+  //  begin
+  //    VAppend(ASendDates, QFieldDT('SendDate'));
+  //    VAppend(ACargoIDs, QFieldInt('CargoID'));
+  //    VAppend(AReceiverNames, QFieldStr('ReceiverName'));
+  //    QNext;
+  //  end;
+  //  Result:= True;
+  //end;
+  //QClose;
+
+  CargoIDs:= nil;
+  SendDates:= nil;
+  ReceiverNames:= nil;
   WhereStr:= 'WHERE (t1.SendDate >= :BeginDate) AND (t1.SendDate <= :EndDate) ';
   if not VIsNil(AReceiverIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t1','ReceiverID', Length(AReceiverIDs));
-
   QSetQuery(FQuery);
   QClose;
   QSetSQL(
@@ -2057,14 +2111,35 @@ begin
     QFirst;
     while not QEOF do
     begin
-      VAppend(ASendDates, QFieldDT('SendDate'));
-      VAppend(ACargoIDs, QFieldInt('CargoID'));
-      VAppend(AReceiverNames, QFieldStr('ReceiverName'));
+      VAppend(SendDates, QFieldDT('SendDate'));
+      VAppend(CargoIDs, QFieldInt('CargoID'));
+      VAppend(ReceiverNames, QFieldStr('ReceiverName'));
       QNext;
     end;
     Result:= True;
   end;
   QClose;
+
+  if VIsNil(CargoIDs) then Exit;
+
+  if VIsNil(ANameIDs) then
+  begin
+    Result:= True;
+    ACargoIDs:= CargoIDs;
+    ASendDates:= SendDates;
+    AReceiverNames:= ReceiverNames;
+    Exit;
+  end;
+
+  for i:= 0 to High(CargoIDs) do
+  begin
+    if not IsCargoHasMotorNames(CargoIDs[i]) then continue;
+    VAppend(ASendDates, SendDates[i]);
+    VAppend(ACargoIDs, CargoIDs[i]);
+    VAppend(AReceiverNames, ReceiverNames[i]);
+  end;
+
+  Result:= not VIsNil(ACargoIDs);
 end;
 
 function TSQLite.CargoChooseListLoad(const ANameID: Integer;
