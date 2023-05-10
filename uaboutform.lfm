@@ -1,12 +1,12 @@
 object AboutForm: TAboutForm
-  Left = 685
+  Left = 550
   Height = 320
-  Top = 270
-  Width = 650
+  Top = 245
+  Width = 660
   BorderStyle = bsSizeToolWin
   Caption = 'О программе'
   ClientHeight = 320
-  ClientWidth = 650
+  ClientWidth = 660
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.2.4.0'
@@ -460,7 +460,7 @@ object AboutForm: TAboutForm
     Left = 196
     Height = 15
     Top = 7
-    Width = 419
+    Width = 429
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 10
@@ -482,7 +482,7 @@ object AboutForm: TAboutForm
     Left = 196
     Height = 274
     Top = 41
-    Width = 449
+    Width = 459
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Top = 19
     BorderSpacing.Right = 5
