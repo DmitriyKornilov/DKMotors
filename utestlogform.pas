@@ -195,6 +195,9 @@ begin
       TestAddForm.DateTimePicker1.Date:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]
     else
       TestAddForm.DateTimePicker1.Date:= Date;
+    TestAddForm.UsedNameID:= 0;
+    if Length(MainForm.UsedNameIDs)=1 then
+      TestAddForm.UsedNameID:= VFirst(MainForm.UsedNameIDs);
     TestAddForm.ShowModal;
     D:= TestAddForm.DateTimePicker1.Date;
   finally

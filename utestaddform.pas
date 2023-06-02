@@ -75,6 +75,8 @@ type
     procedure ShowTestList(const ANeedSelect: Boolean);
 
     procedure LoadMotors;
+  public
+    UsedNameID: Integer;
   end;
 
 var
@@ -94,7 +96,16 @@ begin
 end;
 
 procedure TTestAddForm.FormShow(Sender: TObject);
+var
+  Ind: Integer;
 begin
+  if UsedNameID>0 then
+  begin
+    Ind:= VIndexOf(NameIDs, UsedNameID);
+    if Ind>=0 then
+      MotorNameComboBox.ItemIndex:= Ind;
+  end;
+
   VSTViewTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
   VSTViewTable.AddColumn('Дата сборки', 100);
   VSTViewTable.AddColumn('Номер', 100);

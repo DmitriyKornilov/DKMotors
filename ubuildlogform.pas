@@ -183,6 +183,9 @@ begin
       BuildAddForm.DateTimePicker1.Date:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2]
     else
       BuildAddForm.DateTimePicker1.Date:= Date;
+    BuildAddForm.UsedNameID:= 0;
+    if Length(MainForm.UsedNameIDs)=1 then
+      BuildAddForm.UsedNameID:= VFirst(MainForm.UsedNameIDs);
     BuildAddForm.ShowModal;
     D:= BuildAddForm.DateTimePicker1.Date;
   finally

@@ -63,6 +63,8 @@ type
     procedure DelMotor;
 
     procedure ShowBuildList(const ANeedSelect: Boolean);
+  public
+    UsedNameID: Integer;
   end;
 
 var
@@ -85,7 +87,16 @@ begin
 end;
 
 procedure TBuildAddForm.FormShow(Sender: TObject);
+var
+  Ind: Integer;
 begin
+  if UsedNameID>0 then
+  begin
+    Ind:= VIndexOf(NameIDs, UsedNameID);
+    if Ind>=0 then
+      MotorNameComboBox.ItemIndex:= Ind;
+  end;
+
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
   VSTTable.AddColumn('№ п/п', 60);
   VSTTable.AddColumn('Наименование', 220);
@@ -179,7 +190,6 @@ end;
 procedure TBuildAddForm.LoadMotorNames;
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
-
   if not VIsNil(NameIDs) then
     AddButton.Enabled:= True
   else
