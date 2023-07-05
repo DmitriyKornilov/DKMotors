@@ -226,6 +226,7 @@ begin
   S:= 'Упорядочить по:';
   V:= VCreateStr([
     'дате прибытия',
+    'дате убытия',
     'номеру'
   ]);
   VSTOrderList:= TVSTStringList.Create(VT3, S, @ShowRepair);

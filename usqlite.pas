@@ -223,7 +223,7 @@ type
 
     //ремонты
     function RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
-          const AOrderType: Integer; //1 - по дате прибытия, 2 - по номеру
+          const AOrderType: Integer; //1 - по дате прибытия, 2- по дате убытия, 3 - по номеру
           const AListType: Integer; //0 - все, 1-в ремонте, 2 - отремонтированные
           out AArrivalDates, ASendingDates: TDateVector;
           out ARecIDs, AMotorIDs, APassports, AWorkDayCounts: TIntVector;
@@ -2788,7 +2788,7 @@ begin
 end;
 
 function TSQLite.RepairListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
-          const AOrderType: Integer; //1 - по дате прибытия, 2 - по номеру
+          const AOrderType: Integer; //1 - по дате прибытия, 2- по дате убытия, 3 - по номеру
           const AListType: Integer; //0 - все, 1-в ремонте, 2 - отремонтированные
           out AArrivalDates, ASendingDates: TDateVector;
           out ARecIDs, AMotorIDs, APassports, AWorkDayCounts: TIntVector;
@@ -2824,6 +2824,8 @@ begin
   if AOrderType=1 then
     OrderStr:= 'ORDER BY t1.ArrivalDate, t2.MotorNum'
   else if AOrderType=2 then
+    OrderStr:= 'ORDER BY t1.SendingDate, t2.MotorNum'
+  else if AOrderType=3 then
     OrderStr:= 'ORDER BY t2.MotorNum, t1.ArrivalDate';
 
   QSetQuery(FQuery);
