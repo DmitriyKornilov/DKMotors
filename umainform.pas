@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls, USQLite3ListForm,
+  StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
   UControlListForm, UCalendarForm, USQLite, DK_Const;
@@ -21,6 +21,7 @@ type
     DividerBevel6: TDividerBevel;
     DividerBevel7: TDividerBevel;
     DividerBevel8: TDividerBevel;
+    DividerBevel9: TDividerBevel;
     MotorListButton: TRxSpeedButton;
     ChooseMotorNamesButton: TSpeedButton;
     ChooseRecieverNamesButton: TSpeedButton;
@@ -34,6 +35,7 @@ type
     MainPanel: TPanel;
     MotorNamesLabel: TLabel;
     MotorNamesPanel: TPanel;
+    RefreshButton: TSpeedButton;
     RepairButton: TRxSpeedButton;
     CalendarButton: TRxSpeedButton;
     ToolPanel: TPanel;
@@ -62,6 +64,7 @@ type
     procedure MotorNamesPanelClick(Sender: TObject);
     procedure ReceiverNamesLabelClick(Sender: TObject);
     procedure ReceiverNamesPanelClick(Sender: TObject);
+    procedure RefreshButtonClick(Sender: TObject);
     procedure RepairButtonClick(Sender: TObject);
     procedure StatisticButtonClick(Sender: TObject);
     procedure BuildLogButtonClick(Sender: TObject);
@@ -128,9 +131,9 @@ begin
   Height:= 300;
   Width:= 500;
 
-  USQLite3ListForm.ImageList:= ImageListEdit24;
   SQLite:= TSQLite.Create;
-  SQLite.SetEditListSettings(DefaultSelectionBGColor, clWindowText);
+  SQLite.SetColors(DefaultSelectionBGColor, clWindowText);
+  SQLite.SetNavigatorGlyphs(ImageListEdit24);
   ConnectDB;
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
   SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
@@ -191,6 +194,12 @@ end;
 procedure TMainForm.ReceiverNamesPanelClick(Sender: TObject);
 begin
   ChangeUsedReceiverList;
+end;
+
+procedure TMainForm.RefreshButtonClick(Sender: TObject);
+begin
+  SQLite.Reconnect;
+  Choose;
 end;
 
 procedure TMainForm.RepairButtonClick(Sender: TObject);
