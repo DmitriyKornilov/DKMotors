@@ -6,27 +6,47 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, DividerBevel, DK_LCLStrRus, DK_Vector, rxctrls,
+  StdCtrls, Menus, DK_LCLStrRus, DK_Vector, DK_VSTTables,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
-  UControlListForm, UCalendarForm, USQLite, DK_Const;
+  UControlListForm, UCalendarForm, USQLite, BCButton, DK_Const, UUtils,
+  DK_CtrlUtils, LCLType;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
-    ControlListButton: TRxSpeedButton;
-    DividerBevel5: TDividerBevel;
-    DividerBevel6: TDividerBevel;
-    DividerBevel7: TDividerBevel;
-    DividerBevel8: TDividerBevel;
-    DividerBevel9: TDividerBevel;
-    MotorListButton: TRxSpeedButton;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
+    Bevel4: TBevel;
+    DictionaryButton: TBCButton;
+    ManufactureButton: TBCButton;
+    BuildLogMenuItem: TMenuItem;
+    DictionaryMenu: TPopupMenu;
+    DefectListMenuItem: TMenuItem;
+    FactoryListMenuItem: TMenuItem;
+    PlaceListMenuItem: TMenuItem;
+    ReasonListMenuItem: TMenuItem;
+    ReceiverNamesMenuItem: TMenuItem;
+    MotorNamesMenuItem: TMenuItem;
+    ProductMenu: TPopupMenu;
+    ProductButton: TBCButton;
+    MotorListMenuItem: TMenuItem;
+    ManufactureMenu: TPopupMenu;
+    RepairMenuItem: TMenuItem;
+    Separator1: TMenuItem;
+    Separator2: TMenuItem;
+    Separator3: TMenuItem;
+    ShipmentMenuItem: TMenuItem;
+    ControlListMenuItem: TMenuItem;
+    ReportButton: TBCButton;
+    CalendarButton: TBCButton;
+    StatisticMenuItem: TMenuItem;
+    ReclamationMenuItem: TMenuItem;
     ChooseMotorNamesButton: TSpeedButton;
     ChooseRecieverNamesButton: TSpeedButton;
     ExitButton: TSpeedButton;
-    DividerBevel4: TDividerBevel;
     ImageListEdit24: TImageList;
     ImageListCategory24: TImageList;
     ImageList16: TImageList;
@@ -36,44 +56,51 @@ type
     MotorNamesLabel: TLabel;
     MotorNamesPanel: TPanel;
     RefreshButton: TSpeedButton;
-    RepairButton: TRxSpeedButton;
-    CalendarButton: TRxSpeedButton;
+    ClaimButton: TBCButton;
+    ClaimMenu: TPopupMenu;
+    StoreMenuItem: TMenuItem;
+    TestLogMenuItem: TMenuItem;
     ToolPanel: TPanel;
     ReceiverNamesLabel: TLabel;
     ReceiverNamesPanel: TPanel;
-    BuildLogButton: TRxSpeedButton;
-    StatisticButton: TRxSpeedButton;
-    ShipmentButton: TRxSpeedButton;
-    ReclamationButton: TRxSpeedButton;
-    StoreButton: TRxSpeedButton;
-    TestLogButton: TRxSpeedButton;
-    ReportButton: TRxSpeedButton;
     AboutButton: TSpeedButton;
     procedure AboutButtonClick(Sender: TObject);
-    procedure CalendarButtonClick(Sender: TObject);
+    procedure BuildLogMenuItemClick(Sender: TObject);
     procedure ChooseMotorNamesButtonClick(Sender: TObject);
     procedure ChooseRecieverNamesButtonClick(Sender: TObject);
-    procedure ControlListButtonClick(Sender: TObject);
+    procedure ClaimButtonClick(Sender: TObject);
+    procedure ControlListMenuItemClick(Sender: TObject);
+    procedure DefectListMenuItemClick(Sender: TObject);
+    procedure DictionaryButtonClick(Sender: TObject);
     procedure ExitButtonClick(Sender: TObject);
+    procedure FactoryListMenuItemClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Label2Click(Sender: TObject);
     procedure Label3Click(Sender: TObject);
-    procedure MotorListButtonClick(Sender: TObject);
+    procedure ManufactureButtonClick(Sender: TObject);
+    procedure MotorListMenuItemClick(Sender: TObject);
     procedure MotorNamesLabelClick(Sender: TObject);
+    procedure MotorNamesMenuItemClick(Sender: TObject);
     procedure MotorNamesPanelClick(Sender: TObject);
+    procedure PlaceListMenuItemClick(Sender: TObject);
+    procedure ProductButtonClick(Sender: TObject);
+    procedure ReasonListMenuItemClick(Sender: TObject);
     procedure ReceiverNamesLabelClick(Sender: TObject);
+    procedure ReceiverNamesMenuItemClick(Sender: TObject);
     procedure ReceiverNamesPanelClick(Sender: TObject);
+    procedure ReclamationMenuItemClick(Sender: TObject);
     procedure RefreshButtonClick(Sender: TObject);
-    procedure RepairButtonClick(Sender: TObject);
-    procedure StatisticButtonClick(Sender: TObject);
-    procedure BuildLogButtonClick(Sender: TObject);
-    procedure ShipmentButtonClick(Sender: TObject);
-    procedure ReclamationButtonClick(Sender: TObject);
-    procedure StoreButtonClick(Sender: TObject);
-    procedure TestLogButtonClick(Sender: TObject);
+    procedure RepairMenuItemClick(Sender: TObject);
+    procedure ShipmentMenuItemClick(Sender: TObject);
     procedure ReportButtonClick(Sender: TObject);
+    procedure CalendarButtonClick(Sender: TObject);
+    procedure StatisticMenuItemClick(Sender: TObject);
+    procedure StoreMenuItemClick(Sender: TObject);
+    procedure TestLogMenuItemClick(Sender: TObject);
   private
+    Category: Byte;
+
     BuildLogForm: TBuildLogForm;
     TestLogForm: TTestLogForm;
     ShipmentForm: TShipmentForm;
@@ -87,7 +114,7 @@ type
     CalendarForm: TCalendarForm;
 
     procedure ConnectDB;
-    procedure Choose;
+    procedure CategoryChoose(const ACategory: Byte);
     procedure FreeForms;
     procedure SetFormPosition(AForm: TForm);
     procedure OpenBuildLogForm;
@@ -106,6 +133,8 @@ type
     procedure ChangeUsedReceiverList;
 
     procedure ShowData;
+
+    procedure DictionaryChoose(const ADictionary: Byte);
   public
     UsedNameIDs: TIntVector;
     UsedNames: TStrVector;
@@ -131,13 +160,18 @@ begin
   Height:= 300;
   Width:= 500;
 
+  SetToolPanels([
+    ToolPanel, MotorNamesPanel, ReceiverNamesPanel
+  ]);
+  SetToolButtons([
+    RefreshButton, AboutButton, ExitButton, ChooseMotorNamesButton, ChooseRecieverNamesButton
+  ]);
+
   SQLite:= TSQLite.Create;
-  SQLite.SetColors(DefaultSelectionBGColor, clWindowText);
-  SQLite.SetNavigatorGlyphs(ImageListEdit24);
   ConnectDB;
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
   SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
-  Choose;
+  CategoryChoose(4);
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -161,6 +195,36 @@ begin
   ChangeUsedMotorList;
 end;
 
+procedure TMainForm.MotorNamesMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(1);
+end;
+
+procedure TMainForm.ReceiverNamesMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(2);
+end;
+
+procedure TMainForm.DefectListMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(3);
+end;
+
+procedure TMainForm.ReasonListMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(4);
+end;
+
+procedure TMainForm.FactoryListMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(5);
+end;
+
+procedure TMainForm.PlaceListMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(6);
+end;
+
 procedure TMainForm.MotorNamesPanelClick(Sender: TObject);
 begin
   ChangeUsedMotorList;
@@ -171,9 +235,29 @@ begin
   ChangeUsedReceiverList;
 end;
 
-procedure TMainForm.ControlListButtonClick(Sender: TObject);
+procedure TMainForm.ManufactureButtonClick(Sender: TObject);
 begin
-  if not Assigned(ControlListForm) then Choose;
+  ControlPopupMenuShow(Sender, ManufactureMenu);
+end;
+
+procedure TMainForm.ProductButtonClick(Sender: TObject);
+begin
+  ControlPopupMenuShow(Sender, ProductMenu);
+end;
+
+procedure TMainForm.ClaimButtonClick(Sender: TObject);
+begin
+  ControlPopupMenuShow(Sender, ClaimMenu);
+end;
+
+procedure TMainForm.DictionaryButtonClick(Sender: TObject);
+begin
+  ControlPopupMenuShow(Sender, DictionaryMenu);
+end;
+
+procedure TMainForm.ControlListMenuItemClick(Sender: TObject);
+begin
+  if not Assigned(ControlListForm) then CategoryChoose(3);
 end;
 
 procedure TMainForm.Label3Click(Sender: TObject);
@@ -181,9 +265,9 @@ begin
   ChangeUsedReceiverList;
 end;
 
-procedure TMainForm.MotorListButtonClick(Sender: TObject);
+procedure TMainForm.MotorListMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(MotorListForm) then Choose;
+  if not Assigned(MotorListForm) then CategoryChoose(4);
 end;
 
 procedure TMainForm.ReceiverNamesLabelClick(Sender: TObject);
@@ -196,15 +280,15 @@ begin
   ChangeUsedReceiverList;
 end;
 
+procedure TMainForm.ReclamationMenuItemClick(Sender: TObject);
+begin
+  if not Assigned(ReclamationForm) then CategoryChoose(7);
+end;
+
 procedure TMainForm.RefreshButtonClick(Sender: TObject);
 begin
   SQLite.Reconnect;
-  Choose;
-end;
-
-procedure TMainForm.RepairButtonClick(Sender: TObject);
-begin
-  if not Assigned(RepairForm) then Choose;
+  CategoryChoose(Category);
 end;
 
 procedure TMainForm.ExitButtonClick(Sender: TObject);
@@ -221,44 +305,44 @@ begin
   FreeAndNil(AboutForm);
 end;
 
-procedure TMainForm.CalendarButtonClick(Sender: TObject);
+procedure TMainForm.BuildLogMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(CalendarForm) then Choose;
+  if not Assigned(BuildLogForm) then CategoryChoose(1);
 end;
 
-procedure TMainForm.BuildLogButtonClick(Sender: TObject);
+procedure TMainForm.RepairMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(BuildLogForm) then Choose;
+  if not Assigned(RepairForm) then CategoryChoose(9);
 end;
 
-procedure TMainForm.ShipmentButtonClick(Sender: TObject);
+procedure TMainForm.ShipmentMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(ShipmentForm) then Choose;
-end;
-
-procedure TMainForm.ReclamationButtonClick(Sender: TObject);
-begin
-  if not Assigned(ReclamationForm) then Choose;
-end;
-
-procedure TMainForm.StoreButtonClick(Sender: TObject);
-begin
-  if not Assigned(StoreForm) then Choose;
-end;
-
-procedure TMainForm.TestLogButtonClick(Sender: TObject);
-begin
-  if not Assigned(TestLogForm) then Choose;
+  if not Assigned(ShipmentForm) then CategoryChoose(6);
 end;
 
 procedure TMainForm.ReportButtonClick(Sender: TObject);
 begin
-  if not Assigned(ReportForm) then Choose;
+  if not Assigned(ReportForm) then CategoryChoose(10);
 end;
 
-procedure TMainForm.StatisticButtonClick(Sender: TObject);
+procedure TMainForm.CalendarButtonClick(Sender: TObject);
 begin
-  if not Assigned(StatisticForm) then Choose;
+  if not Assigned(CalendarForm) then CategoryChoose(11);
+end;
+
+procedure TMainForm.StatisticMenuItemClick(Sender: TObject);
+begin
+  if not Assigned(StatisticForm) then CategoryChoose(8);
+end;
+
+procedure TMainForm.StoreMenuItemClick(Sender: TObject);
+begin
+  if not Assigned(StoreForm) then CategoryChoose(5);
+end;
+
+procedure TMainForm.TestLogMenuItemClick(Sender: TObject);
+begin
+  if not Assigned(TestLogForm) then CategoryChoose(2);
 end;
 
 procedure TMainForm.ConnectDB;
@@ -272,22 +356,25 @@ begin
   SQLite.ExecuteScript(DDLName);
 end;
 
-procedure TMainForm.Choose;
+procedure TMainForm.CategoryChoose(const ACategory: Byte);
 begin
   Screen.Cursor:= crHourGlass;
   try
     FreeForms;
-    if BuildLogButton.Down       then OpenBuildLogForm
-    else if ShipmentButton.Down  then OpenShipmentForm
-    else if ReclamationButton.Down  then OpenReclamationForm
-    else if StoreButton.Down  then OpenStoreForm
-    else if TestLogButton.Down  then OpenTestForm
-    else if ReportButton.Down  then OpenReportForm
-    else if StatisticButton.Down then OpenStatisticForm
-    else if MotorListButton.Down then OpenMotorListForm
-    else if RepairButton.Down then OpenRepairForm
-    else if ControlListButton.Down then OpenControlListForm
-    else if CalendarButton.Down then OpenCalendarForm;
+    Category:= ACategory;
+    case Category of
+      1: OpenBuildLogForm;
+      2: OpenTestForm;
+      3: OpenControlListForm;
+      4: OpenMotorListForm;
+      5: OpenStoreForm;
+      6: OpenShipmentForm;
+      7: OpenReclamationForm;
+      8: OpenStatisticForm;
+      9: OpenRepairForm;
+      10: OpenReportForm;
+      11: OpenCalendarForm;
+    end;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -407,16 +494,47 @@ end;
 
 procedure TMainForm.ShowData;
 begin
-  if BuildLogButton.Down         then BuildLogForm.ShowBuildLog
-  else if ShipmentButton.Down    then ShipmentForm.ShowShipment
-  else if ReclamationButton.Down then ReclamationForm.ShowReclamation
-  else if StoreButton.Down       then StoreForm.ShowStore
-  else if TestLogButton.Down     then TestLogForm.ShowTestLog
-  else if ReportButton.Down      then ReportForm.ShowReport
-  else if StatisticButton.Down   then StatisticForm.ShowStatistic
-  else if MotorListButton.Down   then MotorListForm.ShowMotorList
-  else if RepairButton.Down      then RepairForm.ShowRepair
-  else if ControlListButton.Down then ControlListForm.ShowControlList;
+  case Category of
+    1: BuildLogForm.ShowBuildLog;
+    2: TestLogForm.ShowTestLog;
+    3: ControlListForm.ShowControlList;
+    4: MotorListForm.ShowMotorList;
+    5: StoreForm.ShowStore;
+    6: ShipmentForm.ShowShipment;
+    7: ReclamationForm.ShowReclamation;
+    8: StatisticForm.ShowStatistic;
+    9: RepairForm.ShowRepair;
+    10: ReportForm.ShowReport;
+    //11: ;
+  end;
+end;
+
+procedure TMainForm.DictionaryChoose(const ADictionary: Byte);
+var
+  IsOK: Boolean;
+begin
+  case ADictionary of
+    1: IsOK:= SQLite.EditList('Наименования электродвигателей',
+                              'MOTORNAMES', 'NameID', 'MotorName', False, True);
+    2: IsOK:= SQLite.EditList('Грузополучатели',
+                              'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True);
+    3: IsOK:= SQLite.EditList('Элементы электродвигателей',
+                              'RECLAMATIONDEFECTS', 'DefectID', 'DefectName', True, True);
+    4: IsOK:= SQLite.EditTable('Причины возникновения неисправностей',
+                              'RECLAMATIONREASONS', 'ReasonID',
+                              ['ReasonName',  'ReasonColor'],
+                              ['Причина',     'Цвет'       ],
+                              [ctString,      ctColor      ],
+                              [True,          True         ],
+                              [300,           80           ],
+                              [taLeftJustify, taCenter     ],
+                              True, ['ReasonName']);
+    5: IsOK:= SQLite.EditList('Заводы',
+                              'RECLAMATIONFACTORIES', 'FactoryID', 'FactoryName', True, True);
+    6: IsOK:= SQLite.EditList('Предприятия (депо)',
+                              'RECLAMATIONPLACES', 'PlaceID', 'PlaceName', True, True);
+  end;
+  if IsOK then ShowData;
 end;
 
 procedure TMainForm.SetNamesPanelsVisible(const AMotorNamesPanelVisible,

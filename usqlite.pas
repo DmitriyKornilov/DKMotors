@@ -433,7 +433,7 @@ end;
 procedure TSQLite.NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
 begin
-  LoadIDsAndNames(AComboBox, AIDs,
+  KeyPickLoad(AComboBox, AIDs,
                   'MOTORNAMES', 'NameID', 'MotorName', 'NameID',
                   AKeyValueNotZero, 'ВСЕ НАИМЕНОВАНИЯ');
 end;
@@ -441,7 +441,7 @@ end;
 procedure TSQLite.ReceiverIDsAndNamesLoad(AComboBox: TComboBox;
   out AIDs: TIntVector; const AKeyValueNotZero: Boolean = True);
 begin
-  LoadIDsAndNames(AComboBox, AIDs,
+  KeyPickLoad(AComboBox, AIDs,
                   'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', 'ReceiverName',
                   AKeyValueNotZero, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ');
 end;

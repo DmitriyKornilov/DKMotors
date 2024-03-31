@@ -6,11 +6,11 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid, rxctrls,
-  DK_Vector, DividerBevel, USheetUtils, DK_DateUtils, UReclamationEditForm,
+  StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid,
+  DK_Vector, UUtils, USheetUtils, DK_DateUtils, UReclamationEditForm,
   DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
-  URepairEditForm, DateTimePicker, UControlListEditForm, DK_Zoom, DK_Const,
-  DK_VSTTools;
+  URepairEditForm, DateTimePicker, UControlListEditForm, BCButton, DK_Zoom,
+  DK_Const, DK_VSTTools;
 
 type
 
@@ -19,9 +19,14 @@ type
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
     Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
+    Bevel4: TBevel;
+    Bevel5: TBevel;
     CardPanel: TPanel;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
+    ExportButton: TBCButton;
     Label3: TLabel;
     LeftPanel: TPanel;
     LogGrid: TsWorksheetGrid;
@@ -29,29 +34,19 @@ type
     Panel4: TPanel;
     RepairButton: TSpeedButton;
     MotorCardCheckBox: TCheckBox;
-    DefectListButton: TRxSpeedButton;
-    DividerBevel8: TDividerBevel;
-    DividerBevel9: TDividerBevel;
-    FactoryListButton: TRxSpeedButton;
     Label2: TLabel;
     MotorNumEdit: TEditButton;
     Panel2: TPanel;
     DelButton: TSpeedButton;
-    DividerBevel5: TDividerBevel;
-    DividerBevel7: TDividerBevel;
     EditButton: TSpeedButton;
-    DividerBevel6: TDividerBevel;
-    ExportButton: TRxSpeedButton;
     Panel3: TPanel;
     Panel5: TPanel;
     Panel7: TPanel;
-    PlaceListButton: TRxSpeedButton;
-    ReasonListButton: TRxSpeedButton;
     ControlButton: TSpeedButton;
     ReportPeriodPanel: TPanel;
     Splitter0: TSplitter;
     Splitter1: TSplitter;
-    TopToolsPanel: TPanel;
+    ToolPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     VT3: TVirtualStringTree;
@@ -63,18 +58,15 @@ type
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
-    procedure FactoryListButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure LogGridDblClick(Sender: TObject);
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
-    procedure PlaceListButtonClick(Sender: TObject);
-    procedure DefectListButtonClick(Sender: TObject);
-    procedure ReasonListButtonClick(Sender: TObject);
     procedure RepairButtonClick(Sender: TObject);
   private
     CardForm: TCardForm;
@@ -133,6 +125,13 @@ uses UMainForm;
 
 procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetToolButtons([
+    AddButton, DelButton, EditButton, RepairButton, ControlButton
+  ]);
+
   CanShow:= False;
   CardForm:= CreateCardForm(ReclamationForm, CardPanel);
   MotorCardCheckBox.Checked:= False;
@@ -167,6 +166,12 @@ end;
 procedure TReclamationForm.FormShow(Sender: TObject);
 begin
   ShowReclamation;
+end;
+
+procedure TReclamationForm.LogGridDblClick(Sender: TObject);
+begin
+  if SelectedIndex<0 then Exit;
+  OpenReclamationEditForm(2);
 end;
 
 procedure TReclamationForm.LogGridMouseDown(Sender: TObject;
@@ -213,34 +218,6 @@ end;
 procedure TReclamationForm.MotorNumEditChange(Sender: TObject);
 begin
   ShowReclamation;
-end;
-
-procedure TReclamationForm.PlaceListButtonClick(Sender: TObject);
-begin
-  if SQLite.EditList('Предприятия (депо)',
-    'RECLAMATIONPLACES', 'PlaceID', 'PlaceName', True, True) then
-      ShowReclamation;
-end;
-
-procedure TReclamationForm.FactoryListButtonClick(Sender: TObject);
-begin
-  if SQLite.EditList('Заводы',
-    'RECLAMATIONFACTORIES', 'FactoryID', 'FactoryName', True, True) then
-      ShowReclamation;
-end;
-
-procedure TReclamationForm.DefectListButtonClick(Sender: TObject);
-begin
-  if SQLite.EditList('Неисправные элементы',
-    'RECLAMATIONDEFECTS', 'DefectID', 'DefectName', True, True) then
-      ShowReclamation;
-end;
-
-procedure TReclamationForm.ReasonListButtonClick(Sender: TObject);
-begin
-  if SQLite.EditList('Причины возникновения неисправностей',
-    'RECLAMATIONREASONS', 'ReasonID', 'ReasonName', True, True, 'ReasonColor') then
-      ShowReclamation;
 end;
 
 procedure TReclamationForm.RepairButtonClick(Sender: TObject);
@@ -331,9 +308,9 @@ procedure TReclamationForm.ExportReclamation;
 var
   Drawer: TReclamationSheet;
   Sheet: TsWorksheet;
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TReclamationSheet.Create(Sheet);

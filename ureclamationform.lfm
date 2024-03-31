@@ -1,23 +1,23 @@
 object ReclamationForm: TReclamationForm
-  Left = -14
+  Left = 425
   Height = 638
-  Top = 230
-  Width = 1875
+  Top = 202
+  Width = 1141
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ReclamationForm'
   ClientHeight = 638
-  ClientWidth = 1875
+  ClientWidth = 1141
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.6.0'
-  object TopToolsPanel: TPanel
+  LCLVersion = '3.2.0.0'
+  object ToolPanel: TPanel
     Left = 2
     Height = 40
     Top = 2
-    Width = 1871
+    Width = 1137
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -27,186 +27,21 @@ object ReclamationForm: TReclamationForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1867
+    ClientWidth = 1133
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
-    object ExportButton: TRxSpeedButton
-      Cursor = crHandPoint
-      Left = 1609
-      Height = 36
-      Top = 0
-      Width = 112
-      Align = alLeft
-      AutoSize = True
-      Caption = 'Экспорт'
-      Glyph.Data = {
-        36100000424D3610000000000000360000002800000020000000200000000100
-        2000000000000010000064000000640000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        00000000000000000000000000000000000043711E1043711E3F43711E6F4372
-        1E9F44721F0D0000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        000000000000000000000000000000000000000000000000000043721E014372
-        1E1F43711E4E43711E7E43721EAE43711EDE43711EFE44721FFF44721FFF4472
-        1FFF44721F120000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        00000000000043721E0543711E2E43711E5E43711E8E43711EBE43711EED4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721F120000000000000000000000000000000000000000000000000000
-        000000000000000000000000000000000000000000000000000043711E484371
-        1E9D43711ECD43711EF844721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FC644721FC244721FC244721FC244721FC244721FC244721FC24472
-        1FC244721FC244721FC244721FC244721FC243711EAC43721F1B44721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFA3BA91FFABBF9AFFABBF9AFFABBF9AFFABBF9AFFABBF9AFFABBF9AFFABBF
-        9AFFABBF9AFFABBF9AFFABBF9AFFABBF9AFF648A46FF43721E8744721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFF1F4EEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF7E9E65FF83A16AFF83A16AFF83A16AFFD3DECBFFBBCCAEFF83A16AFF83A1
-        6AFF83A16AFF83A16AFFD2DDC9FFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFBDCDB0FF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF43711EFF43711EFF43711EFF43711EFFBDCDB0FF99B285FF43711EFF4371
-        1EFF43711EFF43711EFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFE4EADFFFF1F4EEFFF1F4EEFFF1F4EEFFF9FBF8FFF7F9F5FFF1F4EEFFF1F4
-        EEFFF1F4EEFFF1F4EEFFF9FBF8FFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF4D782AFFA1B88EFFABBF9AFF487524FF44721FFF4A76
-        26FFD9E2D2FFEEF2EBFF87A570FF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFB8C9AAFF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFFCAD7BFFFFFFFFFFF8CA875FF44721FFF8EAA
-        78FFFFFFFFFFE0E8DAFF467321FF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFB8C9AAFF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9043711E994371
-        1EFF43711EFF43711EFF43711EFF678C49FFFDFDFDFFE1E8DBFF467321FFE1E8
-        DBFFFEFEFEFF7F9E65FF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF83A16BFF88A571FF88A571FF88A571FFD2DDC9FFBECEB1FF88A571FF88A5
-        71FF88A571FF88A571FFD4DECBFFFEFEFEFF7F9E66FF43711E9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFFBCCCAFFFFFFFFFFFAEC29FFFFFFF
-        FFFFD6E0CEFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFB1C4A2FFBACBACFFBACBACFFBACBACFFE6ECE1FFD9E2D2FFBACBACFFBACB
-        ACFFBACBACFFBACBACFFE6ECE1FFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF5C843CFFFAFBF9FFFCFDFCFFFEFE
-        FEFF739557FF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF457220FFE4EBDFFFFFFFFFFFF5F7
-        F3FF4B7728FF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF809F67FFFFFFFFFFE9EEE5FFFFFF
-        FFFF9CB488FF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFB8CAAAFFC2D1B5FFC2D1B5FFC2D1B5FFE8EEE4FFDDE6D7FFC2D1B5FFC2D1
-        B5FFC2D1B5FFC2D1B5FFE9EEE4FFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFFDBE4D4FFFEFEFEFF77995DFFF5F8
-        F4FFF2F5F0FF507B2DFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF85A36DFF8AA773FF8AA773FF8AA773FFD4DFCCFFBFCFB3FF8AA773FF8AA7
-        73FF8AA773FF8AA773FFD4DFCCFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF7D9D63FFFFFFFFFFDAE3D3FF44721FFFADC1
-        9CFFFFFFFFFFA6BB94FF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFFD5DFCDFFFFFFFFFF8DA977FF44721FFF5B83
-        3AFFFCFCFBFFF6F8F5FF557F34FF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFBBCBADFF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF4E792BFF477422FF44721FFF4472
-        1FFF77985CFF8EAA78FF688D4BFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFE5EBE0FFF1F5EFFFF1F5EFFFF1F5EFFFFAFBF9FFF7F9F6FFF1F5EFFFF1F5
-        EFFFF1F5EFFFF1F5EFFFFAFBF9FFFFFFFFFF7F9F66FF44721F9043711E994371
-        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF4D792AFF4E7A2BFF4E7A2BFF4E7A2BFFC1D0B5FF9FB68CFF4E7A2BFF4E7A
-        2BFF4E7A2BFF4E7A2BFFBFCEB2FFFEFEFEFF7F9E66FF43711E9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFFBDCDB0FF99B285FF44721FFF4472
-        1FFF44721FFF44721FFFBBCCAEFFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF6F9253FF729557FF729557FF729557FFCED9C4FFB2C5A3FF729557FF7295
-        57FF729557FF729557FFCCD8C2FFFFFFFFFF7F9F66FF44721F9044721F994472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF44721FFF4472
-        1FFFF1F4EEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7F9F66FF44721F9043711E994371
-        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFFB2C5A3FFBBCBADFFBBCBADFFBBCBADFFBBCBADFFBBCBADFFBBCBADFFBBCB
-        ADFFBBCBADFFBBCBADFFBBCBADFFBBCBADFF698E4CFF43711E8A43711E544371
-        1EB243711EE243711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF43711EDA43711ED843711ED843711ED843711ED843711ED843711ED84371
-        1ED843711ED843711ED843711ED843711ED843711EC243711E23000000000000
-        00000000000043721E1343711E4343711E7343711EA343711ED343711EFB4371
-        1EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF43711EFF4371
-        1EFF43711E120000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        000000000000000000000000000000000000000000000000000043721E084371
-        1E3443711E6443711E9343721EC343711EF243721FFF43721FFF43721FFF4372
-        1FFF43721F120000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        000000000000000000000000000043721E0243711E2443711E5443711E844372
-        1EB443711E0F0000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000
-      }
-      Margin = 10
-      OnClick = ExportButtonClick
-      ParentFont = False
-    end
-    object DividerBevel6: TDividerBevel
-      Left = 716
-      Height = 36
-      Top = 0
-      Width = 20
-      Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
-    end
-    object DividerBevel7: TDividerBevel
-      Left = 1589
-      Height = 36
-      Top = 0
-      Width = 20
-      Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
-    end
     object Panel3: TPanel
-      Left = 237
+      Left = 233
       Height = 36
       Top = 0
-      Width = 220
+      Width = 200
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 36
-      ClientWidth = 220
+      ClientWidth = 200
       ParentFont = False
       TabOrder = 0
       object AddButton: TSpeedButton
@@ -649,16 +484,6 @@ object ReclamationForm: TReclamationForm
         OnClick = DelButtonClick
         ParentFont = False
       end
-      object DividerBevel5: TDividerBevel
-        Left = 200
-        Height = 36
-        Top = 0
-        Width = 20
-        Align = alLeft
-        Font.Style = [fsBold]
-        Orientation = trVertical
-        ParentFont = False
-      end
       object RepairButton: TSpeedButton
         Cursor = crHandPoint
         Left = 120
@@ -957,98 +782,25 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel5: TPanel
-      Left = 1029
+      Left = 996
       Height = 36
       Top = 0
-      Width = 560
+      Width = 0
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       Caption = 'Panel5'
-      ClientHeight = 36
-      ClientWidth = 560
       TabOrder = 1
-      object DefectListButton: TRxSpeedButton
-        Cursor = crHandPoint
-        Left = 0
-        Height = 36
-        Top = 0
-        Width = 220
-        Align = alLeft
-        AutoSize = True
-        Constraints.MinWidth = 220
-        Caption = 'Неисправные элементы'
-        Images = MainForm.ImageListCategory24
-        ImageIndex = 9
-        Margin = 10
-        OnClick = DefectListButtonClick
-        ParentFont = False
-      end
-      object ReasonListButton: TRxSpeedButton
-        Cursor = crHandPoint
-        Left = 220
-        Height = 36
-        Top = 0
-        Width = 50
-        Align = alLeft
-        Caption = 'Причины неисправностей'
-        Images = MainForm.ImageListCategory24
-        ImageIndex = 10
-        Margin = 10
-        Visible = False
-        OnClick = ReasonListButtonClick
-        ParentFont = False
-      end
-      object PlaceListButton: TRxSpeedButton
-        Cursor = crHandPoint
-        Left = 270
-        Height = 36
-        Top = 0
-        Width = 190
-        Align = alLeft
-        AutoSize = True
-        Constraints.MinWidth = 190
-        Caption = 'Предприятия (депо)'
-        Images = MainForm.ImageListCategory24
-        ImageIndex = 11
-        Margin = 10
-        OnClick = PlaceListButtonClick
-        ParentFont = False
-      end
-      object FactoryListButton: TRxSpeedButton
-        Cursor = crHandPoint
-        Left = 460
-        Height = 36
-        Top = 0
-        Width = 100
-        Align = alLeft
-        AutoSize = True
-        Constraints.MinWidth = 100
-        Caption = 'Заводы'
-        Images = MainForm.ImageListCategory24
-        ImageIndex = 12
-        Margin = 10
-        OnClick = FactoryListButtonClick
-        ParentFont = False
-      end
-    end
-    object DividerBevel8: TDividerBevel
-      Left = 217
-      Height = 36
-      Top = 0
-      Width = 20
-      Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
     end
     object Panel7: TPanel
-      Left = 457
+      Left = 443
       Height = 36
       Top = 0
       Width = 259
       Align = alLeft
       AutoSize = True
+      BorderSpacing.Left = 6
+      BorderSpacing.Right = 6
       BevelOuter = bvNone
       ClientHeight = 36
       ClientWidth = 259
@@ -1088,7 +840,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel2: TPanel
-      Left = 1029
+      Left = 996
       Height = 36
       Top = 0
       Width = 0
@@ -1097,38 +849,31 @@ object ReclamationForm: TReclamationForm
       BevelOuter = bvNone
       TabOrder = 3
     end
-    object DividerBevel9: TDividerBevel
-      Left = 1009
-      Height = 36
-      Top = 0
-      Width = 20
-      Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
-    end
     object MotorCardCheckBox: TCheckBox
-      Left = 736
+      Left = 716
       Height = 36
       Top = 0
-      Width = 273
+      Width = 270
       Align = alLeft
+      BorderSpacing.Left = 6
+      BorderSpacing.Right = 6
       Caption = 'Учетная карточка электродвигателя'
       Checked = True
-      OnChange = MotorCardCheckBoxChange
       State = cbChecked
       TabOrder = 4
+      OnChange = MotorCardCheckBoxChange
     end
     object ReportPeriodPanel: TPanel
       Left = 0
       Height = 36
       Top = 0
-      Width = 217
+      Width = 226
       Align = alLeft
       AutoSize = True
+      BorderSpacing.Right = 3
       BevelOuter = bvNone
       ClientHeight = 36
-      ClientWidth = 217
+      ClientWidth = 226
       ParentFont = False
       TabOrder = 5
       object DateTimePicker1: TDateTimePicker
@@ -1136,7 +881,7 @@ object ReclamationForm: TReclamationForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = ReportPeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 118
+        Left = 127
         Height = 28
         Top = 4
         Width = 99
@@ -1196,13 +941,163 @@ object ReclamationForm: TReclamationForm
         Left = 106
         Height = 20
         Top = 8
-        Width = 6
+        Width = 15
         BorderSpacing.Left = 6
-        Caption = '-'
-        Font.Style = [fsBold]
+        Caption = '—'
         ParentColor = False
         ParentFont = False
       end
+    end
+    object ExportButton: TBCButton
+      Cursor = crHandPoint
+      Left = 997
+      Height = 34
+      Top = 1
+      Width = 104
+      Align = alLeft
+      AutoSize = True
+      StateClicked.Background.Color = 16245964
+      StateClicked.Background.Gradient1.StartColor = 16577765
+      StateClicked.Background.Gradient1.EndColor = 16180676
+      StateClicked.Background.Gradient1.GradientType = gtLinear
+      StateClicked.Background.Gradient1.Point1XPercent = 0
+      StateClicked.Background.Gradient1.Point1YPercent = 0
+      StateClicked.Background.Gradient1.Point2XPercent = 0
+      StateClicked.Background.Gradient1.Point2YPercent = 100
+      StateClicked.Background.Gradient2.StartColor = 15716760
+      StateClicked.Background.Gradient2.EndColor = 14398312
+      StateClicked.Background.Gradient2.GradientType = gtLinear
+      StateClicked.Background.Gradient2.Point1XPercent = 0
+      StateClicked.Background.Gradient2.Point1YPercent = 0
+      StateClicked.Background.Gradient2.Point2XPercent = 0
+      StateClicked.Background.Gradient2.Point2YPercent = 100
+      StateClicked.Background.Gradient1EndPercent = 55
+      StateClicked.Background.Style = bbsColor
+      StateClicked.Border.Color = 10048512
+      StateClicked.Border.LightColor = clBlack
+      StateClicked.Border.LightOpacity = 100
+      StateClicked.Border.Style = bboSolid
+      StateClicked.FontEx.Color = clBlack
+      StateClicked.FontEx.FontQuality = fqSystemClearType
+      StateClicked.FontEx.Shadow = False
+      StateClicked.FontEx.ShadowRadius = 5
+      StateClicked.FontEx.ShadowOffsetX = 5
+      StateClicked.FontEx.ShadowOffsetY = 5
+      StateClicked.FontEx.Style = []
+      StateHover.Background.Color = 16511461
+      StateHover.Background.Gradient1.StartColor = 16643818
+      StateHover.Background.Gradient1.EndColor = 16576729
+      StateHover.Background.Gradient1.GradientType = gtLinear
+      StateHover.Background.Gradient1.Point1XPercent = 0
+      StateHover.Background.Gradient1.Point1YPercent = 0
+      StateHover.Background.Gradient1.Point2XPercent = 0
+      StateHover.Background.Gradient1.Point2YPercent = 100
+      StateHover.Background.Gradient2.StartColor = 16639678
+      StateHover.Background.Gradient2.EndColor = 16112039
+      StateHover.Background.Gradient2.GradientType = gtLinear
+      StateHover.Background.Gradient2.Point1XPercent = 0
+      StateHover.Background.Gradient2.Point1YPercent = 0
+      StateHover.Background.Gradient2.Point2XPercent = 0
+      StateHover.Background.Gradient2.Point2YPercent = 100
+      StateHover.Background.Gradient1EndPercent = 50
+      StateHover.Background.Style = bbsColor
+      StateHover.Border.Color = 14120960
+      StateHover.Border.LightOpacity = 200
+      StateHover.Border.Style = bboSolid
+      StateHover.FontEx.Color = clBlack
+      StateHover.FontEx.FontQuality = fqSystemClearType
+      StateHover.FontEx.Shadow = False
+      StateHover.FontEx.ShadowRadius = 5
+      StateHover.FontEx.ShadowOffsetX = 5
+      StateHover.FontEx.ShadowOffsetY = 5
+      StateHover.FontEx.Style = []
+      StateNormal.Background.Color = 14803425
+      StateNormal.Background.Gradient1.StartColor = 15921906
+      StateNormal.Background.Gradient1.EndColor = 15461355
+      StateNormal.Background.Gradient1.GradientType = gtLinear
+      StateNormal.Background.Gradient1.Point1XPercent = 0
+      StateNormal.Background.Gradient1.Point1YPercent = 0
+      StateNormal.Background.Gradient1.Point2XPercent = 0
+      StateNormal.Background.Gradient1.Point2YPercent = 100
+      StateNormal.Background.Gradient2.StartColor = 14540253
+      StateNormal.Background.Gradient2.EndColor = 13619151
+      StateNormal.Background.Gradient2.GradientType = gtLinear
+      StateNormal.Background.Gradient2.Point1XPercent = 0
+      StateNormal.Background.Gradient2.Point1YPercent = 0
+      StateNormal.Background.Gradient2.Point2XPercent = 0
+      StateNormal.Background.Gradient2.Point2YPercent = 100
+      StateNormal.Background.Gradient1EndPercent = 50
+      StateNormal.Background.Style = bbsColor
+      StateNormal.Border.Color = 11382189
+      StateNormal.Border.LightOpacity = 200
+      StateNormal.Border.Style = bboSolid
+      StateNormal.FontEx.Color = clBlack
+      StateNormal.FontEx.FontQuality = fqSystemClearType
+      StateNormal.FontEx.Shadow = False
+      StateNormal.FontEx.ShadowRadius = 5
+      StateNormal.FontEx.ShadowOffsetX = 5
+      StateNormal.FontEx.ShadowOffsetY = 5
+      StateNormal.FontEx.Style = []
+      BorderSpacing.Left = 1
+      BorderSpacing.Top = 1
+      BorderSpacing.Bottom = 1
+      Caption = 'Экспорт'
+      Color = clNone
+      DropDownWidth = 16
+      DropDownArrowSize = 8
+      GlobalOpacity = 255
+      GlyphMargin = 0
+      OnClick = ExportButtonClick
+      ParentColor = False
+      Rounding.RoundX = 0
+      Rounding.RoundY = 0
+      RoundingDropDown.RoundX = 1
+      RoundingDropDown.RoundY = 1
+      TextApplyGlobalOpacity = False
+      DropDownStyle = bdsCommon
+      Images = MainForm.ImageListCategory24
+      ImageIndex = 7
+      MemoryUsage = bmuHigh
+    end
+    object Bevel2: TBevel
+      Left = 229
+      Height = 36
+      Top = 0
+      Width = 2
+      Align = alLeft
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
+    end
+    object Bevel3: TBevel
+      Left = 435
+      Height = 36
+      Top = 0
+      Width = 2
+      Align = alLeft
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
+    end
+    object Bevel4: TBevel
+      Left = 708
+      Height = 36
+      Top = 0
+      Width = 2
+      Align = alLeft
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
+    end
+    object Bevel5: TBevel
+      Left = 992
+      Height = 36
+      Top = 0
+      Width = 2
+      Align = alLeft
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
     end
   end
   object LeftPanel: TPanel
@@ -1219,6 +1114,7 @@ object ReclamationForm: TReclamationForm
     ClientHeight = 588
     ClientWidth = 308
     Color = clWindow
+    ParentBackground = False
     ParentColor = False
     TabOrder = 1
     object VT1: TVirtualStringTree
@@ -1274,30 +1170,30 @@ object ReclamationForm: TReclamationForm
     Left = 320
     Height = 594
     Top = 44
-    Width = 1555
+    Width = 821
     Align = alClient
     BevelOuter = bvNone
     ClientHeight = 594
-    ClientWidth = 1555
+    ClientWidth = 821
     TabOrder = 3
     object Panel4: TPanel
       Left = 0
       Height = 234
       Top = 0
-      Width = 1553
+      Width = 819
       Align = alClient
       BorderSpacing.Right = 2
       BorderSpacing.Bottom = 2
       BevelOuter = bvNone
       BorderStyle = bsSingle
       ClientHeight = 230
-      ClientWidth = 1549
+      ClientWidth = 815
       TabOrder = 0
       object LogGrid: TsWorksheetGrid
         Left = 0
         Height = 206
         Top = 0
-        Width = 1549
+        Width = 815
         AutoExpand = []
         DisplayFixedColRow = False
         FrozenBorderPen.Style = psClear
@@ -1327,16 +1223,18 @@ object ReclamationForm: TReclamationForm
         TabOrder = 0
         TabStop = False
         TitleFont.Style = [fsBold]
+        OnDblClick = LogGridDblClick
         OnMouseDown = LogGridMouseDown
       end
       object ZoomPanel: TPanel
         Left = 0
         Height = 22
         Top = 208
-        Width = 1549
+        Width = 815
         Align = alBottom
         BevelOuter = bvNone
         Color = clWindow
+        ParentBackground = False
         ParentColor = False
         TabOrder = 1
       end
@@ -1344,7 +1242,7 @@ object ReclamationForm: TReclamationForm
         Left = 0
         Height = 2
         Top = 206
-        Width = 1549
+        Width = 815
         Align = alBottom
         Shape = bsBottomLine
         Style = bsRaised
@@ -1354,7 +1252,7 @@ object ReclamationForm: TReclamationForm
       Left = 2
       Height = 350
       Top = 244
-      Width = 1551
+      Width = 817
       Align = alBottom
       BorderSpacing.Left = 2
       BorderSpacing.Top = 2
@@ -1367,7 +1265,7 @@ object ReclamationForm: TReclamationForm
       Left = 0
       Height = 6
       Top = 236
-      Width = 1555
+      Width = 821
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine

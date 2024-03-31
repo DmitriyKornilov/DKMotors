@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  EditBtn, StdCtrls, rxctrls, VirtualTrees, DividerBevel, DK_VSTTables,
+  EditBtn, StdCtrls, VirtualTrees, DK_VSTTables, DK_SheetExporter,
   UCardForm, DK_Vector, USheetUtils, DK_StrUtils, USQLite, UControlListEditForm,
-  DK_Dialogs, DK_SheetExporter, DK_Const;
+  BCButton, DK_Dialogs, DK_Const, UUtils;
 
 type
 
@@ -16,34 +16,32 @@ type
 
   TControlListForm = class(TForm)
     AddButton: TSpeedButton;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
     DelButton: TSpeedButton;
-    DividerBevel5: TDividerBevel;
-    DividerBevel6: TDividerBevel;
-    DividerBevel7: TDividerBevel;
     EditButton: TSpeedButton;
-    ExportButton: TRxSpeedButton;
     Label2: TLabel;
     MotorCardCheckBox: TCheckBox;
     MotorNumEdit: TEditButton;
-    Panel1: TPanel;
-    Panel2: TPanel;
     Panel3: TPanel;
-    Panel5: TPanel;
     CardPanel: TPanel;
     Panel7: TPanel;
+    ExportButton: TBCButton;
     Splitter2: TSplitter;
-    TopToolsPanel: TPanel;
+    ToolPanel: TPanel;
     VT1: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
-    procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
+    procedure ExportButtonClick(Sender: TObject);
+    procedure VT1DblClick(Sender: TObject);
   private
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
@@ -71,6 +69,13 @@ uses UMainForm;
 
 procedure TControlListForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetToolButtons([
+    AddButton, DelButton, EditButton
+  ]);
+
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(ControlListForm, CardPanel);
   CreateMotorsTable;
@@ -88,29 +93,6 @@ end;
 procedure TControlListForm.EditButtonClick(Sender: TObject);
 begin
   OpenControlListEditForm(2);
-end;
-
-procedure TControlListForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TSheetExporter;
-  Sheet: TsWorksheet;
-  ControlSheet: TControlSheet;
-begin
-  Exporter:= TSheetExporter.Create;
-  try
-    Sheet:= Exporter.AddWorksheet('Лист1');
-    ControlSheet:= TControlSheet.Create(Sheet);
-    try
-      ControlSheet.Draw(MotorNames, MotorNums, Series, Notes);
-    finally
-      FreeAndNil(ControlSheet);
-    end;
-    Exporter.PageSettings(spoPortrait);
-
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
 end;
 
 procedure TControlListForm.AddButtonClick(Sender: TObject);
@@ -156,6 +138,35 @@ begin
   ShowControlList;
 end;
 
+procedure TControlListForm.ExportButtonClick(Sender: TObject);
+var
+  Exporter: TSheetsExporter;
+  Sheet: TsWorksheet;
+  ControlSheet: TControlSheet;
+begin
+  Exporter:= TSheetsExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    ControlSheet:= TControlSheet.Create(Sheet);
+    try
+      ControlSheet.Draw(MotorNames, MotorNums, Series, Notes);
+    finally
+      FreeAndNil(ControlSheet);
+    end;
+    Exporter.PageSettings(spoPortrait);
+
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
+end;
+
+procedure TControlListForm.VT1DblClick(Sender: TObject);
+begin
+  if not VSTMotorsTable.IsSelected then Exit;
+  OpenControlListEditForm(2);
+end;
+
 procedure TControlListForm.CreateMotorsTable;
 begin
   VSTMotorsTable:= TVSTTable.Create(VT1);
@@ -165,7 +176,7 @@ begin
   VSTMotorsTable.AddColumn('Наименование', 200);
   VSTMotorsTable.AddColumn('Номер', 100);
   VSTMotorsTable.AddColumn('Партия', 100);
-  VSTMotorsTable.AddColumn('Примечание');
+  VSTMotorsTable.AddColumn('Примечание', 400);
   VSTMotorsTable.CanSelect:= True;
   VSTMotorsTable.Draw;
 end;

@@ -10,7 +10,7 @@
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <XPManifest>
-        <DpiAware Value="True"/>
+        <DpiAware Value="True/PM_V2"/>
       </XPManifest>
       <Icon Value="0"/>
     </General>
@@ -18,8 +18,8 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <RevisionNr Value="1"/>
-      <BuildNr Value="21"/>
+      <MinorVersionNr Value="1"/>
+      <BuildNr Value="1"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
@@ -33,6 +33,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="bgracontrols"/>
+      </Item>
       <Item>
         <PackageName Value="DKZoom"/>
       </Item>
@@ -56,9 +59,6 @@
       </Item>
       <Item>
         <PackageName Value="DateTimeCtrls"/>
-      </Item>
-      <Item>
-        <PackageName Value="rxnew"/>
       </Item>
       <Item>
         <PackageName Value="LazControls"/>
@@ -269,6 +269,11 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UControlListEditForm"/>
       </Unit>
+      <Unit>
+        <Filename Value="uutils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UUtils"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -283,7 +288,6 @@
     </SearchPaths>
     <Linking>
       <Debugging>
-        <GenerateDebugInfo Value="False"/>
         <DebugInfoType Value="dsDwarf2Set"/>
         <UseExternalDbgSyms Value="True"/>
       </Debugging>

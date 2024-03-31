@@ -1,25 +1,26 @@
 object AboutForm: TAboutForm
   Left = 550
-  Height = 320
+  Height = 400
   Top = 245
-  Width = 660
+  Width = 825
   BorderStyle = bsSizeToolWin
   Caption = 'О программе'
-  ClientHeight = 320
-  ClientWidth = 660
+  ClientHeight = 400
+  ClientWidth = 825
+  DesignTimePPI = 120
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '3.2.0.0'
   object Image1: TImage
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
-    Left = 5
+    Left = 6
     Height = 271
-    Top = 5
+    Top = 6
     Width = 181
     AutoSize = True
-    BorderSpacing.Bottom = 5
-    BorderSpacing.Around = 5
+    BorderSpacing.Bottom = 6
+    BorderSpacing.Around = 6
     Picture.Data = {
       0A544A706567496D616765AB350000FFD8FFE000104A46494600010202004E00
       4E0000FFC0001108010F00B503011100021101031101FFDB0084000604050605
@@ -457,16 +458,16 @@ object AboutForm: TAboutForm
     AnchorSideLeft.Control = Image1
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Side = asrCenter
-    Left = 196
-    Height = 15
-    Top = 7
-    Width = 429
+    Left = 199
+    Height = 20
+    Top = 9
+    Width = 582
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Left = 10
-    BorderSpacing.Top = 5
-    BorderSpacing.Right = 5
-    Caption = 'DKMotors v1.0.1'
+    BorderSpacing.Left = 12
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 6
+    Caption = 'DKMotors v1.1.0'
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
@@ -479,14 +480,14 @@ object AboutForm: TAboutForm
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Left = 196
-    Height = 274
-    Top = 41
-    Width = 459
+    Left = 199
+    Height = 341
+    Top = 53
+    Width = 620
     Anchors = [akTop, akLeft, akRight, akBottom]
-    BorderSpacing.Top = 19
-    BorderSpacing.Right = 5
-    BorderSpacing.Bottom = 5
+    BorderSpacing.Top = 24
+    BorderSpacing.Right = 6
+    BorderSpacing.Bottom = 6
     BorderStyle = bsNone
     Color = clBtnFace
     Lines.Strings = (
@@ -501,10 +502,10 @@ object AboutForm: TAboutForm
       ''
       'Применено:'
       '     Free Pascal Compiler v3.2.2 (www.freepascal.org)'
-      '     Lazarus IDE v2.2.2 (www.lazarus-ide.org)'
+      '     Lazarus IDE v3.2 (www.lazarus-ide.org)'
       ''
       'PNG-файлы пиктограмм получены с flaticon.com,  подробности '
-      'https://github.com/DmitriyKornilov/DKMotors/blob/main/png/Icon_attributes.pdf'
+      'https://github.com/DmitriyKornilov/DKMotors/blob/main/png/Icons_info.pdf'
       ''
       '      '
       ''

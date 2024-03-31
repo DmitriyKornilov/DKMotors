@@ -1,51 +1,54 @@
 object MotorListForm: TMotorListForm
   Left = 442
-  Height = 521
+  Height = 651
   Top = 211
-  Width = 1023
+  Width = 1279
   Align = alClient
   BorderStyle = bsNone
   Caption = 'MotorListForm'
-  ClientHeight = 521
-  ClientWidth = 1023
+  ClientHeight = 651
+  ClientWidth = 1279
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '3.2.0.0'
   object ToolPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 1019
+    Width = 1275
     Align = alTop
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 1015
-    Constraints.MaxHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1271
+    Constraints.MaxHeight = 40
     TabOrder = 0
     object Panel7: TPanel
-      Left = 95
-      Height = 28
+      Left = 81
+      Height = 36
       Top = 0
-      Width = 205
+      Width = 257
       Align = alLeft
       AutoSize = True
+      BorderSpacing.Left = 6
+      BorderSpacing.Right = 6
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 205
+      ClientHeight = 36
+      ClientWidth = 257
       TabOrder = 0
       object Label2: TLabel
         AnchorSideLeft.Control = Panel7
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         Left = 0
-        Height = 15
-        Top = 7
-        Width = 97
+        Height = 20
+        Top = 8
+        Width = 122
         Caption = 'Поиск по номеру'
         ParentColor = False
       end
@@ -54,13 +57,13 @@ object MotorListForm: TMotorListForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
-        Left = 102
-        Height = 23
-        Top = 3
-        Width = 103
-        BorderSpacing.Left = 5
+        Left = 128
+        Height = 28
+        Top = 4
+        Width = 129
+        BorderSpacing.Left = 6
         ButtonCursor = crHandPoint
-        ButtonWidth = 23
+        ButtonWidth = 29
         Images = MainForm.ImageList16
         ImageIndex = 0
         MaxLength = 0
@@ -71,146 +74,150 @@ object MotorListForm: TMotorListForm
         TabOrder = 0
       end
     end
-    object DividerBevel3: TDividerBevel
-      Left = 300
-      Height = 28
+    object MoreInfoCheckBox: TCheckBox
+      Left = 558
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 270
       Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
+      BorderSpacing.Left = 6
+      BorderSpacing.Right = 6
+      Caption = 'Учётная карточка электродвигателя'
+      Checked = True
+      State = cbChecked
+      TabOrder = 1
+      OnChange = MoreInfoCheckBoxChange
     end
-    object Panel5: TPanel
-      Left = 315
-      Height = 28
+    object CheckBox1: TCheckBox
+      Left = 352
+      Height = 36
       Top = 0
-      Width = 154
+      Width = 192
+      Align = alLeft
+      BorderSpacing.Left = 6
+      BorderSpacing.Right = 6
+      Caption = 'Упорядочить по номеру'
+      TabOrder = 2
+      OnChange = CheckBox1Change
+    end
+    object YearPanel: TPanel
+      Left = 0
+      Height = 36
+      Top = 0
+      Width = 71
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 154
-      ParentFont = False
-      TabOrder = 1
-      object CheckBox1: TCheckBox
-        AnchorSideLeft.Control = Panel5
-        AnchorSideTop.Control = Panel5
+      ClientHeight = 36
+      ClientWidth = 71
+      TabOrder = 3
+      object SpinEdit1: TSpinEdit
+        AnchorSideLeft.Control = YearPanel
+        AnchorSideTop.Control = YearPanel
         AnchorSideTop.Side = asrCenter
-        Left = 0
-        Height = 19
-        Top = 5
-        Width = 154
-        Caption = 'Упорядочить по номеру'
-        OnChange = CheckBox1Change
+        Left = 1
+        Height = 28
+        Top = 4
+        Width = 70
+        Alignment = taCenter
+        BorderSpacing.Left = 1
+        BorderSpacing.Top = 4
+        BorderSpacing.Bottom = 2
+        MinValue = 2010
+        OnChange = SpinEdit1Change
         TabOrder = 0
+        Value = 2022
       end
     end
-    object MoreInfoCheckBox: TCheckBox
-      Left = 484
-      Height = 28
+    object Bevel1: TBevel
+      Left = 73
+      Height = 36
       Top = 0
-      Width = 218
+      Width = 2
       Align = alLeft
-      Caption = 'Учётная карточка электродвигателя'
-      Checked = True
-      OnChange = MoreInfoCheckBoxChange
-      State = cbChecked
-      TabOrder = 2
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
     end
-    object DividerBevel5: TDividerBevel
-      Left = 469
-      Height = 28
+    object Bevel2: TBevel
+      Left = 344
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 2
       Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
     end
-    object SpinEdit1: TSpinEdit
-      Left = 1
-      Height = 23
-      Top = 3
-      Width = 79
-      Align = alLeft
-      Alignment = taCenter
-      BorderSpacing.Left = 1
-      BorderSpacing.Top = 3
-      BorderSpacing.Bottom = 2
-      MinValue = 2010
-      OnChange = SpinEdit1Change
-      TabOrder = 3
-      Value = 2022
-    end
-    object DividerBevel4: TDividerBevel
-      Left = 80
-      Height = 28
+    object Bevel3: TBevel
+      Left = 550
+      Height = 36
       Top = 0
-      Width = 15
+      Width = 2
       Align = alLeft
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Shape = bsRightLine
     end
   end
   object LeftPanel: TPanel
     Left = 2
-    Height = 483
-    Top = 36
-    Width = 170
+    Height = 605
+    Top = 44
+    Width = 212
     Align = alLeft
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 479
-    ClientWidth = 166
+    ClientHeight = 601
+    ClientWidth = 208
     Color = clWindow
+    ParentBackground = False
     ParentColor = False
     TabOrder = 1
     object VT2: TVirtualStringTree
       Left = 0
-      Height = 479
+      Height = 601
       Top = 0
-      Width = 166
+      Width = 208
       Align = alClient
       BorderStyle = bsNone
-      DefaultNodeHeight = 20
+      DefaultNodeHeight = 25
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
       Header.Columns = <>
-      Header.Height = 16
+      Header.Height = 20
       Header.MainColumn = -1
       TabOrder = 0
     end
   end
   object Splitter1: TSplitter
-    Left = 172
-    Height = 487
-    Top = 34
-    Width = 5
+    Left = 214
+    Height = 609
+    Top = 42
+    Width = 6
     ResizeStyle = rsLine
   end
   object MainPanel: TPanel
-    Left = 177
-    Height = 483
-    Top = 36
-    Width = 844
+    Left = 220
+    Height = 605
+    Top = 44
+    Width = 1057
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
-    ClientHeight = 483
-    ClientWidth = 844
+    ClientHeight = 605
+    ClientWidth = 1057
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
-      Height = 440
-      Top = 43
-      Width = 844
+      Height = 550
+      Top = 55
+      Width = 1057
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 0
@@ -219,9 +226,9 @@ object MotorListForm: TMotorListForm
       AnchorSideBottom.Control = CardPanel
       Cursor = crVSplit
       Left = 0
-      Height = 5
-      Top = 38
-      Width = 844
+      Height = 6
+      Top = 49
+      Width = 1057
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
@@ -229,11 +236,11 @@ object MotorListForm: TMotorListForm
     object VT1: TVirtualStringTree
       AnchorSideBottom.Control = Splitter2
       Left = 0
-      Height = 38
+      Height = 49
       Top = 0
-      Width = 844
+      Width = 1057
       Align = alClient
-      DefaultNodeHeight = 20
+      DefaultNodeHeight = 25
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
       Header.Columns = <>

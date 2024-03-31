@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
-  Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
+  Buttons, StdCtrls, VirtualTrees, USQLite, UUtils,
   DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTools,
   DK_Dialogs, DK_Const, UTestAddForm, fpspreadsheetgrid,
   USheetUtils;
@@ -17,13 +17,13 @@ type
 
   TTestLogForm = class(TForm)
     AddButton: TSpeedButton;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     DelButton: TSpeedButton;
-    DividerBevel2: TDividerBevel;
-    DividerBevel3: TDividerBevel;
     EditButtonPanel: TPanel;
-    DividerBevel1: TDividerBevel;
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -35,6 +35,7 @@ type
     TestGrid: TsWorksheetGrid;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
+    YearPanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
@@ -100,6 +101,13 @@ end;
 
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetToolButtons([
+    AddButton, DelButton
+  ]);
+
   MainForm.SetNamesPanelsVisible(True, False);
   VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @SelectDate);
   TestLog:= TTestLogTable.Create(TestGrid, @SelectMotor);

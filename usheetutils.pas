@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid, fpspreadsheet,
   DK_Vector, DK_Matrix, DK_Fonts, Graphics, DK_SheetConst, DK_Const, DK_PPI,
   DateUtils, DK_DateUtils, DK_StatPlotter, DK_Math, DK_StrUtils, DK_Graph,
-  DK_SheetUtils, DK_SheetTables;
+  DK_SheetUtils, DK_SheetTables, DK_Color;
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, fpspreadsheetgrid, USQLite, DividerBevel,  DK_Vector, LCLType,
+  Buttons, fpspreadsheetgrid, USQLite, UUtils,  DK_Vector, LCLType,
   EditBtn, Spin, DK_StrUtils, DK_DateUtils, VirtualTrees, DK_VSTTables,
   UCardForm, DK_Const, DK_VSTTools;
 
@@ -15,24 +15,24 @@ type
   { TMotorListForm }
 
   TMotorListForm = class(TForm)
+    Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
     CheckBox1: TCheckBox;
     MoreInfoCheckBox: TCheckBox;
-    DividerBevel3: TDividerBevel;
-    DividerBevel4: TDividerBevel;
-    DividerBevel5: TDividerBevel;
     MotorNumEdit: TEditButton;
     Label2: TLabel;
     LeftPanel: TPanel;
     MainPanel: TPanel;
+    SpinEdit1: TSpinEdit;
     ToolPanel: TPanel;
     CardPanel: TPanel;
-    Panel5: TPanel;
     Panel7: TPanel;
-    SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
+    YearPanel: TPanel;
     procedure CheckBox1Change(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MoreInfoCheckBoxChange(Sender: TObject);
@@ -68,6 +68,10 @@ uses UMainForm;
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(MotorListForm, CardPanel);
   CreateMotorsTable;

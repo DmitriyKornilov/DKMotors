@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
-  Buttons, VirtualTrees, DividerBevel, DateTimePicker, fpspreadsheetgrid,
+  Buttons, VirtualTrees, UUtils, DateTimePicker, fpspreadsheetgrid,
   DK_VSTTables, DK_SheetExporter, DK_DateUtils, UCalendar, USQLite, DK_Vector,
-  LCLType, StdCtrls, ComCtrls, rxctrls, UCalendarEditForm, DK_Const,
-  DateUtils, DK_Zoom;
+  LCLType, StdCtrls, ComCtrls, UCalendarEditForm, BCButton, DK_Const,
+  DK_Color, DateUtils, DK_Zoom;
 
 type
 
@@ -18,6 +18,7 @@ type
   TCalendarForm = class(TForm)
     AddDateButton: TSpeedButton;
     Bevel1: TBevel;
+    Bevel2: TBevel;
     CancelCopyButton: TSpeedButton;
     CopyDateButton: TSpeedButton;
     CopyEditPanel: TPanel;
@@ -31,12 +32,14 @@ type
     DelDateButton: TSpeedButton;
     EditDateButton: TSpeedButton;
     EditPanel: TPanel;
-    ExportButton: TRxSpeedButton;
+    ExportButton: TBCButton;
     CalendarGrid: TsWorksheetGrid;
     BeforeCountLabel: TLabel;
     Label1: TLabel;
     Label10: TLabel;
     Label9: TLabel;
+    YearSpinEdit: TSpinEdit;
+    YearPanel: TPanel;
     ZoomPanel: TPanel;
     WorkCountLabel: TLabel;
     NotWorkCountLabel: TLabel;
@@ -59,15 +62,13 @@ type
     Panel1: TPanel;
     Panel2: TPanel;
     Panel7: TPanel;
-    DividerBevel1: TDividerBevel;
     PeriodPanel: TPanel;
     SaveCopyButton: TSpeedButton;
     SpinEdit1: TSpinEdit;
     Splitter2: TSplitter;
-    TopPanel: TPanel;
+    ToolPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
-    YearSpinEdit: TSpinEdit;
     Splitter1: TSplitter;
     procedure AddDateButtonClick(Sender: TObject);
     procedure CalendarGridDblClick(Sender: TObject);
@@ -158,6 +159,17 @@ procedure TCalendarForm.FormCreate(Sender: TObject);
 var
   W1, W2: Integer;
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetFlatToolPanels([
+    DateEditPanel, CopyEditPanel
+  ]);
+  SetToolButtons([
+    AddDateButton, DelDateButton, EditDateButton, CopyDateButton,
+    SaveCopyButton, DelCopyButton, CancelCopyButton
+  ]);
+
   MainForm.SetNamesPanelsVisible(False, False);
 
   ZoomPercent:= 100;
@@ -336,9 +348,9 @@ procedure TCalendarForm.ExportCalendar;
 var
   Drawer: TCalendarSheet;
   Sheet: TsWorksheet;
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TCalendarSheet.Create(Sheet);

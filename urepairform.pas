@@ -6,9 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, EditBtn, VirtualTrees, DividerBevel, DK_VSTTables, USheetUtils,
-  rxctrls, DK_Vector, USQLite, DK_StrUtils, DK_Dialogs, DK_Const,
-  DK_SheetExporter, UCalendar, UCardForm, URepairEditForm, DK_VSTTools;
+  Buttons, EditBtn, VirtualTrees, UUtils, DK_VSTTables, USheetUtils,
+  DK_Vector, USQLite, DK_StrUtils, DK_Dialogs, DK_Const,
+  DK_SheetExporter, UCalendar, UCardForm, URepairEditForm, BCButton,
+  DK_VSTTools;
 
 type
 
@@ -16,12 +17,12 @@ type
 
   TRepairForm = class(TForm)
     AddButton: TSpeedButton;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
+    Bevel4: TBevel;
     DelButton: TSpeedButton;
-    DividerBevel5: TDividerBevel;
-    DividerBevel6: TDividerBevel;
-    DividerBevel7: TDividerBevel;
     EditButton: TSpeedButton;
-    ExportButton: TRxSpeedButton;
+    ExportButton: TBCButton;
     Label2: TLabel;
     MotorCardCheckBox: TCheckBox;
     MotorNumEdit: TEditButton;
@@ -49,6 +50,7 @@ type
     procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure MotorNumEditButtonClick(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
+    procedure VT1DblClick(Sender: TObject);
   private
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
@@ -84,6 +86,13 @@ uses UMainForm;
 
 procedure TRepairForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetToolButtons([
+    AddButton, DelButton, EditButton
+  ]);
+
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(RepairForm, CardPanel);
   CreateMotorsTable;
@@ -94,11 +103,11 @@ end;
 
 procedure TRepairForm.ExportButtonClick(Sender: TObject);
 var
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
   Sheet: TsWorksheet;
   RepairSheet: TRepairSheet;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     RepairSheet:= TRepairSheet.Create(Sheet);
@@ -150,12 +159,10 @@ procedure TRepairForm.MotorCardCheckBoxChange(Sender: TObject);
 begin
   if MotorCardCheckBox.Checked then
   begin
-    VT1.Align:= alCustom;
     Splitter2.Visible:= True;
     Splitter2.Align:= alTop;
     CardPanel.Visible:= True;
     Splitter2.Align:= alBottom;
-    VT1.Align:= alClient;
   end
   else begin
     CardPanel.Visible:= False;
@@ -171,6 +178,12 @@ end;
 procedure TRepairForm.MotorNumEditChange(Sender: TObject);
 begin
   ShowRepair;
+end;
+
+procedure TRepairForm.VT1DblClick(Sender: TObject);
+begin
+  if not VSTMotorsTable.IsSelected then Exit;
+  OpenRepairEditForm(2);
 end;
 
 procedure TRepairForm.CreateMotorsTable;

@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils, LCLType,
-  StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils, rxctrls, DividerBevel,
-  USQLite, DK_Matrix, DK_SheetExporter, DK_SheetConst, DK_StrUtils, DK_Zoom,
-  DK_VSTTools;
+  fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils,
+  LCLType, StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils,
+  UUtils, USQLite, BCButton, DK_Matrix, DK_SheetExporter, DK_SheetConst,
+  DK_StrUtils, DK_Zoom, DK_VSTTools;
 
 type
 
@@ -18,6 +18,9 @@ type
   TStatisticForm = class(TForm)
     ANEMAsSameNameCheckBox: TCheckBox;
     Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
+    ExportButton: TBCButton;
     Label10: TLabel;
     ANEMPanel: TPanel;
     SeveralPeriodsCheckBox: TCheckBox;
@@ -27,9 +30,6 @@ type
     TotalCountForUsedParamsOnlyCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
-    DividerBevel1: TDividerBevel;
-    DividerBevel3: TDividerBevel;
-    ExportButton: TRxSpeedButton;
     Grid1: TsWorksheetGrid;
     Label3: TLabel;
     Label4: TLabel;
@@ -48,20 +48,20 @@ type
     AdditionYearCountSpinEdit: TSpinEdit;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
-    TopPanel: TPanel;
+    ToolPanel: TPanel;
     ClientPanel: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     VT3: TVirtualStringTree;
     ZoomPanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
+    procedure ExportButtonClick(Sender: TObject);
     procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
     procedure ShowGraphicsCheckBoxChange(Sender: TObject);
     procedure ShowLinePercentCheckBoxChange(Sender: TObject);
     procedure ShowPercentCheckBoxChange(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DateTimePicker2Change(Sender: TObject);
-    procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure AdditionYearCountSpinEditChange(Sender: TObject);
@@ -127,6 +127,10 @@ uses UMainForm;
 
 procedure TStatisticForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+
   CanShow:= False;
 
   SelectedIndex:= -1;
@@ -144,11 +148,6 @@ begin
   CanShow:= True;
 
   ShowStatistic;
-end;
-
-procedure TStatisticForm.ExportButtonClick(Sender: TObject);
-begin
-  ExportStatistic(SelectedIndex);
 end;
 
 procedure TStatisticForm.DateTimePicker1Change(Sender: TObject);
@@ -207,6 +206,11 @@ end;
 procedure TStatisticForm.ANEMAsSameNameCheckBoxChange(Sender: TObject);
 begin
   ShowStatistic;
+end;
+
+procedure TStatisticForm.ExportButtonClick(Sender: TObject);
+begin
+  ExportStatistic(SelectedIndex);
 end;
 
 procedure TStatisticForm.ShowPercentCheckBoxChange(Sender: TObject);
@@ -268,7 +272,7 @@ begin
   SelectedIndex:= 0;
   StatisticList:= TVSTStringList.Create(VT1, S, @SelectStatistic);
   StatisticList.Update(V, SelectedIndex);
-  Panel2.Height:= StatisticList.NeededHeight + 10;
+  Panel2.Height:= StatisticList.TotalHeight + 10;
 end;
 
 procedure TStatisticForm.SelectStatistic;
@@ -465,9 +469,9 @@ procedure TStatisticForm.ExportStatisticForSinglePeriod(const AParamType: Intege
 var
   Drawer: TStatisticSinglePeriodSheet;
   Sheet: TsWorksheet;
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
 
@@ -509,9 +513,9 @@ procedure TStatisticForm.ExportStatisticForSeveralPeriods(const AParamType: Inte
 var
   Drawer: TStatisticSeveralPeriodsSheet;
   Sheet: TsWorksheet;
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
 

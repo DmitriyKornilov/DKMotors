@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, rxctrls, fpspreadsheetgrid, DividerBevel, DateTimePicker,
-  DK_DateUtils, USheetUtils, USQLite, DK_SheetExporter, DK_Vector,
+  StdCtrls, fpspreadsheetgrid, UUtils, DateTimePicker,
+  DK_DateUtils, USheetUtils, USQLite, BCButton, DK_SheetExporter, DK_Vector,
   DK_Matrix;
 
 type
@@ -15,13 +15,13 @@ type
   { TReportForm }
 
   TReportForm = class(TForm)
+    Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
+    ExportButton: TBCButton;
     NumberListCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
-    DividerBevel1: TDividerBevel;
-    DividerBevel2: TDividerBevel;
-    DividerBevel3: TDividerBevel;
-    ExportButton: TRxSpeedButton;
     Label1: TLabel;
     LogGrid: TsWorksheetGrid;
     OrderNumCheckBox: TCheckBox;
@@ -33,11 +33,11 @@ type
     RadioButton3: TRadioButton;
     ReportPeriodPanel: TPanel;
     ToolPanel: TPanel;
+    procedure ExportButtonClick(Sender: TObject);
     procedure NumberListCheckBoxChange(Sender: TObject);
     procedure OrderNumCheckBoxChange(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DateTimePicker2Change(Sender: TObject);
-    procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -71,19 +71,6 @@ uses UMainForm;
 
 { TReportForm }
 
-procedure TReportForm.ExportButtonClick(Sender: TObject);
-var
-  Exporter: TGridExporter;
-begin
-  Exporter:= TGridExporter.Create(LogGrid);
-  try
-    Exporter.PageSettings(spoPortrait, pfWidth);
-    Exporter.Save('Выполнено!');
-  finally
-    FreeAndNil(Exporter);
-  end;
-end;
-
 procedure TReportForm.DateTimePicker2Change(Sender: TObject);
 begin
   ShowReport;
@@ -101,6 +88,10 @@ end;
 
 procedure TReportForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+
   SetControlsVisible;
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= FirstDayInMonth(Date);
@@ -110,6 +101,19 @@ procedure TReportForm.NumberListCheckBoxChange(Sender: TObject);
 begin
   SetControlsVisible;
   ShowReport;
+end;
+
+procedure TReportForm.ExportButtonClick(Sender: TObject);
+var
+  Exporter: TGridExporter;
+begin
+  Exporter:= TGridExporter.Create(LogGrid);
+  try
+    Exporter.PageSettings(spoPortrait, pfWidth);
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
 end;
 
 procedure TReportForm.FormDestroy(Sender: TObject);

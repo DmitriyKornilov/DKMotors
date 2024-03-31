@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls,
-  Buttons, rxctrls, fpspreadsheetgrid, USQLite, USheetUtils,
+  Buttons, fpspreadsheetgrid, USQLite, USheetUtils, BCButton, UUtils,
   DK_Vector, DK_SheetExporter, DK_Zoom;
 
 type
@@ -16,9 +16,9 @@ type
   TCardForm = class(TForm)
     Bevel1: TBevel;
     CardPanel: TPanel;
-    ExportButton: TRxSpeedButton;
+    ExportButton: TBCButton;
     CardGrid: TsWorksheetGrid;
-    TopPanel: TPanel;
+    ToolPanel: TPanel;
     ZoomPanel: TPanel;
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -66,6 +66,9 @@ procedure TCardForm.FormCreate(Sender: TObject);
 begin
   MotorID:= 0;
   ZoomPercent:= 100;
+  SetToolPanels([
+    ToolPanel
+  ]);
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawCard, True);
   MotorCardSheet:= TMotorCardSheet.Create(CardGrid.Worksheet, CardGrid);
 end;
@@ -111,9 +114,9 @@ procedure TCardForm.ExportCard;
 var
   Drawer: TMotorCardSheet;
   Sheet: TsWorksheet;
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TMotorCardSheet.Create(Sheet);

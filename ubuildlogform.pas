@@ -5,8 +5,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
-  Buttons, StdCtrls, VirtualTrees, DividerBevel, USQLite,
-  rxctrls, DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTools,
+  Buttons, StdCtrls, VirtualTrees, USQLite, UUtils,
+  DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTools,
   DK_Dialogs, DK_Const, UBuildAddForm, UBuildEditForm,
   USheetUtils, fpspreadsheetgrid;
 
@@ -16,18 +16,17 @@ type
 
   TBuildLogForm = class(TForm)
     AddButton: TSpeedButton;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
     CheckBox1: TCheckBox;
     DelButton: TSpeedButton;
     EditButton: TSpeedButton;
-    DividerBevel2: TDividerBevel;
-    DividerBevel3: TDividerBevel;
     EditButtonPanel: TPanel;
-    DividerBevel1: TDividerBevel;
     LogGrid: TsWorksheetGrid;
-    MotorNamesButton: TRxSpeedButton;
     Panel1: TPanel;
     Panel2: TPanel;
     SpinEdit1: TSpinEdit;
+    YearPanel: TPanel;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
@@ -38,7 +37,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNamesButtonClick(Sender: TObject);
+    procedure LogGridDblClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
     Months: TStrVector;
@@ -53,6 +52,8 @@ type
 
     procedure SelectMotor;
     procedure SelectDate;
+
+    procedure EditMotor;
 
     procedure OpenDatesList(const ASelectedDate: TDate);
   public
@@ -72,6 +73,13 @@ uses UMainForm;
 
 procedure TBuildLogForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetToolButtons([
+    AddButton, DelButton, EditButton
+  ]);
+
   MainForm.SetNamesPanelsVisible(True, False);
   BuildLog:= TBuildLogTable.Create(LogGrid, @SelectMotor);
   VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @SelectDate);
@@ -90,11 +98,10 @@ begin
   ShowBuildLog;
 end;
 
-procedure TBuildLogForm.MotorNamesButtonClick(Sender: TObject);
+procedure TBuildLogForm.LogGridDblClick(Sender: TObject);
 begin
-  if SQLite.EditList('Наименования электродвигателей',
-    'MOTORNAMES', 'NameID', 'MotorName', False, True) then
-      ShowBuildLog;
+  if not BuildLog.IsSelected then Exit;
+  EditMotor;
 end;
 
 procedure TBuildLogForm.SpinEdit1Change(Sender: TObject);
@@ -132,6 +139,7 @@ end;
 
 procedure TBuildLogForm.ShowBuildLog;
 begin
+  BuildLog.Unselect;
   OpenDatesList(SelectedDate);
 end;
 
@@ -146,7 +154,7 @@ begin
   ShowBuildLog;
 end;
 
-procedure TBuildLogForm.EditButtonClick(Sender: TObject);
+procedure TBuildLogForm.EditMotor;
 var
   BuildEditForm: TBuildEditForm;
   D: TDate;
@@ -159,12 +167,20 @@ begin
     BuildEditForm.MotorNumEdit.Text:= MotorNums[BuildLog.SelectedIndex];
     BuildEditForm.RotorNumEdit.Text:= RotorNums[BuildLog.SelectedIndex];
     BuildEditForm.OldMotorCheckBox.Checked:= OldMotors[BuildLog.SelectedIndex]=1;
-    BuildEditForm.ShowModal;
-    D:= BuildEditForm.DateTimePicker1.Date;
+    if BuildEditForm.ShowModal=mrOK then
+    begin
+      D:= BuildEditForm.DateTimePicker1.Date;
+      BuildLog.Unselect;
+      OpenDatesList(D);
+    end;
   finally
     FreeAndNil(BuildEditForm);
   end;
-   OpenDatesList(D);
+end;
+
+procedure TBuildLogForm.EditButtonClick(Sender: TObject);
+begin
+  EditMotor;
 end;
 
 procedure TBuildLogForm.CheckBox1Change(Sender: TObject);

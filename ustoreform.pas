@@ -6,23 +6,23 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Spin, DividerBevel, fpspreadsheetgrid, USheetUtils, USQLite, rxctrls,
-  DK_Vector, DK_SheetExporter;
+  StdCtrls, Spin, UUtils, fpspreadsheetgrid, USheetUtils, USQLite,
+  BCButton, DK_Vector, DK_SheetExporter;
 
 type
 
   { TStoreForm }
 
   TStoreForm = class(TForm)
+    Bevel2: TBevel;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
-    DividerBevel7: TDividerBevel;
-    ExportButton: TRxSpeedButton;
+    ExportButton: TBCButton;
     Label2: TLabel;
     Panel2: TPanel;
     Panel5: TPanel;
-    Panel1: TPanel;
+    ToolPanel: TPanel;
     ReportGrid: TsWorksheetGrid;
     SpinEdit1: TSpinEdit;
     procedure CheckBox1Click(Sender: TObject);
@@ -74,6 +74,9 @@ end;
 
 procedure TStoreForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
   MainForm.SetNamesPanelsVisible(True, False);
   StoreSheet:= TStoreSheet.Create(ReportGrid);
   Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;

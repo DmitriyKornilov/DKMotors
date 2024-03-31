@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, ComCtrls, rxctrls, DK_DateUtils, VirtualTrees, DK_VSTTools,
-  USQLite, USheetUtils, UCargoEditForm, DividerBevel, fpspreadsheetgrid,
+  Spin, ComCtrls, DK_DateUtils, VirtualTrees, DK_VSTTools, USQLite,
+  USheetUtils, UCargoEditForm, BCButton, UUtils, fpspreadsheetgrid,
   DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, DK_Zoom;
 
 type
@@ -17,20 +17,20 @@ type
   TShipmentForm = class(TForm)
     AddButton: TSpeedButton;
     Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
     DelButton: TSpeedButton;
-    DividerBevel1: TDividerBevel;
-    DividerBevel3: TDividerBevel;
     EditButton: TSpeedButton;
     EditButtonPanel: TPanel;
-    ExportButton: TRxSpeedButton;
+    ExportButton: TBCButton;
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
-    RxSpeedButton5: TRxSpeedButton;
     SpinEdit1: TSpinEdit;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
+    YearPanel: TPanel;
     ZoomPanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
@@ -39,7 +39,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure RxSpeedButton5Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
     Months: TStrVector;
@@ -106,6 +105,13 @@ end;
 
 procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetToolButtons([
+    AddButton, DelButton, EditButton
+  ]);
+
   MainForm.SetNamesPanelsVisible(True, True);
 
   ZoomPercent:= 100;
@@ -130,17 +136,6 @@ end;
 procedure TShipmentForm.FormShow(Sender: TObject);
 begin
   OpenShipmentList(0);
-end;
-
-procedure TShipmentForm.RxSpeedButton5Click(Sender: TObject);
-begin
-  if SQLite.EditList('Грузополучатели',
-    'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True) then
-  begin
-    SQLite.ShipmentListLoad(MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
-                            SpinEdit1.Value, Months, Shipments, CargoIDs);
-    SelectShipment;
-  end;
 end;
 
 procedure TShipmentForm.SpinEdit1Change(Sender: TObject);
@@ -177,9 +172,9 @@ procedure TShipmentForm.ExportShipment;
 var
   Drawer: TCargoSheet;
   Sheet: TsWorksheet;
-  Exporter: TSheetExporter;
+  Exporter: TSheetsExporter;
 begin
-  Exporter:= TSheetExporter.Create;
+  Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TCargoSheet.Create(Sheet);
