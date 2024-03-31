@@ -2,12 +2,12 @@ object CalendarForm: TCalendarForm
   Left = 614
   Height = 701
   Top = 122
-  Width = 949
+  Width = 950
   Align = alClient
   BorderStyle = bsNone
   Caption = 'CalendarForm'
   ClientHeight = 701
-  ClientWidth = 949
+  ClientWidth = 950
   DesignTimePPI = 120
   FormStyle = fsStayOnTop
   OnCreate = FormCreate
@@ -19,7 +19,7 @@ object CalendarForm: TCalendarForm
     Left = 2
     Height = 40
     Top = 2
-    Width = 945
+    Width = 946
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -29,7 +29,7 @@ object CalendarForm: TCalendarForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 941
+    ClientWidth = 942
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 0
@@ -185,42 +185,42 @@ object CalendarForm: TCalendarForm
     end
   end
   object Splitter1: TSplitter
-    Left = 310
+    Left = 380
     Height = 657
     Top = 44
     Width = 6
     ResizeStyle = rsLine
   end
   object MainPanel: TPanel
-    Left = 316
+    Left = 386
     Height = 655
     Top = 44
-    Width = 631
+    Width = 562
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     ClientHeight = 655
-    ClientWidth = 631
+    ClientWidth = 562
     TabOrder = 2
     object Panel7: TPanel
       Left = 0
       Height = 655
       Top = 0
-      Width = 631
+      Width = 562
       Align = alClient
       BevelOuter = bvNone
       BorderStyle = bsSingle
       Caption = 'Panel7'
       ClientHeight = 651
-      ClientWidth = 627
+      ClientWidth = 558
       TabOrder = 0
       object CalendarGrid: TsWorksheetGrid
         Left = 0
         Height = 627
         Top = 0
-        Width = 627
+        Width = 558
         AutoExpand = []
         DisplayFixedColRow = False
         FrozenBorderPen.Style = psClear
@@ -257,7 +257,7 @@ object CalendarForm: TCalendarForm
         Left = 0
         Height = 22
         Top = 629
-        Width = 627
+        Width = 558
         Align = alBottom
         BevelOuter = bvNone
         Color = clWindow
@@ -269,7 +269,7 @@ object CalendarForm: TCalendarForm
         Left = 0
         Height = 2
         Top = 627
-        Width = 627
+        Width = 558
         Align = alBottom
         Shape = bsBottomLine
         Style = bsRaised
@@ -280,11 +280,11 @@ object CalendarForm: TCalendarForm
     Left = 0
     Height = 657
     Top = 44
-    Width = 310
+    Width = 380
     Align = alLeft
     BevelOuter = bvNone
     ClientHeight = 657
-    ClientWidth = 310
+    ClientWidth = 380
     Color = clBtnFace
     ParentBackground = False
     ParentColor = False
@@ -293,13 +293,13 @@ object CalendarForm: TCalendarForm
       Left = 2
       Height = 249
       Top = 0
-      Width = 308
+      Width = 378
       Align = alClient
       BorderSpacing.Left = 2
       BevelOuter = bvNone
       BorderStyle = bsSingle
       ClientHeight = 245
-      ClientWidth = 304
+      ClientWidth = 374
       Color = clWindow
       ParentBackground = False
       ParentColor = False
@@ -308,25 +308,25 @@ object CalendarForm: TCalendarForm
         Left = 0
         Height = 93
         Top = 22
-        Width = 304
+        Width = 374
         Align = alClient
         BevelOuter = bvNone
         Caption = 'EditPanel'
         ClientHeight = 93
-        ClientWidth = 304
+        ClientWidth = 374
         ParentBackground = False
         TabOrder = 0
         object DateEditPanel: TPanel
           Left = 0
           Height = 35
           Top = 0
-          Width = 304
+          Width = 374
           Align = alTop
           AutoSize = True
           BorderSpacing.Bottom = 1
           BevelOuter = bvNone
           ClientHeight = 35
-          ClientWidth = 304
+          ClientWidth = 374
           Constraints.MinHeight = 35
           ParentBackground = False
           TabOrder = 0
@@ -406,7 +406,7 @@ object CalendarForm: TCalendarForm
           Left = 1
           Height = 57
           Top = 36
-          Width = 302
+          Width = 372
           Align = alClient
           BorderSpacing.Left = 1
           BorderSpacing.Right = 1
@@ -427,12 +427,12 @@ object CalendarForm: TCalendarForm
         Left = 0
         Height = 130
         Top = 115
-        Width = 304
+        Width = 374
         Align = alBottom
         BevelOuter = bvNone
         Caption = 'CopyPanel'
         ClientHeight = 130
-        ClientWidth = 304
+        ClientWidth = 374
         ParentBackground = False
         TabOrder = 1
         Visible = False
@@ -440,13 +440,13 @@ object CalendarForm: TCalendarForm
           Left = 0
           Height = 35
           Top = 0
-          Width = 304
+          Width = 374
           Align = alTop
           AutoSize = True
           BorderSpacing.Bottom = 1
           BevelOuter = bvNone
           ClientHeight = 35
-          ClientWidth = 304
+          ClientWidth = 374
           Constraints.MinHeight = 35
           ParentBackground = False
           TabOrder = 0
@@ -508,7 +508,7 @@ object CalendarForm: TCalendarForm
           Left = 1
           Height = 94
           Top = 36
-          Width = 302
+          Width = 372
           Align = alClient
           BorderSpacing.Left = 1
           BorderSpacing.Right = 1
@@ -528,7 +528,7 @@ object CalendarForm: TCalendarForm
         Left = 2
         Height = 20
         Top = 0
-        Width = 302
+        Width = 372
         Align = alTop
         BorderSpacing.Left = 2
         BorderSpacing.Bottom = 2
@@ -542,14 +542,14 @@ object CalendarForm: TCalendarForm
       Left = 2
       Height = 400
       Top = 255
-      Width = 308
+      Width = 378
       Align = alBottom
       BorderSpacing.Left = 2
       BorderSpacing.Bottom = 2
       BevelOuter = bvNone
       BorderStyle = bsSingle
       ClientHeight = 396
-      ClientWidth = 304
+      ClientWidth = 374
       Color = clWindow
       ParentBackground = False
       ParentColor = False
@@ -558,7 +558,7 @@ object CalendarForm: TCalendarForm
         Left = 2
         Height = 20
         Top = 0
-        Width = 302
+        Width = 372
         Align = alTop
         BorderSpacing.Left = 2
         BorderSpacing.Bottom = 2
@@ -571,14 +571,14 @@ object CalendarForm: TCalendarForm
         Left = 6
         Height = 28
         Top = 26
-        Width = 298
+        Width = 368
         Align = alTop
         AutoSize = True
         BorderSpacing.Left = 6
         BorderSpacing.Top = 6
         BevelOuter = bvNone
         ClientHeight = 28
-        ClientWidth = 298
+        ClientWidth = 368
         ParentBackground = False
         ParentFont = False
         TabOrder = 0
@@ -659,12 +659,12 @@ object CalendarForm: TCalendarForm
         Left = 0
         Height = 162
         Top = 54
-        Width = 304
+        Width = 374
         Align = alTop
         AutoSize = True
         BevelOuter = bvNone
         ClientHeight = 162
-        ClientWidth = 304
+        ClientWidth = 374
         ParentBackground = False
         TabOrder = 1
         object Label4: TLabel
@@ -847,7 +847,7 @@ object CalendarForm: TCalendarForm
         Left = 2
         Height = 20
         Top = 231
-        Width = 302
+        Width = 372
         Align = alTop
         BorderSpacing.Left = 2
         BorderSpacing.Top = 15
@@ -861,11 +861,11 @@ object CalendarForm: TCalendarForm
         Left = 0
         Height = 143
         Top = 253
-        Width = 304
+        Width = 374
         Align = alClient
         BevelOuter = bvNone
         ClientHeight = 143
-        ClientWidth = 304
+        ClientWidth = 374
         ParentBackground = False
         TabOrder = 2
         object SpinEdit1: TSpinEdit
@@ -960,7 +960,7 @@ object CalendarForm: TCalendarForm
       Left = 0
       Height = 6
       Top = 249
-      Width = 310
+      Width = 380
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine

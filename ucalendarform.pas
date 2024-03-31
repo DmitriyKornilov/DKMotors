@@ -181,19 +181,19 @@ begin
 
   LoadColors;
 
-  W1:= 110;
-  W2:= 200;
-  LeftPanel.Width:= W1+W2;
-
   CalendarSheet:= TCalendarSheet.Create(CalendarGrid.Worksheet, CalendarGrid);
 
+  W1:= 110;
+  W2:= 200;
   VSTDays:= TVSTTable.Create(VT1);
   VSTDays.CanSelect:= True;
+  VSTDays.HeaderFont.Style:= [fsBold];
   VSTDays.AddColumn('Дата', W1);
   VSTDays.AddColumn('Статус', W2);
   VSTDays.Draw;
 
   VSTCopy:= TVSTTable.Create(VT2);
+  VSTCopy.HeaderFont.Style:= [fsBold];
   VSTCopy.CanSelect:= True;
   VSTCopy.AddColumn('Дата', W1);
   VSTCopy.AddColumn('Статус', W2);

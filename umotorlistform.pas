@@ -106,6 +106,7 @@ begin
   VSTMotorsTable:= TVSTTable.Create(VT1);
   VSTMotorsTable.OnSelect:= @SelectMotor;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
+  VSTMotorsTable.SetHeaderHeight(25);
   VSTMotorsTable.AddColumn('Дата сборки', 100);
   VSTMotorsTable.AddColumn('Наименование', 200);
   VSTMotorsTable.AddColumn('Номер', 100);

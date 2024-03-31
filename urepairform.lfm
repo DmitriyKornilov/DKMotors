@@ -1,7 +1,7 @@
 object RepairForm: TRepairForm
-  Left = 455
+  Left = 364
   Height = 713
-  Top = 184
+  Top = 147
   Width = 905
   Align = alClient
   BorderStyle = bsNone

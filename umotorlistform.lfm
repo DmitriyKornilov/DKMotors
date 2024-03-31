@@ -1,13 +1,13 @@
 object MotorListForm: TMotorListForm
-  Left = 442
+  Left = 354
   Height = 651
-  Top = 211
-  Width = 1279
+  Top = 169
+  Width = 1280
   Align = alClient
   BorderStyle = bsNone
   Caption = 'MotorListForm'
   ClientHeight = 651
-  ClientWidth = 1279
+  ClientWidth = 1280
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -17,7 +17,7 @@ object MotorListForm: TMotorListForm
     Left = 2
     Height = 40
     Top = 2
-    Width = 1275
+    Width = 1276
     Align = alTop
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
@@ -25,7 +25,7 @@ object MotorListForm: TMotorListForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1271
+    ClientWidth = 1272
     Constraints.MaxHeight = 40
     TabOrder = 0
     object Panel7: TPanel
@@ -204,20 +204,20 @@ object MotorListForm: TMotorListForm
     Left = 220
     Height = 605
     Top = 44
-    Width = 1057
+    Width = 1058
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     ClientHeight = 605
-    ClientWidth = 1057
+    ClientWidth = 1058
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
       Height = 550
       Top = 55
-      Width = 1057
+      Width = 1058
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 0
@@ -228,7 +228,7 @@ object MotorListForm: TMotorListForm
       Left = 0
       Height = 6
       Top = 49
-      Width = 1057
+      Width = 1058
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
@@ -238,9 +238,10 @@ object MotorListForm: TMotorListForm
       Left = 0
       Height = 49
       Top = 0
-      Width = 1057
+      Width = 1056
       Align = alClient
-      DefaultNodeHeight = 25
+      BorderSpacing.Right = 2
+      DefaultNodeHeight = 31
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
       Header.Columns = <>
