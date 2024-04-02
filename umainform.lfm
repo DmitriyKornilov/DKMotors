@@ -1,11 +1,13 @@
 object MainForm: TMainForm
-  Left = 562
-  Height = 459
-  Top = 175
-  Width = 1098
+  Left = 423
+  Height = 500
+  Top = 187
+  Width = 1200
   Caption = 'Учет производства, поставок и рекламационных случаев электродвигателей ООО "Электрожелдормаш"'
-  ClientHeight = 459
-  ClientWidth = 1098
+  ClientHeight = 500
+  ClientWidth = 1200
+  Constraints.MinHeight = 500
+  Constraints.MinWidth = 1200
   DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -15,7 +17,7 @@ object MainForm: TMainForm
     Left = 2
     Height = 40
     Top = 2
-    Width = 1094
+    Width = 1196
     Align = alTop
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
@@ -23,14 +25,14 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1090
+    ClientWidth = 1192
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
     object AboutButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1004
+      Left = 1106
       Height = 36
       Top = 0
       Width = 40
@@ -43,7 +45,7 @@ object MainForm: TMainForm
     end
     object ExitButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 1050
+      Left = 1152
       Height = 36
       Top = 0
       Width = 40
@@ -56,7 +58,7 @@ object MainForm: TMainForm
     end
     object RefreshButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 958
+      Left = 1060
       Height = 36
       Hint = 'Обновить данные'
       Top = 0
@@ -71,7 +73,7 @@ object MainForm: TMainForm
       ParentShowHint = False
     end
     object Bevel2: TBevel
-      Left = 1046
+      Left = 1148
       Height = 36
       Top = 0
       Width = 2
@@ -81,7 +83,7 @@ object MainForm: TMainForm
       Shape = bsRightLine
     end
     object Bevel3: TBevel
-      Left = 954
+      Left = 1056
       Height = 36
       Top = 0
       Width = 2
@@ -652,7 +654,7 @@ object MainForm: TMainForm
       MemoryUsage = bmuHigh
     end
     object Bevel4: TBevel
-      Left = 1000
+      Left = 1102
       Height = 36
       Top = 0
       Width = 2
@@ -663,7 +665,7 @@ object MainForm: TMainForm
     end
     object DictionaryButton: TBCButton
       Cursor = crHandPoint
-      Left = 791
+      Left = 893
       Height = 34
       Top = 1
       Width = 160
@@ -778,9 +780,9 @@ object MainForm: TMainForm
   end
   object MainPanel: TPanel
     Left = 0
-    Height = 333
+    Height = 374
     Top = 126
-    Width = 1098
+    Width = 1200
     Align = alClient
     BevelOuter = bvNone
     ParentFont = False
@@ -793,7 +795,7 @@ object MainForm: TMainForm
     Left = 2
     Height = 40
     Top = 44
-    Width = 1094
+    Width = 1196
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -802,7 +804,7 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1090
+    ClientWidth = 1192
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 2
@@ -977,7 +979,7 @@ object MainForm: TMainForm
       Left = 181
       Height = 20
       Top = 8
-      Width = 907
+      Width = 1009
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 6
@@ -998,7 +1000,7 @@ object MainForm: TMainForm
     Left = 2
     Height = 40
     Top = 86
-    Width = 1094
+    Width = 1196
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -1007,7 +1009,7 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 36
-    ClientWidth = 1090
+    ClientWidth = 1192
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 3
@@ -1183,7 +1185,7 @@ object MainForm: TMainForm
       Left = 180
       Height = 20
       Top = 8
-      Width = 908
+      Width = 1010
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       BorderSpacing.Left = 12
