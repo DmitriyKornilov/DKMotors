@@ -125,6 +125,7 @@ begin
   VSTCargoTable.AddColumn('Наименование', 220);
   VSTCargoTable.AddColumn('Номер', 100);
   VSTCargoTable.AddColumn('Партия');
+  VSTCargoTable.AutosizeColumnEnable('Наименование');
   VSTCargoTable.CanSelect:= True;
   VSTCargoTable.Draw;
 

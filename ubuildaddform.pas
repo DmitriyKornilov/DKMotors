@@ -103,6 +103,7 @@ begin
   VSTTable.AddColumn('Номер', 100);
   VSTTable.AddColumn('Ротор');
   VSTTable.CanSelect:= True;
+  VSTTable.AutosizeColumnEnable('Наименование');
   VSTTable.Draw;
   DateTimePicker1.SetFocus;
 end;

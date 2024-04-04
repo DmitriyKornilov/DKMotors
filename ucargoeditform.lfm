@@ -11,7 +11,7 @@ object CargoEditForm: TCargoEditForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '3.2.0.0'
   object Panel2: TPanel
     Left = 3
     Height = 359
@@ -102,10 +102,10 @@ object CargoEditForm: TCargoEditForm
       BorderSpacing.Right = 3
       DropDownCount = 15
       ItemHeight = 20
-      OnChange = MotorNameComboBoxChange
       ParentFont = False
       Style = csDropDownList
       TabOrder = 1
+      OnChange = MotorNameComboBoxChange
     end
     object Label3: TLabel
       AnchorSideLeft.Control = Panel2
@@ -139,10 +139,10 @@ object CargoEditForm: TCargoEditForm
       BorderSpacing.Top = 15
       BorderSpacing.Right = 3
       MaxLength = 50
-      OnChange = MotorNumEditChange
-      OnKeyDown = MotorNumEditKeyDown
       ParentFont = False
       TabOrder = 2
+      OnChange = MotorNumEditChange
+      OnKeyDown = MotorNumEditKeyDown
     end
     object AddButton: TSpeedButton
       AnchorSideTop.Control = VT1
@@ -483,10 +483,10 @@ object CargoEditForm: TCargoEditForm
       BorderSpacing.Right = 3
       DropDownCount = 15
       ItemHeight = 20
-      OnChange = ReceiverNameComboBoxChange
       ParentFont = False
       Style = csDropDownList
       TabOrder = 3
+      OnChange = ReceiverNameComboBoxChange
     end
     object Label5: TLabel
       AnchorSideLeft.Control = Panel2
@@ -512,9 +512,9 @@ object CargoEditForm: TCargoEditForm
       Width = 125
       BorderSpacing.Left = 8
       BorderSpacing.Top = 15
-      OnKeyDown = SeriesEditKeyDown
       ParentFont = False
       TabOrder = 4
+      OnKeyDown = SeriesEditKeyDown
     end
     object VT1: TVirtualStringTree
       AnchorSideLeft.Control = Panel2
