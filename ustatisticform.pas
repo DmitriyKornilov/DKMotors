@@ -9,7 +9,7 @@ uses
   fpspreadsheetgrid, VirtualTrees, DK_Vector, DK_VSTTables, USheetUtils,
   LCLType, StdCtrls, Spin, ComCtrls, DateTimePicker, DK_DateUtils,
   UUtils, USQLite, BCButton, DK_Matrix, DK_SheetExporter, DK_SheetConst,
-  DK_StrUtils, DK_Zoom, DK_VSTTools;
+  DK_StrUtils, DK_Zoom, DK_VSTTableTools;
 
 type
 

@@ -9,7 +9,7 @@ uses
   Buttons, EditBtn, VirtualTrees, UUtils, DK_VSTTables, USheetUtils,
   DK_Vector, USQLite, DK_StrUtils, DK_Dialogs, DK_Const,
   DK_SheetExporter, UCalendar, UCardForm, URepairEditForm, BCButton,
-  DK_VSTTools;
+  DK_VSTTableTools;
 
 type
 

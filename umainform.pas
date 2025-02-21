@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Menus, DK_LCLStrRus, DK_Vector, DK_VSTTables,
+  StdCtrls, Menus, DK_LCLStrRus, DK_Vector, DK_VSTTypes,
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
-  UControlListForm, UCalendarForm, USQLite, BCButton, DK_Const, UUtils,
+  UControlListForm, UCalendarForm, USQLite, BCButton, DK_Const,
   DK_CtrlUtils, LCLType;
 
 type

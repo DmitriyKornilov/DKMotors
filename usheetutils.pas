@@ -26,14 +26,14 @@ type
 
   TLogTable = class(TSheetTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
   end;
 
   { TBuildLogTable }
 
   TBuildLogTable = class(TLogTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
     procedure Update(const ADate: TDate;
             const AMotorNames, AMotorNums, ARotorNums: TStrVector);
   end;
@@ -42,7 +42,7 @@ type
 
   TTestLogTable = class(TLogTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetSelectEvent);
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
     procedure Update(const ADate: TDate; const ATestResults: TIntVector;
             const AMotorNames, AMotorNums, ATestNotes: TStrVector;
             const ATotalCount, AFailCount: Integer);
@@ -913,7 +913,7 @@ end;
 { TLogTable }
 
 constructor TLogTable.Create(const AGrid: TsWorksheetGrid;
-  const AOnSelect: TSheetSelectEvent);
+  const AOnSelect: TSheetEvent);
 begin
   inherited Create(AGrid);
   SetFontsName(SHEET_FONT_NAME);
@@ -928,7 +928,7 @@ end;
 { TTestLogTable }
 
 constructor TTestLogTable.Create(const AGrid: TsWorksheetGrid;
-  const AOnSelect: TSheetSelectEvent);
+  const AOnSelect: TSheetEvent);
 begin
   inherited Create(AGrid, AOnSelect);
   AddColumn('№ п/п', 50);
@@ -974,7 +974,7 @@ end;
 { TBuildLogTable }
 
 constructor TBuildLogTable.Create(const AGrid: TsWorksheetGrid;
-  const AOnSelect: TSheetSelectEvent);
+  const AOnSelect: TSheetEvent);
 begin
   inherited Create(AGrid, AOnSelect);
   AddColumn('№ п/п', 50);
@@ -2476,8 +2476,8 @@ var
 
   procedure CalcParams;
   begin
-    ScaleX:= XFactorDefaultDivScreen;
-    ScaleY:= YFactorDefaultDivScreen;
+    ScaleX:= 1; //XFactorDefaultDivScreen;
+    ScaleY:= 1; //YFactorDefaultDivScreen;
     OffsetX:= 0;
     OffsetY:= 0;
     ColNum:= 2;

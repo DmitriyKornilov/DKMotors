@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="1"/>
+      <BuildNr Value="6"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
@@ -34,10 +34,10 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="bgracontrols"/>
+        <PackageName Value="DKUIUtils"/>
       </Item>
       <Item>
-        <PackageName Value="DKZoom"/>
+        <PackageName Value="bgracontrols"/>
       </Item>
       <Item>
         <PackageName Value="DKGraphics"/>

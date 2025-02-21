@@ -10,7 +10,7 @@ uses
   DK_Vector, UUtils, USheetUtils, DK_DateUtils, UReclamationEditForm,
   DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
   URepairEditForm, DateTimePicker, UControlListEditForm, BCButton, DK_Zoom,
-  DK_Const, DK_VSTTools;
+  DK_Const, DK_VSTTableTools;
 
 type
 
