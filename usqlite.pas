@@ -116,6 +116,8 @@ type
     function MotorsInTestLogWrite(const ATestDate: TDate;
                            const AMotorIDs, ATestResults: TIntVector;
                            const ATestNotes: TStrVector): Boolean;
+    function TestLastFineDatesStr(const AMotorIDs: TIntVector): TStrVector;
+
     //контроль
     function ControlNoteLoad(const AMotorID: Integer): String;
     function ControlListLoad(const ANameIDs: TIntVector; const ANumberLike: String;
@@ -174,6 +176,8 @@ type
                          out ASendDate: TDate;
                          out AMotorIDs: TIntVector;
                          out AMotorNames, AMotorNums, ASeries: TStrVector): Boolean;
+    function CargoPackingSheet(const ACargoID: Integer;
+                         out AMotorNames, AMotorNums, ATestDates: TStrVector): Boolean;
     function CargoLoad(const ACargoID: Integer;
                      out ASendDate: TDate; out AReceiverName: String;
                      out AMotorNames: TStrVector; out AMotorCounts: TIntVector;
@@ -187,6 +191,7 @@ type
                       const AReceiverID: Integer;
                       const AMotorIDs, AWritedMotorIDs: TIntVector;
                       const ASeries: TStrVector): Boolean;
+
 
     //рекламации
     function ReclamationListLoad(const AMotorID: Integer;
@@ -435,7 +440,7 @@ procedure TSQLite.NameIDsAndMotorNamesLoad(AComboBox: TComboBox;
 begin
   KeyPickLoad(AComboBox, AIDs,
                   'MOTORNAMES', 'NameID', 'MotorName', 'NameID',
-                  AKeyValueNotZero, 'ВСЕ НАИМЕНОВАНИЯ');
+                  AKeyValueNotZero{, 'ВСЕ НАИМЕНОВАНИЯ'});
 end;
 
 procedure TSQLite.ReceiverIDsAndNamesLoad(AComboBox: TComboBox;
@@ -443,7 +448,7 @@ procedure TSQLite.ReceiverIDsAndNamesLoad(AComboBox: TComboBox;
 begin
   KeyPickLoad(AComboBox, AIDs,
                   'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', 'ReceiverName',
-                  AKeyValueNotZero, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ');
+                  AKeyValueNotZero{, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ'});
 end;
 
 function TSQLite.ReclamationReportWithReasonsLoad(const ATableName,
@@ -1476,6 +1481,34 @@ begin
   end;
 end;
 
+function TSQLite.TestLastFineDatesStr(const AMotorIDs: TIntVector): TStrVector;
+var
+  i: Integer;
+begin
+  VDim(Result{%H-}, Length(AMotorIDs), EmptyStr);
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT TestDate ' +
+    'FROM MOTORTEST ' +
+    'WHERE (Fail=0) AND (MotorID = :MotorID) ' +
+    'ORDER BY TestDate DESC ' +
+    'LIMIT 1'
+  );
+
+  for i:= 0 to High(AMotorIDs) do
+  begin
+    QParamInt('MotorID', AMotorIDs[i]);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      Result[i]:= FormatDateTime('dd.mm.yyyy', QFieldDT('TestDate'));
+    end;
+    QClose;
+  end;
+end;
+
 function TSQLite.ControlNoteLoad(const AMotorID: Integer): String;
 begin
   Result:= ValueStrInt32ID('MOTORLIST', 'ControlNote', 'MotorID', AMotorID);
@@ -2233,6 +2266,44 @@ begin
     Result:= True;
   end;
   QClose;
+end;
+
+function TSQLite.CargoPackingSheet(const ACargoID: Integer; out AMotorNames,
+  AMotorNums, ATestDates: TStrVector): Boolean;
+var
+  MotorIDs: TIntVector;
+begin
+  Result:= False;
+  AMotorNames:= nil;
+  AMotorNums:= nil;
+  ATestDates:= nil;
+  MotorIDs:= nil;
+
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT t1.MotorID, t1.MotorNum, t2.MotorName ' +
+    'FROM MOTORLIST t1 ' +
+    'INNER JOIN MOTORNAMES t2 ON (t1.NameID=t2.NameID) ' +
+    'WHERE t1.CargoID = :CargoID ' +
+    'ORDER BY t2.MotorName, t1.MotorNum'
+  );
+  QParamInt('CargoID', ACargoID);
+  QOpen;
+  if not QIsEmpty then
+  begin
+    QFirst;
+    while not QEOF do
+    begin
+      VAppend(MotorIDs, QFieldInt('MotorID'));
+      VAppend(AMotorNames, QFieldStr('MotorName'));
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      QNext;
+    end;
+    Result:= True;
+  end;
+  QClose;
+
+  ATestDates:= TestLastFineDatesStr(MotorIDs);
 end;
 
 function TSQLite.CargoLoad(const ACargoID: Integer; out ASendDate: TDate; out

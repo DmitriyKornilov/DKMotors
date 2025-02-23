@@ -29,6 +29,14 @@ type
     constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
   end;
 
+  { TCargoPackingSheet }
+
+  TCargoPackingSheet = class(TLogTable)
+  public
+    constructor Create(const AGrid: TsWorksheetGrid);
+    procedure Update(const AMotorNames, AMotorNums, ATestDates: TStrVector);
+  end;
+
   { TBuildLogTable }
 
   TBuildLogTable = class(TLogTable)
@@ -923,6 +931,32 @@ begin
   HeaderFont.Style:= [fsBold];
   RowAfterFont.Style:= [fsBold];
   OnSelect:= AOnSelect;
+end;
+
+{ TCargoPackingSheet }
+
+constructor TCargoPackingSheet.Create(const AGrid: TsWorksheetGrid);
+begin
+  inherited Create(AGrid, nil);
+  CanSelect:= False;
+  AddColumn('№ п/п', 70);
+  AddColumn('Наименование', 350);
+  AddColumn('Заводской номер', 160);
+  AddColumn('Дата изготовления', 160);
+  AddToHeader(1, 1, '№ п/п');
+  AddToHeader(1, 2, 'Наименование');
+  AddToHeader(1, 3, 'Заводской номер');
+  AddToHeader(1, 4, 'Дата изготовления');
+end;
+
+procedure TCargoPackingSheet.Update(const AMotorNames, AMotorNums,
+  ATestDates: TStrVector);
+begin
+  SetColumnOrder('№ п/п');
+  SetColumnString('Наименование', AMotorNames);
+  SetColumnString('Заводской номер', AMotorNums);
+  SetColumnString('Дата изготовления', ATestDates);
+  Draw;
 end;
 
 { TTestLogTable }

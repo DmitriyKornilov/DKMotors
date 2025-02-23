@@ -34,6 +34,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="laz_fpspreadsheet_visual_dsgn"/>
+      </Item>
+      <Item>
         <PackageName Value="DKUIUtils"/>
       </Item>
       <Item>
@@ -273,6 +276,13 @@
         <Filename Value="uutils.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UUtils"/>
+      </Unit>
+      <Unit>
+        <Filename Value="upackingsheetform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="PackingSheetForm"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UPackingSheetForm"/>
       </Unit>
     </Units>
   </ProjectOptions>

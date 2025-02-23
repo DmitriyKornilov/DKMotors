@@ -8,7 +8,8 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   Spin, ComCtrls, DK_DateUtils, VirtualTrees, DK_VSTTableTools, USQLite,
   USheetUtils, UCargoEditForm, BCButton, UUtils, fpspreadsheetgrid,
-  DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, DK_Zoom;
+  DK_Dialogs, DK_Vector, DK_Matrix, DK_Const, DK_SheetExporter, DK_Zoom,
+  UPackingSheetForm;
 
 type
 
@@ -23,6 +24,7 @@ type
     EditButton: TSpeedButton;
     EditButtonPanel: TPanel;
     ExportButton: TBCButton;
+    PackingSheetButton: TBCButton;
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -39,6 +41,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure PackingSheetButtonClick(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
     Months: TStrVector;
@@ -136,6 +139,21 @@ end;
 procedure TShipmentForm.FormShow(Sender: TObject);
 begin
   OpenShipmentList(0);
+end;
+
+procedure TShipmentForm.PackingSheetButtonClick(Sender: TObject);
+var
+  PackingSheetForm: TPackingSheetForm;
+begin
+  if not VSTCargoList.IsSelected then Exit;
+
+  PackingSheetForm:= TPackingSheetForm.Create(nil);
+  try
+    PackingSheetForm.CargoID:= CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2];
+    PackingSheetForm.ShowModal;
+  finally
+    FreeAndNil(PackingSheetForm);
+  end;
 end;
 
 procedure TShipmentForm.SpinEdit1Change(Sender: TObject);
