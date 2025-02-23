@@ -52,7 +52,7 @@ type
 
     procedure CreateTypesList;
   public
-    procedure ShowMotorList;
+    procedure ViewUpdate;
   end;
 
 var
@@ -93,12 +93,12 @@ end;
 
 procedure TMotorListForm.MotorNumEditChange(Sender: TObject);
 begin
-  ShowMotorList;
+  ViewUpdate;
 end;
 
 procedure TMotorListForm.SpinEdit1Change(Sender: TObject);
 begin
-  ShowMotorList;
+  ViewUpdate;
 end;
 
 procedure TMotorListForm.CreateMotorsTable;
@@ -126,11 +126,11 @@ begin
     'отгруженные',
     'неотгруженные'
   ]);
-  VSTTypesList:= TVSTStringList.Create(VT2, S, @ShowMotorList);
+  VSTTypesList:= TVSTStringList.Create(VT2, S, @ViewUpdate);
   VSTTypesList.Update(V);
 end;
 
-procedure TMotorListForm.ShowMotorList;
+procedure TMotorListForm.ViewUpdate;
 var
   MotorNumberLike: String;
 
@@ -173,12 +173,12 @@ end;
 
 procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
-  ShowMotorList;
+  ViewUpdate;
 end;
 
 procedure TMotorListForm.FormShow(Sender: TObject);
 begin
-  ShowMotorList;
+  ViewUpdate;
 end;
 
 procedure TMotorListForm.MoreInfoCheckBoxChange(Sender: TObject);

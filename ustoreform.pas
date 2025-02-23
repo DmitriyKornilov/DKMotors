@@ -37,7 +37,7 @@ type
     StoreSheet: TStoreSheet;
     procedure ExportSheet;
   public
-    procedure ShowStore;
+    procedure ViewUpdate;
   end;
 
 var
@@ -53,18 +53,18 @@ uses UMainForm;
 
 procedure TStoreForm.CheckBox1Click(Sender: TObject);
 begin
-  ShowStore;
+  ViewUpdate;
 end;
 
 procedure TStoreForm.CheckBox2Click(Sender: TObject);
 begin
-  ShowStore;
+  ViewUpdate;
 end;
 
 procedure TStoreForm.CheckBox3Click(Sender: TObject);
 begin
   SpinEdit1.Enabled:= CheckBox3.Checked;
-  ShowStore;
+  ViewUpdate;
 end;
 
 procedure TStoreForm.ExportButtonClick(Sender: TObject);
@@ -89,15 +89,15 @@ end;
 
 procedure TStoreForm.FormShow(Sender: TObject);
 begin
-  ShowStore;
+  ViewUpdate;
 end;
 
 procedure TStoreForm.SpinEdit1Change(Sender: TObject);
 begin
-  ShowStore;
+  ViewUpdate;
 end;
 
-procedure TStoreForm.ShowStore;
+procedure TStoreForm.ViewUpdate;
 var
   TotalMotorNames, MotorNames, MotorNums: TStrVector;
   TotalMotorCounts: TIntVector;

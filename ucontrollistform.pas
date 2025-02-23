@@ -53,7 +53,7 @@ type
     procedure SelectMotor;
     procedure OpenControlListEditForm(const AEditType: Byte);
   public
-    procedure ShowControlList;
+    procedure ViewUpdate;
   end;
 
 var
@@ -87,7 +87,7 @@ begin
   if not VSTMotorsTable.IsSelected then Exit;
   if not Confirm('Удалить данные о постановке на контроль?') then Exit;
   SQLite.ControlDelete(MotorIDs[VSTMotorsTable.SelectedIndex]);
-  ShowControlList;
+  ViewUpdate;
 end;
 
 procedure TControlListForm.EditButtonClick(Sender: TObject);
@@ -108,7 +108,7 @@ end;
 
 procedure TControlListForm.FormShow(Sender: TObject);
 begin
-  ShowControlList;
+  ViewUpdate;
 end;
 
 procedure TControlListForm.MotorCardCheckBoxChange(Sender: TObject);
@@ -135,7 +135,7 @@ end;
 
 procedure TControlListForm.MotorNumEditChange(Sender: TObject);
 begin
-  ShowControlList;
+  ViewUpdate;
 end;
 
 procedure TControlListForm.ExportButtonClick(Sender: TObject);
@@ -207,13 +207,13 @@ begin
       ControlListEditForm.MotorName:= MotorNames[VSTMotorsTable.SelectedIndex];
       ControlListEditForm.MotorNum:= MotorNums[VSTMotorsTable.SelectedIndex];
     end;
-    if ControlListEditForm.ShowModal = mrOK then ShowControlList;
+    if ControlListEditForm.ShowModal = mrOK then ViewUpdate;
   finally
     FreeAndNil(ControlListEditForm);
   end;
 end;
 
-procedure TControlListForm.ShowControlList;
+procedure TControlListForm.ViewUpdate;
 var
   MotorNumberLike: String;
 begin

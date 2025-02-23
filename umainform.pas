@@ -100,39 +100,14 @@ type
     procedure TestLogMenuItemClick(Sender: TObject);
   private
     Category: Byte;
-
-    BuildLogForm: TBuildLogForm;
-    TestLogForm: TTestLogForm;
-    ShipmentForm: TShipmentForm;
-    ReclamationForm: TReclamationForm;
-    StoreForm: TStoreForm;
-    MotorListForm: TMotorListForm;
-    ReportForm: TReportForm;
-    StatisticForm: TStatisticForm;
-    RepairForm: TRepairForm;
-    ControlListForm: TControlListForm;
-    CalendarForm: TCalendarForm;
+    CategoryForm: TForm;
 
     procedure ConnectDB;
-    procedure CategoryChoose(const ACategory: Byte);
-    procedure FreeForms;
-    procedure SetFormPosition(AForm: TForm);
-    procedure OpenBuildLogForm;
-    procedure OpenTestForm;
-    procedure OpenShipmentForm;
-    procedure OpenReclamationForm;
-    procedure OpenStoreForm;
-    procedure OpenMotorListForm;
-    procedure OpenReportForm;
-    procedure OpenStatisticForm;
-    procedure OpenRepairForm;
-    procedure OpenControlListForm;
-    procedure OpenCalendarForm;
+
+    procedure ViewUpdate;
 
     procedure ChangeUsedMotorList;
     procedure ChangeUsedReceiverList;
-
-    procedure ShowData;
 
     procedure DictionaryChoose(const ADictionary: Byte);
   public
@@ -141,6 +116,8 @@ type
 
     UsedReceiverIDs: TIntVector;
     UsedReceiverNames: TStrVector;
+
+    procedure CategorySelect(const ACategory: Byte);
 
     procedure SetNamesPanelsVisible(const AMotorNamesPanelVisible,
                                           AReceiverNamesPanelVisible: Boolean);
@@ -156,10 +133,6 @@ implementation
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  //for normal form maximizing
-  Height:= 300;
-  Width:= 500;
-
   SetToolPanels([
     ToolPanel, MotorNamesPanel, ReceiverNamesPanel
   ]);
@@ -171,13 +144,14 @@ begin
   ConnectDB;
   SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
   SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
-  CategoryChoose(4);
+
+  CategorySelect(4);
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  if Assigned(CategoryForm) then FreeAndNil(CategoryForm);
   if Assigned(SQLite) then FreeAndNil(SQLite);
-  FreeForms;
 end;
 
 procedure TMainForm.ChooseMotorNamesButtonClick(Sender: TObject);
@@ -257,7 +231,7 @@ end;
 
 procedure TMainForm.ControlListMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(ControlListForm) then CategoryChoose(3);
+  if not Assigned(ControlListForm) then CategorySelect(3);
 end;
 
 procedure TMainForm.Label3Click(Sender: TObject);
@@ -267,7 +241,7 @@ end;
 
 procedure TMainForm.MotorListMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(MotorListForm) then CategoryChoose(4);
+  if not Assigned(MotorListForm) then CategorySelect(4);
 end;
 
 procedure TMainForm.ReceiverNamesLabelClick(Sender: TObject);
@@ -282,13 +256,13 @@ end;
 
 procedure TMainForm.ReclamationMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(ReclamationForm) then CategoryChoose(7);
+  if not Assigned(ReclamationForm) then CategorySelect(7);
 end;
 
 procedure TMainForm.RefreshButtonClick(Sender: TObject);
 begin
   SQLite.Reconnect;
-  CategoryChoose(Category);
+  CategorySelect(Category);
 end;
 
 procedure TMainForm.ExitButtonClick(Sender: TObject);
@@ -307,42 +281,42 @@ end;
 
 procedure TMainForm.BuildLogMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(BuildLogForm) then CategoryChoose(1);
+  if not Assigned(BuildLogForm) then CategorySelect(1);
 end;
 
 procedure TMainForm.RepairMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(RepairForm) then CategoryChoose(9);
+  if not Assigned(RepairForm) then CategorySelect(9);
 end;
 
 procedure TMainForm.ShipmentMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(ShipmentForm) then CategoryChoose(6);
+  if not Assigned(ShipmentForm) then CategorySelect(6);
 end;
 
 procedure TMainForm.ReportButtonClick(Sender: TObject);
 begin
-  if not Assigned(ReportForm) then CategoryChoose(10);
+  if not Assigned(ReportForm) then CategorySelect(10);
 end;
 
 procedure TMainForm.CalendarButtonClick(Sender: TObject);
 begin
-  if not Assigned(CalendarForm) then CategoryChoose(11);
+  if not Assigned(CalendarForm) then CategorySelect(11);
 end;
 
 procedure TMainForm.StatisticMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(StatisticForm) then CategoryChoose(8);
+  if not Assigned(StatisticForm) then CategorySelect(8);
 end;
 
 procedure TMainForm.StoreMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(StoreForm) then CategoryChoose(5);
+  if not Assigned(StoreForm) then CategorySelect(5);
 end;
 
 procedure TMainForm.TestLogMenuItemClick(Sender: TObject);
 begin
-  if not Assigned(TestLogForm) then CategoryChoose(2);
+  if not Assigned(TestLogForm) then CategorySelect(2);
 end;
 
 procedure TMainForm.ConnectDB;
@@ -356,157 +330,67 @@ begin
   SQLite.ExecuteScript(DDLName);
 end;
 
-procedure TMainForm.CategoryChoose(const ACategory: Byte);
+procedure TMainForm.ViewUpdate;
 begin
+  if not Assigned(CategoryForm) then Exit;
+
+  case Category of
+    1: (CategoryForm as TBuildLogForm).ViewUpdate;
+    2: (CategoryForm as TTestLogForm).ViewUpdate;
+    3: (CategoryForm as TControlListForm).ViewUpdate;
+    4: (CategoryForm as TMotorListForm).ViewUpdate;
+    5: (CategoryForm as TStoreForm).ViewUpdate;
+    6: (CategoryForm as TShipmentForm).ViewUpdate;
+    7: (CategoryForm as TReclamationForm).ViewUpdate;
+    8: (CategoryForm as TStatisticForm).ViewUpdate;
+    9: (CategoryForm as TRepairForm).ViewUpdate;
+    10: (CategoryForm as TReportForm).ViewUpdate;
+    //11: ;
+  end;
+
+end;
+
+procedure TMainForm.CategorySelect(const ACategory: Byte);
+begin
+  if ACategory=Category then Exit;
+
   Screen.Cursor:= crHourGlass;
   try
-    FreeForms;
     Category:= ACategory;
+
+    if Assigned(CategoryForm) then FreeAndNil(CategoryForm);
     case Category of
-      1: OpenBuildLogForm;
-      2: OpenTestForm;
-      3: OpenControlListForm;
-      4: OpenMotorListForm;
-      5: OpenStoreForm;
-      6: OpenShipmentForm;
-      7: OpenReclamationForm;
-      8: OpenStatisticForm;
-      9: OpenRepairForm;
-      10: OpenReportForm;
-      11: OpenCalendarForm;
+      1: CategoryForm:= FormOnPanelCreate(TBuildLogForm, MainPanel);
+      2: CategoryForm:= FormOnPanelCreate(TTestLogForm, MainPanel);
+      3: CategoryForm:= FormOnPanelCreate(TControlListForm, MainPanel);
+      4: CategoryForm:= FormOnPanelCreate(TMotorListForm, MainPanel);
+      5: CategoryForm:= FormOnPanelCreate(TStoreForm, MainPanel);
+      6: CategoryForm:= FormOnPanelCreate(TShipmentForm, MainPanel);
+      7: CategoryForm:= FormOnPanelCreate(TReclamationForm, MainPanel);
+      8: CategoryForm:= FormOnPanelCreate(TStatisticForm, MainPanel);
+      9: CategoryForm:= FormOnPanelCreate(TRepairForm, MainPanel);
+      10: CategoryForm:= FormOnPanelCreate(TReportForm, MainPanel);
+      11: CategoryForm:= FormOnPanelCreate(TCalendarForm, MainPanel);
     end;
+
+    if Assigned(CategoryForm) then
+      CategoryForm.Show;
+
   finally
     Screen.Cursor:= crDefault;
   end;
 end;
 
-procedure TMainForm.FreeForms;
-begin
-  if Assigned(BuildLogForm) then FreeAndNil(BuildLogForm);
-  if Assigned(TestLogForm) then FreeAndNil(TestLogForm);
-  if Assigned(ShipmentForm) then FreeAndNil(ShipmentForm);
-  if Assigned(ReclamationForm) then FreeAndNil(ReclamationForm);
-  if Assigned(StoreForm) then FreeAndNil(StoreForm);
-  if Assigned(ReportForm) then FreeAndNil(ReportForm);
-  if Assigned(StatisticForm) then FreeAndNil(StatisticForm);
-  if Assigned(MotorListForm) then FreeAndNil(MotorListForm);
-  if Assigned(RepairForm) then FreeAndNil(RepairForm);
-  if Assigned(ControlListForm) then FreeAndNil(ControlListForm);
-  if Assigned(CalendarForm) then FreeAndNil(CalendarForm);
-end;
-
-procedure TMainForm.SetFormPosition(AForm: TForm);
-begin
-  AForm.Parent:= MainPanel;
-  AForm.Left:= 0;
-  AForm.Top:= 0;
-  AForm.MakeFullyVisible();
-end;
-
-procedure TMainForm.OpenBuildLogForm;
-begin
-  BuildLogForm:= TBuildLogForm.Create(MainForm);
-  SetFormPosition(TForm(BuildLogForm));
-  BuildLogForm.Show;
-end;
-
-procedure TMainForm.OpenTestForm;
-begin
-  TestLogForm:= TTestLogForm.Create(MainForm);
-  SetFormPosition(TForm(TestLogForm));
-  TestLogForm.Show;
-end;
-
-procedure TMainForm.OpenShipmentForm;
-begin
-  ShipmentForm:= TShipmentForm.Create(MainForm);
-  SetFormPosition(TForm(ShipmentForm));
-  ShipmentForm.Show;
-end;
-
-procedure TMainForm.OpenReclamationForm;
-begin
-  ReclamationForm:= TReclamationForm.Create(MainForm);
-  SetFormPosition(TForm(ReclamationForm));
-  ReclamationForm.Show;
-end;
-
-procedure TMainForm.OpenStoreForm;
-begin
-  StoreForm:= TStoreForm.Create(MainForm);
-  SetFormPosition(TForm(StoreForm));
-  StoreForm.Show;
-end;
-
-procedure TMainForm.OpenMotorListForm;
-begin
-  MotorListForm:= TMotorListForm.Create(MainForm);
-  SetFormPosition(TForm(MotorListForm));
-  MotorListForm.Show;
-end;
-
-procedure TMainForm.OpenReportForm;
-begin
-  ReportForm:= TReportForm.Create(MainForm);
-  SetFormPosition(TForm(ReportForm));
-  ReportForm.Show;
-end;
-
-procedure TMainForm.OpenStatisticForm;
-begin
-  StatisticForm:= TStatisticForm.Create(MainForm);
-  SetFormPosition(TForm(StatisticForm));
-  StatisticForm.Show;
-end;
-
-procedure TMainForm.OpenRepairForm;
-begin
-  RepairForm:= TRepairForm.Create(MainForm);
-  SetFormPosition(TForm(RepairForm));
-  RepairForm.Show;
-end;
-
-procedure TMainForm.OpenControlListForm;
-begin
-  ControlListForm:= TControlListForm.Create(MainForm);
-  SetFormPosition(TForm(ControlListForm));
-  ControlListForm.Show;
-end;
-
-procedure TMainForm.OpenCalendarForm;
-begin
-  CalendarForm:= TCalendarForm.Create(MainForm);
-  SetFormPosition(TForm(CalendarForm));
-  CalendarForm.Show;
-end;
-
 procedure TMainForm.ChangeUsedMotorList;
 begin
   if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True,
-    UsedNameIDs, UsedNames) then ShowData;
+    UsedNameIDs, UsedNames) then ViewUpdate;
 end;
 
 procedure TMainForm.ChangeUsedReceiverList;
 begin
   if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True,
-    UsedReceiverIDs, UsedReceiverNames) then ShowData;
-end;
-
-procedure TMainForm.ShowData;
-begin
-  case Category of
-    1: BuildLogForm.ShowBuildLog;
-    2: TestLogForm.ShowTestLog;
-    3: ControlListForm.ShowControlList;
-    4: MotorListForm.ShowMotorList;
-    5: StoreForm.ShowStore;
-    6: ShipmentForm.ShowShipment;
-    7: ReclamationForm.ShowReclamation;
-    8: StatisticForm.ShowStatistic;
-    9: RepairForm.ShowRepair;
-    10: ReportForm.ShowReport;
-    //11: ;
-  end;
+    UsedReceiverIDs, UsedReceiverNames) then ViewUpdate;
 end;
 
 procedure TMainForm.DictionaryChoose(const ADictionary: Byte);
@@ -534,7 +418,7 @@ begin
     6: IsOK:= SQLite.EditList('Предприятия (депо)',
                               'RECLAMATIONPLACES', 'PlaceID', 'PlaceName', True, True);
   end;
-  if IsOK then ShowData;
+  if IsOK then ViewUpdate;
 end;
 
 procedure TMainForm.SetNamesPanelsVisible(const AMotorNamesPanelVisible,

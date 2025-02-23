@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid,
   DK_Vector, UUtils, USheetUtils, DK_DateUtils, UReclamationEditForm,
-  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, DK_VSTTables,
+  DK_StrUtils, DK_Dialogs, DK_SheetExporter, USQLite, UCardForm, {DK_VSTTables,}
   URepairEditForm, DateTimePicker, UControlListEditForm, BCButton, DK_Zoom,
-  DK_Const, DK_VSTTableTools;
+  DK_Const, DK_VSTParamList{DK_VSTTableTools};
 
 type
 
@@ -28,7 +28,7 @@ type
     DateTimePicker2: TDateTimePicker;
     ExportButton: TBCButton;
     Label3: TLabel;
-    LeftPanel: TPanel;
+    SettingClientPanel: TPanel;
     LogGrid: TsWorksheetGrid;
     MainPanel: TPanel;
     Panel4: TPanel;
@@ -47,9 +47,6 @@ type
     Splitter0: TSplitter;
     Splitter1: TSplitter;
     ToolPanel: TPanel;
-    VT1: TVirtualStringTree;
-    VT2: TVirtualStringTree;
-    VT3: TVirtualStringTree;
     ZoomPanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
     procedure ControlButtonClick(Sender: TObject);
@@ -70,14 +67,9 @@ type
     procedure RepairButtonClick(Sender: TObject);
   private
     CardForm: TCardForm;
-    VSTOrderList: TVSTStringList;
-    VSTDefectList: TVSTCheckList;
-    VSTReasonList: TVSTCheckTable;
-
+    ParamList: TVSTParamList;
     CanShow: Boolean;
-
     ZoomPercent: Integer;
-
     SelectedIndex: Integer;
     ReclamationSheet: TReclamationSheet;
 
@@ -103,13 +95,9 @@ type
     procedure DrawReclamation(const AZoomPercent: Integer);
     procedure ExportReclamation;
 
-    procedure CreateOrderList;
-    procedure SelectOrder;
-
-    procedure CreateDefectList;
-    procedure CreateReasonList;
+    procedure ParamListCreate;
   public
-    procedure ShowReclamation;
+    procedure ViewUpdate;
   end;
 
 var
@@ -143,29 +131,24 @@ begin
 
   ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid);
 
-  CreateOrderList;
-  CreateDefectList;
-  CreateReasonList;
+  ParamListCreate;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
   DateTimePicker1.Date:= LastDayInYear(Date);
 
   CanShow:= True;
-  ShowReclamation;
 end;
 
 procedure TReclamationForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(CardForm) then FreeAndNil(CardForm);
   if Assigned(ReclamationSheet) then FReeAndNil(ReclamationSheet);
-  if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
-  if Assigned(VSTDefectList) then FreeAndNil(VSTDefectList);
-  if Assigned(VSTReasonList) then FreeAndNil(VSTReasonList);
+  if Assigned(ParamList) then FreeAndNil(ParamList);
 end;
 
 procedure TReclamationForm.FormShow(Sender: TObject);
 begin
-  ShowReclamation;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.LogGridDblClick(Sender: TObject);
@@ -217,7 +200,7 @@ end;
 
 procedure TReclamationForm.MotorNumEditChange(Sender: TObject);
 begin
-  ShowReclamation;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.RepairButtonClick(Sender: TObject);
@@ -256,7 +239,7 @@ begin
   end;
 end;
 
-procedure TReclamationForm.ShowReclamation;
+procedure TReclamationForm.ViewUpdate;
 begin
   if not CanShow then Exit;
   Screen.Cursor:= crHourGlass;
@@ -277,11 +260,11 @@ var
   OrderIndex: Integer;
 begin
   OrderIndex:= 0;
-  if VSTOrderList.IsSelected then
-    OrderIndex:= VSTOrderList.SelectedIndex;
+  if ParamList.IsSelected['OrderList'] then
+    OrderIndex:= ParamList.Selected['OrderList'];
 
-  UsedReasonIDs:= VCut(ListReasonIDs, VSTReasonList.Selected);
-  UsedDefectIDs:= VCut(ListDefectIDs, VSTDefectList.Selected);
+  UsedReasonIDs:= VCut(ListReasonIDs, ParamList.Checkeds['ReasonList']);
+  UsedDefectIDs:= VCut(ListDefectIDs, ParamList.Checkeds['DefectList']);
 
   SQLite.ReclamationListLoad(DateTimePicker2.Date, DateTimePicker1.Date,
                         MainForm.UsedNameIDs, UsedDefectIDs, UsedReasonIDs,
@@ -326,11 +309,14 @@ begin
   end;
 end;
 
-procedure TReclamationForm.CreateOrderList;
+procedure TReclamationForm.ParamListCreate;
 var
   S: String;
   V: TStrVector;
+  i: Integer;
 begin
+  ParamList:= TVSTParamList.Create(SettingClientPanel);
+
   S:= 'Упорядочить по:';
   V:= VCreateStr([
     'дате уведомления',
@@ -340,41 +326,21 @@ begin
     'неисправному элементу',
     'причине неисправности'
   ]);
-  VSTOrderList:= TVSTStringList.Create(VT1, S, @SelectOrder);
-  VSTOrderList.Update(V);
-end;
+  ParamList.AddStringList('OrderList', S, V, @ViewUpdate);
 
-procedure TReclamationForm.CreateDefectList;
-var
-  S: String;
-  V: TStrVector;
-  i: Integer;
-begin
   S:= 'Неисправный элемент:';
   SQLite.KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
                      ListDefectIDs, V, False, 'DefectName');
   for i:= 0 to High(V) do
     V[i]:= SFirstLower(V[i]);
-  VSTDefectList:= TVSTCheckList.Create(VT2, S, V, @ShowReclamation);
-end;
+  ParamList.AddCheckList('DefectList', S, V, @ViewUpdate);
 
-procedure TReclamationForm.CreateReasonList;
-var
-  S: String;
-  V: TStrVector;
-  i: Integer;
-begin
   S:= 'Причина неисправности:';
   SQLite.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName',
                      ListReasonIDs, V);
   for i:= 0 to High(V) do
     V[i]:= SFirstLower(V[i]);
-  VSTReasonList:= TVSTCheckList.Create(VT3, S, V, @ShowReclamation);
-end;
-
-procedure TReclamationForm.SelectOrder;
-begin
-  ShowReclamation;
+  ParamList.AddCheckList('ReasonList', S, V, @ViewUpdate);
 end;
 
 procedure TReclamationForm.DeleteRaclamation;
@@ -383,7 +349,7 @@ begin
   if not Confirm('Удалить рекламацию?') then Exit;
   SQLite.Delete('RECLAMATIONS', 'RecID', RecIDs[SelectedIndex]);
   ClearSelection;
-  ShowReclamation;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.OpenReclamationEditForm(const AEditType: Byte);
@@ -395,12 +361,12 @@ begin
     ReclamationEditForm.RecID:= 0;
     if AEditType=2 then
       ReclamationEditForm.RecID:= RecIDs[SelectedIndex];
-    if ReclamationEditForm.ShowModal = mrOK then ShowReclamation;
+    if ReclamationEditForm.ShowModal = mrOK then ViewUpdate;
   finally
     FreeAndNil(ReclamationEditForm);
   end;
   ClearSelection;
-  ShowReclamation;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.OpenRepairEditForm;
@@ -412,7 +378,7 @@ begin
     RepairEditForm.RecID:= RecIDs[SelectedIndex];
     RepairEditForm.MotorName:= MotorNames[SelectedIndex];
     RepairEditForm.MotorNum:= MotorNums[SelectedIndex];
-    if RepairEditForm.ShowModal = mrOK then ShowReclamation;
+    if RepairEditForm.ShowModal = mrOK then ViewUpdate;
   finally
     FreeAndNil(RepairEditForm);
   end;
@@ -455,14 +421,14 @@ end;
 
 procedure TReclamationForm.DateTimePicker1Change(Sender: TObject);
 begin
-  if not LeftPanel.Visible then Exit;
-  ShowReclamation;
+  if not SettingClientPanel.Visible then Exit;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.DateTimePicker2Change(Sender: TObject);
 begin
-  if not LeftPanel.Visible then Exit;
-  ShowReclamation;
+  if not SettingClientPanel.Visible then Exit;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.ExportButtonClick(Sender: TObject);

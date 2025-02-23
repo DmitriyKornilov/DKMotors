@@ -111,7 +111,7 @@ type
     procedure ExportStatisticForSeveralPeriods(const AParamType: Integer);
 
   public
-    procedure ShowStatistic;
+    procedure ViewUpdate;
   end;
 
 var
@@ -147,17 +147,17 @@ begin
   DateTimePicker1.Date:= LastDayInMonth(Date);
   CanShow:= True;
 
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.DateTimePicker1Change(Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.DateTimePicker2Change(Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.VerifyDates;
@@ -190,22 +190,22 @@ procedure TStatisticForm.SeveralPeriodsCheckBoxChange(Sender: TObject);
 begin
   AdditionYearCountSpinEdit.Enabled:= SeveralPeriodsCheckBox.Checked;
   ShowLinePercentCheckBox.Visible:= not SeveralPeriodsCheckBox.Checked;
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.ShowGraphicsCheckBoxChange(Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.ShowLinePercentCheckBoxChange(Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.ANEMAsSameNameCheckBoxChange(Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.ExportButtonClick(Sender: TObject);
@@ -215,7 +215,7 @@ end;
 
 procedure TStatisticForm.ShowPercentCheckBoxChange(Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.FormDestroy(Sender: TObject);
@@ -233,16 +233,16 @@ begin
     Label4.Caption:= 'предыдущиx года'
   else
     Label4.Caption:= 'предыдущиx лет';
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.TotalCountForUsedParamsOnlyCheckBoxChange(
   Sender: TObject);
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
-procedure TStatisticForm.ShowStatistic;
+procedure TStatisticForm.ViewUpdate;
 begin
   if not CanShow then Exit;
   VerifyDates;
@@ -281,7 +281,7 @@ begin
   SelectedIndex:= StatisticList.SelectedIndex;
   ANEMPanel.Visible:= SelectedIndex=0;
   VT3.Visible:= SelectedIndex=3;
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.CreateReasonList;
@@ -310,7 +310,7 @@ begin
   for i:= 0 to High(ReasonNames) do
     V[i]:= SFirstLower(ReasonNames[i]);
   S:= 'Включать в отчёт:';
-  ReasonList:= TVSTCheckList.Create(VT2, S, V, @ShowStatistic);
+  ReasonList:= TVSTCheckList.Create(VT2, S, V, @ViewUpdate);
 end;
 
 procedure TStatisticForm.CreateMonthReportTypeList;
@@ -329,7 +329,7 @@ end;
 
 procedure TStatisticForm.SelectMonthReportType;
 begin
-  ShowStatistic;
+  ViewUpdate;
 end;
 
 procedure TStatisticForm.LoadStatistic(const AParamType: Integer);

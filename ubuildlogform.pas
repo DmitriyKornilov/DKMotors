@@ -57,7 +57,7 @@ type
 
     procedure OpenDatesList(const ASelectedDate: TDate);
   public
-    procedure ShowBuildLog;
+    procedure ViewUpdate;
   end;
 
 var
@@ -95,7 +95,7 @@ end;
 
 procedure TBuildLogForm.FormShow(Sender: TObject);
 begin
-  ShowBuildLog;
+  ViewUpdate;
 end;
 
 procedure TBuildLogForm.LogGridDblClick(Sender: TObject);
@@ -137,7 +137,7 @@ begin
   VSTDateList.Update(Months, Dates, ASelectedDate);
 end;
 
-procedure TBuildLogForm.ShowBuildLog;
+procedure TBuildLogForm.ViewUpdate;
 begin
   BuildLog.Unselect;
   OpenDatesList(SelectedDate);
@@ -151,7 +151,7 @@ begin
                   MotorNums[BuildLog.SelectedIndex] +
                  '?') then Exit;
   SQLite.Delete('MOTORLIST', 'MotorID', MotorIDs[BuildLog.SelectedIndex]);
-  ShowBuildLog;
+  ViewUpdate;
 end;
 
 procedure TBuildLogForm.EditMotor;
@@ -185,7 +185,7 @@ end;
 
 procedure TBuildLogForm.CheckBox1Change(Sender: TObject);
 begin
-  ShowBuildLog;
+  ViewUpdate;
 end;
 
 procedure TBuildLogForm.AddButtonClick(Sender: TObject);

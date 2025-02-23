@@ -57,7 +57,7 @@ type
 
     procedure SetControlsVisible;
   public
-    procedure ShowReport;
+    procedure ViewUpdate;
   end;
 
 var
@@ -73,17 +73,17 @@ uses UMainForm;
 
 procedure TReportForm.DateTimePicker2Change(Sender: TObject);
 begin
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.DateTimePicker1Change(Sender: TObject);
 begin
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.OrderNumCheckBoxChange(Sender: TObject);
 begin
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.FormCreate(Sender: TObject);
@@ -100,7 +100,7 @@ end;
 procedure TReportForm.NumberListCheckBoxChange(Sender: TObject);
 begin
   SetControlsVisible;
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.ExportButtonClick(Sender: TObject);
@@ -124,25 +124,25 @@ end;
 procedure TReportForm.FormShow(Sender: TObject);
 begin
   SetControlsVisible;
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.RadioButton1Click(Sender: TObject);
 begin
   SetControlsVisible;
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.RadioButton2Click(Sender: TObject);
 begin
   SetControlsVisible;
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.RadioButton3Click(Sender: TObject);
 begin
   SetControlsVisible;
-  ShowReport;
+  ViewUpdate;
 end;
 
 procedure TReportForm.FreeSheets;
@@ -158,7 +158,7 @@ begin
   OrderNumCheckBox.Visible:= NumberListCheckBox.Checked;
 end;
 
-procedure TReportForm.ShowReport;
+procedure TReportForm.ViewUpdate;
 begin
   Screen.Cursor:= crHourGlass;
   try

@@ -62,7 +62,7 @@ type
     procedure OpenDatesList(const ASelectedDate: TDate);
 
   public
-    procedure ShowTestLog;
+    procedure ViewUpdate;
   end;
 
 var
@@ -116,7 +116,7 @@ begin
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
-procedure TTestLogForm.ShowTestLog;
+procedure TTestLogForm.ViewUpdate;
 begin
   OpenDatesList(SelectedDate);
   OpenBeforeTestList;
@@ -131,7 +131,7 @@ end;
 
 procedure TTestLogForm.FormShow(Sender: TObject);
 begin
-  ShowTestLog;
+  ViewUpdate;
 end;
 
 procedure TTestLogForm.SpinEdit1Change(Sender: TObject);
@@ -177,7 +177,7 @@ procedure TTestLogForm.DelButtonClick(Sender: TObject);
 begin
   if not Confirm('Удалить результаты испытаний?') then Exit;
   SQLite.Delete('MOTORTEST', 'TestID', TestIDs[TestLog.SelectedIndex]);
-  ShowTestLog;
+  ViewUpdate;
 end;
 
 procedure TTestLogForm.CheckBox1Change(Sender: TObject);

@@ -66,7 +66,7 @@ type
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
     procedure SetButtonsEnabled(const AEnabled: Boolean);
   public
-    procedure ShowShipment;
+    procedure ViewUpdate;
   end;
 
 var
@@ -122,7 +122,7 @@ begin
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
-procedure TShipmentForm.ShowShipment;
+procedure TShipmentForm.ViewUpdate;
 begin
   OpenShipmentList(0);
 end;

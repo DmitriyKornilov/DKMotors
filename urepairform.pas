@@ -70,7 +70,7 @@ type
 
     procedure OpenRepairEditForm(const AEditType: Byte);
   public
-    procedure ShowRepair;
+    procedure ViewUpdate;
   end;
 
 var
@@ -134,7 +134,7 @@ begin
   if not VSTMotorsTable.IsSelected then Exit;
   if not Confirm('Удалить данные о гарантийном ремонте?') then Exit;
   SQLite.RepairDelete(RecIDs[VSTMotorsTable.SelectedIndex]);
-  ShowRepair;
+  ViewUpdate;
 end;
 
 procedure TRepairForm.EditButtonClick(Sender: TObject);
@@ -152,7 +152,7 @@ end;
 
 procedure TRepairForm.FormShow(Sender: TObject);
 begin
-  ShowRepair;
+  ViewUpdate;
 end;
 
 procedure TRepairForm.MotorCardCheckBoxChange(Sender: TObject);
@@ -177,7 +177,7 @@ end;
 
 procedure TRepairForm.MotorNumEditChange(Sender: TObject);
 begin
-  ShowRepair;
+  ViewUpdate;
 end;
 
 procedure TRepairForm.VT1DblClick(Sender: TObject);
@@ -227,7 +227,7 @@ begin
     'в ремонте',
     'отремонтированные'
   ]);
-  VSTTypeList:= TVSTStringList.Create(VT2, S, @ShowRepair);
+  VSTTypeList:= TVSTStringList.Create(VT2, S, @ViewUpdate);
   VSTTypeList.Update(V, 1);
 end;
 
@@ -242,7 +242,7 @@ begin
     'дате убытия',
     'номеру'
   ]);
-  VSTOrderList:= TVSTStringList.Create(VT3, S, @ShowRepair);
+  VSTOrderList:= TVSTStringList.Create(VT3, S, @ViewUpdate);
   VSTOrderList.Update(V);
 end;
 
@@ -259,13 +259,13 @@ begin
       RepairEditForm.MotorName:= MotorNames[VSTMotorsTable.SelectedIndex];
       RepairEditForm.MotorNum:= MotorNums[VSTMotorsTable.SelectedIndex];
     end;
-    if RepairEditForm.ShowModal = mrOK then ShowRepair;
+    if RepairEditForm.ShowModal = mrOK then ViewUpdate;
   finally
     FreeAndNil(RepairEditForm);
   end;
 end;
 
-procedure TRepairForm.ShowRepair;
+procedure TRepairForm.ViewUpdate;
 var
   MotorNumberLike: String;
   i: Integer;
