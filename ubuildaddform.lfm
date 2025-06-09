@@ -7,12 +7,12 @@ object BuildAddForm: TBuildAddForm
   ClientHeight = 664
   ClientWidth = 610
   DesignTimePPI = 120
+  Position = poScreenCenter
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '2.2.2.0'
   object Panel1: TPanel
     Left = 0
     Height = 664
@@ -36,8 +36,8 @@ object BuildAddForm: TBuildAddForm
       BorderSpacing.Right = 3
       BevelOuter = bvNone
       BorderStyle = bsSingle
-      ClientHeight = 226
-      ClientWidth = 600
+      ClientHeight = 230
+      ClientWidth = 604
       ParentFont = False
       TabOrder = 0
       object Label1: TLabel
@@ -85,10 +85,10 @@ object BuildAddForm: TBuildAddForm
         BorderSpacing.Right = 3
         DropDownCount = 15
         ItemHeight = 20
-        OnChange = MotorNameComboBoxChange
         ParentFont = False
         Style = csDropDownList
         TabOrder = 0
+        OnChange = MotorNameComboBoxChange
       end
       object Label3: TLabel
         AnchorSideLeft.Control = Panel2
@@ -120,9 +120,9 @@ object BuildAddForm: TBuildAddForm
         BorderSpacing.Top = 15
         BorderSpacing.Right = 3
         MaxLength = 50
-        OnKeyDown = MotorNumEditKeyDown
         ParentFont = False
         TabOrder = 1
+        OnKeyDown = MotorNumEditKeyDown
       end
       object Label4: TLabel
         AnchorSideLeft.Control = Panel2
@@ -153,9 +153,9 @@ object BuildAddForm: TBuildAddForm
         BorderSpacing.Top = 15
         BorderSpacing.Right = 3
         MaxLength = 50
-        OnKeyDown = RotorNumEditKeyDown
         ParentFont = False
         TabOrder = 2
+        OnKeyDown = RotorNumEditKeyDown
       end
       object AddButton: TSpeedButton
         AnchorSideTop.Control = RotorNumEdit
@@ -309,8 +309,8 @@ object BuildAddForm: TBuildAddForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 0
-        OnClick = AddButtonClick
         ParentFont = False
+        OnClick = AddButtonClick
       end
       object DelButton: TSpeedButton
         AnchorSideTop.Control = AddButton
@@ -462,8 +462,8 @@ object BuildAddForm: TBuildAddForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 1
-        OnClick = DelButtonClick
         ParentFont = False
+        OnClick = DelButtonClick
       end
       object DateTimePicker1: TDateTimePicker
         AnchorSideLeft.Control = Label3
@@ -672,8 +672,8 @@ object BuildAddForm: TBuildAddForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 4
-        OnClick = CancelButtonClick
         ParentFont = False
+        OnClick = CancelButtonClick
       end
       object SaveButton: TSpeedButton
         AnchorSideTop.Control = CancelButton
@@ -824,8 +824,8 @@ object BuildAddForm: TBuildAddForm
         }
         Images = MainForm.ImageListEdit24
         ImageIndex = 3
-        OnClick = SaveButtonClick
         ParentFont = False
+        OnClick = SaveButtonClick
       end
       object DividerBevel1: TDividerBevel
         Left = 0

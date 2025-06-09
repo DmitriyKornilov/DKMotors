@@ -123,13 +123,13 @@ begin
 
   if not VSTTable.IsSelected then
   begin
-    ShowInfo('Не указан рекламационный электродвигатель!');
+    Inform('Не указан рекламационный электродвигатель!');
     Exit;
   end;
 
   if PlaceNameComboBox.ItemIndex=0 then
   begin
-    ShowInfo('Не указано предприятие (депо)!');
+    Inform('Не указано предприятие (депо)!');
     Exit;
   end;
 
@@ -138,7 +138,7 @@ begin
     Mileage:= -1
   else if not TryStrToInt(S, Mileage) then
   begin
-    ShowInfo('Некорректное значение величины пробега!');
+    Inform('Некорректное значение величины пробега!');
     Exit;
   end;
 
@@ -208,7 +208,7 @@ procedure TReclamationEditForm.LoadNames;
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
   if VIsNil(NameIDs) then
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 
   SQLite.KeyPickList('RECLAMATIONPLACES', 'PlaceID', 'PlaceName',
                  PlaceIDs, PlaceNames, False, 'PlaceName');

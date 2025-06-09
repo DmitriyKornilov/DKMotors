@@ -7,12 +7,12 @@ object ReclamationEditForm: TReclamationEditForm
   ClientHeight = 946
   ClientWidth = 725
   DesignTimePPI = 120
+  Position = poScreenCenter
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '2.2.2.0'
   object Panel2: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
@@ -30,8 +30,8 @@ object ReclamationEditForm: TReclamationEditForm
     BorderSpacing.Right = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 873
-    ClientWidth = 715
+    ClientHeight = 877
+    ClientWidth = 719
     ParentFont = False
     TabOrder = 0
     object Label1: TLabel
@@ -109,9 +109,9 @@ object ReclamationEditForm: TReclamationEditForm
       BorderSpacing.Top = 15
       BorderSpacing.Right = 3
       MaxLength = 50
-      OnChange = MotorNumEditChange
       ParentFont = False
       TabOrder = 1
+      OnChange = MotorNumEditChange
     end
     object DateTimePicker1: TDateTimePicker
       AnchorSideLeft.Control = Label1
@@ -430,8 +430,8 @@ object ReclamationEditForm: TReclamationEditForm
         Width = 149
         BorderSpacing.Left = 3
         Caption = 'Прибыл в ремонт'
-        OnChange = ArrivalCheckBoxChange
         TabOrder = 0
+        OnChange = ArrivalCheckBoxChange
       end
       object DateTimePicker2: TDateTimePicker
         AnchorSideLeft.Control = ArrivalCheckBox
@@ -490,8 +490,8 @@ object ReclamationEditForm: TReclamationEditForm
         BorderSpacing.Top = 4
         Caption = 'Убыл из ремонта'
         Enabled = False
-        OnChange = SendingCheckBoxChange
         TabOrder = 3
+        OnChange = SendingCheckBoxChange
       end
       object DateTimePicker3: TDateTimePicker
         AnchorSideLeft.Control = SendingCheckBox
@@ -690,8 +690,8 @@ object ReclamationEditForm: TReclamationEditForm
       }
       Images = MainForm.ImageListEdit24
       ImageIndex = 4
-      OnClick = CancelButtonClick
       ParentFont = False
+      OnClick = CancelButtonClick
     end
     object SaveButton: TSpeedButton
       AnchorSideTop.Control = CancelButton
@@ -842,8 +842,8 @@ object ReclamationEditForm: TReclamationEditForm
       }
       Images = MainForm.ImageListEdit24
       ImageIndex = 3
-      OnClick = SaveButtonClick
       ParentFont = False
+      OnClick = SaveButtonClick
     end
     object DividerBevel1: TDividerBevel
       Left = 0

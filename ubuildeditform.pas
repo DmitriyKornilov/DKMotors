@@ -79,7 +79,7 @@ begin
 
   if MotorNameComboBox.Text=EmptyStr then
   begin
-    ShowInfo('Не указано наименование двигателя!');
+    Inform('Не указано наименование двигателя!');
     Exit;
   end;
   NameID:= NameIDs[MotorNameComboBox.ItemIndex];
@@ -87,7 +87,7 @@ begin
   MotorNum:= STrim(MotorNumEdit.Text);
   if MotorNum=EmptyStr then
   begin
-    ShowInfo('Не указан номер двигателя!');
+    Inform('Не указан номер двигателя!');
     Exit;
   end;
 
@@ -105,7 +105,7 @@ begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
 
   if VIsNil(NameIDs) then
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 end;
 
 end.

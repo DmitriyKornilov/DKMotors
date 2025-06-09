@@ -140,7 +140,7 @@ procedure TRepairEditForm.FormCreate(Sender: TObject);
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
   if VIsNil(NameIDs) then
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= Date;
@@ -180,7 +180,7 @@ begin
 
   if not VSTTable.IsSelected then
   begin
-    ShowInfo('Не указан рекламационный электродвигатель!');
+    Inform('Не указан рекламационный электродвигатель!');
     Exit;
   end;
 
@@ -191,7 +191,7 @@ begin
     SendingDate:= DateTimePicker2.Date;
     if CompareDate(ArrivalDate, SendingDate)>0 then
     begin
-      ShowInfo('Дата убытия не может быть меньше даты прибытия!');
+      Inform('Дата убытия не может быть меньше даты прибытия!');
       Exit;
     end;
   end;

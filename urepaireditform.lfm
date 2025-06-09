@@ -1,16 +1,17 @@
 object RepairEditForm: TRepairEditForm
   Left = 564
-  Height = 441
+  Height = 551
   Top = 196
-  Width = 586
-  ClientHeight = 441
-  ClientWidth = 586
+  Width = 732
+  ClientHeight = 551
+  ClientWidth = 732
+  DesignTimePPI = 120
+  Position = poDesktopCenter
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  Position = poDesktopCenter
-  LCLVersion = '2.2.4.0'
   object Panel2: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
@@ -38,10 +39,10 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Side = asrCenter
       Left = 2
       Height = 15
-      Top = 14
+      Top = 18
       Width = 83
       BorderSpacing.Left = 2
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 15
       Caption = 'Наименование'
       ParentColor = False
       ParentFont = False
@@ -52,16 +53,16 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Control = Panel2
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
-      Left = 106
+      Left = 132
       Height = 23
-      Top = 10
+      Top = 12
       Width = 470
       Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 10
+      BorderSpacing.Left = 6
+      BorderSpacing.Top = 12
       BorderSpacing.Right = 2
       DropDownCount = 15
-      ItemHeight = 15
+      ItemHeight = 20
       ParentFont = False
       Style = csDropDownList
       TabOrder = 0
@@ -72,10 +73,10 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Side = asrCenter
       Left = 2
       Height = 15
-      Top = 49
+      Top = 61
       Width = 95
       BorderSpacing.Left = 2
-      BorderSpacing.Top = 10
+      BorderSpacing.Top = 12
       Caption = 'Номер двигателя'
       ParentColor = False
       ParentFont = False
@@ -87,18 +88,18 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
-      Left = 106
+      Left = 132
       Height = 23
-      Top = 45
+      Top = 56
       Width = 470
       Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 12
+      BorderSpacing.Left = 6
+      BorderSpacing.Top = 15
       BorderSpacing.Right = 2
       MaxLength = 50
-      OnChange = MotorNumEditChange
       ParentFont = False
       TabOrder = 1
+      OnChange = MotorNumEditChange
     end
     object VT1: TVirtualStringTree
       AnchorSideLeft.Control = Panel2
@@ -107,12 +108,12 @@ object RepairEditForm: TRepairEditForm
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Left = 2
-      Height = 91
-      Top = 80
+      Height = 114
+      Top = 100
       Width = 574
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 2
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 15
       BorderSpacing.Right = 2
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
@@ -130,11 +131,11 @@ object RepairEditForm: TRepairEditForm
       AnchorSideBottom.Side = asrBottom
       Left = 2
       Height = 145
-      Top = 237
+      Top = 296
       Width = 574
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Left = 2
-      BorderSpacing.Top = 5
+      BorderSpacing.Top = 6
       BorderSpacing.Right = 2
       BorderSpacing.Bottom = 2
       TabOrder = 3
@@ -153,8 +154,8 @@ object RepairEditForm: TRepairEditForm
       Width = 578
       Anchors = [akLeft, akRight]
       AutoSize = True
-      BorderSpacing.Top = 10
-      BorderSpacing.Bottom = 6
+      BorderSpacing.Top = 12
+      BorderSpacing.Bottom = 8
       BevelOuter = bvNone
       TabOrder = 4
       Visible = False
@@ -165,17 +166,17 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Control = VT1
       AnchorSideTop.Side = asrBottom
       AnchorSideBottom.Side = asrBottom
-      Left = 106
+      Left = 132
       Height = 23
-      Top = 181
+      Top = 226
       Width = 79
       CenturyFrom = 1941
       MaxDate = 2958465
       MinDate = -53780
       ParentFont = False
       TabOrder = 5
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 10
+      BorderSpacing.Left = 6
+      BorderSpacing.Top = 12
       TrailingSeparator = False
       TextForNullDate = 'NULL'
       LeadingZeros = True
@@ -195,7 +196,7 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Side = asrCenter
       Left = 2
       Height = 15
-      Top = 185
+      Top = 231
       Width = 99
       BorderSpacing.Left = 2
       Caption = 'Прибыл в ремонт'
@@ -206,11 +207,11 @@ object RepairEditForm: TRepairEditForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = DateTimePicker1
       AnchorSideTop.Side = asrCenter
-      Left = 201
+      Left = 251
       Height = 19
-      Top = 183
+      Top = 229
       Width = 123
-      BorderSpacing.Left = 16
+      BorderSpacing.Left = 20
       Caption = 'Наличие паспорта'
       TabOrder = 6
     end
@@ -219,33 +220,33 @@ object RepairEditForm: TRepairEditForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = DateTimePicker1
       AnchorSideTop.Side = asrCenter
-      Left = 340
+      Left = 425
       Height = 19
-      Top = 183
+      Top = 229
       Width = 115
-      BorderSpacing.Left = 16
-      BorderSpacing.Top = 3
+      BorderSpacing.Left = 20
+      BorderSpacing.Top = 4
       Caption = 'Убыл из ремонта'
-      OnChange = SendingCheckBoxChange
       TabOrder = 7
+      OnChange = SendingCheckBoxChange
     end
     object DateTimePicker2: TDateTimePicker
       AnchorSideLeft.Control = SendingCheckBox
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = DateTimePicker1
       AnchorSideTop.Side = asrCenter
-      Left = 460
+      Left = 575
       Height = 23
-      Top = 181
+      Top = 226
       Width = 79
       CenturyFrom = 1941
       MaxDate = 2958465
       MinDate = -53780
       ParentFont = False
       TabOrder = 8
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 12
-      BorderSpacing.Right = 6
+      BorderSpacing.Left = 6
+      BorderSpacing.Top = 15
+      BorderSpacing.Right = 8
       Enabled = False
       TrailingSeparator = False
       TextForNullDate = 'NULL'
@@ -266,10 +267,10 @@ object RepairEditForm: TRepairEditForm
       AnchorSideTop.Side = asrBottom
       Left = 2
       Height = 15
-      Top = 217
+      Top = 271
       Width = 71
       BorderSpacing.Left = 2
-      BorderSpacing.Top = 13
+      BorderSpacing.Top = 16
       Caption = 'Примечание'
       ParentColor = False
     end
@@ -283,7 +284,7 @@ object RepairEditForm: TRepairEditForm
     AutoSize = True
     BorderSpacing.Left = 2
     BorderSpacing.Right = 2
-    BorderSpacing.Bottom = 6
+    BorderSpacing.Bottom = 8
     BevelOuter = bvNone
     ClientHeight = 45
     ClientWidth = 582
@@ -294,15 +295,15 @@ object RepairEditForm: TRepairEditForm
       AnchorSideRight.Control = ButtonPanel
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 480
-      Height = 30
-      Top = 15
-      Width = 100
+      Left = 455
+      Height = 38
+      Top = 19
+      Width = 125
       Anchors = [akTop, akRight]
       AutoSize = True
       BorderSpacing.Right = 2
-      Constraints.MinHeight = 30
-      Constraints.MinWidth = 100
+      Constraints.MinHeight = 38
+      Constraints.MinWidth = 125
       Caption = 'Отмена'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -438,23 +439,23 @@ object RepairEditForm: TRepairEditForm
       }
       Images = MainForm.ImageListEdit24
       ImageIndex = 4
-      OnClick = CancelButtonClick
       ParentFont = False
+      OnClick = CancelButtonClick
     end
     object SaveButton: TSpeedButton
       AnchorSideTop.Control = CancelButton
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = CancelButton
       Cursor = crHandPoint
-      Left = 380
-      Height = 30
-      Top = 15
-      Width = 100
+      Left = 355
+      Height = 38
+      Top = 19
+      Width = 125
       Anchors = [akTop, akRight]
       AutoSize = True
-      BorderSpacing.Top = 12
-      Constraints.MinHeight = 30
-      Constraints.MinWidth = 100
+      BorderSpacing.Top = 15
+      Constraints.MinHeight = 38
+      Constraints.MinWidth = 125
       Caption = 'Сохранить'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -590,8 +591,8 @@ object RepairEditForm: TRepairEditForm
       }
       Images = MainForm.ImageListEdit24
       ImageIndex = 3
-      OnClick = SaveButtonClick
       ParentFont = False
+      OnClick = SaveButtonClick
     end
     object DividerBevel1: TDividerBevel
       Left = 0

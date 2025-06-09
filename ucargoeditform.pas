@@ -101,14 +101,14 @@ procedure TCargoEditForm.LoadMotorNames;
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
   if VIsNil(NameIDs) then
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 end;
 
 procedure TCargoEditForm.LoadReceiverNames;
 begin
   SQLite.ReceiverIDsAndNamesLoad(ReceiverNameComboBox, ReceiverIDs);
   if VIsNil(ReceiverIDs) then
-    ShowInfo('Отсутствует список наименований грузополучателей!');
+    Inform('Отсутствует список наименований грузополучателей!');
 end;
 
 procedure TCargoEditForm.FormShow(Sender: TObject);
@@ -168,13 +168,13 @@ begin
 
   if ReceiverNameComboBox.Text=EmptyStr then
   begin
-    ShowInfo('Не указано наименование грузополучателя!');
+    Inform('Не указано наименование грузополучателя!');
     Exit;
   end;
 
   if VIsNil(MotorIDs) then
   begin
-    ShowInfo('Список отгруженных двигателей не заполнен!');
+    Inform('Список отгруженных двигателей не заполнен!');
     Exit;
   end;
 
@@ -284,7 +284,7 @@ begin
   MotorSeries:= STrim(SeriesEdit.Text);
   if MotorSeries=EmptyStr then
   begin
-    ShowInfo('Не указан номер партии!');
+    Inform('Не указан номер партии!');
     Exit;
   end;
 

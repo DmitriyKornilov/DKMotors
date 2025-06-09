@@ -92,7 +92,7 @@ procedure TTestAddForm.LoadMotorNames;
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
   if VIsNil(NameIDs) then
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 end;
 
 procedure TTestAddForm.FormShow(Sender: TObject);
@@ -160,7 +160,7 @@ begin
   CanFormClose:= False;
   if VIsNil(TestMotorIDs) then
   begin
-    ShowInfo('Список испытанных двигателей не заполнен!');
+    Inform('Список испытанных двигателей не заполнен!');
     Exit;
   end;
 

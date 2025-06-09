@@ -152,13 +152,13 @@ begin
 
   if MotorNameComboBox.Text=EmptyStr then
   begin
-    ShowInfo('Не указано наименование двигателя!');
+    Inform('Не указано наименование двигателя!');
     Exit;
   end;
 
   if VIsNil(MotorNums) then
   begin
-    ShowInfo('Не указаны номера двигателей!');
+    Inform('Не указаны номера двигателей!');
     Exit;
   end;
 
@@ -194,7 +194,7 @@ begin
   if not VIsNil(NameIDs) then
     AddButton.Enabled:= True
   else
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 end;
 
 procedure TBuildAddForm.AddMotor;
@@ -213,7 +213,7 @@ begin
   s1:= STrim(MotorNumEdit.Text);
   if s1=EmptyStr then
   begin
-    ShowInfo('Не указан номер двигателя!');
+    Inform('Не указан номер двигателя!');
     CancelWrite;
     Exit;
   end;
@@ -223,7 +223,7 @@ begin
   if n>=0 then
    if MotorNameIDs[n] = NameIDs[MotorNameComboBox.ItemIndex] then
   begin
-    ShowInfo('Двигатель' + SYMBOL_BREAK +
+    Inform('Двигатель' + SYMBOL_BREAK +
               MotorNameComboBox.Text + ' № ' + s1 + SYMBOL_BREAK +
              'уже есть в списке!');
     CancelWrite;
@@ -234,7 +234,7 @@ begin
   if SQLite.IsDuplicateMotorNumber(DateTimePicker1.Date,
                          NameIDs[MotorNameComboBox.ItemIndex], s1) then
   begin
-    ShowInfo('Двигатель' + SYMBOL_BREAK +
+    Inform('Двигатель' + SYMBOL_BREAK +
               MotorNameComboBox.Text + ' № ' + s1 + SYMBOL_BREAK +
              'уже есть в базе!');
     CancelWrite;

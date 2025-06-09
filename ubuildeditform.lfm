@@ -7,11 +7,11 @@ object BuildEditForm: TBuildEditForm
   ClientHeight = 260
   ClientWidth = 594
   DesignTimePPI = 120
+  Position = poScreenCenter
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '2.2.2.0'
   object Panel2: TPanel
     AnchorSideBottom.Control = ButtonPanel
     Left = 3
@@ -26,8 +26,8 @@ object BuildEditForm: TBuildEditForm
     BorderSpacing.Right = 3
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 187
-    ClientWidth = 584
+    ClientHeight = 191
+    ClientWidth = 588
     ParentFont = False
     TabOrder = 0
     object Label1: TLabel
@@ -352,8 +352,8 @@ object BuildEditForm: TBuildEditForm
       }
       Images = MainForm.ImageListEdit24
       ImageIndex = 4
-      OnClick = CancelButtonClick
       ParentFont = False
+      OnClick = CancelButtonClick
     end
     object SaveButton: TSpeedButton
       AnchorSideTop.Control = CancelButton
@@ -504,8 +504,8 @@ object BuildEditForm: TBuildEditForm
       }
       Images = MainForm.ImageListEdit24
       ImageIndex = 3
-      OnClick = SaveButtonClick
       ParentFont = False
+      OnClick = SaveButtonClick
     end
     object DividerBevel1: TDividerBevel
       Left = 0

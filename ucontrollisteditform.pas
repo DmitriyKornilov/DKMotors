@@ -73,7 +73,7 @@ procedure TControlListEditForm.FormCreate(Sender: TObject);
 begin
   SQLite.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
   if VIsNil(NameIDs) then
-    ShowInfo('Отсутствует список наименований двигателей!');
+    Inform('Отсутствует список наименований двигателей!');
 
   VSTTable:= TVSTTable.Create(VT1);
 
@@ -108,7 +108,7 @@ begin
 
   if not VSTTable.IsSelected then
   begin
-    ShowInfo('Не указан электродвигатель!');
+    Inform('Не указан электродвигатель!');
     Exit;
   end;
 

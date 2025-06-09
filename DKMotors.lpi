@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="7"/>
+      <BuildNr Value="8"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
@@ -33,6 +33,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="DKDialogs"/>
+      </Item>
       <Item>
         <PackageName Value="laz_fpspreadsheet_visual_dsgn"/>
       </Item>
@@ -281,6 +284,7 @@
         <Filename Value="upackingsheetform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="PackingSheetForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UPackingSheetForm"/>
       </Unit>
