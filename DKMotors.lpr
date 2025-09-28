@@ -13,7 +13,7 @@ uses
   Forms, UMainForm, lazcontrols, datetimectrls, UReclamationForm,
   UBuildAddForm, USheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
-  UTestLogForm, UShipmentForm, UReclamationEditForm, USQLite, UStatisticForm,
+  UTestLogForm, UShipmentForm, UReclamationEditForm, UDataBase, UStatisticForm,
   URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm,
   UCardForm, URepairEditForm, UControlListEditForm, UUtils, UPackingSheetForm;
 

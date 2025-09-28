@@ -23,7 +23,34 @@
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
-      <Item Name="Default" Default="True"/>
+      <Item Name="Debug" Default="True"/>
+      <Item Name="Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="DKMotors"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="utils;forms"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <RunWithoutDebug Value="True"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -33,6 +60,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="SQLDBLaz"/>
+      </Item>
       <Item>
         <PackageName Value="DKDialogs"/>
       </Item>
@@ -93,7 +123,7 @@
         <UnitName Value="UMainForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ureclamationform.pas"/>
+        <Filename Value="forms\ureclamationform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ReclamationForm"/>
         <HasResources Value="True"/>
@@ -101,7 +131,7 @@
         <UnitName Value="UReclamationForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ubuildaddform.pas"/>
+        <Filename Value="forms\ubuildaddform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BuildAddForm"/>
         <HasResources Value="True"/>
@@ -109,12 +139,12 @@
         <UnitName Value="UBuildAddForm"/>
       </Unit>
       <Unit>
-        <Filename Value="usheetutils.pas"/>
+        <Filename Value="utils\usheetutils.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="USheetUtils"/>
       </Unit>
       <Unit>
-        <Filename Value="utestaddform.pas"/>
+        <Filename Value="forms\utestaddform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="TestAddForm"/>
         <HasResources Value="True"/>
@@ -122,7 +152,7 @@
         <UnitName Value="UTestAddForm"/>
       </Unit>
       <Unit>
-        <Filename Value="uaboutform.pas"/>
+        <Filename Value="forms\uaboutform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AboutForm"/>
         <HasResources Value="True"/>
@@ -130,7 +160,7 @@
         <UnitName Value="UAboutForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ucargoeditform.pas"/>
+        <Filename Value="forms\ucargoeditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="CargoEditForm"/>
         <HasResources Value="True"/>
@@ -138,7 +168,7 @@
         <UnitName Value="UCargoEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ustoreform.pas"/>
+        <Filename Value="forms\ustoreform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="StoreForm"/>
         <HasResources Value="True"/>
@@ -146,7 +176,7 @@
         <UnitName Value="UStoreForm"/>
       </Unit>
       <Unit>
-        <Filename Value="umotorlistform.pas"/>
+        <Filename Value="forms\umotorlistform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MotorListForm"/>
         <HasResources Value="True"/>
@@ -154,7 +184,7 @@
         <UnitName Value="UMotorListForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ubuildlogform.pas"/>
+        <Filename Value="forms\ubuildlogform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BuildLogForm"/>
         <HasResources Value="True"/>
@@ -162,7 +192,7 @@
         <UnitName Value="UBuildLogForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ubuildeditform.pas"/>
+        <Filename Value="forms\ubuildeditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BuildEditForm"/>
         <HasResources Value="True"/>
@@ -170,7 +200,7 @@
         <UnitName Value="UBuildEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ureportform.pas"/>
+        <Filename Value="forms\ureportform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ReportForm"/>
         <HasResources Value="True"/>
@@ -178,7 +208,7 @@
         <UnitName Value="UReportForm"/>
       </Unit>
       <Unit>
-        <Filename Value="utestlogform.pas"/>
+        <Filename Value="forms\utestlogform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="TestLogForm"/>
         <HasResources Value="True"/>
@@ -186,7 +216,7 @@
         <UnitName Value="UTestLogForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ushipmentform.pas"/>
+        <Filename Value="forms\ushipmentform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ShipmentForm"/>
         <HasResources Value="True"/>
@@ -194,7 +224,7 @@
         <UnitName Value="UShipmentForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ureclamationeditform.pas"/>
+        <Filename Value="forms\ureclamationeditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ReclamationEditForm"/>
         <HasResources Value="True"/>
@@ -202,12 +232,12 @@
         <UnitName Value="UReclamationEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="usqlite.pas"/>
+        <Filename Value="utils\udatabase.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="USQLite"/>
+        <UnitName Value="UDataBase"/>
       </Unit>
       <Unit>
-        <Filename Value="ustatisticform.pas"/>
+        <Filename Value="forms\ustatisticform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="StatisticForm"/>
         <HasResources Value="True"/>
@@ -215,7 +245,7 @@
         <UnitName Value="UStatisticForm"/>
       </Unit>
       <Unit>
-        <Filename Value="urepairform.pas"/>
+        <Filename Value="forms\urepairform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="RepairForm"/>
         <HasResources Value="True"/>
@@ -223,7 +253,7 @@
         <UnitName Value="URepairForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ucontrollistform.pas"/>
+        <Filename Value="forms\ucontrollistform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ControlListForm"/>
         <HasResources Value="True"/>
@@ -231,12 +261,12 @@
         <UnitName Value="UControlListForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ucalendar.pas"/>
+        <Filename Value="utils\ucalendar.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UCalendar"/>
       </Unit>
       <Unit>
-        <Filename Value="ucalendarform.pas"/>
+        <Filename Value="forms\ucalendarform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="CalendarForm"/>
         <HasResources Value="True"/>
@@ -244,7 +274,7 @@
         <UnitName Value="UCalendarForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ucalendareditform.pas"/>
+        <Filename Value="forms\ucalendareditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="CalendarEditForm"/>
         <HasResources Value="True"/>
@@ -252,7 +282,7 @@
         <UnitName Value="UCalendarEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ucardform.pas"/>
+        <Filename Value="forms\ucardform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="CardForm"/>
         <HasResources Value="True"/>
@@ -260,7 +290,7 @@
         <UnitName Value="UCardForm"/>
       </Unit>
       <Unit>
-        <Filename Value="urepaireditform.pas"/>
+        <Filename Value="forms\urepaireditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="RepairEditForm"/>
         <HasResources Value="True"/>
@@ -268,7 +298,7 @@
         <UnitName Value="URepairEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="ucontrollisteditform.pas"/>
+        <Filename Value="forms\ucontrollisteditform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ControlListEditForm"/>
         <HasResources Value="True"/>
@@ -276,12 +306,12 @@
         <UnitName Value="UControlListEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="uutils.pas"/>
+        <Filename Value="utils\uutils.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UUtils"/>
       </Unit>
       <Unit>
-        <Filename Value="upackingsheetform.pas"/>
+        <Filename Value="forms\upackingsheetform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="PackingSheetForm"/>
         <HasResources Value="True"/>
@@ -298,11 +328,13 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="utils;forms"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
       <Debugging>
         <DebugInfoType Value="dsDwarf2Set"/>
+        <UseHeaptrc Value="True"/>
         <UseExternalDbgSyms Value="True"/>
       </Debugging>
       <Options>

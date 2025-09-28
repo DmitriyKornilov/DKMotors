@@ -2,21 +2,31 @@ unit UMainForm;
 
 {$mode objfpc}{$H+}
 
+//{$DEFINE DEBUG}
+
 interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Menus, DK_LCLStrRus, DK_Vector, DK_VSTTypes,
+  StdCtrls, Menus, LCLType, BCButton, SQLDB,
+  //DK packages utils
+  {$IFDEF DEBUG}
+  DK_HeapTrace,
+  {$ENDIF}
+  DK_LCLStrRus, DK_Vector, DK_VSTTypes, DK_CtrlUtils, DK_Const,
+  //Project utils
+  UDataBase,
+  //Forms
   UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
-  UControlListForm, UCalendarForm, USQLite, BCButton, DK_Const,
-  DK_CtrlUtils, LCLType;
+  UControlListForm, UCalendarForm;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    BaseDDLScript: TSQLScript;
     Bevel2: TBevel;
     Bevel3: TBevel;
     Bevel4: TBevel;
@@ -76,6 +86,7 @@ type
     procedure FactoryListMenuItemClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure Label2Click(Sender: TObject);
     procedure Label3Click(Sender: TObject);
     procedure ManufactureButtonClick(Sender: TObject);
@@ -126,24 +137,21 @@ type
 var
   MainForm: TMainForm;
 
-
 implementation
 
 {$R *.lfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel, MotorNamesPanel, ReceiverNamesPanel
-  ]);
-  SetToolButtons([
-    RefreshButton, AboutButton, ExitButton, ChooseMotorNamesButton, ChooseRecieverNamesButton
-  ]);
+  {$IFDEF DEBUG}
+  HeapTraceOutputFile('trace.trc');
+  {$ENDIF}
 
-  SQLite:= TSQLite.Create;
+  Caption:= MAIN_CAPTION + ' - ' + PROJECT_NOTE;
   ConnectDB;
-  SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
-  SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
+
+  DataBase.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
+  DataBase.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
 
   CategorySelect(4);
 end;
@@ -151,7 +159,17 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(CategoryForm) then FreeAndNil(CategoryForm);
-  if Assigned(SQLite) then FreeAndNil(SQLite);
+  if Assigned(DataBase) then FreeAndNil(DataBase);
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([
+    ToolPanel, MotorNamesPanel, ReceiverNamesPanel
+  ]);
+  SetToolButtons([
+    RefreshButton, AboutButton, ExitButton, ChooseMotorNamesButton, ChooseRecieverNamesButton
+  ]);
 end;
 
 procedure TMainForm.ChooseMotorNamesButtonClick(Sender: TObject);
@@ -261,7 +279,7 @@ end;
 
 procedure TMainForm.RefreshButtonClick(Sender: TObject);
 begin
-  SQLite.Reconnect;
+  DataBase.Reconnect;
   CategorySelect(Category);
 end;
 
@@ -321,13 +339,17 @@ end;
 
 procedure TMainForm.ConnectDB;
 var
-  ProgPath, DBName, DDLName: String;
+  DBPath, DBName{, DDLName}: String;
 begin
-  ProgPath:= ExtractFilePath(Application.ExeName);
-  DBName:= ProgPath + 'DKMotors.db';
-  DDLName:= ProgPath + 'DDL.sql';
-  SQLite.Connect(DBName);
-  SQLite.ExecuteScript(DDLName);
+  DBPath:= ExtractFilePath(Application.ExeName) + 'db' + DirectorySeparator;
+  DBName:= DBPath + 'DKMotors.db';
+  //DDLName:= DBPath + 'ddl.sql';
+
+  DataBase:= TDataBase.Create;
+  DataBase.Connect(DBName);
+
+  //DataBase.ExecuteScript(DDLName);
+  DataBase.ExecuteScript(BaseDDLScript);
 end;
 
 procedure TMainForm.ViewUpdate;
@@ -347,7 +369,6 @@ begin
     10: (CategoryForm as TReportForm).ViewUpdate;
     //11: ;
   end;
-
 end;
 
 procedure TMainForm.CategorySelect(const ACategory: Byte);
@@ -383,13 +404,13 @@ end;
 
 procedure TMainForm.ChangeUsedMotorList;
 begin
-  if SQLite.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True,
+  if DataBase.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, True,
     UsedNameIDs, UsedNames) then ViewUpdate;
 end;
 
 procedure TMainForm.ChangeUsedReceiverList;
 begin
-  if SQLite.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True,
+  if DataBase.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, True,
     UsedReceiverIDs, UsedReceiverNames) then ViewUpdate;
 end;
 
@@ -398,13 +419,13 @@ var
   IsOK: Boolean;
 begin
   case ADictionary of
-    1: IsOK:= SQLite.EditList('Наименования электродвигателей',
+    1: IsOK:= DataBase.EditList('Наименования электродвигателей',
                               'MOTORNAMES', 'NameID', 'MotorName', False, True);
-    2: IsOK:= SQLite.EditList('Грузополучатели',
+    2: IsOK:= DataBase.EditList('Грузополучатели',
                               'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True);
-    3: IsOK:= SQLite.EditList('Элементы электродвигателей',
+    3: IsOK:= DataBase.EditList('Элементы электродвигателей',
                               'RECLAMATIONDEFECTS', 'DefectID', 'DefectName', True, True);
-    4: IsOK:= SQLite.EditTable('Причины возникновения неисправностей',
+    4: IsOK:= DataBase.EditTable('Причины возникновения неисправностей',
                               'RECLAMATIONREASONS', 'ReasonID',
                               ['ReasonName',  'ReasonColor'],
                               ['Причина',     'Цвет'       ],
@@ -413,9 +434,9 @@ begin
                               [300,           80           ],
                               [taLeftJustify, taCenter     ],
                               True, ['ReasonName']);
-    5: IsOK:= SQLite.EditList('Заводы',
+    5: IsOK:= DataBase.EditList('Заводы',
                               'RECLAMATIONFACTORIES', 'FactoryID', 'FactoryName', True, True);
-    6: IsOK:= SQLite.EditList('Предприятия (депо)',
+    6: IsOK:= DataBase.EditList('Предприятия (депо)',
                               'RECLAMATIONPLACES', 'PlaceID', 'PlaceName', True, True);
   end;
   if IsOK then ViewUpdate;
