@@ -5,8 +5,8 @@ unit UStoreForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, BCButton,
-  StdCtrls, Spin, fpspreadsheetgrid,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
+  StdCtrls, Spin, DividerBevel, fpspreadsheetgrid,
   //DK packages utils
   DK_Vector, DK_SheetExporter, DK_CtrlUtils,
   //Project utils
@@ -17,11 +17,11 @@ type
   { TStoreForm }
 
   TStoreForm = class(TForm)
-    Bevel2: TBevel;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
-    ExportButton: TBCButton;
+    DividerBevel1: TDividerBevel;
+    ExportButton: TSpeedButton;
     Label2: TLabel;
     Panel2: TPanel;
     Panel5: TPanel;
@@ -54,6 +54,26 @@ uses UMainForm;
 
 { TStoreForm }
 
+procedure TStoreForm.FormCreate(Sender: TObject);
+begin
+  MainForm.SetNamesPanelsVisible(True, False);
+  StoreSheet:= TStoreSheet.Create(ReportGrid.Worksheet, ReportGrid, GridFont);
+  Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;
+end;
+
+procedure TStoreForm.FormDestroy(Sender: TObject);
+begin
+  if Assigned(StoreSheet) then FreeAndNil(StoreSheet);
+end;
+
+procedure TStoreForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  Images.ToButtons([ExportButton]);
+
+  ViewUpdate;
+end;
+
 procedure TStoreForm.CheckBox1Click(Sender: TObject);
 begin
   ViewUpdate;
@@ -73,26 +93,6 @@ end;
 procedure TStoreForm.ExportButtonClick(Sender: TObject);
 begin
   ExportSheet;
-end;
-
-procedure TStoreForm.FormCreate(Sender: TObject);
-begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  MainForm.SetNamesPanelsVisible(True, False);
-  StoreSheet:= TStoreSheet.Create(ReportGrid);
-  Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;
-end;
-
-procedure TStoreForm.FormDestroy(Sender: TObject);
-begin
-  if Assigned(StoreSheet) then FreeAndNil(StoreSheet);
-end;
-
-procedure TStoreForm.FormShow(Sender: TObject);
-begin
-  ViewUpdate;
 end;
 
 procedure TStoreForm.SpinEdit1Change(Sender: TObject);

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, fpspreadsheetgrid, DateTimePicker, BCButton,
+  StdCtrls, fpspreadsheetgrid, DateTimePicker, DividerBevel,
   //DK packages utils
   DK_DateUtils, DK_SheetExporter, DK_Vector, DK_Matrix, DK_CtrlUtils,
   //Project utils
@@ -17,10 +17,10 @@ type
   { TReportForm }
 
   TReportForm = class(TForm)
-    Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
-    ExportButton: TBCButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    DividerBevel3: TDividerBevel;
+    ExportButton: TSpeedButton;
     NumberListCheckBox: TCheckBox;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
@@ -73,6 +73,27 @@ uses UMainForm;
 
 { TReportForm }
 
+procedure TReportForm.FormCreate(Sender: TObject);
+begin
+  SetControlsVisible;
+  DateTimePicker1.Date:= Date;
+  DateTimePicker2.Date:= FirstDayInMonth(Date);
+end;
+
+procedure TReportForm.FormDestroy(Sender: TObject);
+begin
+  FreeSheets;
+end;
+
+procedure TReportForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  Images.ToButtons([ExportButton]);
+
+  SetControlsVisible;
+  ViewUpdate;
+end;
+
 procedure TReportForm.DateTimePicker2Change(Sender: TObject);
 begin
   ViewUpdate;
@@ -86,17 +107,6 @@ end;
 procedure TReportForm.OrderNumCheckBoxChange(Sender: TObject);
 begin
   ViewUpdate;
-end;
-
-procedure TReportForm.FormCreate(Sender: TObject);
-begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-
-  SetControlsVisible;
-  DateTimePicker1.Date:= Date;
-  DateTimePicker2.Date:= FirstDayInMonth(Date);
 end;
 
 procedure TReportForm.NumberListCheckBoxChange(Sender: TObject);
@@ -116,17 +126,6 @@ begin
   finally
     FreeAndNil(Exporter);
   end;
-end;
-
-procedure TReportForm.FormDestroy(Sender: TObject);
-begin
-  FreeSheets;
-end;
-
-procedure TReportForm.FormShow(Sender: TObject);
-begin
-  SetControlsVisible;
-  ViewUpdate;
 end;
 
 procedure TReportForm.RadioButton1Click(Sender: TObject);
@@ -196,7 +195,7 @@ begin
                     BuildDates, MotorNames, MotorNums, RotorNums);
   DataBase.BuildTotalLoad(BD, ED, MainForm.UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts);
-  MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid);
+  MotorBuildSheet:= TMotorBuildSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
   MotorBuildSheet.DrawReport(BD, ED, NumberListCheckBox.Checked,
                              BuildDates, MotorNames, MotorNums, RotorNums,
                              TotalMotorNames, TotalMotorCounts);
@@ -222,7 +221,7 @@ begin
 
   DataBase.TestTotalLoad(BD, ED, MainForm.UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts, TotalFailCounts);
-  MotorTestSheet:= TMotorTestSheet.Create(LogGrid);
+  MotorTestSheet:= TMotorTestSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
   MotorTestSheet.DrawReport(BD, ED, NumberListCheckBox.Checked,
                         TestDates, MotorNames, MotorNums,
                         TestNotes, TestResults,
@@ -253,7 +252,7 @@ begin
                 OrderNumCheckBox.Checked,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);
 
-  ReportShipmentSheet:= TReportShipmentSheet.Create(LogGrid);
+  ReportShipmentSheet:= TReportShipmentSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
   ReportShipmentSheet.DrawReport(Length(MainForm.UsedReceiverIDs)=1,
                 NumberListCheckBox.Checked,
                 BD, ED, TotalMotorNames, TotalMotorCounts,

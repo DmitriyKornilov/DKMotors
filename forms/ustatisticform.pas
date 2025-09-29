@@ -5,8 +5,8 @@ unit UStatisticForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, BCButton,
-  fpspreadsheetgrid, VirtualTrees, LCLType, StdCtrls, Spin, ComCtrls, DateTimePicker,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, ComCtrls,
+  fpspreadsheetgrid, VirtualTrees, LCLType, StdCtrls, Spin, DateTimePicker, DividerBevel,
   //DK packages utils
   DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetExporter, DK_SheetConst,
   DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils,
@@ -20,9 +20,9 @@ type
   TStatisticForm = class(TForm)
     ANEMAsSameNameCheckBox: TCheckBox;
     Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
-    ExportButton: TBCButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    ExportButton: TSpeedButton;
     Label10: TLabel;
     ANEMPanel: TPanel;
     SeveralPeriodsCheckBox: TCheckBox;
@@ -58,6 +58,7 @@ type
     ZoomPanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure SeveralPeriodsCheckBoxChange(Sender: TObject);
     procedure ShowGraphicsCheckBoxChange(Sender: TObject);
     procedure ShowLinePercentCheckBoxChange(Sender: TObject);
@@ -129,10 +130,6 @@ uses UMainForm;
 
 procedure TStatisticForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-
   CanShow:= False;
 
   SelectedIndex:= -1;
@@ -150,6 +147,19 @@ begin
   CanShow:= True;
 
   ViewUpdate;
+end;
+
+procedure TStatisticForm.FormDestroy(Sender: TObject);
+begin
+  if Assigned(StatisticList) then FreeAndNil(StatisticList);
+  if Assigned(ReasonList) then FreeAndNil(ReasonList);
+  if Assigned(MonthReportTypeList) then FreeAndNil(MonthReportTypeList);
+end;
+
+procedure TStatisticForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  Images.ToButtons([ExportButton]);
 end;
 
 procedure TStatisticForm.DateTimePicker1Change(Sender: TObject);
@@ -218,13 +228,6 @@ end;
 procedure TStatisticForm.ShowPercentCheckBoxChange(Sender: TObject);
 begin
   ViewUpdate;
-end;
-
-procedure TStatisticForm.FormDestroy(Sender: TObject);
-begin
-  if Assigned(StatisticList) then FreeAndNil(StatisticList);
-  if Assigned(ReasonList) then FreeAndNil(ReasonList);
-  if Assigned(MonthReportTypeList) then FreeAndNil(MonthReportTypeList);
 end;
 
 procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);

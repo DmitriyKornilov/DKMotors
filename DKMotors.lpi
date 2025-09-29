@@ -76,9 +76,6 @@
         <PackageName Value="DKUIUtils"/>
       </Item>
       <Item>
-        <PackageName Value="bgracontrols"/>
-      </Item>
-      <Item>
         <PackageName Value="DKGraphics"/>
       </Item>
       <Item>

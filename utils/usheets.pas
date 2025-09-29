@@ -57,56 +57,6 @@ type
             const ATotalCount, AFailCount: Integer);
   end;
 
-  { TMotorBuildSheet }
-
-  TMotorBuildSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
-
-    FBuildDate: TDate;
-    FMotorNames, FMotorNums, FRotorNums: TStrVector;
-
-    procedure DrawTitle;
-  public
-    constructor Create(const AGrid: TsWorksheetGrid);
-    destructor  Destroy; override;
-    procedure DrawLine(const AIndex: Integer; const ASelected: Boolean);
-    procedure Draw(const ABuildDate: TDate;
-                   const AMotorNames, AMotorNums, ARotorNums: TStrVector);
-    procedure DrawReport(const ABeginDate, AEndDate: TDate;
-                   const ANeedNumberList: Boolean;
-                   const ABuildDates: TDateVector;
-                   const AMotorNames, AMotorNums, ARotorNums: TStrVector;
-                   const ATotalMotorNames: TStrVector;
-                   const ATotalMotorCount: TIntVector);
-
-  end;
-
-  { TReportShipmentSheet }
-
-  TReportShipmentSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
-  public
-    constructor Create(const AGrid: TsWorksheetGrid);
-    destructor  Destroy; override;
-    procedure DrawReport(const ASingleReceiver: Boolean;
-                   const ANeedNumberList: Boolean;
-                   const ABeginDate, AEndDate: TDate;
-                   const ATotalMotorNames: TStrVector;
-                   const ATotalMotorCount: TIntVector;
-                   const ARecieverNames: TStrVector;
-                   const ARecieverMotorNames: TStrMatrix;
-                   const ARecieverMotorCounts: TIntMatrix;
-                   const AListSendDates: TDateVector;
-                   const AListMotorNames, AListMotorNums, AListReceiverNames: TStrVector);
-
-  end;
-
   { TStatisticSheet }
 
   TStatisticSheet = class (TObject)
@@ -506,22 +456,39 @@ type
     procedure DrawReport; override;
   end;
 
+  { TMotorBuildSheet }
+
+  TMotorBuildSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
+  private
+    FBuildDate: TDate;
+    FMotorNames, FMotorNums, FRotorNums: TStrVector;
+    procedure DrawTitle;
+  public
+    procedure DrawLine(const AIndex: Integer; const ASelected: Boolean);
+    procedure Draw(const ABuildDate: TDate;
+                   const AMotorNames, AMotorNums, ARotorNums: TStrVector);
+    procedure DrawReport(const ABeginDate, AEndDate: TDate;
+                   const ANeedNumberList: Boolean;
+                   const ABuildDates: TDateVector;
+                   const AMotorNames, AMotorNums, ARotorNums: TStrVector;
+                   const ATotalMotorNames: TStrVector;
+                   const ATotalMotorCount: TIntVector);
+
+  end;
+
   { TMotorTestSheet }
 
-  TMotorTestSheet = class (TObject)
+  TMotorTestSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
-
     FTestDate: TDate;
     FMotorNames, FMotorNums, FTestNotes: TStrVector;
     FTestResults: TIntVector;
-
     procedure DrawTitle;
   public
-    constructor Create(const AGrid: TsWorksheetGrid);
-    destructor  Destroy; override;
     procedure DrawLine(const AIndex: Integer; const ASelected: Boolean);
     procedure Draw(const ATestDate: TDate;
                    const AMotorNames, AMotorNums, ATestNotes: TStrVector;
@@ -533,19 +500,33 @@ type
                    const ATestResults: TIntVector;
                    const ATotalMotorNames: TStrVector;
                    const ATotalMotorCounts, ATotalFailCounts: TIntVector);
+  end;
+
+  { TReportShipmentSheet }
+
+  TReportShipmentSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
+  public
+    procedure DrawReport(const ASingleReceiver: Boolean;
+                   const ANeedNumberList: Boolean;
+                   const ABeginDate, AEndDate: TDate;
+                   const ATotalMotorNames: TStrVector;
+                   const ATotalMotorCount: TIntVector;
+                   const ARecieverNames: TStrVector;
+                   const ARecieverMotorNames: TStrMatrix;
+                   const ARecieverMotorCounts: TIntMatrix;
+                   const AListSendDates: TDateVector;
+                   const AListMotorNames, AListMotorNums, AListReceiverNames: TStrVector);
 
   end;
 
   { TStoreSheet }
 
-  TStoreSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
+  TStoreSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   public
-    constructor Create(const AGrid: TsWorksheetGrid);
-    destructor  Destroy; override;
     procedure Draw(const ADeltaDays: Integer;
                    const ATestDates: TDateVector;
                    const AMotorNames, AMotorNums: TStrVector;
@@ -3464,26 +3445,14 @@ end;
 
 { TReportShipmentSheet }
 
-constructor TReportShipmentSheet.Create(const AGrid: TsWorksheetGrid);
-var
-  ColWidths: TIntVector;
+function TReportShipmentSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     150, // № п/п - Дата отправки
     300, // Наименование двигателя
     150, // Номер двигателя
     300  // Грузополучатель
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AGrid.Worksheet, AGrid);
-end;
-
-destructor TReportShipmentSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
 end;
 
 procedure TReportShipmentSheet.DrawReport(const ASingleReceiver: Boolean;
@@ -3502,8 +3471,8 @@ var
 begin
   if VIsNil(ATotalMotorNames) then Exit;
 
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   C:= 3 + Ord(ANeedNumberList);
 
@@ -3516,61 +3485,61 @@ begin
 
   //Заголовок отчета
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
 
   if not ASingleReceiver then
   begin
 
-    FWriter.WriteText(R, 1, R, C, S, cbtNone, True, True);
+    Writer.WriteText(R, 1, R, C, S, cbtNone, True, True);
     //Таблица сводная: наименование/количество
     R:= R + 1;
-    FWriter.WriteText(R, 1, R, C, EmptyStr, cbtNone);
-    //FWriter.SetRowHeight(R, 10);
+    Writer.WriteText(R, 1, R, C, EmptyStr, cbtNone);
+    //Writer.SetRowHeight(R, 10);
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, C, 'Всего отгружено', cbtNone, True, True);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+    Writer.WriteText(R, 1, R, C, 'Всего отгружено', cbtNone, True, True);
     R:= R + 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
-    FWriter.WriteText(R, 3, 'Количество', cbtOuter, True, True);
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
+    Writer.WriteText(R, 3, 'Количество', cbtOuter, True, True);
+    Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
     for i:= 0 to High(ATotalMotorNames) do
     begin
       R:= R + 1;
-      FWriter.SetAlignment(haLeft, vaCenter);
-      FWriter.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
-      FWriter.SetAlignment(haCenter, vaCenter);
-      FWriter.WriteNumber(R, 3, ATotalMotorCount[i], cbtOuter);
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaCenter);
+      Writer.WriteNumber(R, 3, ATotalMotorCount[i], cbtOuter);
     end;
   end
   else
-    FWriter.WriteText(R, 1, R, 3, S, cbtNone, True, True);
+    Writer.WriteText(R, 1, R, 3, S, cbtNone, True, True);
 
   for i:= 0 to High(ARecieverNames) do
   begin
     R:= R + 1;
-    FWriter.WriteText(R, 1, R, 3, EmptyStr, cbtNone);
-    //FWriter.SetRowHeight(R, 15);
+    Writer.WriteText(R, 1, R, 3, EmptyStr, cbtNone);
+    //Writer.SetRowHeight(R, 15);
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-    FWriter.WriteText(R, 1, R, 3, ARecieverNames[i], cbtNone, True, True);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+    Writer.WriteText(R, 1, R, 3, ARecieverNames[i], cbtNone, True, True);
     R:= R + 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
-    FWriter.WriteText(R, 3, 'Количество', cbtOuter, True, True);
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
+    Writer.WriteText(R, 3, 'Количество', cbtOuter, True, True);
     for j:= 0 to High(ARecieverMotorNames[i]) do
     begin
       R:= R + 1;
-      FWriter.SetFont(FFontName, FFontSize, [], clBlack);
-      FWriter.SetAlignment(haLeft, vaCenter);
-      FWriter.WriteText(R, 1, R, 2, ARecieverMotorNames[i,j], cbtOuter, True, True);
-      FWriter.SetAlignment(haCenter, vaCenter);
-      FWriter.WriteNumber(R, 3, ARecieverMotorCounts[i,j], cbtOuter);
+      Writer.SetFont(Font.Name, Font.Size, [], clBlack);
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.WriteText(R, 1, R, 2, ARecieverMotorNames[i,j], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaCenter);
+      Writer.WriteNumber(R, 3, ARecieverMotorCounts[i,j], cbtOuter);
     end;
   end;
 
@@ -3578,46 +3547,45 @@ begin
   begin
     R:= R + 1;
     if not ASingleReceiver then
-      FWriter.WriteText(R, 1, R, 4, EmptyStr, cbtNone)
+      Writer.WriteText(R, 1, R, 4, EmptyStr, cbtNone)
     else
-      FWriter.WriteText(R, 1, R, 3, EmptyStr, cbtNone);
+      Writer.WriteText(R, 1, R, 3, EmptyStr, cbtNone);
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
     if not ASingleReceiver then
-      FWriter.WriteText(R, 1, R, 4, 'Пономерной список', cbtNone, True, True)
+      Writer.WriteText(R, 1, R, 4, 'Пономерной список', cbtNone, True, True)
     else
-      FWriter.WriteText(R, 1, R, 3, 'Пономерной список', cbtNone, True, True);
+      Writer.WriteText(R, 1, R, 3, 'Пономерной список', cbtNone, True, True);
     R:= R + 1;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 1, 'Дата отгрузки', cbtOuter, True, True);
-    FWriter.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
-    FWriter.WriteText(R, 3, 'Номер', cbtOuter, True, True);
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 1, 'Дата отгрузки', cbtOuter, True, True);
+    Writer.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
+    Writer.WriteText(R, 3, 'Номер', cbtOuter, True, True);
     if not ASingleReceiver then
-      FWriter.WriteText(R, 4, 'Грузополучатель', cbtOuter, True, True);
+      Writer.WriteText(R, 4, 'Грузополучатель', cbtOuter, True, True);
 
-
-    FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+    Writer.SetFont(Font.Name, Font.Size, [], clBlack);
 
     for i:= 0 to High(AListSendDates) do
     begin
       R:= R + 1;
-      FWriter.SetAlignment(haCenter, vaCenter);
-      FWriter.WriteDate(R, 1, AListSendDates[i], cbtOuter);
-      FWriter.SetAlignment(haLeft, vaCenter);
-      FWriter.WriteText(R, 2, AListMotorNames[i], cbtOuter, True, True);
-      FWriter.SetAlignment(haCenter, vaCenter);
-      FWriter.WriteText(R, 3, AListMotorNums[i], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaCenter);
+      Writer.WriteDate(R, 1, AListSendDates[i], cbtOuter);
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.WriteText(R, 2, AListMotorNames[i], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaCenter);
+      Writer.WriteText(R, 3, AListMotorNums[i], cbtOuter, True, True);
       if not ASingleReceiver then
       begin
-        FWriter.SetAlignment(haLeft, vaCenter);
-        FWriter.WriteText(R, 4, AListReceiverNames[i], cbtOuter, True, True);
+        Writer.SetAlignment(haLeft, vaCenter);
+        Writer.WriteText(R, 4, AListReceiverNames[i], cbtOuter, True, True);
       end;
     end;
   end;
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TBeforeTestSheet }
@@ -3943,26 +3911,14 @@ end;
 
 { TStoreSheet }
 
-constructor TStoreSheet.Create(const AGrid: TsWorksheetGrid);
-var
-  ColWidths: TIntVector;
+function TStoreSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     150, // Дата сдачи (испытаний)
     300, // Наименование двигателя
     200//, // Номер двигателя
     //100  // Номер партии
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AGrid.Worksheet, AGrid);
-end;
-
-destructor TStoreSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
 end;
 
 procedure TStoreSheet.Draw(const ADeltaDays: Integer;
@@ -3976,8 +3932,8 @@ var
 begin
   if VIsNil(ATestDates) then Exit;
 
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   S:= 'Отчет по наличию электродвигателей на складе на ' +
       FormatDateTime('dd.mm.yyyy', Date);
@@ -3989,97 +3945,63 @@ begin
 
   //Заголовок отчета
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, R, 3, S, cbtNone, True, True);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, R, 3, S, cbtNone, True, True);
   //Таблица сводная: наименование/количество
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Количество', cbtOuter, True, True);
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Количество', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
   for i:= 0 to High(ATotalMotorNames) do
   begin
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 3, ATotalMotorCounts[i], cbtOuter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteNumber(R, 3, ATotalMotorCounts[i], cbtOuter);
   end;
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteNumber(R, 3, VSum(ATotalMotorCounts), cbtOuter);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteNumber(R, 3, VSum(ATotalMotorCounts), cbtOuter);
 
   //Таблица пономерная
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Дата сдачи', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
-  //FWriter.WriteText(R, 4, 'Номер партии', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Дата сдачи', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
+  //Writer.WriteText(R, 4, 'Номер партии', cbtOuter, True, True);
 
   FrozenCount:= R;
 
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
   for i:= 0 to High(ATestDates) do
   begin
     R:= R + 1;
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteDate(R, 1, ATestDates[i], cbtOuter);
-    FWriter.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
-    FWriter.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
-    //FWriter.WriteText(R, 4, ASeries[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteDate(R, 1, ATestDates[i], cbtOuter);
+    Writer.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
+    Writer.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
+    //Writer.WriteText(R, 4, ASeries[i], cbtOuter, True, True);
   end;
 
-  FWriter.SetFrozenRows(FrozenCount);
+  Writer.SetFrozenRows(FrozenCount);
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TMotorTestSheet }
 
-procedure TMotorTestSheet.DrawTitle;
-var
-  R: Integer;
+function TMotorTestSheet.SetWidths: TIntVector;
 begin
-
-
-
-
-  R:= 1;
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, 5, 'Журнал испытаний за ' +
-                    FormatDateTime('dd.mm.yyyy', FTestDate),
-                    cbtBottom, True, True);
-  R:= R+1;
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  //FWriter.SetBackground(COLOR_BACKGROUND_TITLE);
-  //FWriter.WriteText(R, 1, 'Дата испытаний', cbtOuter, True, True);
-  FWriter.WriteText(R, 1, '№ п/п', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
-  //FWriter.WriteText(R, 4, 'Номер партии', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Результат испытаний', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, 'Примечание', cbtOuter, True, True);
-
-
-end;
-
-constructor TMotorTestSheet.Create(const AGrid: TsWorksheetGrid);
-var
-  ColWidths: TIntVector;
-begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     150, // Дата испытаний
     300, // Наименование двигателя
     200, // Номер двигателя
@@ -4087,13 +4009,28 @@ begin
     200, // Результат (норма/брак)
     300  // Примечание
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AGrid.Worksheet, AGrid);
 end;
 
-destructor TMotorTestSheet.Destroy;
+procedure TMotorTestSheet.DrawTitle;
+var
+  R: Integer;
 begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
+  R:= 1;
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, 5, 'Журнал испытаний за ' +
+                    FormatDateTime('dd.mm.yyyy', FTestDate),
+                    cbtBottom, True, True);
+  R:= R+1;
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  //Writer.SetBackground(COLOR_BACKGROUND_TITLE);
+  Writer.WriteText(R, 1, '№ п/п', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
+  //Writer.WriteText(R, 4, 'Номер партии', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Результат испытаний', cbtOuter, True, True);
+  Writer.WriteText(R, 5, 'Примечание', cbtOuter, True, True);
 end;
 
 procedure TMotorTestSheet.DrawLine(const AIndex: Integer;
@@ -4105,27 +4042,27 @@ begin
   R:= AIndex + 3;
 
   if ASelected then
-    FWriter.SetBackground(DefaultSelectionBGColor)
+    Writer.SetBackground(DefaultSelectionBGColor)
   else
-    FWriter.SetBackgroundClear;
+    Writer.SetBackgroundClear;
 
   if FTestResults[AIndex]=0 then
   begin
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+    Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
     S:= 'норма';
   end
   else begin
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clRed);
+    Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clRed);
     S:= 'брак';
   end;
 
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteNumber(R, 1, AIndex+1, cbtOuter);
-  FWriter.WriteText(R, 2, FMotorNames[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 3, FMotorNums[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 4, S, cbtOuter, True, True);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 5, FTestNotes[AIndex], cbtOuter, True, True);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteNumber(R, 1, AIndex+1, cbtOuter);
+  Writer.WriteText(R, 2, FMotorNames[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 3, FMotorNums[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 4, S, cbtOuter, True, True);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 5, FTestNotes[AIndex], cbtOuter, True, True);
 end;
 
 procedure TMotorTestSheet.Draw(const ATestDate: TDate;
@@ -4134,7 +4071,7 @@ procedure TMotorTestSheet.Draw(const ATestDate: TDate;
 var
   i, N, K: Integer;
 begin
-  FWriter.BeginEdit;
+  Writer.BeginEdit;
 
   FTestDate:= ATestDate;
   FMotorNames:= AMotorNames;
@@ -4150,16 +4087,16 @@ begin
       DrawLine(i, False);
 
     i:= Length(AMotorNames) + 3;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
     N:= VSum(ATotalMotorCounts);
     K:= VSum(ATotalFailCounts);
-    FWriter.WriteText(i, 1,  'Норма: ' + IntToStr(N-K), cbtTop, True, True);
-    FWriter.WriteText(i, 2,  'Брак: ' + IntToStr(K), cbtTop, True, True);
-    FWriter.SetFrozenRows(2);
+    Writer.WriteText(i, 1,  'Норма: ' + IntToStr(N-K), cbtTop, True, True);
+    Writer.WriteText(i, 2,  'Брак: ' + IntToStr(K), cbtTop, True, True);
+    Writer.SetFrozenRows(2);
   end;
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 procedure TMotorTestSheet.DrawReport(const ABeginDate, AEndDate: TDate;
@@ -4175,8 +4112,8 @@ var
 begin
   if VIsNil(ATestDates) then Exit;
 
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   S:= 'Отчет по испытанию электродвигателей за ';
   if SameDate(ABeginDate, AEndDate) then
@@ -4187,125 +4124,113 @@ begin
 
   //Заголовок отчета
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
   if ANeedNumberList then
-    FWriter.WriteText(R, 1, R, 5, S, cbtNone, True, True)
+    Writer.WriteText(R, 1, R, 5, S, cbtNone, True, True)
   else
-    FWriter.WriteText(R, 1, R, 4, S, cbtNone, True, True);
+    Writer.WriteText(R, 1, R, 4, S, cbtNone, True, True);
   //Таблица сводная: наименование/количество
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Норма', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Брак', cbtOuter, True, True);
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Норма', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Брак', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
   FrozenCount:= R;
   for i:= 0 to High(ATotalMotorNames) do
   begin
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
     N:= ATotalMotorCounts[i];
     K:= ATotalFailCounts[i];
-    FWriter.WriteNumber(R, 3, N-K, cbtOuter);
-    FWriter.WriteNumber(R, 4, K, cbtOuter);
+    Writer.WriteNumber(R, 3, N-K, cbtOuter);
+    Writer.WriteNumber(R, 4, K, cbtOuter);
   end;
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
+  Writer.SetAlignment(haCenter, vaCenter);
   N:= VSum(ATotalMotorCounts);
   K:= VSum(ATotalFailCounts);
-  FWriter.WriteNumber(R, 3, N-K, cbtOuter);
-  FWriter.WriteNumber(R, 4, K, cbtOuter);
+  Writer.WriteNumber(R, 3, N-K, cbtOuter);
+  Writer.WriteNumber(R, 4, K, cbtOuter);
 
   if ANeedNumberList then
   begin
     //Таблица пономерная
     R:= R + 2;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 1, 'Дата испытаний', cbtOuter, True, True);
-    FWriter.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
-    FWriter.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
-    FWriter.WriteText(R, 4, 'Результат испытаний', cbtOuter, True, True);
-    FWriter.WriteText(R, 5, 'Примечание', cbtOuter, True, True);
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 1, 'Дата испытаний', cbtOuter, True, True);
+    Writer.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
+    Writer.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
+    Writer.WriteText(R, 4, 'Результат испытаний', cbtOuter, True, True);
+    Writer.WriteText(R, 5, 'Примечание', cbtOuter, True, True);
     FrozenCount:= R;
 
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+    Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
     for i:= 0 to High(ATestDates) do
     begin
       R:= R + 1;
       if ATestResults[i]=0 then
       begin
         S:= 'норма';
-        FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+        Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
       end
       else begin
         S:= 'брак';
-        FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clRed);
+        Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clRed);
       end;
-      FWriter.SetAlignment(haCenter, vaCenter);
-      FWriter.WriteDate(R, 1, ATestDates[i], cbtOuter);
-      FWriter.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 4, S, cbtOuter, True, True);
-      FWriter.SetAlignment(haLeft, vaCenter);
-      FWriter.WriteText(R, 5, ATestNotes[i], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaCenter);
+      Writer.WriteDate(R, 1, ATestDates[i], cbtOuter);
+      Writer.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
+      Writer.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
+      Writer.WriteText(R, 4, S, cbtOuter, True, True);
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.WriteText(R, 5, ATestNotes[i], cbtOuter, True, True);
     end;
   end;
 
-  FWriter.SetFrozenRows(FrozenCount);
+  Writer.SetFrozenRows(FrozenCount);
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TMotorBuildSheet }
+
+function TMotorBuildSheet.SetWidths: TIntVector;
+begin
+  Result:= VCreateInt([
+    150, // № п/п - Дата сборки
+    300, // Наименование двигателя
+    200, // Номер двигателя
+    200  // Номер Ротора
+  ]);
+end;
 
 procedure TMotorBuildSheet.DrawTitle;
 var
   R: Integer;
 begin
   R:= 1;
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, 4, 'Журнал сборки за ' +
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, 4, 'Журнал сборки за ' +
                     FormatDateTime('dd.mm.yyyy', FBuildDate),
                     cbtBottom, True, True);
 
   R:= R+1;
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, '№ п/п', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Номер ротора', cbtOuter, True, True);
-end;
-
-constructor TMotorBuildSheet.Create(const AGrid: TsWorksheetGrid);
-var
-  ColWidths: TIntVector;
-begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
-    150, // № п/п - Дата сборки
-    300, // Наименование двигателя
-    200, // Номер двигателя
-    200  // Номер Ротора
-  ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AGrid.Worksheet, AGrid);
-end;
-
-destructor TMotorBuildSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.WriteText(R, 1, '№ п/п', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Номер ротора', cbtOuter, True, True);
 end;
 
 procedure TMotorBuildSheet.DrawLine(const AIndex: Integer;
@@ -4315,18 +4240,18 @@ var
 begin
   R:= AIndex + 3;
 
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetAlignment(haCenter, vaCenter);
 
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
   if ASelected then
-    FWriter.SetBackground(DefaultSelectionBGColor)
+    Writer.SetBackground(DefaultSelectionBGColor)
   else
-    FWriter.SetBackgroundClear;
+    Writer.SetBackgroundClear;
 
-  FWriter.WriteNumber(R, 1, AIndex+1, cbtOuter);
-  FWriter.WriteText(R, 2, FMotorNames[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 3, FMotorNums[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 4, FRotorNums[AIndex], cbtOuter, True, True);
+  Writer.WriteNumber(R, 1, AIndex+1, cbtOuter);
+  Writer.WriteText(R, 2, FMotorNames[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 3, FMotorNums[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 4, FRotorNums[AIndex], cbtOuter, True, True);
 end;
 
 procedure TMotorBuildSheet.Draw(const ABuildDate: TDate;
@@ -4334,7 +4259,7 @@ procedure TMotorBuildSheet.Draw(const ABuildDate: TDate;
 var
   i: Integer;
 begin
-  FWriter.BeginEdit;
+  Writer.BeginEdit;
 
   FBuildDate:= ABuildDate;
   FMotorNames:= AMotorNames;
@@ -4347,10 +4272,10 @@ begin
   begin
     for i:= 0 to High(AMotorNames) do
       DrawLine(i, False);
-    FWriter.SetFrozenRows(2);
+    Writer.SetFrozenRows(2);
   end;
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 procedure TMotorBuildSheet.DrawReport(const ABeginDate, AEndDate: TDate;
@@ -4365,8 +4290,8 @@ var
 begin
   if VIsNil(ABuildDates) then Exit;
 
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   S:= 'Отчет по сборке электродвигателей за ';
   if SameDate(ABeginDate, AEndDate) then
@@ -4377,60 +4302,60 @@ begin
 
   //Заголовок отчета
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
   if ANeedNumberList then
-    FWriter.WriteText(R, 1, R, 4, S, cbtNone, True, True)
+    Writer.WriteText(R, 1, R, 4, S, cbtNone, True, True)
   else
-    FWriter.WriteText(R, 1, R, 3, S, cbtNone, True, True);
+    Writer.WriteText(R, 1, R, 3, S, cbtNone, True, True);
   //Таблица сводная: наименование/количество
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Количество', cbtOuter, True, True);
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Количество', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
   FrozenCount:= R;
   for i:= 0 to High(ATotalMotorNames) do
   begin
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 3, ATotalMotorCount[i], cbtOuter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteNumber(R, 3, ATotalMotorCount[i], cbtOuter);
   end;
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteNumber(R, 3, VSum(ATotalMotorCount), cbtOuter);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteNumber(R, 3, VSum(ATotalMotorCount), cbtOuter);
 
   if ANeedNumberList then
   begin
     //Таблица пономерная
     R:= R + 2;
-    FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 1, 'Дата сборки', cbtOuter, True, True);
-    FWriter.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
-    FWriter.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
-    FWriter.WriteText(R, 4, 'Номер ротора', cbtOuter, True, True);
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 1, 'Дата сборки', cbtOuter, True, True);
+    Writer.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
+    Writer.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
+    Writer.WriteText(R, 4, 'Номер ротора', cbtOuter, True, True);
     FrozenCount:= R;
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+    Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
     for i:= 0 to High(ABuildDates) do
     begin
       R:= R + 1;
-      FWriter.WriteDate(R, 1, ABuildDates[i], cbtOuter);
-      FWriter.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 4, ARotorNums[i], cbtOuter, True, True);
+      Writer.WriteDate(R, 1, ABuildDates[i], cbtOuter);
+      Writer.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
+      Writer.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
+      Writer.WriteText(R, 4, ARotorNums[i], cbtOuter, True, True);
     end;
   end;
 
-  FWriter.SetFrozenRows(FrozenCount);
+  Writer.SetFrozenRows(FrozenCount);
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TReclamationSheet }
