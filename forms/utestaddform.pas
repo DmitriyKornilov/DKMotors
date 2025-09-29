@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, DateTimePicker, LCLType, VirtualTrees, DividerBevel,
   //DK packages utils
-  DK_VSTTables, DK_Vector, DK_Dialogs, DK_StrUtils, DK_Const,
+  DK_VSTTables, DK_Vector, DK_Dialogs, DK_StrUtils, DK_Const, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -40,7 +40,6 @@ type
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -58,7 +57,6 @@ type
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
     NameIDs: TIntVector;
-    CanFormClose: Boolean;
 
     VSTViewTable, VSTTestTable: TVSTTable;
 
@@ -91,17 +89,30 @@ implementation
 
 { TTestAddForm }
 
-procedure TTestAddForm.LoadMotorNames;
+procedure TTestAddForm.FormCreate(Sender: TObject);
 begin
-  DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
-  if VIsNil(NameIDs) then
-    Inform('Отсутствует список наименований двигателей!');
+  LoadMotorNames;
+  TestMotorIDs:= nil;
+  TestResults:= nil;
+  TestNotes:= nil;
+
+  VSTViewTable:= TVSTTable.Create(VT1);
+  VSTTestTable:= TVSTTable.Create(VT2);
+end;
+
+procedure TTestAddForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(VSTViewTable);
+  FreeAndNil(VSTTestTable);
 end;
 
 procedure TTestAddForm.FormShow(Sender: TObject);
 var
   Ind: Integer;
 begin
+  Images.ToButtons([SaveButton, CancelButton, DelButton, AddButton]);
+  SetEventButtons([SaveButton, CancelButton, DelButton, AddButton]);
+
   if UsedNameID>0 then
   begin
     Ind:= VIndexOf(NameIDs, UsedNameID);
@@ -126,6 +137,13 @@ begin
   VSTTestTable.Draw;
 
   DateTimePicker1.SetFocus;
+end;
+
+procedure TTestAddForm.LoadMotorNames;
+begin
+  DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
+  if VIsNil(NameIDs) then
+    Inform('Отсутствует список наименований двигателей!');
 end;
 
 procedure TTestAddForm.MotorNameComboBoxChange(Sender: TObject);
@@ -158,18 +176,22 @@ begin
   Memo1.SetFocus;
 end;
 
+procedure TTestAddForm.CancelButtonClick(Sender: TObject);
+begin
+  ModalResult:= mrCancel;
+end;
+
 procedure TTestAddForm.SaveButtonClick(Sender: TObject);
 begin
-  CanFormClose:= False;
   if VIsNil(TestMotorIDs) then
   begin
     Inform('Список испытанных двигателей не заполнен!');
     Exit;
   end;
 
-  DataBase.MotorsInTestLogWrite(DateTimePicker1.Date, TestMotorIDs, TestResults, TestNotes);
+  if not DataBase.MotorsInTestLogWrite(DateTimePicker1.Date, TestMotorIDs, TestResults,
+                                       TestNotes) then Exit;
 
-  CanFormClose:= True;
   ModalResult:= mrOK;
 end;
 
@@ -198,17 +220,6 @@ begin
   DelButton.Enabled:= VSTTestTable.IsSelected;
 end;
 
-procedure TTestAddForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
-end;
-
-procedure TTestAddForm.CancelButtonClick(Sender: TObject);
-begin
-  CanFormClose:= True;
-  ModalResult:= mrCancel;
-end;
-
 procedure TTestAddForm.DelButtonClick(Sender: TObject);
 begin
   DelTest;
@@ -217,25 +228,6 @@ end;
 procedure TTestAddForm.AddButtonClick(Sender: TObject);
 begin
   AddTest;
-end;
-
-procedure TTestAddForm.FormCreate(Sender: TObject);
-begin
-  LoadMotorNames;
-  TestMotorIDs:= nil;
-  TestResults:= nil;
-  TestNotes:= nil;
-
-  VSTViewTable:= TVSTTable.Create(VT1);
-  VSTTestTable:= TVSTTable.Create(VT2);
-
-  CanFormClose:= True;
-end;
-
-procedure TTestAddForm.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(VSTViewTable);
-  FreeAndNil(VSTTestTable);
 end;
 
 procedure TTestAddForm.AddTest;

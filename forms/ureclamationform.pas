@@ -5,13 +5,13 @@ unit UReclamationForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, BCButton,
-  StdCtrls, EditBtn, ComCtrls, VirtualTrees, fpspreadsheetgrid, DateTimePicker,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, StdCtrls,
+  ComCtrls, VirtualTrees, fpspreadsheetgrid, DateTimePicker, DividerBevel,
   //DK packages utils
   DK_Vector, DK_DateUtils, DK_StrUtils, DK_Dialogs, DK_SheetExporter, DK_Zoom, DK_Const,
-  DK_VSTParamList,
+  DK_VSTParamList, DK_CtrlUtils, DK_Filter,
   //Project utils
-  UDataBase, UUtils, USheetUtils,
+  UVars, USheets,
   //Forms
   UCardForm, UReclamationEditForm, URepairEditForm, UControlListEditForm;
 
@@ -22,14 +22,14 @@ type
   TReclamationForm = class(TForm)
     AddButton: TSpeedButton;
     Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
-    Bevel4: TBevel;
-    Bevel5: TBevel;
     CardPanel: TPanel;
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
-    ExportButton: TBCButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    DividerBevel3: TDividerBevel;
+    DividerBevel4: TDividerBevel;
+    ExportButton: TSpeedButton;
     Label3: TLabel;
     SettingClientPanel: TPanel;
     LogGrid: TsWorksheetGrid;
@@ -37,14 +37,12 @@ type
     Panel4: TPanel;
     RepairButton: TSpeedButton;
     MotorCardCheckBox: TCheckBox;
-    Label2: TLabel;
-    MotorNumEdit: TEditButton;
     Panel2: TPanel;
     DelButton: TSpeedButton;
     EditButton: TSpeedButton;
     Panel3: TPanel;
     Panel5: TPanel;
-    Panel7: TPanel;
+    FilterPanel: TPanel;
     ControlButton: TSpeedButton;
     ReportPeriodPanel: TPanel;
     Splitter0: TSplitter;
@@ -65,14 +63,13 @@ type
     procedure LogGridMouseDown(Sender: TObject; Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure MotorCardCheckBoxChange(Sender: TObject);
-    procedure MotorNumEditButtonClick(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure RepairButtonClick(Sender: TObject);
   private
     CardForm: TCardForm;
     ParamList: TVSTParamList;
     CanShow: Boolean;
     ZoomPercent: Integer;
+    FilterString: String;
     SelectedIndex: Integer;
     ReclamationSheet: TReclamationSheet;
 
@@ -97,6 +94,7 @@ type
     procedure LoadReclamation;
     procedure DrawReclamation(const AZoomPercent: Integer);
     procedure ExportReclamation;
+    procedure FilterReclamation(const AFilterString: String);
 
     procedure ParamListCreate;
   public
@@ -116,13 +114,6 @@ uses UMainForm;
 
 procedure TReclamationForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetToolButtons([
-    AddButton, DelButton, EditButton, RepairButton, ControlButton
-  ]);
-
   CanShow:= False;
   CardForm:= CreateCardForm(ReclamationForm, CardPanel);
   MotorCardCheckBox.Checked:= False;
@@ -132,12 +123,16 @@ begin
   ZoomPercent:= 100;
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawReclamation, True);
 
-  ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid);
+  ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
+  ReclamationSheet.Font.Size:= ReclamationSheet.Font.Size-1;
 
   ParamListCreate;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
   DateTimePicker1.Date:= LastDayInYear(Date);
+
+  FilterString:= EmptyStr;
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterReclamation, 250, 500);
 
   CanShow:= True;
 end;
@@ -151,6 +146,15 @@ end;
 
 procedure TReclamationForm.FormShow(Sender: TObject);
 begin
+  SetToolPanels([ToolPanel]);
+  SetToolButtons([
+    AddButton, DelButton, EditButton, RepairButton, ControlButton
+  ]);
+  Images.ToButtons([
+    ExportButton,
+    AddButton, DelButton, EditButton, RepairButton, ControlButton
+  ]);
+
   ViewUpdate;
 end;
 
@@ -194,16 +198,6 @@ begin
     CardPanel.Visible:= False;
     Splitter1.Visible:= False;
   end;
-end;
-
-procedure TReclamationForm.MotorNumEditButtonClick(Sender: TObject);
-begin
-  MotorNumEdit.Text:= EmptyStr;
-end;
-
-procedure TReclamationForm.MotorNumEditChange(Sender: TObject);
-begin
-  ViewUpdate;
 end;
 
 procedure TReclamationForm.RepairButtonClick(Sender: TObject);
@@ -271,7 +265,7 @@ begin
 
   DataBase.ReclamationListLoad(DateTimePicker2.Date, DateTimePicker1.Date,
                         MainForm.UsedNameIDs, UsedDefectIDs, UsedReasonIDs,
-                        OrderIndex, STrim(MotorNumEdit.Text),
+                        OrderIndex, STrim(FilterString),
                         RecDates, BuildDates, ArrivalDates, SendingDates,
                         RecIDs, MotorIDs, Mileages, Opinions,
                         ReasonColors, Passports,
@@ -299,7 +293,8 @@ begin
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
-    Drawer:= TReclamationSheet.Create(Sheet);
+    Drawer:= TReclamationSheet.Create(Sheet, nil, GridFont);
+    Drawer.Font.Size:= Drawer.Font.Size-1;
     Drawer.Draw(RecDates, BuildDates, ArrivalDates, SendingDates,
                         Mileages, Opinions, ReasonColors,
                         PlaceNames, FactoryNames, Departures, DefectNames,
@@ -310,6 +305,12 @@ begin
     FreeAndNil(Drawer);
     FreeAndNil(Exporter);
   end;
+end;
+
+procedure TReclamationForm.FilterReclamation(const AFilterString: String);
+begin
+  FilterString:= AFilterString;
+  ViewUpdate;
 end;
 
 procedure TReclamationForm.ParamListCreate;

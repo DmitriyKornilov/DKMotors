@@ -1,14 +1,15 @@
-unit USheetUtils;
+unit USheets;
 
 {$mode ObjFPC}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, DK_SheetWriter, fpstypes, fpspreadsheetgrid, fpspreadsheet,
-  DK_Vector, DK_Matrix, DK_Fonts, Graphics, DK_SheetConst, DK_Const, DK_PPI,
-  DateUtils, DK_DateUtils, DK_StatPlotter, DK_Math, DK_StrUtils, DK_Graph,
-  DK_SheetUtils, DK_SheetTables, DK_Color;
+  Classes, SysUtils, Graphics,  fpstypes, fpspreadsheetgrid, fpspreadsheet, DateUtils,
+  //DK packages utils
+  DK_Vector, DK_Matrix, DK_Fonts, DK_SheetConst, DK_Const, DK_PPI, DK_SheetWriter,
+  DK_DateUtils, DK_StatPlotter, DK_Math, DK_StrUtils, DK_Graph,
+  DK_SheetUtils, DK_SheetTables, DK_Color, DK_SheetTypes;
 
 const
   COLOR_BACKGROUND_TITLE = clBtnFace;
@@ -26,14 +27,14 @@ type
 
   TLogTable = class(TSheetTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent; const AFont: TFont);
   end;
 
   { TCargoPackingSheet }
 
   TCargoPackingSheet = class(TLogTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid);
+    constructor Create(const AGrid: TsWorksheetGrid; const AFont: TFont);
     procedure Update(const AMotorNames, AMotorNums, ATestDates: TStrVector);
   end;
 
@@ -41,7 +42,7 @@ type
 
   TBuildLogTable = class(TLogTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent; const AFont: TFont);
     procedure Update(const ADate: TDate;
             const AMotorNames, AMotorNums, ARotorNums: TStrVector);
   end;
@@ -50,7 +51,7 @@ type
 
   TTestLogTable = class(TLogTable)
   public
-    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent);
+    constructor Create(const AGrid: TsWorksheetGrid; const AOnSelect: TSheetEvent; const AFont: TFont);
     procedure Update(const ADate: TDate; const ATestResults: TIntVector;
             const AMotorNames, AMotorNums, ATestNotes: TStrVector;
             const ATotalCount, AFailCount: Integer);
@@ -505,8 +506,6 @@ type
     procedure DrawReport; override;
   end;
 
-
-
   { TMotorTestSheet }
 
   TMotorTestSheet = class (TObject)
@@ -556,14 +555,10 @@ type
 
   { TBeforeTestSheet }
 
-  TBeforeTestSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
+  TBeforeTestSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   public
-    constructor Create(const AGrid: TsWorksheetGrid);
-    destructor  Destroy; override;
     procedure Draw(const ABuildDates: TDateVector;
                    const AMotorNames, AMotorNums: TStrVector;
                    const ATotalMotorNames: TStrVector;
@@ -575,15 +570,10 @@ type
 
   { TCargoSheet }
 
-  TCargoSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
+  TCargoSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   public
-    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid = nil);
-    destructor  Destroy; override;
-    procedure Zoom(const APercents: Integer);
     procedure Draw(const ASendDate: TDate; const AReceiverName: String;
                    const AMotorNames: TStrVector; const AMotorsCount: TIntVector;
                    const AMotorNums, ASeries: TStrMatrix);
@@ -591,14 +581,10 @@ type
 
   { TRepairSheet }
 
-  TRepairSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
+  TRepairSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   public
-    constructor Create(const ASheet: TsWorksheet);
-    destructor  Destroy; override;
     procedure Draw(const APassports, ADayCounts: TIntVector;
                    const AMotorNames, AMotorNums: TStrVector;
                    const AArrivalDates, ASendingDates: TDateVector);
@@ -606,28 +592,19 @@ type
 
   { TControlSheet }
 
-  TControlSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
+  TControlSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   public
-    constructor Create(const ASheet: TsWorksheet);
-    destructor  Destroy; override;
     procedure Draw(const AMotorNames, AMotorNums, ASeries, ANotes: TStrVector);
   end;
 
   { TMotorCardSheet }
 
-  TMotorCardSheet = class (TObject)
-  private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
+  TMotorCardSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   public
-    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid = nil);
-    destructor  Destroy; override;
-    procedure Zoom(const APercents: Integer);
     procedure Draw(const ABuildDate, ASendDate: TDate;
       const AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName, AControlNote: String;
       const ATestDates: TDateVector;
@@ -644,12 +621,10 @@ type
 
   { TReclamationSheet }
 
-  TReclamationSheet = class (TObject)
+  TReclamationSheet = class (TCustomSheet)
+  protected
+    function SetWidths: TIntVector; override;
   private
-    FWriter: TSheetWriter;
-    FFontName: String;
-    FFontSize: Single;
-
     FRecDates, FBuildDates, FArrivalDates, FSendingDates: TDateVector;
     FMileages, FOpinions, FReasonColors: TIntVector;
     FPlaceNames, FFactoryNames, FDepartures: TStrVector;
@@ -658,9 +633,6 @@ type
 
     procedure DrawTitle;
   public
-    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid = nil);
-    destructor  Destroy; override;
-    procedure Zoom(const APercents: Integer);
     procedure DrawLine(const AIndex: Integer; const ASelected: Boolean);
     procedure Draw(const ARecDates, ABuildDates, AArrivalDates, ASendingDates: TDateVector;
                    const AMileages, AOpinions, AReasonColors: TIntVector;
@@ -921,12 +893,12 @@ end;
 { TLogTable }
 
 constructor TLogTable.Create(const AGrid: TsWorksheetGrid;
-  const AOnSelect: TSheetEvent);
+  const AOnSelect: TSheetEvent; const AFont: TFont);
 begin
   inherited Create(AGrid);
-  SetFontsName(SHEET_FONT_NAME);
-  SetFontsSize(SHEET_FONT_SIZE);
-  RowBeforeFont.Size:= SHEET_FONT_SIZE + 2;
+  SetFontsName(AFont.Name);
+  SetFontsSize(AFont.Size);
+  RowBeforeFont.Size:= AFont.Size + 2;
   RowBeforeFont.Style:= [fsBold];
   HeaderFont.Style:= [fsBold];
   RowAfterFont.Style:= [fsBold];
@@ -935,9 +907,9 @@ end;
 
 { TCargoPackingSheet }
 
-constructor TCargoPackingSheet.Create(const AGrid: TsWorksheetGrid);
+constructor TCargoPackingSheet.Create(const AGrid: TsWorksheetGrid; const AFont: TFont);
 begin
-  inherited Create(AGrid, nil);
+  inherited Create(AGrid, nil, AFont);
   CanSelect:= False;
   AddColumn('№ п/п', 70);
   AddColumn('Наименование', 350);
@@ -962,9 +934,9 @@ end;
 { TTestLogTable }
 
 constructor TTestLogTable.Create(const AGrid: TsWorksheetGrid;
-  const AOnSelect: TSheetEvent);
+  const AOnSelect: TSheetEvent; const AFont: TFont);
 begin
-  inherited Create(AGrid, AOnSelect);
+  inherited Create(AGrid, AOnSelect, AFont);
   AddColumn('№ п/п', 50);
   AddColumn('Наименование двигателя', 300);
   AddColumn('Номер двигателя', 150);
@@ -1008,9 +980,9 @@ end;
 { TBuildLogTable }
 
 constructor TBuildLogTable.Create(const AGrid: TsWorksheetGrid;
-  const AOnSelect: TSheetEvent);
+  const AOnSelect: TSheetEvent; const AFont: TFont);
 begin
-  inherited Create(AGrid, AOnSelect);
+  inherited Create(AGrid, AOnSelect, AFont);
   AddColumn('№ п/п', 50);
   AddColumn('Наименование двигателя', 300);
   AddColumn('Номер двигателя', 150);
@@ -3371,27 +3343,15 @@ end;
 
 { TControlSheet }
 
-constructor TControlSheet.Create(const ASheet: TsWorksheet);
-var
-  ColWidths: TIntVector;
+function TControlSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     60,   //№п/п
     300,  // Наименование
     150,  // Номер
     100,  // Партия
     500   // Примечание
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, ASheet, nil);
-end;
-
-destructor TControlSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
 end;
 
 procedure TControlSheet.Draw(const AMotorNames, AMotorNums, ASeries, ANotes: TStrVector);
@@ -3399,51 +3359,46 @@ var
   R, i: Integer;
   S: String;
 begin
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   R:= 1;
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetAlignment(haCenter, vaCenter);
   S:= 'Электродвигатели на контроле';
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
 
   R:=R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, '№п/п', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Партия', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, 'Примечание', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.WriteText(R, 1, '№п/п', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Партия', cbtOuter, True, True);
+  Writer.WriteText(R, 5, 'Примечание', cbtOuter, True, True);
 
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
   for i:= 0 to High(AMotorNums) do
   begin
     R:=R + 1;
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 1, i+1, cbtOuter);
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
-    FWriter.WriteText(R, 4, ASeries[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 5, ANotes[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteNumber(R, 1, i+1, cbtOuter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
+    Writer.WriteText(R, 4, ASeries[i], cbtOuter, True, True);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 5, ANotes[i], cbtOuter, True, True);
   end;
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TRepairSheet }
 
-constructor TRepairSheet.Create(const ASheet: TsWorksheet);
-var
-  ColWidths: TIntVector;
+function TRepairSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     60,   //№п/п
     300,  // Наименование
     150,  // Номер
@@ -3452,13 +3407,6 @@ begin
     150,  // Убыл из ремонта
     130   // Срок ремонта (дней)
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, ASheet, nil);
-end;
-
-destructor TRepairSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
 end;
 
 procedure TRepairSheet.Draw(const APassports, ADayCounts: TIntVector;
@@ -3468,54 +3416,51 @@ var
   R, i: Integer;
   S: String;
 begin
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   R:= 1;
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetAlignment(haCenter, vaCenter);
   S:= 'Гарантийный ремонт электродвигателей';
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
 
   R:=R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, '№п/п', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Наличие паспорта', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, 'Прибыл в ремонт', cbtOuter, True, True);
-  FWriter.WriteText(R, 6, 'Убыл из ремонта', cbtOuter, True, True);
-  FWriter.WriteText(R, 7, 'Срок ремонта (рабочих дней)', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.WriteText(R, 1, '№п/п', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Наличие паспорта', cbtOuter, True, True);
+  Writer.WriteText(R, 5, 'Прибыл в ремонт', cbtOuter, True, True);
+  Writer.WriteText(R, 6, 'Убыл из ремонта', cbtOuter, True, True);
+  Writer.WriteText(R, 7, 'Срок ремонта (рабочих дней)', cbtOuter, True, True);
 
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
   for i:= 0 to High(AMotorNums) do
   begin
     R:=R + 1;
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 1, i+1, cbtOuter);
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteNumber(R, 1, i+1, cbtOuter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 2, AMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteText(R, 3, AMotorNums[i], cbtOuter, True, True);
     S:= EmptyStr;
     if APassports[i]>0 then S:= CHECK_SYMBOL;
-    FWriter.WriteText(R, 4, S, cbtOuter);
-    FWriter.WriteDate(R, 5, AArrivalDates[i], cbtOuter);
+    Writer.WriteText(R, 4, S, cbtOuter);
+    Writer.WriteDate(R, 5, AArrivalDates[i], cbtOuter);
     if ASendingDates[i]>0 then
-      FWriter.WriteDate(R, 6, ASendingDates[i], cbtOuter)
+      Writer.WriteDate(R, 6, ASendingDates[i], cbtOuter)
     else
-      FWriter.WriteText(R, 6, EmptyStr, cbtOuter);
+      Writer.WriteText(R, 6, EmptyStr, cbtOuter);
     if ADayCounts[i]>0 then
-      FWriter.WriteNumber(R, 7, ADayCounts[i], cbtOuter)
+      Writer.WriteNumber(R, 7, ADayCounts[i], cbtOuter)
     else
-      FWriter.WriteText(R, 7, EmptyStr, cbtOuter);
+      Writer.WriteText(R, 7, EmptyStr, cbtOuter);
   end;
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
-
-
-
 
 { TReportShipmentSheet }
 
@@ -3677,26 +3622,14 @@ end;
 
 { TBeforeTestSheet }
 
-constructor TBeforeTestSheet.Create(const AGrid: TsWorksheetGrid);
-var
-  ColWidths: TIntVector;
+function TBeforeTestSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     150, // Дата сборки
     300, // Наименование двигателя
     200, // Номер двигателя
     300  // Примечание
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AGrid.Worksheet, AGrid);
-end;
-
-destructor TBeforeTestSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
 end;
 
 procedure TBeforeTestSheet.Draw(const ABuildDates: TDateVector;
@@ -3709,47 +3642,47 @@ var
   R, N, i, j, FrozenCount: Integer;
   S: String;
 begin
-  FWriter.Clear;
+  Writer.Clear;
   if VIsNil(ABuildDates) then Exit;
 
-  FWriter.BeginEdit;
-  FWriter.SetBackgroundClear;
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
 
   //Заголовок отчета
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, 4, 'На испытаниях', cbtNone, True, True);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, 4, 'На испытаниях', cbtNone, True, True);
   //Таблица сводная: наименование/количество
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Количество', cbtOuter, True, True);
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Количество', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
   for i:= 0 to High(ATotalMotorNames) do
   begin
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 3, ATotalMotorCounts[i], cbtOuter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 1, R, 2, ATotalMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteNumber(R, 3, ATotalMotorCounts[i], cbtOuter);
   end;
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteNumber(R, 3, VSum(ATotalMotorCounts), cbtOuter);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, 2, 'ИТОГО', cbtOuter, True, True);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteNumber(R, 3, VSum(ATotalMotorCounts), cbtOuter);
 
   //Таблица пономерная
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Дата сборки', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Испытания', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Дата сборки', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наименование двигателя', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер двигателя', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Испытания', cbtOuter, True, True);
 
   FrozenCount:= R;
 
@@ -3759,76 +3692,58 @@ begin
     N:= 0;
     if not VIsNil(ATestDates[i]) then
       N:= High(ATestDates[i]);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
-    FWriter.WriteDate(R, 1, R+N, 1, ABuildDates[i], cbtOuter);
-    FWriter.WriteText(R, 2, R+N, 2, AMotorNames[i], cbtOuter, True, True);
-    FWriter.WriteText(R, 3, R+N, 3, AMotorNums[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haLeft, vaCenter);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
+    Writer.WriteDate(R, 1, R+N, 1, ABuildDates[i], cbtOuter);
+    Writer.WriteText(R, 2, R+N, 2, AMotorNames[i], cbtOuter, True, True);
+    Writer.WriteText(R, 3, R+N, 3, AMotorNums[i], cbtOuter, True, True);
+    Writer.SetAlignment(haLeft, vaCenter);
     if VIsNil(ATestDates[i]) then
-      FWriter.WriteText(R, 4, R+N, 4, 'Не проводились', cbtOuter, True, True)
+      Writer.WriteText(R, 4, R+N, 4, 'Не проводились', cbtOuter, True, True)
     else begin
       for j:= 0 to High(ATestDates[i]) do
       begin
         if ATestFails[i][j]=0 then
         begin
-          FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
+          Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
           S:= ' - норма';
         end
         else begin
-          FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clRed);
+          Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clRed);
           S:= ' - брак';
         end;
         S:= FormatDateTime('dd.mm.yyyy', ATestDates[i][j]) + S;
         if ATestNotes[i][j]<>EmptyStr then
           S:= S + ' (' + ATestNotes[i][j] + ')';
-        FWriter.WriteText(R+j, 4, S, cbtOuter, True, True);
+        Writer.WriteText(R+j, 4, S, cbtOuter, True, True);
       end;
     end;
     R:= R + N;
   end;
 
-  FWriter.SetFrozenRows(FrozenCount);
-  FWriter.SetRepeatedRows(FrozenCount,FrozenCount);
+  Writer.SetFrozenRows(FrozenCount);
+  Writer.SetRepeatedRows(FrozenCount,FrozenCount);
   if R>FrozenCount then
-    FWriter.DrawBorders(FrozenCount+1, 1, R, FWriter.ColCount, cbtAll);
+    Writer.DrawBorders(FrozenCount+1, 1, R, Writer.ColCount, cbtAll);
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TMotorCardSheet }
 
-constructor TMotorCardSheet.Create(const AWorksheet: TsWorksheet;
-                                   const AGrid: TsWorksheetGrid = nil);
-var
-  ColWidths: TIntVector;
+function TMotorCardSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     130, // Дата уведомления
     130, // Пробег, км
     130, // Предприятие
     130, // Завод
     130, // Выезд/ФИО
     130, // Неисправный элемент
-    130,  // Причина неисправности
+    130, // Причина неисправности
     70,  //Особое мнение
     350  //Примечание
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AWorksheet, AGrid);
-end;
-
-destructor TMotorCardSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
-end;
-
-procedure TMotorCardSheet.Zoom(const APercents: Integer);
-begin
-  FWriter.SetZoom(APercents);
 end;
 
 procedure TMotorCardSheet.Draw(const ABuildDate, ASendDate: TDate;
@@ -3847,57 +3762,57 @@ var
   R, i: Integer;
   S: String;
 begin
-  FWriter.BeginEdit;
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.BeginEdit;
+  Writer.SetAlignment(haCenter, vaCenter);
 
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'УЧЁТНАЯ КАРТОЧКА ЭЛЕКТРОДВИГАТЕЛЯ');
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, Writer.ColCount,  'УЧЁТНАЯ КАРТОЧКА ЭЛЕКТРОДВИГАТЕЛЯ');
 
   R:= R + 1;
-  FWriter.WriteText(R, 1,  EmptyStr);
-  FWriter.SetRowHeight(R, 10);
+  Writer.WriteText(R, 1,  EmptyStr);
+  Writer.SetRowHeight(R, 10);
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, 2,  'Наименование', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Номер', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Партия', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, 'Дата сборки', cbtOuter, True, True);
-  FWriter.WriteText(R, 6, 'Ротор', cbtOuter, True, True);
-  FWriter.WriteText(R, 7, R, FWriter.ColCount,  'Отгружен', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, 2,  'Наименование', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Номер', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Партия', cbtOuter, True, True);
+  Writer.WriteText(R, 5, 'Дата сборки', cbtOuter, True, True);
+  Writer.WriteText(R, 6, 'Ротор', cbtOuter, True, True);
+  Writer.WriteText(R, 7, R, Writer.ColCount,  'Отгружен', cbtOuter, True, True);
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
-  FWriter.WriteText(R, 1, R, 2,  AMotorName, cbtOuter, True, True);
-  FWriter.WriteText(R, 3, AMotorNum, cbtOuter, True, True);
-  FWriter.WriteText(R, 4, ASeries, cbtOuter, True, True);
-  FWriter.WriteDate(R, 5, ABuildDate, cbtOuter);
-  FWriter.WriteText(R, 6, ARotorNum, cbtOuter, True, True);
-  FWriter.SetAlignment(haLeft, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
+  Writer.WriteText(R, 1, R, 2,  AMotorName, cbtOuter, True, True);
+  Writer.WriteText(R, 3, AMotorNum, cbtOuter, True, True);
+  Writer.WriteText(R, 4, ASeries, cbtOuter, True, True);
+  Writer.WriteDate(R, 5, ABuildDate, cbtOuter);
+  Writer.WriteText(R, 6, ARotorNum, cbtOuter, True, True);
+  Writer.SetAlignment(haLeft, vaCenter);
   S:= EmptyStr;
   if AReceiverName<>EmptyStr then
     S:= FormatDateTime('dd.mm.yyyy', ASendDate) + ' - ' + AReceiverName;
-  FWriter.WriteText(R, 7, R, FWriter.ColCount,  S, cbtOuter, True, True);
+  Writer.WriteText(R, 7, R, Writer.ColCount,  S, cbtOuter, True, True);
 
   R:= R + 1;
-  FWriter.WriteText(R, 1,  EmptyStr);
-  FWriter.SetRowHeight(R, 10);
+  Writer.WriteText(R, 1,  EmptyStr);
+  Writer.SetRowHeight(R, 10);
   R:= R + 1;
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Приемо-сдаточные испытания:');
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+1, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, Writer.ColCount,  'Приемо-сдаточные испытания:');
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Дата', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Результат', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, R, FWriter.ColCount, 'Примечание', cbtOuter, True, True);
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Дата', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Результат', cbtOuter, True, True);
+  Writer.WriteText(R, 3, R, Writer.ColCount, 'Примечание', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
   if VIsNil(ATestDates) then
   begin
     R:= R + 1;
-    FWriter.WriteText(R, 1, EmptyStr, cbtOuter);
-    FWriter.WriteText(R, 2, EmptyStr, cbtOuter, True, True);
-    FWriter.WriteText(R, 3, R, FWriter.ColCount, EmptyStr, cbtOuter, True, True);
+    Writer.WriteText(R, 1, EmptyStr, cbtOuter);
+    Writer.WriteText(R, 2, EmptyStr, cbtOuter, True, True);
+    Writer.WriteText(R, 3, R, Writer.ColCount, EmptyStr, cbtOuter, True, True);
   end
   else begin
     for i:= 0 to High(ATestDates) do
@@ -3907,123 +3822,123 @@ begin
         S:= 'норма'
       else
         S:= 'брак';
-      FWriter.SetAlignment(haCenter, vaCenter);
-      FWriter.WriteDate(R, 1, ATestDates[i], cbtOuter);
-      FWriter.WriteText(R, 2, S, cbtOuter, True, True);
-      FWriter.SetAlignment(haLeft, vaCenter);
-      FWriter.WriteText(R, 3, R, FWriter.ColCount, ATestNotes[i], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaCenter);
+      Writer.WriteDate(R, 1, ATestDates[i], cbtOuter);
+      Writer.WriteText(R, 2, S, cbtOuter, True, True);
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.WriteText(R, 3, R, Writer.ColCount, ATestNotes[i], cbtOuter, True, True);
     end;
   end;
 
   R:= R + 1;
-  FWriter.WriteText(R, 1,  EmptyStr);
-  FWriter.SetRowHeight(R, 10);
+  Writer.WriteText(R, 1,  EmptyStr);
+  Writer.SetRowHeight(R, 10);
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Контроль:');
+  Writer.SetFont(Font.Name, Font.Size+1, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, Writer.ColCount,  'Контроль:');
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount,  AControlNote, cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
+  Writer.WriteText(R, 1, R, Writer.ColCount,  AControlNote, cbtOuter, True, True);
 
   R:= R + 1;
-  FWriter.WriteText(R, 1,  EmptyStr);
-  FWriter.SetRowHeight(R, 10);
+  Writer.WriteText(R, 1,  EmptyStr);
+  Writer.SetRowHeight(R, 10);
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Рекламации:');
+  Writer.SetFont(Font.Name, Font.Size+1, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, Writer.ColCount,  'Рекламации:');
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Дата уведомления', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Пробег, км', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Предприятие', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Завод', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, 'Выезд', cbtOuter, True, True);
-  FWriter.WriteText(R, 6, 'Неисправный элемент', cbtOuter, True, True);
-  FWriter.WriteText(R, 7, 'Причина неисправности', cbtOuter, True, True);
-  FWriter.WriteText(R, 8, 'Особое мнение', cbtOuter, True, True);
-  FWriter.WriteText(R, 9, 'Примечание', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Дата уведомления', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Пробег, км', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Предприятие', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Завод', cbtOuter, True, True);
+  Writer.WriteText(R, 5, 'Выезд', cbtOuter, True, True);
+  Writer.WriteText(R, 6, 'Неисправный элемент', cbtOuter, True, True);
+  Writer.WriteText(R, 7, 'Причина неисправности', cbtOuter, True, True);
+  Writer.WriteText(R, 8, 'Особое мнение', cbtOuter, True, True);
+  Writer.WriteText(R, 9, 'Примечание', cbtOuter, True, True);
 
 
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
   if VIsNil(ARecDates) then
   begin
     R:= R + 1;
     for i:= 1 to 9 do
-      FWriter.WriteText(R, i, EmptyStr, cbtOuter);
+      Writer.WriteText(R, i, EmptyStr, cbtOuter);
   end
   else begin
     for i:= 0 to High(ARecDates) do
     begin
       R:= R + 1;
-      FWriter.SetAlignment(haCenter, vaTop);
-      FWriter.WriteDate(R, 1, ARecDates[i], cbtOuter);
+      Writer.SetAlignment(haCenter, vaTop);
+      Writer.WriteDate(R, 1, ARecDates[i], cbtOuter);
       if AMileages[i]>=0 then
-        FWriter.WriteNumber(R, 2, AMileages[i], cbtOuter)
+        Writer.WriteNumber(R, 2, AMileages[i], cbtOuter)
       else
-        FWriter.WriteText(R, 2, EmptyStr, cbtOuter);
-      FWriter.WriteText(R, 3, APlaceNames[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 4, AFactoryNames[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 5, ADepartures[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 6, ADefectNames[i], cbtOuter, True, True);
-      FWriter.WriteText(R, 7, AReasonNames[i], cbtOuter, True, True);
+        Writer.WriteText(R, 2, EmptyStr, cbtOuter);
+      Writer.WriteText(R, 3, APlaceNames[i], cbtOuter, True, True);
+      Writer.WriteText(R, 4, AFactoryNames[i], cbtOuter, True, True);
+      Writer.WriteText(R, 5, ADepartures[i], cbtOuter, True, True);
+      Writer.WriteText(R, 6, ADefectNames[i], cbtOuter, True, True);
+      Writer.WriteText(R, 7, AReasonNames[i], cbtOuter, True, True);
       S:= EmptyStr;
       if AOpinions[i]=1 then S:= CHECK_SYMBOL;
-      FWriter.WriteText(R, 8, S, cbtOuter);
-      FWriter.SetAlignment(haLeft, vaTop);
-      FWriter.WriteText(R, 9, ARecNotes[i], cbtOuter, True, True);
+      Writer.WriteText(R, 8, S, cbtOuter);
+      Writer.SetAlignment(haLeft, vaTop);
+      Writer.WriteText(R, 9, ARecNotes[i], cbtOuter, True, True);
     end;
   end;
 
 
   R:= R + 1;
-  FWriter.WriteText(R, 1,  EmptyStr);
-  FWriter.SetRowHeight(R, 10);
+  Writer.WriteText(R, 1,  EmptyStr);
+  Writer.SetRowHeight(R, 10);
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize+1, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, R, FWriter.ColCount,  'Гарантийный ремонт:');
+  Writer.SetFont(Font.Name, Font.Size+1, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, R, Writer.ColCount,  'Гарантийный ремонт:');
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Дата прибытия', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Наличие паспорта', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Дата убытия', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Срок ремонта (рабочих дней)', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, R, FWriter.ColCount,  'Примечание', cbtOuter, True, True);
-  FWriter.SetFont(FFontName, FFontSize, [], clBlack);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Дата прибытия', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Наличие паспорта', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Дата убытия', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Срок ремонта (рабочих дней)', cbtOuter, True, True);
+  Writer.WriteText(R, 5, R, Writer.ColCount,  'Примечание', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
   if VIsNil(AArrivalDates) then
   begin
     R:= R + 1;
-    FWriter.WriteText(R, 1, EmptyStr);
-    FWriter.WriteText(R, 2, EmptyStr);
-    FWriter.WriteText(R, 3, EmptyStr);
-    FWriter.WriteText(R, 4, EmptyStr);
-    FWriter.WriteText(R, 5, R, FWriter.ColCount,  EmptyStr);
+    Writer.WriteText(R, 1, EmptyStr);
+    Writer.WriteText(R, 2, EmptyStr);
+    Writer.WriteText(R, 3, EmptyStr);
+    Writer.WriteText(R, 4, EmptyStr);
+    Writer.WriteText(R, 5, R, Writer.ColCount,  EmptyStr);
   end
   else begin
     for i:= 0 to High(AArrivalDates) do
     begin
       R:= R + 1;
-      FWriter.SetAlignment(haCenter, vaTop);
-      FWriter.WriteDate(R, 1, AArrivalDates[i], cbtOuter);
+      Writer.SetAlignment(haCenter, vaTop);
+      Writer.WriteDate(R, 1, AArrivalDates[i], cbtOuter);
       S:= EmptyStr;
       if APassports[i]>0 then
         S:= CHECK_SYMBOL;
-      FWriter.WriteText(R, 2, S, cbtOuter);
+      Writer.WriteText(R, 2, S, cbtOuter);
       if ASendingDates[i]>0 then
-        FWriter.WriteDate(R, 3, ASendingDates[i], cbtOuter)
+        Writer.WriteDate(R, 3, ASendingDates[i], cbtOuter)
       else
-        FWriter.WriteText(R, 3, EmptyStr, cbtOuter);
-      FWriter.WriteNumber(R, 4, AWorkDayCounts[i], cbtOuter);
-      FWriter.SetAlignment(haLeft, vaTop);
-      FWriter.WriteText(R, 5, R, FWriter.ColCount,  ARepairNotes[i], cbtOuter, True, True);
+        Writer.WriteText(R, 3, EmptyStr, cbtOuter);
+      Writer.WriteNumber(R, 4, AWorkDayCounts[i], cbtOuter);
+      Writer.SetAlignment(haLeft, vaTop);
+      Writer.WriteText(R, 5, R, Writer.ColCount,  ARepairNotes[i], cbtOuter, True, True);
     end;
   end;
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TStoreSheet }
@@ -4520,51 +4435,17 @@ end;
 
 { TReclamationSheet }
 
-procedure TReclamationSheet.DrawTitle;
-var
-  R: Integer;
+function TReclamationSheet.SetWidths: TIntVector;
 begin
-  R:= 1;
-  FWriter.SetBackgroundClear;
-  //FWriter.SetBackground(COLOR_BACKGROUND_TITLE);
-
-  FWriter.SetFont(FFontName, FFontSize, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-
-  FWriter.WriteText(R, 1, '№ п/п', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Дата уведомления', cbtOuter, True, True);
-  FWriter.WriteText(R, 3, 'Двигатель', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Номер', cbtOuter, True, True);
-  FWriter.WriteText(R, 5, 'Дата сборки', cbtOuter, True, True);
-  FWriter.WriteText(R, 6, 'Пробег, км', cbtOuter, True, True);
-  FWriter.WriteText(R, 7, 'Предприятие', cbtOuter, True, True);
-  FWriter.WriteText(R, 8, 'Завод', cbtOuter, True, True);
-  FWriter.WriteText(R, 9, 'Выезд', cbtOuter, True, True);
-  FWriter.WriteText(R, 10, 'Неисправный элемент', cbtOuter, True, True);
-  FWriter.WriteText(R, 11, 'Причина неисправности', cbtOuter, True, True);
-  FWriter.WriteText(R, 12, 'Особое мнение', cbtOuter, True, True);
-  FWriter.WriteText(R, 13, 'Примечание', cbtOuter, True, True);
-  FWriter.WriteText(R, 14, 'Прибыл в ремонт', cbtOuter, True, True);
-  FWriter.WriteText(R, 15, 'Убыл из ремонта', cbtOuter, True, True);
-end;
-
-constructor TReclamationSheet.Create(const AWorksheet: TsWorksheet;
-  const AGrid: TsWorksheetGrid);
-var
-  ColWidths: TIntVector;
-begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE - 1;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     30,  //№п/п
     85,  // Дата уведомления
-    150, // Наименование двигателя
+    160, // Наименование двигателя
     60,  // Номер двигателя
     80,  // Дата сборки
     80,  // Пробег, км
     110, // Предприятие
-    110,  // Завод
+    110, // Завод
     110, // Выезд/ФИО
     120, // Неисправный элемент
     120, // Причина неисправности
@@ -4573,19 +4454,34 @@ begin
     80,  //Прибыл в ремонт
     80   // Убыл из ремонта
   ]);
-
-  FWriter:= TSheetWriter.Create(ColWidths, AWorksheet, AGrid);
 end;
 
-destructor TReclamationSheet.Destroy;
+procedure TReclamationSheet.DrawTitle;
+var
+  R: Integer;
 begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
-end;
+  R:= 1;
+  Writer.SetBackgroundClear;
+  //Writer.SetBackground(COLOR_BACKGROUND_TITLE);
 
-procedure TReclamationSheet.Zoom(const APercents: Integer);
-begin
-  FWriter.SetZoom(APercents);
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+
+  Writer.WriteText(R, 1, '№ п/п', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Дата уведомления', cbtOuter, True, True);
+  Writer.WriteText(R, 3, 'Двигатель', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Номер', cbtOuter, True, True);
+  Writer.WriteText(R, 5, 'Дата сборки', cbtOuter, True, True);
+  Writer.WriteText(R, 6, 'Пробег, км', cbtOuter, True, True);
+  Writer.WriteText(R, 7, 'Предприятие', cbtOuter, True, True);
+  Writer.WriteText(R, 8, 'Завод', cbtOuter, True, True);
+  Writer.WriteText(R, 9, 'Выезд', cbtOuter, True, True);
+  Writer.WriteText(R, 10, 'Неисправный элемент', cbtOuter, True, True);
+  Writer.WriteText(R, 11, 'Причина неисправности', cbtOuter, True, True);
+  Writer.WriteText(R, 12, 'Особое мнение', cbtOuter, True, True);
+  Writer.WriteText(R, 13, 'Примечание', cbtOuter, True, True);
+  Writer.WriteText(R, 14, 'Прибыл в ремонт', cbtOuter, True, True);
+  Writer.WriteText(R, 15, 'Убыл из ремонта', cbtOuter, True, True);
 end;
 
 procedure TReclamationSheet.DrawLine(const AIndex: Integer; const ASelected: Boolean);
@@ -4595,55 +4491,52 @@ var
 begin
   R:= 2 + AIndex;
 
-  FWriter.SetAlignment(haCenter, vaTop);
-  FWriter.SetBackground(FReasonColors[AIndex]);
-  FWriter.WriteNumber(R, 1, AIndex+1, cbtOuter);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
+  Writer.SetAlignment(haCenter, vaTop);
+  Writer.SetBackground(FReasonColors[AIndex]);
+
+  Writer.WriteNumber(R, 1, AIndex+1, cbtOuter);
 
   if ASelected then
-  begin
-    FWriter.SetBackground(DefaultSelectionBGColor);
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
-  end
-  else begin
-    FWriter.SetBackgroundClear;
-    FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
-  end;
-
-  FWriter.WriteDate(R, 2, FRecDates[AIndex], cbtOuter);
-  FWriter.SetAlignment(haLeft, vaTop);
-  FWriter.WriteText(R, 3, FMotorNames[AIndex], cbtOuter);
-  FWriter.SetAlignment(haCenter, vaTop);
-  FWriter.WriteText(R, 4, FMotorNums[AIndex], cbtOuter);
-  FWriter.WriteDate(R, 5, FBuildDates[AIndex], cbtOuter);
-  if FMileages[AIndex]>=0 then
-    FWriter.WriteNumber(R, 6, FMileages[AIndex], cbtOuter)
+    Writer.SetBackground(DefaultSelectionBGColor)
   else
-    FWriter.WriteText(R, 6, EmptyStr, cbtOuter);
-  FWriter.WriteText(R, 7, FPlaceNames[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 8, FFactoryNames[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 9, FDepartures[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 10, FDefectNames[AIndex], cbtOuter, True, True);
-  FWriter.WriteText(R, 11, FReasonNames[AIndex], cbtOuter, True, True);
+    Writer.SetBackgroundClear;
 
-  FWriter.SetFont(FFontName, FFontSize+3, [fsBold], clBlack);
+  Writer.WriteDate(R, 2, FRecDates[AIndex], cbtOuter);
+  Writer.SetAlignment(haLeft, vaTop);
+  Writer.WriteText(R, 3, FMotorNames[AIndex], cbtOuter);
+  Writer.SetAlignment(haCenter, vaTop);
+  Writer.WriteText(R, 4, FMotorNums[AIndex], cbtOuter);
+  Writer.WriteDate(R, 5, FBuildDates[AIndex], cbtOuter);
+  if FMileages[AIndex]>=0 then
+    Writer.WriteNumber(R, 6, FMileages[AIndex], cbtOuter)
+  else
+    Writer.WriteText(R, 6, EmptyStr, cbtOuter);
+  Writer.WriteText(R, 7, FPlaceNames[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 8, FFactoryNames[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 9, FDepartures[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 10, FDefectNames[AIndex], cbtOuter, True, True);
+  Writer.WriteText(R, 11, FReasonNames[AIndex], cbtOuter, True, True);
+
+  Writer.SetFont(Font.Name, Font.Size+3, [fsBold], clBlack);
   S:= EmptyStr;
   if FOpinions[AIndex]=1 then S:= CHECK_SYMBOL;
-  FWriter.WriteText(R, 12, S, cbtOuter);
+  Writer.WriteText(R, 12, S, cbtOuter);
 
-  FWriter.SetFont(FFontName, FFontSize, [{fsBold}], clBlack);
-  FWriter.SetAlignment(haLeft, vaTop);
-  FWriter.WriteText(R, 13, FRecNotes[AIndex], cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size, [{fsBold}], clBlack);
+  Writer.SetAlignment(haLeft, vaTop);
+  Writer.WriteText(R, 13, FRecNotes[AIndex], cbtOuter, True, True);
 
-  FWriter.SetAlignment(haCenter, vaTop);
+  Writer.SetAlignment(haCenter, vaTop);
   if FArrivalDates[AIndex]=0 then
-    FWriter.WriteText(R, 14, EmptyStr, cbtOuter, True, True)
+    Writer.WriteText(R, 14, EmptyStr, cbtOuter, True, True)
   else
-    FWriter.WriteDate(R, 14, FArrivalDates[AIndex], cbtOuter);
+    Writer.WriteDate(R, 14, FArrivalDates[AIndex], cbtOuter);
 
   if FSendingDates[AIndex]=0 then
-    FWriter.WriteText(R, 15, EmptyStr, cbtOuter, True, True)
+    Writer.WriteText(R, 15, EmptyStr, cbtOuter, True, True)
   else
-    FWriter.WriteDate(R, 15, FSendingDates[AIndex], cbtOuter);
+    Writer.WriteDate(R, 15, FSendingDates[AIndex], cbtOuter);
 end;
 
 procedure TReclamationSheet.Draw(const ARecDates, ABuildDates,
@@ -4655,7 +4548,7 @@ procedure TReclamationSheet.Draw(const ARecDates, ABuildDates,
 var
   i: Integer;
 begin
-  FWriter.BeginEdit;
+  Writer.BeginEdit;
 
   FRecDates:= ARecDates;
   FBuildDates:= ABuildDates;
@@ -4679,41 +4572,23 @@ begin
 
   for i:= 0 to High(FRecDates) do
     DrawLine(i, False);
-  FWriter.SetBackgroundClear;
-  FWriter.SetFrozenRows(1);
-  FWriter.SetRepeatedRows(1,1);
+  Writer.SetBackgroundClear;
+  Writer.SetFrozenRows(1);
+  Writer.SetRepeatedRows(1,1);
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 { TCargoSheet }
 
-constructor TCargoSheet.Create(const AWorksheet: TsWorksheet;
-                               const AGrid: TsWorksheetGrid = nil);
-var
-  ColWidths: TIntVector;
+function TCargoSheet.SetWidths: TIntVector;
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
-
-  ColWidths:= VCreateInt([
+  Result:= VCreateInt([
     300, // Наименование
     130, // Количество      номера
     100, //                 номера
     100  // Номер партии
   ]);
-  FWriter:= TSheetWriter.Create(ColWidths, AWorksheet, AGrid);
-end;
-
-destructor TCargoSheet.Destroy;
-begin
-  if Assigned(FWriter) then FreeAndNil(FWriter);
-  inherited Destroy;
-end;
-
-procedure TCargoSheet.Zoom(const APercents: Integer);
-begin
-  FWriter.SetZoom(APercents);
 end;
 
 procedure TCargoSheet.Draw(const ASendDate: TDate; const AReceiverName: String;
@@ -4723,71 +4598,71 @@ var
   R, RR, i, j: Integer;
   S: String;
 const
-  FONT_SIZE_DELTA = 1;
+  FONT_SIZE_DELTA = 0;
 begin
-  FWriter.BeginEdit;
+  Writer.BeginEdit;
 
   //Заголовок
   R:= 1;
-  FWriter.SetFont(FFontName, FFontSize+3, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
   S:= FormatDateTime('dd.mm.yyyy', ASendDate) +
       ' Отгрузка в ' + AReceiverName;
-  FWriter.WriteText(R, 1, R, 4, S, cbtNone, True, True);
+  Writer.WriteText(R, 1, R, 4, S, cbtNone, True, True);
 
   //наименование + количество
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize+FONT_SIZE_DELTA, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Наименование двигателей', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, 'Количество', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size+FONT_SIZE_DELTA, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Наименование двигателей', cbtOuter, True, True);
+  Writer.WriteText(R, 2, 'Количество', cbtOuter, True, True);
 
-  FWriter.SetFont(FFontName, FFontSize+FONT_SIZE_DELTA, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size+FONT_SIZE_DELTA, [{fsBold}], clBlack);
   for i:= 0 to High(AMotorNames) do
   begin
     R:= R + 1;
-    FWriter.SetAlignment(haLeft, vaCenter);
-    FWriter.WriteText(R, 1, AMotorNames[i], cbtOuter, True, True);
-    FWriter.SetAlignment(haCenter, vaCenter);
-    FWriter.WriteNumber(R, 2, AMotorsCount[i], cbtOuter);
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.WriteText(R, 1, AMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haCenter, vaCenter);
+    Writer.WriteNumber(R, 2, AMotorsCount[i], cbtOuter);
   end;
   R:= R + 1;
-  FWriter.SetFont(FFontName, FFontSize+FONT_SIZE_DELTA, [fsBold], clBlack);
-  FWriter.SetAlignment(haLeft, vaCenter);
-  FWriter.WriteText(R, 1, 'ИТОГО', cbtOuter, True, True);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteNumber(R, 2, VSum(AMotorsCount), cbtOuter);
+  Writer.SetFont(Font.Name, Font.Size+FONT_SIZE_DELTA, [fsBold], clBlack);
+  Writer.SetAlignment(haLeft, vaCenter);
+  Writer.WriteText(R, 1, 'ИТОГО', cbtOuter, True, True);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteNumber(R, 2, VSum(AMotorsCount), cbtOuter);
 
   //раскладка по номерам + партиям
   R:= R + 2;
-  FWriter.SetFont(FFontName, FFontSize+FONT_SIZE_DELTA, [fsBold], clBlack);
-  FWriter.SetAlignment(haCenter, vaCenter);
-  FWriter.WriteText(R, 1, 'Наименование двигателей', cbtOuter, True, True);
-  FWriter.WriteText(R, 2, R, 3, 'Номера двигателей', cbtOuter, True, True);
-  FWriter.WriteText(R, 4, 'Партия', cbtOuter, True, True);
+  Writer.SetFont(Font.Name, Font.Size+FONT_SIZE_DELTA, [fsBold], clBlack);
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.WriteText(R, 1, 'Наименование двигателей', cbtOuter, True, True);
+  Writer.WriteText(R, 2, R, 3, 'Номера двигателей', cbtOuter, True, True);
+  Writer.WriteText(R, 4, 'Партия', cbtOuter, True, True);
 
-  FWriter.SetFont(FFontName, FFontSize+FONT_SIZE_DELTA, [{fsBold}], clBlack);
+  Writer.SetFont(Font.Name, Font.Size+FONT_SIZE_DELTA, [{fsBold}], clBlack);
   for i:= 0 to High(AMotorNames) do
   begin
     R:= R + 1;
     for j:= 0 to High(AMotorNums[i]) do
     begin
       RR:= R + j;
-      //FWriter.SetAlignment(haCenter, vaTop);
-      FWriter.SetAlignment(haLeft, vaTop);
-      FWriter.WriteText(RR, 2, RR, 3,  AMotorNums[i][j], cbtOuter, True, True);
-      FWriter.SetAlignment(haCenter, vaTop);
-      FWriter.WriteText(RR, 4, ASeries[i][j], cbtOuter, True, True);
+      //Writer.SetAlignment(haCenter, vaTop);
+      Writer.SetAlignment(haLeft, vaTop);
+      Writer.WriteText(RR, 2, RR, 3,  AMotorNums[i][j], cbtOuter, True, True);
+      Writer.SetAlignment(haCenter, vaTop);
+      Writer.WriteText(RR, 4, ASeries[i][j], cbtOuter, True, True);
     end;
-    FWriter.SetAlignment(haLeft, vaTop);
-    FWriter.WriteText(R, 1, R+High(AMotorNums[i]), 1, AMotorNames[i], cbtOuter, True, True);
+    Writer.SetAlignment(haLeft, vaTop);
+    Writer.WriteText(R, 1, R+High(AMotorNums[i]), 1, AMotorNames[i], cbtOuter, True, True);
     R:= R + High(AMotorNums[i]);
   end;
 
   R:= R + 1;
-  FWriter.WriteText(R, 1, R, 4, EmptyStr, cbtTop);
+  Writer.WriteText(R, 1, R, 4, EmptyStr, cbtTop);
 
-  FWriter.EndEdit;
+  Writer.EndEdit;
 end;
 
 end.

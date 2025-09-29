@@ -2,22 +2,22 @@ unit UMainForm;
 
 {$mode objfpc}{$H+}
 
-//{$DEFINE DEBUG}
+{$DEFINE DEBUG}
 
 interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Menus, LCLType, BCButton, SQLDB,
+  StdCtrls, Menus, LCLType, DividerBevel, SQLDB,
   //DK packages utils
   {$IFDEF DEBUG}
   DK_HeapTrace,
   {$ENDIF}
   DK_LCLStrRus, DK_Vector, DK_VSTTypes, DK_CtrlUtils, DK_Const,
   //Project utils
-  UDataBase,
+  UVars,
   //Forms
-  UBuildLogForm, UShipmentForm, UReclamationForm, UStoreForm, UAboutForm,
+  UBuildLogForm, UCargoForm, UReclamationForm, UStoreForm, UAboutForm,
   UTestLogForm, UMotorListForm, UReportForm, UStatisticForm, URepairForm,
   UControlListForm, UCalendarForm;
 
@@ -27,31 +27,32 @@ type
 
   TMainForm = class(TForm)
     BaseDDLScript: TSQLScript;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
-    Bevel4: TBevel;
-    DictionaryButton: TBCButton;
-    ManufactureButton: TBCButton;
+    DictionaryButton: TSpeedButton;
     BuildLogMenuItem: TMenuItem;
     DictionaryMenu: TPopupMenu;
     DefectListMenuItem: TMenuItem;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
     FactoryListMenuItem: TMenuItem;
+    ProductButton: TSpeedButton;
     PlaceListMenuItem: TMenuItem;
+    ClaimButton: TSpeedButton;
     ReasonListMenuItem: TMenuItem;
     ReceiverNamesMenuItem: TMenuItem;
     MotorNamesMenuItem: TMenuItem;
     ProductMenu: TPopupMenu;
-    ProductButton: TBCButton;
     MotorListMenuItem: TMenuItem;
     ManufactureMenu: TPopupMenu;
+    RefreshButton: TSpeedButton;
     RepairMenuItem: TMenuItem;
+    ManufactureButton: TSpeedButton;
+    CalendarButton: TSpeedButton;
     Separator1: TMenuItem;
     Separator2: TMenuItem;
     Separator3: TMenuItem;
     ShipmentMenuItem: TMenuItem;
     ControlListMenuItem: TMenuItem;
-    ReportButton: TBCButton;
-    CalendarButton: TBCButton;
+    ReportButton: TSpeedButton;
     StatisticMenuItem: TMenuItem;
     ReclamationMenuItem: TMenuItem;
     ChooseMotorNamesButton: TSpeedButton;
@@ -65,8 +66,6 @@ type
     MainPanel: TPanel;
     MotorNamesLabel: TLabel;
     MotorNamesPanel: TPanel;
-    RefreshButton: TSpeedButton;
-    ClaimButton: TBCButton;
     ClaimMenu: TPopupMenu;
     StoreMenuItem: TMenuItem;
     TestLogMenuItem: TMenuItem;
@@ -149,6 +148,7 @@ begin
 
   Caption:= MAIN_CAPTION + ' - ' + PROJECT_NOTE;
   ConnectDB;
+  GlobalVarInit;
 
   DataBase.NameIDsAndMotorNamesSelectedLoad(MotorNamesLabel, False, UsedNameIDs, UsedNames);
   DataBase.ReceiverIDsAndNamesSelectedLoad(ReceiverNamesLabel, False, UsedReceiverIDs, UsedReceiverNames);
@@ -170,6 +170,17 @@ begin
   SetToolButtons([
     RefreshButton, AboutButton, ExitButton, ChooseMotorNamesButton, ChooseRecieverNamesButton
   ]);
+
+  Images.ToButtons([
+    ManufactureButton, ProductButton, ClaimButton, ReportButton, CalendarButton,
+    DictionaryButton, ChooseMotorNamesButton, ChooseRecieverNamesButton,
+    RefreshButton, AboutButton, ExitButton
+  ]);
+
+  ManufactureMenu.Images:= ChooseImageListForScreenPPI(Images.PX24, Images.PX30,
+                                                  Images.PX36, Images.PX42);
+  ProductMenu.Images:= ManufactureMenu.Images;
+  ClaimMenu.Images:= ManufactureMenu.Images;
 end;
 
 procedure TMainForm.ChooseMotorNamesButtonClick(Sender: TObject);
@@ -344,10 +355,7 @@ begin
   DBPath:= ExtractFilePath(Application.ExeName) + 'db' + DirectorySeparator;
   DBName:= DBPath + 'DKMotors.db';
   //DDLName:= DBPath + 'ddl.sql';
-
-  DataBase:= TDataBase.Create;
   DataBase.Connect(DBName);
-
   //DataBase.ExecuteScript(DDLName);
   DataBase.ExecuteScript(BaseDDLScript);
 end;

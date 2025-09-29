@@ -5,12 +5,12 @@ unit UPackingSheetForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, BCButton,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   fpspreadsheetgrid,
   //DK packages utils
-  DK_Vector,
+  DK_Vector, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -18,7 +18,7 @@ type
 
   TPackingSheetForm = class(TForm)
     EditButtonPanel: TPanel;
-    ExportButton: TBCButton;
+    ExportButton: TSpeedButton;
     LogGrid: TsWorksheetGrid;
     Panel2: TPanel;
     ToolPanel: TPanel;
@@ -29,7 +29,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     CargoPackingSheet: TCargoPackingSheet;
-    procedure CreatePackingSheet;
+    MotorNames, MotorNums, TestDates: TStrVector;
   public
     CargoID: Integer;
   end;
@@ -43,18 +43,10 @@ implementation
 
 { TPackingSheetForm }
 
-procedure TPackingSheetForm.FormShow(Sender: TObject);
+procedure TPackingSheetForm.FormCreate(Sender: TObject);
 begin
-  CreatePackingSheet;
-end;
-
-procedure TPackingSheetForm.CreatePackingSheet;
-var
-  MotorNames, MotorNums, TestDates: TStrVector;
-begin
-  if CargoID=0 then Exit;
-  DataBase.CargoPackingSheet(CargoID, MotorNames, MotorNums, TestDates);
-  CargoPackingSheet.Update(MotorNames, MotorNums, TestDates);
+  CargoPackingSheet:= TCargoPackingSheet.Create(LogGrid, GridFont);
+  CargoID:= 0;
 end;
 
 procedure TPackingSheetForm.FormDestroy(Sender: TObject);
@@ -62,16 +54,19 @@ begin
   FreeAndNil(CargoPackingSheet);
 end;
 
+procedure TPackingSheetForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  Images.ToButtons([ExportButton]);
+
+  DataBase.CargoPackingSheet(CargoID, MotorNames, MotorNums, TestDates);
+  CargoPackingSheet.Update(MotorNames, MotorNums, TestDates);
+end;
+
 procedure TPackingSheetForm.ExportButtonClick(Sender: TObject);
 begin
   if not Assigned(CargoPackingSheet) then Exit;
   CargoPackingSheet.Save('Выполнено!');
-end;
-
-procedure TPackingSheetForm.FormCreate(Sender: TObject);
-begin
-  CargoPackingSheet:= TCargoPackingSheet.Create(LogGrid);
-  CargoID:= 0;
 end;
 
 end.

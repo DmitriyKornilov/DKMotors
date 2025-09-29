@@ -10,12 +10,13 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, UMainForm, lazcontrols, datetimectrls, UReclamationForm,
-  UBuildAddForm, USheetUtils, UTestAddForm, UAboutForm, UCargoEditForm,
+  Forms, UMainForm, UImages, lazcontrols, datetimectrls, UReclamationForm,
+  UBuildAddForm, USheets, UTestAddForm, UAboutForm, UCargoEditForm,
   UStoreForm, UMotorListForm, UBuildLogForm, UBuildEditForm, UReportForm,
-  UTestLogForm, UShipmentForm, UReclamationEditForm, UDataBase, UStatisticForm,
+  UTestLogForm, UCargoForm, UReclamationEditForm, UDataBase, UStatisticForm,
   URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm,
-  UCardForm, URepairEditForm, UControlListEditForm, UUtils, UPackingSheetForm;
+  UCardForm, URepairEditForm, UControlListEditForm, UVars,
+  UPackingSheetForm;
 
 {$R *.res}
 

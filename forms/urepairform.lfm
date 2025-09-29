@@ -2,13 +2,12 @@ object RepairForm: TRepairForm
   Left = 364
   Height = 570
   Top = 147
-  Width = 724
+  Width = 800
   Align = alClient
   BorderStyle = bsNone
   Caption = 'RepairForm'
   ClientHeight = 570
-  ClientWidth = 724
-  LCLVersion = '4.2.0.0'
+  ClientWidth = 800
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -16,7 +15,7 @@ object RepairForm: TRepairForm
     Left = 2
     Height = 32
     Top = 2
-    Width = 901
+    Width = 796
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -25,15 +24,15 @@ object RepairForm: TRepairForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 32
-    ClientWidth = 901
+    ClientHeight = 28
+    ClientWidth = 792
     Constraints.MaxHeight = 32
     Constraints.MinHeight = 32
     ParentFont = False
     TabOrder = 0
     object Panel1: TPanel
-      Left = 120
-      Height = 36
+      Left = 370
+      Height = 28
       Top = 0
       Width = 0
       Align = alLeft
@@ -44,22 +43,22 @@ object RepairForm: TRepairForm
     end
     object Panel3: TPanel
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 120
+      Width = 102
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 120
+      ClientHeight = 28
+      ClientWidth = 102
       ParentFont = False
       TabOrder = 1
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 36
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -195,17 +194,17 @@ object RepairForm: TRepairForm
           00FC007F00E40080005400000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 0
+        Images = Images.PX24
+        ImageIndex = 3
         ParentFont = False
         OnClick = AddButtonClick
       end
       object EditButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 80
-        Height = 36
+        Left = 68
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -342,17 +341,17 @@ object RepairForm: TRepairForm
           00000000000000000000000000000000000000A5FF0500A5FF8700A5FFE200A5
           FFD900A5FF6D0000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 2
+        Images = Images.PX24
+        ImageIndex = 5
         ParentFont = False
         OnClick = EditButtonClick
       end
       object DelButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 40
-        Height = 36
+        Left = 34
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -489,15 +488,15 @@ object RepairForm: TRepairForm
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 1
+        Images = Images.PX24
+        ImageIndex = 4
         ParentFont = False
         OnClick = DelButtonClick
       end
     end
     object Panel5: TPanel
-      Left = 120
-      Height = 36
+      Left = 370
+      Height = 28
       Top = 0
       Width = 0
       Align = alLeft
@@ -506,56 +505,19 @@ object RepairForm: TRepairForm
       Caption = 'Panel5'
       TabOrder = 2
     end
-    object Panel7: TPanel
-      Left = 131
-      Height = 36
+    object FilterPanel: TPanel
+      Left = 120
+      Height = 28
       Top = 0
-      Width = 259
+      Width = 250
       Align = alLeft
-      AutoSize = True
-      BorderSpacing.Left = 5
-      BorderSpacing.Right = 5
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 259
+      Caption = 'FilterPanel'
       TabOrder = 3
-      object Label2: TLabel
-        AnchorSideLeft.Control = Panel7
-        AnchorSideTop.Control = Panel7
-        AnchorSideTop.Side = asrCenter
-        Left = 0
-        Height = 20
-        Top = 6
-        Width = 122
-        Caption = 'Поиск по номеру'
-        ParentColor = False
-      end
-      object MotorNumEdit: TEditButton
-        AnchorSideLeft.Control = Label2
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel7
-        AnchorSideTop.Side = asrCenter
-        AnchorSideBottom.Side = asrBottom
-        Left = 104
-        Height = 28
-        Top = 3
-        Width = 103
-        BorderSpacing.Left = 6
-        ButtonCursor = crHandPoint
-        ButtonWidth = 23
-        Images = MainForm.ImageList16
-        ImageIndex = 0
-        MaxLength = 0
-        NumGlyphs = 1
-        PasswordChar = #0
-        TabOrder = 0
-        OnButtonClick = MotorNumEditButtonClick
-        OnChange = MotorNumEditChange
-      end
     end
     object Panel2: TPanel
-      Left = 120
-      Height = 36
+      Left = 370
+      Height = 28
       Top = 0
       Width = 0
       Align = alLeft
@@ -564,165 +526,76 @@ object RepairForm: TRepairForm
       TabOrder = 4
     end
     object MotorCardCheckBox: TCheckBox
-      Left = 404
-      Height = 36
+      Left = 388
+      Height = 28
       Top = 0
-      Width = 270
+      Width = 216
       Align = alLeft
-      BorderSpacing.Left = 5
-      BorderSpacing.Right = 5
       Caption = 'Учетная карточка электродвигателя'
       Checked = True
       State = cbChecked
       TabOrder = 5
       OnChange = MotorCardCheckBoxChange
     end
-    object ExportButton: TBCButton
+    object DividerBevel1: TDividerBevel
+      Left = 102
+      Height = 28
+      Top = 0
+      Width = 18
+      Caption = 'DividerBevel1'
+      Align = alLeft
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
+    object DividerBevel2: TDividerBevel
+      Left = 370
+      Height = 28
+      Top = 0
+      Width = 18
+      Caption = 'DividerBevel2'
+      Align = alLeft
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
+    object DividerBevel3: TDividerBevel
+      Left = 604
+      Height = 28
+      Top = 0
+      Width = 18
+      Caption = 'DividerBevel3'
+      Align = alLeft
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
+    object ExportButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 685
-      Height = 34
-      Top = 1
-      Width = 104
+      Left = 622
+      Height = 28
+      Hint = 'Экспорт в формат электронной таблицы XLSX или ODS'
+      Top = 0
+      Width = 91
       Align = alLeft
       AutoSize = True
-      StateClicked.Background.Color = 16245964
-      StateClicked.Background.Gradient1.StartColor = 16577765
-      StateClicked.Background.Gradient1.EndColor = 16180676
-      StateClicked.Background.Gradient1.GradientType = gtLinear
-      StateClicked.Background.Gradient1.Point1XPercent = 0
-      StateClicked.Background.Gradient1.Point1YPercent = 0
-      StateClicked.Background.Gradient1.Point2XPercent = 0
-      StateClicked.Background.Gradient1.Point2YPercent = 100
-      StateClicked.Background.Gradient2.StartColor = 15716760
-      StateClicked.Background.Gradient2.EndColor = 14398312
-      StateClicked.Background.Gradient2.GradientType = gtLinear
-      StateClicked.Background.Gradient2.Point1XPercent = 0
-      StateClicked.Background.Gradient2.Point1YPercent = 0
-      StateClicked.Background.Gradient2.Point2XPercent = 0
-      StateClicked.Background.Gradient2.Point2YPercent = 100
-      StateClicked.Background.Gradient1EndPercent = 55
-      StateClicked.Background.Style = bbsColor
-      StateClicked.Border.Color = 10048512
-      StateClicked.Border.LightColor = clBlack
-      StateClicked.Border.LightOpacity = 100
-      StateClicked.Border.Style = bboSolid
-      StateClicked.FontEx.Color = clBlack
-      StateClicked.FontEx.FontQuality = fqSystemClearType
-      StateClicked.FontEx.Shadow = False
-      StateClicked.FontEx.ShadowRadius = 5
-      StateClicked.FontEx.ShadowOffsetX = 5
-      StateClicked.FontEx.ShadowOffsetY = 5
-      StateClicked.FontEx.Style = []
-      StateHover.Background.Color = 16511461
-      StateHover.Background.Gradient1.StartColor = 16643818
-      StateHover.Background.Gradient1.EndColor = 16576729
-      StateHover.Background.Gradient1.GradientType = gtLinear
-      StateHover.Background.Gradient1.Point1XPercent = 0
-      StateHover.Background.Gradient1.Point1YPercent = 0
-      StateHover.Background.Gradient1.Point2XPercent = 0
-      StateHover.Background.Gradient1.Point2YPercent = 100
-      StateHover.Background.Gradient2.StartColor = 16639678
-      StateHover.Background.Gradient2.EndColor = 16112039
-      StateHover.Background.Gradient2.GradientType = gtLinear
-      StateHover.Background.Gradient2.Point1XPercent = 0
-      StateHover.Background.Gradient2.Point1YPercent = 0
-      StateHover.Background.Gradient2.Point2XPercent = 0
-      StateHover.Background.Gradient2.Point2YPercent = 100
-      StateHover.Background.Gradient1EndPercent = 50
-      StateHover.Background.Style = bbsColor
-      StateHover.Border.Color = 14120960
-      StateHover.Border.LightOpacity = 200
-      StateHover.Border.Style = bboSolid
-      StateHover.FontEx.Color = clBlack
-      StateHover.FontEx.FontQuality = fqSystemClearType
-      StateHover.FontEx.Shadow = False
-      StateHover.FontEx.ShadowRadius = 5
-      StateHover.FontEx.ShadowOffsetX = 5
-      StateHover.FontEx.ShadowOffsetY = 5
-      StateHover.FontEx.Style = []
-      StateNormal.Background.Color = 14803425
-      StateNormal.Background.Gradient1.StartColor = 15921906
-      StateNormal.Background.Gradient1.EndColor = 15461355
-      StateNormal.Background.Gradient1.GradientType = gtLinear
-      StateNormal.Background.Gradient1.Point1XPercent = 0
-      StateNormal.Background.Gradient1.Point1YPercent = 0
-      StateNormal.Background.Gradient1.Point2XPercent = 0
-      StateNormal.Background.Gradient1.Point2YPercent = 100
-      StateNormal.Background.Gradient2.StartColor = 14540253
-      StateNormal.Background.Gradient2.EndColor = 13619151
-      StateNormal.Background.Gradient2.GradientType = gtLinear
-      StateNormal.Background.Gradient2.Point1XPercent = 0
-      StateNormal.Background.Gradient2.Point1YPercent = 0
-      StateNormal.Background.Gradient2.Point2XPercent = 0
-      StateNormal.Background.Gradient2.Point2YPercent = 100
-      StateNormal.Background.Gradient1EndPercent = 50
-      StateNormal.Background.Style = bbsColor
-      StateNormal.Border.Color = 11382189
-      StateNormal.Border.LightOpacity = 200
-      StateNormal.Border.Style = bboSolid
-      StateNormal.FontEx.Color = clBlack
-      StateNormal.FontEx.FontQuality = fqSystemClearType
-      StateNormal.FontEx.Shadow = False
-      StateNormal.FontEx.ShadowRadius = 5
-      StateNormal.FontEx.ShadowOffsetX = 5
-      StateNormal.FontEx.ShadowOffsetY = 5
-      StateNormal.FontEx.Style = []
-      BorderSpacing.Left = 1
-      BorderSpacing.Top = 1
-      BorderSpacing.Bottom = 1
-      Caption = 'Экспорт'
-      Color = clNone
-      DropDownWidth = 16
-      DropDownArrowSize = 8
-      GlobalOpacity = 255
-      GlyphMargin = 0
+      Caption = ' Экспорт '
+      Images = Images.PX24
+      ImageIndex = 9
+      Margin = 5
+      Spacing = 0
+      ShowHint = True
+      ParentShowHint = False
       OnClick = ExportButtonClick
-      ParentColor = False
-      Rounding.RoundX = 0
-      Rounding.RoundY = 0
-      RoundingDropDown.RoundX = 1
-      RoundingDropDown.RoundY = 1
-      TextApplyGlobalOpacity = False
-      DropDownStyle = bdsCommon
-      Images = MainForm.ImageListCategory24
-      ImageIndex = 7
-      MemoryUsage = bmuHigh
-    end
-    object Bevel2: TBevel
-      Left = 123
-      Height = 36
-      Top = 0
-      Width = 2
-      Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
-    end
-    object Bevel3: TBevel
-      Left = 396
-      Height = 36
-      Top = 0
-      Width = 2
-      Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
-    end
-    object Bevel4: TBevel
-      Left = 680
-      Height = 36
-      Top = 0
-      Width = 2
-      Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
     end
   end
   object LeftPanel: TPanel
     Left = 2
-    Height = 667
-    Top = 44
+    Height = 532
+    Top = 36
     Width = 189
     Align = alLeft
     BorderSpacing.Left = 2
@@ -730,8 +603,8 @@ object RepairForm: TRepairForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 667
-    ClientWidth = 189
+    ClientHeight = 528
+    ClientWidth = 185
     Color = clWindow
     ParentBackground = False
     ParentColor = False
@@ -740,7 +613,7 @@ object RepairForm: TRepairForm
       Left = 0
       Height = 40
       Top = 0
-      Width = 232
+      Width = 185
       Align = alTop
       BorderStyle = bsNone
       DefaultText = 'Node'
@@ -752,8 +625,8 @@ object RepairForm: TRepairForm
     object VT3: TVirtualStringTree
       Left = 0
       Height = 40
-      Top = 62
-      Width = 232
+      Top = 50
+      Width = 185
       Align = alTop
       BorderSpacing.Top = 10
       BorderStyle = bsNone
@@ -765,29 +638,29 @@ object RepairForm: TRepairForm
     end
   end
   object Splitter1: TSplitter
-    Left = 238
-    Height = 669
-    Top = 44
+    Left = 191
+    Height = 534
+    Top = 36
     Width = 5
     ResizeStyle = rsLine
   end
   object MainPanel: TPanel
-    Left = 244
-    Height = 667
-    Top = 44
-    Width = 661
+    Left = 196
+    Height = 532
+    Top = 36
+    Width = 604
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
-    ClientHeight = 667
-    ClientWidth = 661
+    ClientHeight = 532
+    ClientWidth = 604
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
       Height = 440
-      Top = 227
-      Width = 659
+      Top = 92
+      Width = 602
       Align = alBottom
       BorderSpacing.Right = 2
       BevelOuter = bvNone
@@ -798,8 +671,8 @@ object RepairForm: TRepairForm
       Cursor = crVSplit
       Left = 0
       Height = 5
-      Top = 112
-      Width = 661
+      Top = 87
+      Width = 604
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
@@ -807,9 +680,9 @@ object RepairForm: TRepairForm
     object VT1: TVirtualStringTree
       AnchorSideBottom.Control = Splitter2
       Left = 0
-      Height = 111
+      Height = 87
       Top = 0
-      Width = 659
+      Width = 602
       Align = alClient
       BorderSpacing.Right = 2
       DefaultNodeHeight = 25

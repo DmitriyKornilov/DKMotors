@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, DateTimePicker, VirtualTrees, DividerBevel, DateUtils,
   //DK packages utils
-  DK_VSTTables, DK_Vector, DK_StrUtils, DK_Const, DK_Dialogs,
+  DK_VSTTables, DK_Vector, DK_StrUtils, DK_Const, DK_Dialogs, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -36,7 +36,6 @@ type
     SendingCheckBox: TCheckBox;
     VT1: TVirtualStringTree;
     procedure CancelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -44,7 +43,6 @@ type
     procedure SaveButtonClick(Sender: TObject);
     procedure SendingCheckBoxChange(Sender: TObject);
   private
-    CanFormClose: Boolean;
     VSTTable: TVSTTable;
 
     NameIDs, RecIDs, MotorNameIDs: TIntVector;
@@ -66,6 +64,38 @@ implementation
 {$R *.lfm}
 
 { TRepairEditForm }
+
+procedure TRepairEditForm.FormCreate(Sender: TObject);
+begin
+  DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
+  if VIsNil(NameIDs) then
+    Inform('Отсутствует список наименований двигателей!');
+
+  DateTimePicker1.Date:= Date;
+  DateTimePicker2.Date:= Date;
+  VSTTable:= TVSTTable.Create(VT1);
+end;
+
+procedure TRepairEditForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(VSTTable);
+end;
+
+procedure TRepairEditForm.FormShow(Sender: TObject);
+begin
+  Images.ToButtons([SaveButton, CancelButton]);
+  SetEventButtons([SaveButton, CancelButton]);
+
+  VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
+  VSTTable.AddColumn('Дата сборки', 120);
+  VSTTable.AddColumn('Номер', 100);
+  VSTTable.AddColumn('Дата уведомления', 160);
+  VSTTable.AddColumn('Предприятие', 100);
+  VSTTable.CanSelect:= True;
+  VSTTable.Draw;
+
+  if RecID>0 then LoadRepair;
+end;
 
 procedure TRepairEditForm.SendingCheckBoxChange(Sender: TObject);
 begin
@@ -128,59 +158,20 @@ begin
   end;
 end;
 
-procedure TRepairEditForm.CancelButtonClick(Sender: TObject);
-begin
-  CanFormClose:= True;
-  ModalResult:= mrCancel;
-end;
-
-procedure TRepairEditForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
-end;
-
-procedure TRepairEditForm.FormCreate(Sender: TObject);
-begin
-  DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
-  if VIsNil(NameIDs) then
-    Inform('Отсутствует список наименований двигателей!');
-
-  DateTimePicker1.Date:= Date;
-  DateTimePicker2.Date:= Date;
-  VSTTable:= TVSTTable.Create(VT1);
-
-  CanFormClose:= True;
-end;
-
-procedure TRepairEditForm.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(VSTTable);
-end;
-
-procedure TRepairEditForm.FormShow(Sender: TObject);
-begin
-  VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
-  VSTTable.AddColumn('Дата сборки', 120);
-  VSTTable.AddColumn('Номер', 100);
-  VSTTable.AddColumn('Дата уведомления', 160);
-  VSTTable.AddColumn('Предприятие', 100);
-  VSTTable.CanSelect:= True;
-  VSTTable.Draw;
-
-  if RecID>0 then LoadRepair;
-end;
-
 procedure TRepairEditForm.MotorNumEditChange(Sender: TObject);
 begin
   LoadMotors;
+end;
+
+procedure TRepairEditForm.CancelButtonClick(Sender: TObject);
+begin
+  ModalResult:= mrCancel;
 end;
 
 procedure TRepairEditForm.SaveButtonClick(Sender: TObject);
 var
   ArrivalDate, SendingDate: TDate;
 begin
-  CanFormClose:= False;
-
   if not VSTTable.IsSelected then
   begin
     Inform('Не указан рекламационный электродвигатель!');
@@ -201,9 +192,9 @@ begin
   if RecID=0 then
     RecID:= RecIDs[VSTTable.SelectedIndex];
 
-  CanFormClose:= DataBase.RepairUpdate(RecID, ArrivalDate, SendingDate,
+  if not DataBase.RepairUpdate(RecID, ArrivalDate, SendingDate,
                                      Ord(PassportCheckBox.Checked),
-                                     STrim(RecNoteMemo.Text));
+                                     STrim(RecNoteMemo.Text)) then Exit;
   ModalResult:= mrOK;
 end;
 

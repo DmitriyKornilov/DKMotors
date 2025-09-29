@@ -6,12 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, EditBtn, VirtualTrees, BCButton,
+  Buttons, DividerBevel, VirtualTrees,
   //DK packages utils
   DK_VSTTables, DK_StrUtils, DK_Dialogs, DK_Const, DK_Vector, DK_SheetExporter,
-  DK_VSTTableTools,
+  DK_VSTTableTools, DK_CtrlUtils, DK_Filter,
   //Project utils
-  UDataBase, UUtils, USheetUtils, UCalendar,
+  UVars, USheets, UCalendar,
   //Forms
   UCardForm, URepairEditForm;
 
@@ -21,22 +21,20 @@ type
 
   TRepairForm = class(TForm)
     AddButton: TSpeedButton;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
-    Bevel4: TBevel;
     DelButton: TSpeedButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    DividerBevel3: TDividerBevel;
     EditButton: TSpeedButton;
-    ExportButton: TBCButton;
-    Label2: TLabel;
+    ExportButton: TSpeedButton;
     MotorCardCheckBox: TCheckBox;
-    MotorNumEdit: TEditButton;
     Panel1: TPanel;
     CardPanel: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
     LeftPanel: TPanel;
-    Panel7: TPanel;
+    FilterPanel: TPanel;
     MainPanel: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
@@ -52,8 +50,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MotorCardCheckBoxChange(Sender: TObject);
-    procedure MotorNumEditButtonClick(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure VT1DblClick(Sender: TObject);
   private
     CardForm: TCardForm;
@@ -61,6 +57,7 @@ type
     VSTTypeList: TVSTStringList;
     VSTOrderList: TVSTStringList;
     RecIDs, MotorIDs: TIntVector;
+    FilterString: String;
 
     ArrivalDates, SendingDates: TDateVector;
     Passports, DayCounts: TIntVector;
@@ -68,6 +65,7 @@ type
 
     procedure CreateMotorsTable;
     procedure SelectMotor;
+    procedure FilterMotor(const AFilterString: String);
 
     procedure CreateTypeList;
     procedure CreateOrderList;
@@ -90,19 +88,31 @@ uses UMainForm;
 
 procedure TRepairForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetToolButtons([
-    AddButton, DelButton, EditButton
-  ]);
-
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(RepairForm, CardPanel);
   CreateMotorsTable;
   CreateTypeList;
   CreateOrderList;
+  FilterString:= EmptyStr;
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 250, 500);
   MotorCardCheckBox.Checked:= False;
+end;
+
+procedure TRepairForm.FormDestroy(Sender: TObject);
+begin
+  if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
+  if Assigned(VSTTypeList) then FreeAndNil(VSTTypeList);
+  if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
+  if Assigned(CardForm) then FreeAndNil(CardForm);
+end;
+
+procedure TRepairForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  SetToolButtons([AddButton, DelButton, EditButton]);
+  Images.ToButtons([ExportButton, AddButton, DelButton, EditButton]);
+
+  ViewUpdate;
 end;
 
 procedure TRepairForm.ExportButtonClick(Sender: TObject);
@@ -114,7 +124,7 @@ begin
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
-    RepairSheet:= TRepairSheet.Create(Sheet);
+    RepairSheet:= TRepairSheet.Create(Sheet, nil, GridFont);
     try
       RepairSheet.Draw(Passports, DayCounts, MotorNames, MotorNums, ArrivalDates, SendingDates);
     finally
@@ -146,19 +156,6 @@ begin
   OpenRepairEditForm(2);
 end;
 
-procedure TRepairForm.FormDestroy(Sender: TObject);
-begin
-  if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
-  if Assigned(VSTTypeList) then FreeAndNil(VSTTypeList);
-  if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
-  if Assigned(CardForm) then FreeAndNil(CardForm);
-end;
-
-procedure TRepairForm.FormShow(Sender: TObject);
-begin
-  ViewUpdate;
-end;
-
 procedure TRepairForm.MotorCardCheckBoxChange(Sender: TObject);
 begin
   if MotorCardCheckBox.Checked then
@@ -174,16 +171,6 @@ begin
   end;
 end;
 
-procedure TRepairForm.MotorNumEditButtonClick(Sender: TObject);
-begin
-  MotorNumEdit.Text:= EmptyStr;
-end;
-
-procedure TRepairForm.MotorNumEditChange(Sender: TObject);
-begin
-  ViewUpdate;
-end;
-
 procedure TRepairForm.VT1DblClick(Sender: TObject);
 begin
   if not VSTMotorsTable.IsSelected then Exit;
@@ -193,6 +180,7 @@ end;
 procedure TRepairForm.CreateMotorsTable;
 begin
   VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.SetSingleFont(GridFont);
   VSTMotorsTable.OnSelect:= @SelectMotor;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
   VSTMotorsTable.AddColumn('№ п/п', 50);
@@ -218,6 +206,12 @@ begin
   if VSTMotorsTable.IsSelected then
     MotorID:= MotorIDs[VSTMotorsTable.SelectedIndex];
   CardForm.ShowCard(MotorID);
+end;
+
+procedure TRepairForm.FilterMotor(const AFilterString: String);
+begin
+  FilterString:= AFilterString;
+  ViewUpdate;
 end;
 
 procedure TRepairForm.CreateTypeList;
@@ -271,7 +265,6 @@ end;
 
 procedure TRepairForm.ViewUpdate;
 var
-  MotorNumberLike: String;
   i: Integer;
   PassStrs, DayCountsStrs, SendingDatesStrs, ArrivalDatesStrs: TStrVector;
 begin
@@ -280,9 +273,8 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
-    MotorNumberLike:= STrim(MotorNumEdit.Text);
 
-    DataBase.RepairListLoad(MainForm.UsedNameIDs, MotorNumberLike,
+    DataBase.RepairListLoad(MainForm.UsedNameIDs, STrim(FilterString),
                           VSTOrderList.SelectedIndex+1, VSTTypeList.SelectedIndex,
                           ArrivalDates, SendingDates,
                           RecIDs, MotorIDs, Passports, DayCounts,

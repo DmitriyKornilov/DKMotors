@@ -6,11 +6,11 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls,
-  Buttons, fpspreadsheetgrid,  BCButton,
+  Buttons, fpspreadsheetgrid,
   //DK packages utils
-  DK_Vector, DK_SheetExporter, DK_Zoom,
+  DK_Vector, DK_SheetExporter, DK_Zoom, DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -19,13 +19,14 @@ type
   TCardForm = class(TForm)
     Bevel1: TBevel;
     CardPanel: TPanel;
-    ExportButton: TBCButton;
     CardGrid: TsWorksheetGrid;
+    ExportButton: TSpeedButton;
     ToolPanel: TPanel;
     ZoomPanel: TPanel;
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     MotorCardSheet: TMotorCardSheet;
     MotorID: Integer;
@@ -69,21 +70,25 @@ procedure TCardForm.FormCreate(Sender: TObject);
 begin
   MotorID:= 0;
   ZoomPercent:= 100;
-  SetToolPanels([
-    ToolPanel
-  ]);
-  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawCard, True);
-  MotorCardSheet:= TMotorCardSheet.Create(CardGrid.Worksheet, CardGrid);
-end;
 
-procedure TCardForm.ExportButtonClick(Sender: TObject);
-begin
-  ExportCard;
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawCard, True);
+  MotorCardSheet:= TMotorCardSheet.Create(CardGrid.Worksheet, CardGrid, GridFont);
 end;
 
 procedure TCardForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(MotorCardSheet) then FreeAndNil(MotorCardSheet);
+end;
+
+procedure TCardForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  Images.ToButtons([ExportButton]);
+end;
+
+procedure TCardForm.ExportButtonClick(Sender: TObject);
+begin
+  ExportCard;
 end;
 
 procedure TCardForm.DrawCard(const AZoomPercent: Integer);
@@ -122,7 +127,7 @@ begin
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
-    Drawer:= TMotorCardSheet.Create(Sheet);
+    Drawer:= TMotorCardSheet.Create(Sheet, nil, GridFont);
     try
       Drawer.Draw(BuildDate, SendDate, MotorName, MotorNum, Sers,
                 RotorNum, ReceiverName, ControlNote, TestDates, TestResults, TestNotes,
@@ -133,7 +138,7 @@ begin
     finally
       FreeAndNil(Drawer);
     end;
-    Exporter.PageSettings(spoLandscape);
+    Exporter.PageSettings(spoLandscape, pfWidth, True, False);
 
     Exporter.Save('Выполнено!');
   finally

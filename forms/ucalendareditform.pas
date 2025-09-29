@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, DateTimePicker, DividerBevel, DateUtils,
   //DK packages utils
-  DK_Const, DK_DateUtils, DK_Vector,
+  DK_Const, DK_DateUtils, DK_Vector, DK_CtrlUtils,
   //Project utils
-  UDataBase;
+  UVars;
 
 type
 
@@ -47,18 +47,11 @@ implementation
 
 { TCalendarEditForm }
 
-procedure TCalendarEditForm.CancelButtonClick(Sender: TObject);
-begin
-  ModalResult:= mrCancel;
-end;
-
-procedure TCalendarEditForm.DateTimePicker1Change(Sender: TObject);
-begin
-  DateTimePicker2.MinDate:= DateTimePicker1.Date;
-end;
-
 procedure TCalendarEditForm.FormShow(Sender: TObject);
 begin
+  Images.ToButtons([SaveButton, CancelButton]);
+  SetEventButtons([SaveButton, CancelButton]);
+
   DateTimePicker1.MinDate:= FirstDayInYear(Year);
   DateTimePicker1.MaxDate:= LastDayInYear(Year);
   if SameDate(DayDate, NULDATE) then //новый
@@ -69,6 +62,11 @@ begin
   DateTimePicker2.Date:= DateTimePicker1.Date;
   DateTimePicker2.MinDate:= DateTimePicker1.Date;
   DateTimePicker2.MaxDate:= DateTimePicker1.MaxDate;
+end;
+
+procedure TCalendarEditForm.CancelButtonClick(Sender: TObject);
+begin
+  ModalResult:= mrCancel;
 end;
 
 procedure TCalendarEditForm.SaveButtonClick(Sender: TObject);
@@ -82,9 +80,15 @@ begin
   VDim(Dates, N+1);
   for i:= 0 to N do
     Dates[i]:= IncDay(DateTimePicker1.Date, i);
-  DataBase.WriteCalendarSpecDays(Dates, Status);
+
+  if not DataBase.WriteCalendarSpecDays(Dates, Status) then Exit;
 
   ModalResult:= mrOK;
+end;
+
+procedure TCalendarEditForm.DateTimePicker1Change(Sender: TObject);
+begin
+  DateTimePicker2.MinDate:= DateTimePicker1.Date;
 end;
 
 end.

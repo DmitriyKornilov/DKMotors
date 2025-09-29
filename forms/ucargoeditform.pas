@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Buttons, DateTimePicker, LCLType, VirtualTrees, DividerBevel,
   //DK packages utils
-  DK_Vector, DK_Dialogs, DK_VSTTables, DK_StrUtils, DK_Const,
+  DK_Vector, DK_Dialogs, DK_VSTTables, DK_StrUtils, DK_Const, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -38,11 +38,8 @@ type
     VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
-
-
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -72,8 +69,6 @@ type
 
     WritedMotorIDs: TIntVector;
 
-    CanFormClose: Boolean;
-
     VSTViewTable, VSTCargoTable: TVSTTable;
 
     procedure LoadMotorNames;
@@ -99,22 +94,26 @@ implementation
 
 { TCargoEditForm }
 
-procedure TCargoEditForm.LoadMotorNames;
+procedure TCargoEditForm.FormCreate(Sender: TObject);
 begin
-  DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
-  if VIsNil(NameIDs) then
-    Inform('Отсутствует список наименований двигателей!');
+  VSTViewTable:= TVSTTable.Create(VT1);
+  VSTCargoTable:= TVSTTable.Create(VT2);
+  DateTimePicker1.Date:= Date;
+  LoadMotorNames;
+  LoadReceiverNames;
 end;
 
-procedure TCargoEditForm.LoadReceiverNames;
+procedure TCargoEditForm.FormDestroy(Sender: TObject);
 begin
-  DataBase.ReceiverIDsAndNamesLoad(ReceiverNameComboBox, ReceiverIDs);
-  if VIsNil(ReceiverIDs) then
-    Inform('Отсутствует список наименований грузополучателей!');
+  FreeAndNil(VSTViewTable);
+  FreeAndNil(VSTCargoTable);
 end;
 
 procedure TCargoEditForm.FormShow(Sender: TObject);
 begin
+  Images.ToButtons([SaveButton, CancelButton, DelButton, AddButton]);
+  SetEventButtons([SaveButton, CancelButton, DelButton, AddButton]);
+
   VSTViewTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
   VSTViewTable.AddColumn('Дата сборки', 100);
   VSTViewTable.AddColumn('Номер', 100);
@@ -134,6 +133,20 @@ begin
   if CargoID>0 then LoadCargo;
 
   DateTimePicker1.SetFocus;
+end;
+
+procedure TCargoEditForm.LoadMotorNames;
+begin
+  DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
+  if VIsNil(NameIDs) then
+    Inform('Отсутствует список наименований двигателей!');
+end;
+
+procedure TCargoEditForm.LoadReceiverNames;
+begin
+  DataBase.ReceiverIDsAndNamesLoad(ReceiverNameComboBox, ReceiverIDs);
+  if VIsNil(ReceiverIDs) then
+    Inform('Отсутствует список наименований грузополучателей!');
 end;
 
 procedure TCargoEditForm.MotorNameComboBoxChange(Sender: TObject);
@@ -164,10 +177,15 @@ begin
   MotorNumEdit.SetFocus;
 end;
 
-procedure TCargoEditForm.SaveButtonClick(Sender: TObject);
+procedure TCargoEditForm.CancelButtonClick(Sender: TObject);
 begin
-  CanFormClose:= False;
+  ModalResult:= mrCancel;
+end;
 
+procedure TCargoEditForm.SaveButtonClick(Sender: TObject);
+var
+  IsOK: Boolean;
+begin
   if ReceiverNameComboBox.Text=EmptyStr then
   begin
     Inform('Не указано наименование грузополучателя!');
@@ -182,16 +200,16 @@ begin
 
   if CargoID=0 then
   begin
-    DataBase.CargoWrite(DateTimePicker1.Date, ReceiverIDs[ReceiverNameComboBox.ItemIndex],
+    IsOK:= DataBase.CargoWrite(DateTimePicker1.Date, ReceiverIDs[ReceiverNameComboBox.ItemIndex],
                MotorIDs, Series);
     CargoID:= DataBase.LastWritedInt32ID('CARGOLIST');
   end
   else if CargoID>0 then
-    DataBase.CargoUpdate(CargoID,
+    IsOK:= DataBase.CargoUpdate(CargoID,
                DateTimePicker1.Date, ReceiverIDs[ReceiverNameComboBox.ItemIndex],
                MotorIDs, WritedMotorIDs, Series);
 
-  CanFormClose:= True;
+  if not IsOK then Exit;
   ModalResult:= mrOK;
 end;
 
@@ -229,33 +247,6 @@ procedure TCargoEditForm.VT2MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   DelButton.Enabled:= VSTCargoTable.IsSelected;
-end;
-
-procedure TCargoEditForm.FormCreate(Sender: TObject);
-begin
-  VSTViewTable:= TVSTTable.Create(VT1);
-  VSTCargoTable:= TVSTTable.Create(VT2);
-  DateTimePicker1.Date:= Date;
-  LoadMotorNames;
-  LoadReceiverNames;
-  CanFormClose:= True;
-end;
-
-procedure TCargoEditForm.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(VSTViewTable);
-  FreeAndNil(VSTCargoTable);
-end;
-
-procedure TCargoEditForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
-end;
-
-procedure TCargoEditForm.CancelButtonClick(Sender: TObject);
-begin
-  CanFormClose:= True;
-  ModalResult:= mrCancel;
 end;
 
 procedure TCargoEditForm.AddButtonClick(Sender: TObject);

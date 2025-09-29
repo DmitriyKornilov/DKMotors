@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, DividerBevel,
   StdCtrls, DateTimePicker, VirtualTrees,
   //DK packages utils
-  DK_Vector, DK_Dialogs, DK_VSTTables, DK_StrUtils, DK_Const,
+  DK_Vector, DK_Dialogs, DK_VSTTables, DK_StrUtils, DK_Const, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -52,7 +52,6 @@ type
     VT1: TVirtualStringTree;
     procedure ArrivalCheckBoxChange(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -60,7 +59,6 @@ type
     procedure SaveButtonClick(Sender: TObject);
     procedure SendingCheckBoxChange(Sender: TObject);
   private
-    CanFormClose: Boolean;
     VSTTable: TVSTTable;
 
     MotorIDs: TIntVector;
@@ -91,7 +89,6 @@ begin
   DateTimePicker2.Date:= Date;
   VSTTable:= TVSTTable.Create(VT1);
   LoadNames;
-  CanFormClose:= True;
 end;
 
 procedure TReclamationEditForm.FormDestroy(Sender: TObject);
@@ -101,6 +98,9 @@ end;
 
 procedure TReclamationEditForm.FormShow(Sender: TObject);
 begin
+  Images.ToButtons([SaveButton, CancelButton]);
+  SetEventButtons([SaveButton, CancelButton]);
+
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
   VSTTable.AddColumn('Дата сборки', 100);
   VSTTable.AddColumn('Номер', 100);
@@ -116,14 +116,18 @@ begin
   LoadMotors;
 end;
 
+procedure TReclamationEditForm.CancelButtonClick(Sender: TObject);
+begin
+  ModalResult:= mrCancel;
+end;
+
 procedure TReclamationEditForm.SaveButtonClick(Sender: TObject);
 var
   S: String;
   Mileage: Integer;
   ArrivalDate, SendingDate: TDate;
+  IsOK: Boolean;
 begin
-  CanFormClose:= False;
-
   if not VSTTable.IsSelected then
   begin
     Inform('Не указан рекламационный электродвигатель!');
@@ -146,7 +150,7 @@ begin
   end;
 
   if RecID=0 then
-    CanFormClose:= DataBase.ReclamationWrite(DateTimePicker1.Date,
+    IsOK:= DataBase.ReclamationWrite(DateTimePicker1.Date,
                           MotorIDs[VSTTable.SelectedIndex], Mileage,
                           PlaceIDs[PlaceNameComboBox.ItemIndex],
                           FactoryIDs[FactoryNameComboBox.ItemIndex],
@@ -162,7 +166,7 @@ begin
     SendingDate:= 0;
     if SendingCheckBox.Checked then
       SendingDate:= DateTimePicker3.Date;
-    CanFormClose:= DataBase.ReclamationUpdate(DateTimePicker1.Date,
+    IsOK:= DataBase.ReclamationUpdate(DateTimePicker1.Date,
                           ArrivalDate, SendingDate, RecID,
                           MotorIDs[VSTTable.SelectedIndex], Mileage,
                           PlaceIDs[PlaceNameComboBox.ItemIndex],
@@ -175,18 +179,13 @@ begin
                           STrim(RecNoteMemo.Text));
   end;
 
+  if not IsOK then Exit;
   ModalResult:= mrOK;
 end;
 
 procedure TReclamationEditForm.SendingCheckBoxChange(Sender: TObject);
 begin
   DateTimePicker3.Enabled:= SendingCheckBox.Checked;
-end;
-
-procedure TReclamationEditForm.CancelButtonClick(Sender: TObject);
-begin
-  CanFormClose:= True;
-  ModalResult:= mrCancel;
 end;
 
 procedure TReclamationEditForm.ArrivalCheckBoxChange(Sender: TObject);
@@ -199,12 +198,6 @@ begin
     SendingCheckBox.Checked:= False;
     PassportCheckBox.Checked:= False;
   end;
-end;
-
-procedure TReclamationEditForm.FormCloseQuery(Sender: TObject;
-  var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
 end;
 
 procedure TReclamationEditForm.LoadNames;

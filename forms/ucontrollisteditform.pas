@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
   StdCtrls, VirtualTrees, DividerBevel,
   //DK packages utils
-  DK_VSTTables, DK_Vector, DK_Dialogs, DK_StrUtils, DK_Const,
+  DK_VSTTables, DK_Vector, DK_Dialogs, DK_StrUtils, DK_Const, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -31,14 +31,12 @@ type
     SaveButton: TSpeedButton;
     VT1: TVirtualStringTree;
     procedure CancelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MotorNumEditChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
   private
-    CanFormClose: Boolean;
     VSTTable: TVSTTable;
 
     NameIDs, MotorIDs: TIntVector;
@@ -60,18 +58,6 @@ implementation
 
 { TControlListEditForm }
 
-procedure TControlListEditForm.CancelButtonClick(Sender: TObject);
-begin
-  CanFormClose:= True;
-  ModalResult:= mrCancel;
-end;
-
-procedure TControlListEditForm.FormCloseQuery(Sender: TObject;
-  var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
-end;
-
 procedure TControlListEditForm.FormCreate(Sender: TObject);
 begin
   DataBase.NameIDsAndMotorNamesLoad(MotorNameComboBox, NameIDs);
@@ -79,8 +65,6 @@ begin
     Inform('Отсутствует список наименований двигателей!');
 
   VSTTable:= TVSTTable.Create(VT1);
-
-  CanFormClose:= True;
 end;
 
 procedure TControlListEditForm.FormDestroy(Sender: TObject);
@@ -90,6 +74,9 @@ end;
 
 procedure TControlListEditForm.FormShow(Sender: TObject);
 begin
+  Images.ToButtons([SaveButton, CancelButton]);
+  SetEventButtons([SaveButton, CancelButton]);
+
   VSTTable.HeaderBGColor:= COLOR_BACKGROUND_TITLE;
   VSTTable.AddColumn('Номер', 200);
   VSTTable.AddColumn('Партия', 200);
@@ -105,10 +92,13 @@ begin
   LoadMotors;
 end;
 
+procedure TControlListEditForm.CancelButtonClick(Sender: TObject);
+begin
+  ModalResult:= mrCancel;
+end;
+
 procedure TControlListEditForm.SaveButtonClick(Sender: TObject);
 begin
-  CanFormClose:= False;
-
   if not VSTTable.IsSelected then
   begin
     Inform('Не указан электродвигатель!');
@@ -118,7 +108,7 @@ begin
   if MotorID=0 then
     MotorID:= MotorIDs[VSTTable.SelectedIndex];
 
-  CanFormClose:= DataBase.ControlUpdate(MotorID, STrim(NoteMemo.Text));
+  if not DataBase.ControlUpdate(MotorID, STrim(NoteMemo.Text)) then Exit;
   ModalResult:= mrOK;
 end;
 

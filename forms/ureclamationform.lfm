@@ -2,13 +2,12 @@ object ReclamationForm: TReclamationForm
   Left = 529
   Height = 510
   Top = 202
-  Width = 913
+  Width = 1000
   Align = alClient
   BorderStyle = bsNone
   Caption = 'ReclamationForm'
   ClientHeight = 510
-  ClientWidth = 913
-  LCLVersion = '4.2.0.0'
+  ClientWidth = 1000
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -16,7 +15,7 @@ object ReclamationForm: TReclamationForm
     Left = 2
     Height = 32
     Top = 2
-    Width = 909
+    Width = 996
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -25,14 +24,14 @@ object ReclamationForm: TReclamationForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 32
-    ClientWidth = 909
+    ClientHeight = 28
+    ClientWidth = 992
     Constraints.MaxHeight = 32
     Constraints.MinHeight = 32
     ParentFont = False
     TabOrder = 0
     object Panel3: TPanel
-      Left = 187
+      Left = 201
       Height = 28
       Top = 0
       Width = 170
@@ -184,8 +183,8 @@ object ReclamationForm: TReclamationForm
           00FC007F00E40080005400000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 0
+        Images = Images.PX24
+        ImageIndex = 3
         ParentFont = False
         OnClick = AddButtonClick
       end
@@ -331,8 +330,8 @@ object ReclamationForm: TReclamationForm
           00000000000000000000000000000000000000A5FF0500A5FF8700A5FFE200A5
           FFD900A5FF6D0000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 2
+        Images = Images.PX24
+        ImageIndex = 5
         ParentFont = False
         OnClick = EditButtonClick
       end
@@ -478,8 +477,8 @@ object ReclamationForm: TReclamationForm
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 1
+        Images = Images.PX24
+        ImageIndex = 4
         ParentFont = False
         OnClick = DelButtonClick
       end
@@ -625,8 +624,8 @@ object ReclamationForm: TReclamationForm
           00000000000000000000000000000000000000A5FF0500A5FF8700A5FFE200A5
           FFD900A5FF6D0000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListCategory24
-        ImageIndex = 19
+        Images = Images.PX24
+        ImageIndex = 24
         ParentFont = False
         ParentShowHint = False
         OnClick = RepairButtonClick
@@ -773,7 +772,7 @@ object ReclamationForm: TReclamationForm
           00000000000000000000000000000000000000A5FF0500A5FF8700A5FFE200A5
           FFD900A5FF6D0000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListCategory24
+        Images = Images.PX24
         ImageIndex = 18
         ParentFont = False
         ParentShowHint = False
@@ -781,7 +780,7 @@ object ReclamationForm: TReclamationForm
       end
     end
     object Panel5: TPanel
-      Left = 809
+      Left = 982
       Height = 28
       Top = 0
       Width = 0
@@ -791,55 +790,18 @@ object ReclamationForm: TReclamationForm
       Caption = 'Panel5'
       TabOrder = 1
     end
-    object Panel7: TPanel
-      Left = 366
+    object FilterPanel: TPanel
+      Left = 389
       Height = 28
       Top = 0
-      Width = 206
+      Width = 250
       Align = alLeft
-      AutoSize = True
-      BorderSpacing.Left = 5
-      BorderSpacing.Right = 5
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 206
+      Caption = 'FilterPanel'
       TabOrder = 2
-      object Label2: TLabel
-        AnchorSideLeft.Control = Panel7
-        AnchorSideTop.Control = Panel7
-        AnchorSideTop.Side = asrCenter
-        Left = 0
-        Height = 15
-        Top = 7
-        Width = 97
-        Caption = 'Поиск по номеру'
-        ParentColor = False
-      end
-      object MotorNumEdit: TEditButton
-        AnchorSideLeft.Control = Label2
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = Panel7
-        AnchorSideTop.Side = asrCenter
-        AnchorSideBottom.Side = asrBottom
-        Left = 103
-        Height = 23
-        Top = 3
-        Width = 103
-        BorderSpacing.Left = 6
-        ButtonCursor = crHandPoint
-        ButtonWidth = 23
-        Images = MainForm.ImageList16
-        ImageIndex = 0
-        MaxLength = 0
-        NumGlyphs = 1
-        PasswordChar = #0
-        TabOrder = 0
-        OnButtonClick = MotorNumEditButtonClick
-        OnChange = MotorNumEditChange
-      end
     end
     object Panel2: TPanel
-      Left = 809
+      Left = 982
       Height = 28
       Top = 0
       Width = 0
@@ -849,13 +811,11 @@ object ReclamationForm: TReclamationForm
       TabOrder = 3
     end
     object MotorCardCheckBox: TCheckBox
-      Left = 584
+      Left = 657
       Height = 28
       Top = 0
       Width = 216
       Align = alLeft
-      BorderSpacing.Left = 5
-      BorderSpacing.Right = 5
       Caption = 'Учетная карточка электродвигателя'
       Checked = True
       State = cbChecked
@@ -947,156 +907,71 @@ object ReclamationForm: TReclamationForm
         ParentFont = False
       end
     end
-    object ExportButton: TBCButton
-      Cursor = crHandPoint
-      Left = 810
-      Height = 26
-      Top = 1
-      Width = 93
-      Align = alLeft
-      AutoSize = True
-      StateClicked.Background.Color = 16245964
-      StateClicked.Background.Gradient1.StartColor = 16577765
-      StateClicked.Background.Gradient1.EndColor = 16180676
-      StateClicked.Background.Gradient1.GradientType = gtLinear
-      StateClicked.Background.Gradient1.Point1XPercent = 0
-      StateClicked.Background.Gradient1.Point1YPercent = 0
-      StateClicked.Background.Gradient1.Point2XPercent = 0
-      StateClicked.Background.Gradient1.Point2YPercent = 100
-      StateClicked.Background.Gradient2.StartColor = 15716760
-      StateClicked.Background.Gradient2.EndColor = 14398312
-      StateClicked.Background.Gradient2.GradientType = gtLinear
-      StateClicked.Background.Gradient2.Point1XPercent = 0
-      StateClicked.Background.Gradient2.Point1YPercent = 0
-      StateClicked.Background.Gradient2.Point2XPercent = 0
-      StateClicked.Background.Gradient2.Point2YPercent = 100
-      StateClicked.Background.Gradient1EndPercent = 55
-      StateClicked.Background.Style = bbsColor
-      StateClicked.Border.Color = 10048512
-      StateClicked.Border.LightColor = clBlack
-      StateClicked.Border.LightOpacity = 100
-      StateClicked.Border.Style = bboSolid
-      StateClicked.FontEx.Color = clBlack
-      StateClicked.FontEx.FontQuality = fqSystemClearType
-      StateClicked.FontEx.Shadow = False
-      StateClicked.FontEx.ShadowRadius = 5
-      StateClicked.FontEx.ShadowOffsetX = 5
-      StateClicked.FontEx.ShadowOffsetY = 5
-      StateClicked.FontEx.Style = []
-      StateHover.Background.Color = 16511461
-      StateHover.Background.Gradient1.StartColor = 16643818
-      StateHover.Background.Gradient1.EndColor = 16576729
-      StateHover.Background.Gradient1.GradientType = gtLinear
-      StateHover.Background.Gradient1.Point1XPercent = 0
-      StateHover.Background.Gradient1.Point1YPercent = 0
-      StateHover.Background.Gradient1.Point2XPercent = 0
-      StateHover.Background.Gradient1.Point2YPercent = 100
-      StateHover.Background.Gradient2.StartColor = 16639678
-      StateHover.Background.Gradient2.EndColor = 16112039
-      StateHover.Background.Gradient2.GradientType = gtLinear
-      StateHover.Background.Gradient2.Point1XPercent = 0
-      StateHover.Background.Gradient2.Point1YPercent = 0
-      StateHover.Background.Gradient2.Point2XPercent = 0
-      StateHover.Background.Gradient2.Point2YPercent = 100
-      StateHover.Background.Gradient1EndPercent = 50
-      StateHover.Background.Style = bbsColor
-      StateHover.Border.Color = 14120960
-      StateHover.Border.LightOpacity = 200
-      StateHover.Border.Style = bboSolid
-      StateHover.FontEx.Color = clBlack
-      StateHover.FontEx.FontQuality = fqSystemClearType
-      StateHover.FontEx.Shadow = False
-      StateHover.FontEx.ShadowRadius = 5
-      StateHover.FontEx.ShadowOffsetX = 5
-      StateHover.FontEx.ShadowOffsetY = 5
-      StateHover.FontEx.Style = []
-      StateNormal.Background.Color = 14803425
-      StateNormal.Background.Gradient1.StartColor = 15921906
-      StateNormal.Background.Gradient1.EndColor = 15461355
-      StateNormal.Background.Gradient1.GradientType = gtLinear
-      StateNormal.Background.Gradient1.Point1XPercent = 0
-      StateNormal.Background.Gradient1.Point1YPercent = 0
-      StateNormal.Background.Gradient1.Point2XPercent = 0
-      StateNormal.Background.Gradient1.Point2YPercent = 100
-      StateNormal.Background.Gradient2.StartColor = 14540253
-      StateNormal.Background.Gradient2.EndColor = 13619151
-      StateNormal.Background.Gradient2.GradientType = gtLinear
-      StateNormal.Background.Gradient2.Point1XPercent = 0
-      StateNormal.Background.Gradient2.Point1YPercent = 0
-      StateNormal.Background.Gradient2.Point2XPercent = 0
-      StateNormal.Background.Gradient2.Point2YPercent = 100
-      StateNormal.Background.Gradient1EndPercent = 50
-      StateNormal.Background.Style = bbsColor
-      StateNormal.Border.Color = 11382189
-      StateNormal.Border.LightOpacity = 200
-      StateNormal.Border.Style = bboSolid
-      StateNormal.FontEx.Color = clBlack
-      StateNormal.FontEx.FontQuality = fqSystemClearType
-      StateNormal.FontEx.Shadow = False
-      StateNormal.FontEx.ShadowRadius = 5
-      StateNormal.FontEx.ShadowOffsetX = 5
-      StateNormal.FontEx.ShadowOffsetY = 5
-      StateNormal.FontEx.Style = []
-      BorderSpacing.Left = 1
-      BorderSpacing.Top = 1
-      BorderSpacing.Bottom = 1
-      Caption = 'Экспорт'
-      Color = clNone
-      DropDownWidth = 16
-      DropDownArrowSize = 8
-      GlobalOpacity = 255
-      GlyphMargin = 0
-      OnClick = ExportButtonClick
-      ParentColor = False
-      Rounding.RoundX = 0
-      Rounding.RoundY = 0
-      RoundingDropDown.RoundX = 1
-      RoundingDropDown.RoundY = 1
-      TextApplyGlobalOpacity = False
-      DropDownStyle = bdsCommon
-      Images = MainForm.ImageListCategory24
-      ImageIndex = 7
-      MemoryUsage = bmuHigh
-    end
-    object Bevel2: TBevel
+    object DividerBevel1: TDividerBevel
       Left = 183
       Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel1'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
-    object Bevel3: TBevel
-      Left = 359
+    object DividerBevel2: TDividerBevel
+      Left = 371
       Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel2'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
-    object Bevel4: TBevel
-      Left = 577
+    object DividerBevel3: TDividerBevel
+      Left = 639
       Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel3'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
-    object Bevel5: TBevel
-      Left = 805
+    object DividerBevel4: TDividerBevel
+      Left = 873
       Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel4'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
+    object ExportButton: TSpeedButton
+      Cursor = crHandPoint
+      Left = 891
+      Height = 28
+      Hint = 'Экспорт в формат электронной таблицы XLSX или ODS'
+      Top = 0
+      Width = 91
+      Align = alLeft
+      AutoSize = True
+      Caption = ' Экспорт '
+      Images = Images.PX24
+      ImageIndex = 9
+      Margin = 5
+      Spacing = 0
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = ExportButtonClick
     end
   end
   object SettingClientPanel: TPanel
@@ -1126,30 +1001,30 @@ object ReclamationForm: TReclamationForm
     Left = 257
     Height = 474
     Top = 36
-    Width = 656
+    Width = 743
     Align = alClient
     BevelOuter = bvNone
     ClientHeight = 474
-    ClientWidth = 656
+    ClientWidth = 743
     TabOrder = 3
     object Panel4: TPanel
       Left = 0
       Height = 185
       Top = 0
-      Width = 654
+      Width = 741
       Align = alClient
       BorderSpacing.Right = 2
       BorderSpacing.Bottom = 2
       BevelOuter = bvNone
       BorderStyle = bsSingle
-      ClientHeight = 185
-      ClientWidth = 654
+      ClientHeight = 181
+      ClientWidth = 737
       TabOrder = 0
       object LogGrid: TsWorksheetGrid
         Left = 0
         Height = 161
         Top = 0
-        Width = 650
+        Width = 737
         AutoExpand = []
         DisplayFixedColRow = False
         FrozenBorderPen.Style = psClear
@@ -1186,7 +1061,7 @@ object ReclamationForm: TReclamationForm
         Left = 0
         Height = 18
         Top = 163
-        Width = 650
+        Width = 737
         Align = alBottom
         BevelOuter = bvNone
         Color = clWindow
@@ -1198,7 +1073,7 @@ object ReclamationForm: TReclamationForm
         Left = 0
         Height = 2
         Top = 161
-        Width = 650
+        Width = 737
         Align = alBottom
         Shape = bsBottomLine
         Style = bsRaised
@@ -1208,7 +1083,7 @@ object ReclamationForm: TReclamationForm
       Left = 2
       Height = 280
       Top = 194
-      Width = 652
+      Width = 739
       Align = alBottom
       BorderSpacing.Left = 2
       BorderSpacing.Top = 2
@@ -1221,7 +1096,7 @@ object ReclamationForm: TReclamationForm
       Left = 0
       Height = 5
       Top = 187
-      Width = 656
+      Width = 743
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine

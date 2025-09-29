@@ -2,12 +2,11 @@ object BuildEditForm: TBuildEditForm
   Left = 653
   Height = 208
   Top = 266
-  Width = 475
-  BorderStyle = bsSizeToolWin
+  Width = 500
+  BorderIcons = [biSystemMenu]
   ClientHeight = 208
-  ClientWidth = 475
+  ClientWidth = 500
   Position = poScreenCenter
-  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
   object Panel2: TPanel
@@ -15,7 +14,7 @@ object BuildEditForm: TBuildEditForm
     Left = 2
     Height = 151
     Top = 2
-    Width = 471
+    Width = 496
     Align = alTop
     Anchors = [akTop, akLeft, akRight, akBottom]
     AutoSize = True
@@ -25,7 +24,7 @@ object BuildEditForm: TBuildEditForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 147
-    ClientWidth = 467
+    ClientWidth = 492
     ParentFont = False
     TabOrder = 0
     object Label1: TLabel
@@ -66,7 +65,7 @@ object BuildEditForm: TBuildEditForm
       Left = 103
       Height = 23
       Top = 41
-      Width = 362
+      Width = 387
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -101,7 +100,7 @@ object BuildEditForm: TBuildEditForm
       Left = 103
       Height = 23
       Top = 76
-      Width = 362
+      Width = 387
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -133,7 +132,7 @@ object BuildEditForm: TBuildEditForm
       Left = 103
       Height = 23
       Top = 111
-      Width = 362
+      Width = 387
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -176,7 +175,7 @@ object BuildEditForm: TBuildEditForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
-      Left = 208
+      Left = 233
       Height = 19
       Top = 8
       Width = 257
@@ -190,7 +189,7 @@ object BuildEditForm: TBuildEditForm
     Left = 2
     Height = 49
     Top = 153
-    Width = 471
+    Width = 496
     Align = alBottom
     AutoSize = True
     BorderSpacing.Left = 2
@@ -198,7 +197,7 @@ object BuildEditForm: TBuildEditForm
     BorderSpacing.Bottom = 6
     BevelOuter = bvNone
     ClientHeight = 49
-    ClientWidth = 471
+    ClientWidth = 496
     TabOrder = 1
     object CancelButton: TSpeedButton
       AnchorSideTop.Control = DividerBevel1
@@ -206,7 +205,7 @@ object BuildEditForm: TBuildEditForm
       AnchorSideRight.Control = ButtonPanel
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 369
+      Left = 394
       Height = 34
       Top = 15
       Width = 100
@@ -348,8 +347,8 @@ object BuildEditForm: TBuildEditForm
         00FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FC800000780000
         0000000000000000000000000000000000000000000000000000
       }
-      Images = MainForm.ImageListEdit24
-      ImageIndex = 4
+      Images = Images.PX24
+      ImageIndex = 7
       ParentFont = False
       OnClick = CancelButtonClick
     end
@@ -358,7 +357,7 @@ object BuildEditForm: TBuildEditForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = CancelButton
       Cursor = crHandPoint
-      Left = 269
+      Left = 294
       Height = 34
       Top = 15
       Width = 100
@@ -500,8 +499,8 @@ object BuildEditForm: TBuildEditForm
         00FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FC800000780000
         0000000000000000000000000000000000000000000000000000
       }
-      Images = MainForm.ImageListEdit24
-      ImageIndex = 3
+      Images = Images.PX24
+      ImageIndex = 6
       ParentFont = False
       OnClick = SaveButtonClick
     end
@@ -509,7 +508,7 @@ object BuildEditForm: TBuildEditForm
       Left = 0
       Height = 15
       Top = 0
-      Width = 471
+      Width = 496
       Align = alTop
       Font.Style = [fsBold]
       ParentFont = False

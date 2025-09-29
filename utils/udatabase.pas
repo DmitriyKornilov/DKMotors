@@ -5,8 +5,11 @@ unit UDataBase;
 interface
 
 uses
-  Classes, SysUtils, StdCtrls, DateUtils, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
-  DK_Vector, DK_Matrix, DK_Const, DK_StrUtils, UCalendar;
+  Classes, SysUtils, StdCtrls, DateUtils,
+  //DK packages utils
+  DK_Vector, DK_Matrix, DK_Const, DK_StrUtils, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
+  //Project utils
+  UCalendar;
 
 type
 
@@ -87,9 +90,9 @@ type
     function MotorsInBuildLogWrite(const ABuildDate: TDate;
                const ANameIDs, AOldMotors: TIntVector;
                const AMotorNums, ARotorNums: TStrVector): Boolean;
-    procedure MotorInBuildLogUpdate(const AMotorID: Integer;
+    function MotorInBuildLogUpdate(const AMotorID: Integer;
                           const ABuildDate: TDate; const ANameID, AOldMotor: Integer;
-                          const AMotorNum, ARotorNum: String);
+                          const AMotorNum, ARotorNum: String): Boolean;
 
     //испытания
     function TestBeforeListLoad(const ANameIDs: TIntVector;
@@ -288,13 +291,7 @@ type
                 out AMileageNames: TStrVector;
                 out AMotorCounts: TIntMatrix3D): Boolean;
 
-
-
-
   end;
-
-var
-  DataBase: TDataBase;
 
 implementation
 
@@ -330,7 +327,7 @@ var
   i: Integer;
 begin
   Result:= False;
-  if VIsNil(ADates) then Exit;
+
   QSetQuery(FQuery);
   try
     QSetSQL('INSERT OR REPLACE INTO CALENDAR (DayDate, Status) ' +
@@ -376,7 +373,7 @@ begin
   N:= 0;
   while N<AWorkDaysCount do
   begin
-    Calendar:= DataBase.LoadCalendar(BD, IncDay(BD, AWorkDaysCount));
+    Calendar:= LoadCalendar(BD, IncDay(BD, AWorkDaysCount));
     try
       for i:=0 to Calendar.DaysCount-1 do
       begin
@@ -406,7 +403,7 @@ begin
   D:= AEndDate;
   if D=0 then D:= Date;
 
-  Calendar:= DataBase.LoadCalendar(ABeginDate, D);
+  Calendar:= LoadCalendar(ABeginDate, D);
   try
     Result:= Calendar.WorkDaysCount;
   finally
@@ -1099,10 +1096,11 @@ begin
   end;
 end;
 
-procedure TDataBase.MotorInBuildLogUpdate(const AMotorID: Integer;
+function TDataBase.MotorInBuildLogUpdate(const AMotorID: Integer;
   const ABuildDate: TDate; const ANameID, AOldMotor: Integer; const AMotorNum,
-  ARotorNum: String);
+  ARotorNum: String): Boolean;
 begin
+  Result:= False;
   QSetQuery(FQuery);
   try
     QSetSQL('UPDATE MOTORLIST ' +
@@ -1117,6 +1115,7 @@ begin
     QParamInt('OldMotor', AOldMotor);
     QExec;
     QCommit;
+    Result:= True;
   except
     QRollback;
   end;
@@ -1461,7 +1460,7 @@ var
   i: Integer;
 begin
   Result:= False;
-  if VIsNil(AMotorIDs) then Exit;
+
   QSetQuery(FQuery);
   try
     QSetSQL('INSERT INTO MOTORTEST (MotorID, TestDate, Fail, TestNote) ' +
@@ -2279,6 +2278,8 @@ begin
   ATestDates:= nil;
   MotorIDs:= nil;
 
+  if ACargoID=0 then Exit;
+
   QSetQuery(FQuery);
   QSetSQL(
     'SELECT t1.MotorID, t1.MotorNum, t2.MotorName ' +
@@ -2432,7 +2433,7 @@ var
   i, CargoID: Integer;
 begin
   Result:= False;
-  if VIsNil(AMotorIDs) then Exit;
+
   QSetQuery(FQuery);
   try
     QSetSQL('INSERT INTO CARGOLIST (ReceiverID, SendDate) ' +
@@ -2939,7 +2940,7 @@ begin
   if not Result then Exit;
   VDim(AWorkDayCounts{%H-}, Length(AArrivalDates));
     for i:= 0 to High(AWorkDayCounts) do
-      AWorkDayCounts[i]:= DataBase.LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);
+      AWorkDayCounts[i]:= LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);
 end;
 
 function TDataBase.RepairListForMotorIDLoad(const AMotorID: Integer;
@@ -2983,7 +2984,7 @@ begin
   if not Result then Exit;
   VDim(AWorkDayCounts{%H-}, Length(AArrivalDates));
     for i:= 0 to High(AWorkDayCounts) do
-      AWorkDayCounts[i]:= DataBase.LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);
+      AWorkDayCounts[i]:= LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);
 end;
 
 function TDataBase.RepairUpdate(const ARecID: Integer; const AArrivalDate,

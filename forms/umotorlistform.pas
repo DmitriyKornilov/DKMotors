@@ -5,12 +5,13 @@ unit UMotorListForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls, EditBtn,
-  Buttons, fpspreadsheetgrid, Spin, LCLType, VirtualTrees,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
+  Buttons, fpspreadsheetgrid, Spin, LCLType, DividerBevel, VirtualTrees,
   //DK packages utils
   DK_Vector, DK_StrUtils, DK_DateUtils, DK_VSTTables, DK_Const, DK_VSTTableTools,
+  DK_CtrlUtils, DK_Filter,
   //Project utils
-  UDataBase, UUtils,
+  UVars,
   //Forms
   UCardForm;
 
@@ -19,19 +20,17 @@ type
   { TMotorListForm }
 
   TMotorListForm = class(TForm)
-    Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
     CheckBox1: TCheckBox;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    DividerBevel3: TDividerBevel;
     MoreInfoCheckBox: TCheckBox;
-    MotorNumEdit: TEditButton;
-    Label2: TLabel;
     LeftPanel: TPanel;
     MainPanel: TPanel;
     SpinEdit1: TSpinEdit;
     ToolPanel: TPanel;
     CardPanel: TPanel;
-    Panel7: TPanel;
+    FilterPanel: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     VT1: TVirtualStringTree;
@@ -42,10 +41,10 @@ type
     procedure MoreInfoCheckBoxChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure MotorNumEditButtonClick(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
+    FilterString: String;
+
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
     VSTTypesList: TVSTStringList;
@@ -53,6 +52,7 @@ type
 
     procedure CreateMotorsTable;
     procedure SelectMotor;
+    procedure FilterMotor(const AFilterString: String);
 
     procedure CreateTypesList;
   public
@@ -72,14 +72,12 @@ uses UMainForm;
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(MotorListForm, CardPanel);
   CreateMotorsTable;
   CreateTypesList;
+  FilterString:= EmptyStr;
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 250, 500);
   SpinEdit1.Value:= YearOfDate(Date);
 end;
 
@@ -90,13 +88,10 @@ begin
   if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
-procedure TMotorListForm.MotorNumEditButtonClick(Sender: TObject);
+procedure TMotorListForm.FormShow(Sender: TObject);
 begin
-  MotorNumEdit.Text:= EmptyStr;
-end;
+  SetToolPanels([ToolPanel]);
 
-procedure TMotorListForm.MotorNumEditChange(Sender: TObject);
-begin
   ViewUpdate;
 end;
 
@@ -108,6 +103,7 @@ end;
 procedure TMotorListForm.CreateMotorsTable;
 begin
   VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.SetSingleFont(GridFont);
   VSTMotorsTable.OnSelect:= @SelectMotor;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
   VSTMotorsTable.HeaderHeight:= 25;
@@ -136,8 +132,6 @@ end;
 
 procedure TMotorListForm.ViewUpdate;
 var
-  MotorNumberLike: String;
-
   ABuildDates, AMotorNames, AMotorNums, AShippings: TStrVector;
 begin
    if not VSTTypesList.IsSelected then Exit;
@@ -145,12 +139,9 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
-
-    MotorNumberLike:= STrim(MotorNumEdit.Text);
-
     DataBase.MotorListLoad(SpinEdit1.Value,
                         VSTTypesList.SelectedIndex, MainForm.UsedNameIDs,
-                        MotorNumberLike, Checkbox1.Checked,
+                        STrim(FilterString), Checkbox1.Checked,
                         MotorIDs, ABuildDates,
                         AMotorNames, AMotorNums, AShippings);
 
@@ -175,12 +166,13 @@ begin
   CardForm.ShowCard(MotorID);
 end;
 
-procedure TMotorListForm.CheckBox1Change(Sender: TObject);
+procedure TMotorListForm.FilterMotor(const AFilterString: String);
 begin
+  FilterString:= AFilterString;
   ViewUpdate;
 end;
 
-procedure TMotorListForm.FormShow(Sender: TObject);
+procedure TMotorListForm.CheckBox1Change(Sender: TObject);
 begin
   ViewUpdate;
 end;

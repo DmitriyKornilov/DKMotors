@@ -5,11 +5,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
-  Buttons, StdCtrls, VirtualTrees,  fpspreadsheetgrid,
+  Buttons, StdCtrls, DividerBevel, VirtualTrees,  fpspreadsheetgrid,
   //DK packages utils
   DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTableTools, DK_Dialogs, DK_Const,
+  DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, USheetUtils,
+  UVars, USheets,
   //Forms
   UBuildAddForm, UBuildEditForm;
 
@@ -19,10 +20,10 @@ type
 
   TBuildLogForm = class(TForm)
     AddButton: TSpeedButton;
-    Bevel1: TBevel;
-    Bevel2: TBevel;
     CheckBox1: TCheckBox;
     DelButton: TSpeedButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
     EditButton: TSpeedButton;
     EditButtonPanel: TPanel;
     LogGrid: TsWorksheetGrid;
@@ -76,15 +77,8 @@ uses UMainForm;
 
 procedure TBuildLogForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetToolButtons([
-    AddButton, DelButton, EditButton
-  ]);
-
   MainForm.SetNamesPanelsVisible(True, False);
-  BuildLog:= TBuildLogTable.Create(LogGrid, @SelectMotor);
+  BuildLog:= TBuildLogTable.Create(LogGrid, @SelectMotor, GridFont);
   VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @SelectDate);
   SelectedDate:= Date;
   SpinEdit1.Value:= YearOfDate(Date);
@@ -98,6 +92,10 @@ end;
 
 procedure TBuildLogForm.FormShow(Sender: TObject);
 begin
+  SetToolPanels([ToolPanel]);
+  SetToolButtons([AddButton, DelButton, EditButton]);
+  Images.ToButtons([AddButton, DelButton, EditButton]);
+
   ViewUpdate;
 end;
 

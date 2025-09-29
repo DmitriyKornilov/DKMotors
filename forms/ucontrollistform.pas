@@ -6,11 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  EditBtn, StdCtrls, VirtualTrees, BCButton,
+  StdCtrls, DividerBevel, VirtualTrees,
   //DK packages utils
   DK_VSTTables, DK_SheetExporter, DK_Vector, DK_StrUtils, DK_Dialogs, DK_Const,
+  DK_CtrlUtils, DK_Filter,
   //Project utils
-  UDataBase, UUtils, USheetUtils,
+  UVars, USheets,
   //Forms
   UCardForm, UControlListEditForm;
 
@@ -20,18 +21,16 @@ type
 
   TControlListForm = class(TForm)
     AddButton: TSpeedButton;
-    Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
     DelButton: TSpeedButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    DividerBevel3: TDividerBevel;
     EditButton: TSpeedButton;
-    Label2: TLabel;
+    ExportButton: TSpeedButton;
     MotorCardCheckBox: TCheckBox;
-    MotorNumEdit: TEditButton;
     Panel3: TPanel;
     CardPanel: TPanel;
-    Panel7: TPanel;
-    ExportButton: TBCButton;
+    FilterPanel: TPanel;
     Splitter2: TSplitter;
     ToolPanel: TPanel;
     VT1: TVirtualStringTree;
@@ -41,12 +40,12 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorCardCheckBoxChange(Sender: TObject);
-    procedure MotorNumEditButtonClick(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
+    procedure MotorCardCheckBoxChange(Sender: TObject);
     procedure VT1DblClick(Sender: TObject);
   private
+    FilterString: String;
+
     CardForm: TCardForm;
     VSTMotorsTable: TVSTTable;
 
@@ -55,6 +54,7 @@ type
 
     procedure CreateMotorsTable;
     procedure SelectMotor;
+    procedure FilterMotor(const AFilterString: String);
     procedure OpenControlListEditForm(const AEditType: Byte);
   public
     procedure ViewUpdate;
@@ -73,17 +73,27 @@ uses UMainForm;
 
 procedure TControlListForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetToolButtons([
-    AddButton, DelButton, EditButton
-  ]);
-
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(ControlListForm, CardPanel);
   CreateMotorsTable;
+  FilterString:= EmptyStr;
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 250, 500);
   MotorCardCheckBox.Checked:= False;
+end;
+
+procedure TControlListForm.FormDestroy(Sender: TObject);
+begin
+  if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
+  if Assigned(CardForm) then FreeAndNil(CardForm);
+end;
+
+procedure TControlListForm.FormShow(Sender: TObject);
+begin
+  SetToolPanels([ToolPanel]);
+  SetToolButtons([AddButton, DelButton, EditButton]);
+  Images.ToButtons([ExportButton, AddButton, DelButton, EditButton]);
+
+  ViewUpdate;
 end;
 
 procedure TControlListForm.DelButtonClick(Sender: TObject);
@@ -104,17 +114,6 @@ begin
   OpenControlListEditForm(1);
 end;
 
-procedure TControlListForm.FormDestroy(Sender: TObject);
-begin
-  if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
-  if Assigned(CardForm) then FreeAndNil(CardForm);
-end;
-
-procedure TControlListForm.FormShow(Sender: TObject);
-begin
-  ViewUpdate;
-end;
-
 procedure TControlListForm.MotorCardCheckBoxChange(Sender: TObject);
 begin
   If MotorCardCheckBox.Checked then
@@ -132,16 +131,6 @@ begin
   end;
 end;
 
-procedure TControlListForm.MotorNumEditButtonClick(Sender: TObject);
-begin
-  MotorNumEdit.Text:= EmptyStr;
-end;
-
-procedure TControlListForm.MotorNumEditChange(Sender: TObject);
-begin
-  ViewUpdate;
-end;
-
 procedure TControlListForm.ExportButtonClick(Sender: TObject);
 var
   Exporter: TSheetsExporter;
@@ -151,7 +140,7 @@ begin
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
-    ControlSheet:= TControlSheet.Create(Sheet);
+    ControlSheet:= TControlSheet.Create(Sheet, nil, GridFont);
     try
       ControlSheet.Draw(MotorNames, MotorNums, Series, Notes);
     finally
@@ -174,6 +163,7 @@ end;
 procedure TControlListForm.CreateMotorsTable;
 begin
   VSTMotorsTable:= TVSTTable.Create(VT1);
+  VSTMotorsTable.SetSingleFont(GridFont);
   VSTMotorsTable.OnSelect:= @SelectMotor;
   VSTMotorsTable.HeaderFont.Style:= [fsBold];
   VSTMotorsTable.AddColumn('№ п/п', 60);
@@ -198,6 +188,12 @@ begin
   CardForm.ShowCard(MotorID);
 end;
 
+procedure TControlListForm.FilterMotor(const AFilterString: String);
+begin
+  FilterString:= AFilterString;
+  ViewUpdate;
+end;
+
 procedure TControlListForm.OpenControlListEditForm(const AEditType: Byte);
 var
   ControlListEditForm: TControlListEditForm;
@@ -218,15 +214,12 @@ begin
 end;
 
 procedure TControlListForm.ViewUpdate;
-var
-  MotorNumberLike: String;
 begin
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
-    MotorNumberLike:= STrim(MotorNumEdit.Text);
 
-    DataBase.ControlListLoad(MainForm.UsedNameIDs, MotorNumberLike,
+    DataBase.ControlListLoad(MainForm.UsedNameIDs, STrim(FilterString),
                            MotorIDs, MotorNames, MotorNums, Series, Notes);
 
     VSTMotorsTable.ValuesClear;

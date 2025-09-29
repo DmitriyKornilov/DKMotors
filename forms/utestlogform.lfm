@@ -16,47 +16,42 @@ object TestLogForm: TTestLogForm
     Left = 2
     Height = 32
     Top = 2
-    Width = 780
+    Width = 623
     Align = alTop
-    AutoSize = True
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 32
-    ClientWidth = 780
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientWidth = 623
     TabOrder = 0
     object CheckBox1: TCheckBox
-      Left = 168
-      Height = 36
+      Left = 161
+      Height = 28
       Top = 0
-      Width = 192
+      Width = 152
       Align = alLeft
-      BorderSpacing.Left = 5
-      BorderSpacing.Right = 5
       Caption = 'Упорядочить по номеру'
       TabOrder = 0
       OnChange = CheckBox1Change
     end
     object EditButtonPanel: TPanel
-      Left = 77
-      Height = 36
+      Left = 75
+      Height = 28
       Top = 0
-      Width = 80
+      Width = 68
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 80
+      ClientHeight = 28
+      ClientWidth = 68
       ParentFont = False
       TabOrder = 1
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 36
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -192,17 +187,17 @@ object TestLogForm: TTestLogForm
           00FC007F00E40080005400000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 0
+        Images = Images.PX24
+        ImageIndex = 3
         ParentFont = False
         OnClick = AddButtonClick
       end
       object DelButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 40
-        Height = 36
+        Left = 34
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -338,19 +333,18 @@ object TestLogForm: TTestLogForm
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 1
+        Images = Images.PX24
+        ImageIndex = 4
         ParentFont = False
         OnClick = DelButtonClick
       end
     end
     object CheckBox2: TCheckBox
-      Left = 374
-      Height = 36
+      Left = 331
+      Height = 28
       Top = 0
-      Width = 127
+      Width = 102
       Align = alLeft
-      BorderSpacing.Left = 5
       Caption = 'На испытаниях'
       Checked = True
       State = cbChecked
@@ -359,21 +353,21 @@ object TestLogForm: TTestLogForm
     end
     object YearPanel: TPanel
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 71
+      Width = 57
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 71
+      ClientHeight = 28
+      ClientWidth = 57
       TabOrder = 3
       object SpinEdit1: TSpinEdit
         AnchorSideLeft.Control = YearPanel
         AnchorSideTop.Control = YearPanel
         AnchorSideTop.Side = asrCenter
         Left = 1
-        Height = 28
+        Height = 23
         Top = 3
         Width = 56
         Alignment = taCenter
@@ -386,62 +380,68 @@ object TestLogForm: TTestLogForm
         OnChange = SpinEdit1Change
       end
     end
-    object Bevel1: TBevel
-      Left = 74
-      Height = 36
+    object DividerBevel1: TDividerBevel
+      Left = 57
+      Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel1'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 1
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
-    object Bevel2: TBevel
-      Left = 160
-      Height = 36
+    object DividerBevel2: TDividerBevel
+      Left = 143
+      Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel2'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 1
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
-    object Bevel3: TBevel
-      Left = 366
-      Height = 36
+    object DividerBevel3: TDividerBevel
+      Left = 313
+      Height = 28
       Top = 0
-      Width = 2
+      Width = 18
+      Caption = 'DividerBevel3'
       Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 1
-      Shape = bsRightLine
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
     end
   end
   object Splitter1: TSplitter
-    Left = 252
-    Height = 541
-    Top = 44
+    Left = 202
+    Height = 432
+    Top = 36
     Width = 5
     ResizeStyle = rsLine
   end
   object Panel1: TPanel
     Left = 2
-    Height = 539
-    Top = 44
+    Height = 430
+    Top = 36
     Width = 200
     Align = alLeft
     BorderSpacing.Left = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 539
+    ClientHeight = 430
     ClientWidth = 200
     TabOrder = 2
     object VT: TVirtualStringTree
       Left = 0
-      Height = 535
+      Height = 426
       Top = 0
-      Width = 246
+      Width = 196
       Align = alClient
       BorderStyle = bsNone
       Colors.GridLineColor = clSilver
@@ -455,7 +455,7 @@ object TestLogForm: TTestLogForm
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable]
           Position = 0
           Text = 'Документ'
-          Width = 246
+          Width = 196
         end>
       Header.Height = 26
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
@@ -468,44 +468,44 @@ object TestLogForm: TTestLogForm
     end
   end
   object Panel2: TPanel
-    Left = 258
-    Height = 539
-    Top = 44
-    Width = 524
+    Left = 207
+    Height = 430
+    Top = 36
+    Width = 418
     Align = alClient
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
-    ClientHeight = 539
-    ClientWidth = 524
+    ClientHeight = 430
+    ClientWidth = 418
     TabOrder = 3
     object Splitter2: TSplitter
       AnchorSideBottom.Control = Panel4
       Cursor = crVSplit
       Left = 0
       Height = 5
-      Top = 134
-      Width = 524
+      Top = 105
+      Width = 418
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
     end
     object Panel3: TPanel
       Left = 0
-      Height = 133
+      Height = 105
       Top = 0
-      Width = 524
+      Width = 418
       Align = alClient
       BevelOuter = bvNone
       BorderStyle = bsSingle
-      ClientHeight = 133
-      ClientWidth = 524
+      ClientHeight = 105
+      ClientWidth = 418
       TabOrder = 1
       object TestGrid: TsWorksheetGrid
         Left = 0
-        Height = 129
+        Height = 101
         Top = 0
-        Width = 520
+        Width = 414
         DisplayFixedColRow = False
         FrozenBorderPen.Style = psClear
         FrozenCols = 0
@@ -527,19 +527,19 @@ object TestLogForm: TTestLogForm
     object Panel4: TPanel
       Left = 0
       Height = 320
-      Top = 219
-      Width = 524
+      Top = 110
+      Width = 418
       Align = alBottom
       BevelOuter = bvNone
       BorderStyle = bsSingle
       ClientHeight = 320
-      ClientWidth = 524
+      ClientWidth = 418
       TabOrder = 2
       object LogGrid: TsWorksheetGrid
         Left = 0
-        Height = 396
+        Height = 316
         Top = 0
-        Width = 520
+        Width = 414
         AutoExpand = []
         DisplayFixedColRow = False
         FrozenBorderPen.Style = psClear

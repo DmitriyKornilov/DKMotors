@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
   Buttons, DateTimePicker, DividerBevel, VirtualTrees, LCLType,
   //DK packages utils
-  DK_Vector,  DK_VSTTables, DK_Dialogs, DK_StrUtils, DK_Const,
+  DK_Vector, DK_VSTTables, DK_Dialogs, DK_StrUtils, DK_Const, DK_CtrlUtils,
   //Project utils
-  UDataBase, USheetUtils;
+  UVars, USheets;
 
 type
 
@@ -38,7 +38,6 @@ type
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -57,7 +56,6 @@ type
 
     MotorNameIDs: TIntVector;
     MotorNums, RotorNums, MotorNames: TStrVector;
-    CanFormClose: Boolean;
 
     VSTTable: TVSTTable;
 
@@ -81,7 +79,6 @@ procedure TBuildAddForm.FormCreate(Sender: TObject);
 begin
   LoadMotorNames;
   VSTTable:= TVSTTable.Create(VT2);
-  CanFormClose:= True;
 end;
 
 procedure TBuildAddForm.FormDestroy(Sender: TObject);
@@ -93,6 +90,9 @@ procedure TBuildAddForm.FormShow(Sender: TObject);
 var
   Ind: Integer;
 begin
+  Images.ToButtons([SaveButton, CancelButton, DelButton, AddButton]);
+  SetEventButtons([SaveButton, CancelButton, DelButton, AddButton]);
+
   if UsedNameID>0 then
   begin
     Ind:= VIndexOf(NameIDs, UsedNameID);
@@ -129,18 +129,12 @@ end;
 
 procedure TBuildAddForm.CancelButtonClick(Sender: TObject);
 begin
-  CanFormClose:= True;
   ModalResult:= mrCancel;
 end;
 
 procedure TBuildAddForm.DelButtonClick(Sender: TObject);
 begin
   DelMotor;
-end;
-
-procedure TBuildAddForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
 end;
 
 procedure TBuildAddForm.RotorNumEditKeyDown(Sender: TObject; var Key: Word;
@@ -151,8 +145,6 @@ end;
 
 procedure TBuildAddForm.SaveButtonClick(Sender: TObject);
 begin
-  CanFormClose:= False;
-
   if MotorNameComboBox.Text=EmptyStr then
   begin
     Inform('Не указано наименование двигателя!');
@@ -165,10 +157,9 @@ begin
     Exit;
   end;
 
-  DataBase.MotorsInBuildLogWrite(DateTimePicker1.Date, MotorNameIDs, OldMotors,
-                               MotorNums, RotorNums);
+  if not DataBase.MotorsInBuildLogWrite(DateTimePicker1.Date, MotorNameIDs, OldMotors,
+                                        MotorNums, RotorNums) then Exit;
 
-  CanFormClose:= True;
   ModalResult:= mrOK;
 end;
 

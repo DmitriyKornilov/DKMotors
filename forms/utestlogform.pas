@@ -6,11 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin,
-  Buttons, StdCtrls, VirtualTrees, fpspreadsheetgrid,
+  Buttons, StdCtrls, DividerBevel, VirtualTrees, fpspreadsheetgrid,
   //DK packages utils
   DK_DateUtils, DK_Vector, DK_Matrix, DK_VSTTableTools, DK_Dialogs, DK_Const,
+  DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, USheetUtils,
+  UVars, USheets,
   //Forms
   UTestAddForm;
 
@@ -20,12 +21,12 @@ type
 
   TTestLogForm = class(TForm)
     AddButton: TSpeedButton;
-    Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     DelButton: TSpeedButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
+    DividerBevel3: TDividerBevel;
     EditButtonPanel: TPanel;
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
@@ -104,25 +105,12 @@ end;
 
 procedure TTestLogForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetToolButtons([
-    AddButton, DelButton
-  ]);
-
   MainForm.SetNamesPanelsVisible(True, False);
   VSTDateList:= TVSTCategoryDateList.Create(VT, EmptyStr, @SelectDate);
-  TestLog:= TTestLogTable.Create(TestGrid, @SelectMotor);
-  BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid);
+  TestLog:= TTestLogTable.Create(TestGrid, @SelectMotor, GridFont);
+  BeforeTestSheet:= TBeforeTestSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
   SelectedDate:= Date;
   SpinEdit1.Value:= YearOfDate(Date);
-end;
-
-procedure TTestLogForm.ViewUpdate;
-begin
-  OpenDatesList(SelectedDate);
-  OpenBeforeTestList;
 end;
 
 procedure TTestLogForm.FormDestroy(Sender: TObject);
@@ -134,7 +122,17 @@ end;
 
 procedure TTestLogForm.FormShow(Sender: TObject);
 begin
+  SetToolPanels([ToolPanel]);
+  SetToolButtons([AddButton, DelButton]);
+  Images.ToButtons([AddButton, DelButton]);
+
   ViewUpdate;
+end;
+
+procedure TTestLogForm.ViewUpdate;
+begin
+  OpenDatesList(SelectedDate);
+  OpenBeforeTestList;
 end;
 
 procedure TTestLogForm.SpinEdit1Change(Sender: TObject);

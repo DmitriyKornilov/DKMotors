@@ -16,48 +16,44 @@ object BuildLogForm: TBuildLogForm
     Left = 2
     Height = 32
     Top = 2
-    Width = 1402
+    Width = 1121
     Align = alTop
-    AutoSize = True
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 32
-    ClientWidth = 1402
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientWidth = 1121
     TabOrder = 0
     object CheckBox1: TCheckBox
-      Left = 208
-      Height = 36
+      Left = 195
+      Height = 28
       Top = 0
-      Width = 192
+      Width = 152
       Align = alLeft
-      BorderSpacing.Left = 5
       Caption = 'Упорядочить по номеру'
       TabOrder = 0
       OnChange = CheckBox1Change
     end
     object EditButtonPanel: TPanel
-      Left = 77
-      Height = 36
+      Left = 75
+      Height = 28
       Top = 0
-      Width = 120
+      Width = 102
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 120
+      ClientHeight = 28
+      ClientWidth = 102
       ParentFont = False
       TabOrder = 1
       object AddButton: TSpeedButton
         Cursor = crHandPoint
         Left = 0
-        Height = 36
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -193,17 +189,17 @@ object BuildLogForm: TBuildLogForm
           00FC007F00E40080005400000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 0
+        Images = Images.PX24
+        ImageIndex = 3
         ParentFont = False
         OnClick = AddButtonClick
       end
       object DelButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 40
-        Height = 36
+        Left = 34
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -340,17 +336,17 @@ object BuildLogForm: TBuildLogForm
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 1
+        Images = Images.PX24
+        ImageIndex = 4
         ParentFont = False
         OnClick = DelButtonClick
       end
       object EditButton: TSpeedButton
         Cursor = crHandPoint
-        Left = 80
-        Height = 36
+        Left = 68
+        Height = 28
         Top = 0
-        Width = 40
+        Width = 34
         Align = alLeft
         AutoSize = True
         Constraints.MinWidth = 32
@@ -487,49 +483,29 @@ object BuildLogForm: TBuildLogForm
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        Images = MainForm.ImageListEdit24
-        ImageIndex = 2
+        Images = Images.PX24
+        ImageIndex = 5
         ParentFont = False
         OnClick = EditButtonClick
       end
     end
-    object Bevel1: TBevel
-      Left = 73
-      Height = 36
-      Top = 0
-      Width = 2
-      Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
-    end
-    object Bevel2: TBevel
-      Left = 200
-      Height = 36
-      Top = 0
-      Width = 2
-      Align = alLeft
-      BorderSpacing.Left = 2
-      BorderSpacing.Right = 2
-      Shape = bsRightLine
-    end
     object YearPanel: TPanel
       Left = 0
-      Height = 36
+      Height = 28
       Top = 0
-      Width = 71
+      Width = 57
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 71
+      ClientHeight = 28
+      ClientWidth = 57
       TabOrder = 2
       object SpinEdit1: TSpinEdit
         AnchorSideLeft.Control = YearPanel
         AnchorSideTop.Control = YearPanel
         AnchorSideTop.Side = asrCenter
         Left = 1
-        Height = 28
+        Height = 23
         Top = 3
         Width = 56
         Alignment = taCenter
@@ -542,18 +518,42 @@ object BuildLogForm: TBuildLogForm
         OnChange = SpinEdit1Change
       end
     end
+    object DividerBevel1: TDividerBevel
+      Left = 57
+      Height = 28
+      Top = 0
+      Width = 18
+      Caption = 'DividerBevel1'
+      Align = alLeft
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
+    object DividerBevel2: TDividerBevel
+      Left = 177
+      Height = 28
+      Top = 0
+      Width = 18
+      Caption = 'DividerBevel2'
+      Align = alLeft
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
   end
   object Splitter1: TSplitter
-    Left = 252
-    Height = 530
-    Top = 42
+    Left = 202
+    Height = 424
+    Top = 34
     Width = 5
     ResizeStyle = rsLine
   end
   object Panel1: TPanel
     Left = 2
-    Height = 526
-    Top = 44
+    Height = 420
+    Top = 36
     Width = 200
     Align = alLeft
     BorderSpacing.Left = 2
@@ -561,14 +561,14 @@ object BuildLogForm: TBuildLogForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 526
+    ClientHeight = 420
     ClientWidth = 200
     TabOrder = 2
     object VT: TVirtualStringTree
       Left = 0
-      Height = 522
+      Height = 416
       Top = 0
-      Width = 246
+      Width = 196
       Align = alClient
       BorderStyle = bsNone
       Colors.GridLineColor = clSilver
@@ -582,7 +582,7 @@ object BuildLogForm: TBuildLogForm
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable]
           Position = 0
           Text = 'Документ'
-          Width = 246
+          Width = 196
         end>
       Header.Height = 26
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
@@ -595,24 +595,24 @@ object BuildLogForm: TBuildLogForm
     end
   end
   object Panel2: TPanel
-    Left = 258
-    Height = 526
-    Top = 44
-    Width = 1146
+    Left = 207
+    Height = 420
+    Top = 36
+    Width = 916
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 526
-    ClientWidth = 1146
+    ClientHeight = 420
+    ClientWidth = 916
     TabOrder = 3
     object LogGrid: TsWorksheetGrid
       Left = 0
-      Height = 522
+      Height = 416
       Top = 0
-      Width = 1142
+      Width = 912
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear

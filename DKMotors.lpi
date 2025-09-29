@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="8"/>
+      <BuildNr Value="10"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
@@ -60,6 +60,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="LazControlDsgn"/>
+      </Item>
       <Item>
         <PackageName Value="SQLDBLaz"/>
       </Item>
@@ -139,9 +142,9 @@
         <UnitName Value="UBuildAddForm"/>
       </Unit>
       <Unit>
-        <Filename Value="utils\usheetutils.pas"/>
+        <Filename Value="utils\usheets.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="USheetUtils"/>
+        <UnitName Value="USheets"/>
       </Unit>
       <Unit>
         <Filename Value="forms\utestaddform.pas"/>
@@ -216,12 +219,12 @@
         <UnitName Value="UTestLogForm"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\ushipmentform.pas"/>
+        <Filename Value="forms\ucargoform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ShipmentForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UShipmentForm"/>
+        <UnitName Value="UCargoForm"/>
       </Unit>
       <Unit>
         <Filename Value="forms\ureclamationeditform.pas"/>
@@ -306,17 +309,25 @@
         <UnitName Value="UControlListEditForm"/>
       </Unit>
       <Unit>
-        <Filename Value="utils\uutils.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UUtils"/>
-      </Unit>
-      <Unit>
         <Filename Value="forms\upackingsheetform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="PackingSheetForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UPackingSheetForm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="utils\uvars.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVars"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uimages.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Images"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <UnitName Value="UImages"/>
       </Unit>
     </Units>
   </ProjectOptions>

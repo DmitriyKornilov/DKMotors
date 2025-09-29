@@ -5,13 +5,14 @@ unit UCalendarForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin, BCButton,
-  Buttons, VirtualTrees, DateTimePicker, fpspreadsheetgrid, LCLType, StdCtrls, ComCtrls,
-  DateUtils,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Spin, Buttons,
+  VirtualTrees, DateTimePicker, DividerBevel, fpspreadsheetgrid, LCLType, StdCtrls,
+  ComCtrls, DateUtils,
   //DK packages utils
   DK_VSTTables, DK_SheetExporter, DK_DateUtils, DK_Vector, DK_Const, DK_Color, DK_Zoom,
+  DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, UCalendar,
+  UVars, UCalendar,
   //Forms
   UCalendarEditForm;
 
@@ -22,7 +23,6 @@ type
   TCalendarForm = class(TForm)
     AddDateButton: TSpeedButton;
     Bevel1: TBevel;
-    Bevel2: TBevel;
     CancelCopyButton: TSpeedButton;
     CopyDateButton: TSpeedButton;
     CopyEditPanel: TPanel;
@@ -34,11 +34,12 @@ type
     DayPanel: TPanel;
     DelCopyButton: TSpeedButton;
     DelDateButton: TSpeedButton;
+    DividerBevel1: TDividerBevel;
     EditDateButton: TSpeedButton;
     EditPanel: TPanel;
-    ExportButton: TBCButton;
     CalendarGrid: TsWorksheetGrid;
     BeforeCountLabel: TLabel;
+    ExportButton: TSpeedButton;
     Label1: TLabel;
     Label10: TLabel;
     Label9: TLabel;
@@ -163,17 +164,6 @@ procedure TCalendarForm.FormCreate(Sender: TObject);
 var
   W1, W2: Integer;
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetFlatToolPanels([
-    DateEditPanel, CopyEditPanel
-  ]);
-  SetToolButtons([
-    AddDateButton, DelDateButton, EditDateButton, CopyDateButton,
-    SaveCopyButton, DelCopyButton, CancelCopyButton
-  ]);
-
   MainForm.SetNamesPanelsVisible(False, False);
 
   ZoomPercent:= 100;
@@ -185,7 +175,7 @@ begin
 
   LoadColors;
 
-  CalendarSheet:= TCalendarSheet.Create(CalendarGrid.Worksheet, CalendarGrid);
+  CalendarSheet:= TCalendarSheet.Create(CalendarGrid.Worksheet, CalendarGrid, GridFont);
 
   W1:= 110;
   W2:= 200;
@@ -219,6 +209,22 @@ end;
 
 procedure TCalendarForm.FormShow(Sender: TObject);
 begin
+  SetToolPanels([
+    ToolPanel
+  ]);
+  SetFlatToolPanels([
+    DateEditPanel, CopyEditPanel
+  ]);
+  SetToolButtons([
+    AddDateButton, DelDateButton, EditDateButton, CopyDateButton,
+    SaveCopyButton, DelCopyButton, CancelCopyButton
+  ]);
+  Images.ToButtons([
+    AddDateButton, DelDateButton, EditDateButton, CopyDateButton,
+    SaveCopyButton, DelCopyButton, CancelCopyButton,
+    ExportButton
+  ]);
+
   RefreshCalendar;
 end;
 
@@ -336,7 +342,7 @@ begin
   ZoomPercent:= AZoomPercent;
   CalendarSheet.Zoom(ZoomPercent);
   CalendarSheet.Draw(YearCalendar, SelectedDates);
-  CalendarSheet.UpdateColors(ColorVector);
+  CalendarSheet.ColorsUpdate(ColorVector);
 end;
 
 procedure TCalendarForm.RefreshCalendar;
@@ -357,10 +363,10 @@ begin
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
-    Drawer:= TCalendarSheet.Create(Sheet);
+    Drawer:= TCalendarSheet.Create(Sheet, nil, GridFont);
     try
       Drawer.Draw(YearCalendar, SelectedDates);
-      Drawer.UpdateColors(ColorVector);
+      Drawer.ColorsUpdate(ColorVector);
     finally
       FreeAndNil(Drawer);
     end;

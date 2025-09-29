@@ -9,9 +9,9 @@ uses
   fpspreadsheetgrid, VirtualTrees, LCLType, StdCtrls, Spin, ComCtrls, DateTimePicker,
   //DK packages utils
   DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetExporter, DK_SheetConst,
-  DK_StrUtils, DK_Zoom, DK_VSTTableTools,
+  DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, USheetUtils;
+  UVars, USheets;
 
 type
 

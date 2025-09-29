@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, BCButton,
   StdCtrls, Spin, fpspreadsheetgrid,
   //DK packages utils
-  DK_Vector, DK_SheetExporter,
+  DK_Vector, DK_SheetExporter, DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, USheetUtils;
+  UVars, USheets;
 
 type
 

@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs,  ExtCtrls,
   StdCtrls, DateTimePicker, Buttons, DividerBevel,
   //DK packages utils
-  DK_Vector, DK_Dialogs, DK_StrUtils,
+  DK_Vector, DK_Dialogs, DK_StrUtils, DK_CtrlUtils,
   //Project utils
-  UDataBase;
+  UVars;
 
 type
 
@@ -32,12 +32,10 @@ type
     RotorNumEdit: TEdit;
     SaveButton: TSpeedButton;
     procedure CancelButtonClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
   private
-    CanFormClose: Boolean;
     NameIDs: TIntVector;
     procedure LoadMotorNames;
   public
@@ -54,22 +52,18 @@ implementation
 procedure TBuildEditForm.FormCreate(Sender: TObject);
 begin
   LoadMotorNames;
-  CanFormClose:= True;
 end;
 
 procedure TBuildEditForm.CancelButtonClick(Sender: TObject);
 begin
-  CanFormClose:= True;
   ModalResult:= mrCancel;
-end;
-
-procedure TBuildEditForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  CanClose:= CanFormClose;
 end;
 
 procedure TBuildEditForm.FormShow(Sender: TObject);
 begin
+  Images.ToButtons([SaveButton, CancelButton]);
+  SetEventButtons([SaveButton, CancelButton]);
+
   MotorNameComboBox.ItemIndex:= VIndexOf(NameIDs, OldNameID);
 end;
 
@@ -78,8 +72,6 @@ var
   NameID: Integer;
   MotorNum, RotorNum: String;
 begin
-  CanFormClose:= False;
-
   if MotorNameComboBox.Text=EmptyStr then
   begin
     Inform('Не указано наименование двигателя!');
@@ -96,10 +88,9 @@ begin
 
   RotorNum:= STrim(RotorNumEdit.Text);
 
-  DataBase.MotorInBuildLogUpdate(MotorID, DateTimePicker1.Date, NameID,
-                   Ord(OldMotorCheckbox.Checked), MotorNum, RotorNum);
+  if not DataBase.MotorInBuildLogUpdate(MotorID, DateTimePicker1.Date, NameID,
+                   Ord(OldMotorCheckbox.Checked), MotorNum, RotorNum) then Exit;
 
-  CanFormClose:= True;
   ModalResult:= mrOK;
 end;
 

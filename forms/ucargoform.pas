@@ -1,4 +1,4 @@
-unit UShipmentForm;
+unit UCargoForm;
 
 {$mode ObjFPC}{$H+}
 
@@ -6,12 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  Spin, ComCtrls, VirtualTrees, BCButton, fpspreadsheetgrid,
+  Spin, ComCtrls, DividerBevel, VirtualTrees, fpspreadsheetgrid,
   //DK packages utils
   DK_DateUtils, DK_VSTTableTools, DK_Dialogs, DK_Vector, DK_Matrix, DK_Const,
-  DK_SheetExporter, DK_Zoom,
+  DK_SheetExporter, DK_Zoom, DK_CtrlUtils,
   //Project utils
-  UDataBase, UUtils, USheetUtils,
+  UVars, USheets,
   //Forms
   UCargoEditForm, UPackingSheetForm;
 
@@ -22,13 +22,13 @@ type
   TShipmentForm = class(TForm)
     AddButton: TSpeedButton;
     Bevel1: TBevel;
-    Bevel2: TBevel;
-    Bevel3: TBevel;
     DelButton: TSpeedButton;
+    DividerBevel1: TDividerBevel;
+    DividerBevel2: TDividerBevel;
     EditButton: TSpeedButton;
     EditButtonPanel: TPanel;
-    ExportButton: TBCButton;
-    PackingSheetButton: TBCButton;
+    ExportButton: TSpeedButton;
+    PackingSheetButton: TSpeedButton;
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -63,12 +63,10 @@ type
     MotorCounts: TIntVector;
     MotorNums, Series: TStrMatrix;
 
-    procedure OpenShipmentList(const ACargoID: Integer);
-
-    procedure SelectShipment;
-
-    procedure DrawShipment(const AZoomPercent: Integer);
-    procedure ExportShipment;
+    procedure OpenCargoList(const ACargoID: Integer);
+    procedure SelectCargo;
+    procedure DrawCargo(const AZoomPercent: Integer);
+    procedure ExportCargo;
 
     procedure OpenCargoEditForm(const AEditMode: Byte); //1 - add, 2 - edit
     procedure SetButtonsEnabled(const AEnabled: Boolean);
@@ -87,51 +85,16 @@ uses UMainForm;
 
 { TShipmentForm }
 
-procedure TShipmentForm.AddButtonClick(Sender: TObject);
-begin
-  OpenCargoEditForm(1);
-end;
-
-procedure TShipmentForm.DelButtonClick(Sender: TObject);
-begin
-  if not Confirm('Удалить отгрузку ' +  SYMBOL_BREAK +
-                  Shipments[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2] + '?') then Exit;
-  DataBase.Delete('CARGOLIST', 'CargoID', CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2]);
-  OpenShipmentList(0);
-end;
-
-procedure TShipmentForm.EditButtonClick(Sender: TObject);
-begin
-  OpenCargoEditForm(2);
-end;
-
-procedure TShipmentForm.ExportButtonClick(Sender: TObject);
-begin
-  ExportShipment;
-end;
-
 procedure TShipmentForm.FormCreate(Sender: TObject);
 begin
-  SetToolPanels([
-    ToolPanel
-  ]);
-  SetToolButtons([
-    AddButton, DelButton, EditButton
-  ]);
-
   MainForm.SetNamesPanelsVisible(True, True);
 
   ZoomPercent:= 100;
-  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawShipment, True);
+  CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @DrawCargo, True);
 
-  VSTCargoList:= TVSTCategoryIDList.Create(VT, EmptyStr, @SelectShipment);
-  CargoSheet:= TCargoSheet.Create(LogGrid.Worksheet, LogGrid);
+  VSTCargoList:= TVSTCategoryIDList.Create(VT, EmptyStr, @SelectCargo);
+  CargoSheet:= TCargoSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
   SpinEdit1.Value:= YearOfDate(Date);
-end;
-
-procedure TShipmentForm.ViewUpdate;
-begin
-  OpenShipmentList(0);
 end;
 
 procedure TShipmentForm.FormDestroy(Sender: TObject);
@@ -142,7 +105,39 @@ end;
 
 procedure TShipmentForm.FormShow(Sender: TObject);
 begin
-  OpenShipmentList(0);
+  SetToolPanels([ToolPanel]);
+  SetToolButtons([AddButton, DelButton, EditButton]);
+  Images.ToButtons([ExportButton, PackingSheetButton, AddButton, DelButton, EditButton]);
+
+  OpenCargoList(0);
+end;
+
+procedure TShipmentForm.AddButtonClick(Sender: TObject);
+begin
+  OpenCargoEditForm(1);
+end;
+
+procedure TShipmentForm.DelButtonClick(Sender: TObject);
+begin
+  if not Confirm('Удалить отгрузку ' +  SYMBOL_BREAK +
+                  Shipments[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2] + '?') then Exit;
+  DataBase.Delete('CARGOLIST', 'CargoID', CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2]);
+  OpenCargoList(0);
+end;
+
+procedure TShipmentForm.EditButtonClick(Sender: TObject);
+begin
+  OpenCargoEditForm(2);
+end;
+
+procedure TShipmentForm.ExportButtonClick(Sender: TObject);
+begin
+  ExportCargo;
+end;
+
+procedure TShipmentForm.ViewUpdate;
+begin
+  OpenCargoList(0);
 end;
 
 procedure TShipmentForm.PackingSheetButtonClick(Sender: TObject);
@@ -162,10 +157,10 @@ end;
 
 procedure TShipmentForm.SpinEdit1Change(Sender: TObject);
 begin
-  OpenShipmentList(0);
+  OpenCargoList(0);
 end;
 
-procedure TShipmentForm.OpenShipmentList(const ACargoID: Integer);
+procedure TShipmentForm.OpenCargoList(const ACargoID: Integer);
 begin
   LogGrid.Clear;
   DataBase.ShipmentListLoad(MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
@@ -174,23 +169,23 @@ begin
   SetButtonsEnabled(VSTCargoList.IsSelected);
 end;
 
-procedure TShipmentForm.SelectShipment;
+procedure TShipmentForm.SelectCargo;
 begin
   LogGrid.Clear;
   if not VSTCargoList.IsSelected then Exit;
   DataBase.CargoLoad(CargoIDs[VSTCargoList.SelectedIndex1, VSTCargoList.SelectedIndex2],
              SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
-  DrawShipment(ZoomPercent);
+  DrawCargo(ZoomPercent);
 end;
 
-procedure TShipmentForm.DrawShipment(const AZoomPercent: Integer);
+procedure TShipmentForm.DrawCargo(const AZoomPercent: Integer);
 begin
   ZoomPercent:= AZoomPercent;
   CargoSheet.Zoom(ZoomPercent);
   CargoSheet.Draw(SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
 end;
 
-procedure TShipmentForm.ExportShipment;
+procedure TShipmentForm.ExportCargo;
 var
   Drawer: TCargoSheet;
   Sheet: TsWorksheet;
@@ -199,7 +194,7 @@ begin
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
-    Drawer:= TCargoSheet.Create(Sheet);
+    Drawer:= TCargoSheet.Create(Sheet, nil, GridFont);
     try
       Drawer.Draw(SendDate, ReceiverName, MotorNames, MotorCounts, MotorNums, Series);
     finally
@@ -228,7 +223,7 @@ begin
   finally
     FreeAndNil(CargoEditForm);
   end;
-  OpenShipmentList(ID);
+  OpenCargoList(ID);
 end;
 
 procedure TShipmentForm.SetButtonsEnabled(const AEnabled: Boolean);

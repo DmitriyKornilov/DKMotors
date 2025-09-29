@@ -3,19 +3,18 @@ object CargoEditForm: TCargoEditForm
   Height = 569
   Top = 236
   Width = 484
+  BorderIcons = [biSystemMenu]
   ClientHeight = 569
   ClientWidth = 484
   Position = poScreenCenter
-  LCLVersion = '4.2.0.0'
-  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   object Panel2: TPanel
-    Left = 3
-    Height = 359
-    Top = 3
-    Width = 599
+    Left = 2
+    Height = 293
+    Top = 2
+    Width = 480
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -23,8 +22,8 @@ object CargoEditForm: TCargoEditForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 359
-    ClientWidth = 599
+    ClientHeight = 289
+    ClientWidth = 476
     ParentFont = False
     TabOrder = 0
     object Label1: TLabel
@@ -32,9 +31,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Control = DateTimePicker1
       AnchorSideTop.Side = asrCenter
       Left = 2
-      Height = 20
+      Height = 15
       Top = 10
-      Width = 96
+      Width = 76
       BorderSpacing.Left = 2
       Caption = 'Дата отгрузки'
       ParentColor = False
@@ -45,9 +44,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = Panel2
       Left = 103
-      Height = 28
+      Height = 23
       Top = 6
-      Width = 99
+      Width = 79
       CenturyFrom = 1941
       MaxDate = 2958465
       MinDate = -53780
@@ -75,9 +74,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Control = MotorNameComboBox
       AnchorSideTop.Side = asrCenter
       Left = 2
-      Height = 20
-      Top = 78
-      Width = 71
+      Height = 15
+      Top = 80
+      Width = 56
       BorderSpacing.Left = 2
       BorderSpacing.Top = 10
       Caption = 'Двигатель'
@@ -92,9 +91,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Left = 103
-      Height = 28
-      Top = 75
-      Width = 463
+      Height = 23
+      Top = 76
+      Width = 371
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -112,9 +111,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = MotorNumEdit
       Left = 2
-      Height = 20
-      Top = 113
-      Width = 121
+      Height = 15
+      Top = 115
+      Width = 95
       BorderSpacing.Left = 2
       BorderSpacing.Top = 10
       BorderSpacing.Right = 5
@@ -130,9 +129,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Left = 103
-      Height = 28
-      Top = 110
-      Width = 463
+      Height = 23
+      Top = 111
+      Width = 371
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -149,10 +148,10 @@ object CargoEditForm: TCargoEditForm
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 467
-      Height = 38
-      Top = 247
-      Width = 125
+      Left = 374
+      Height = 34
+      Top = 249
+      Width = 100
       Anchors = [akTop, akRight]
       AutoSize = True
       BorderSpacing.Top = 12
@@ -294,8 +293,8 @@ object CargoEditForm: TCargoEditForm
         00FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FC800000780000
         0000000000000000000000000000000000000000000000000000
       }
-      Images = MainForm.ImageListEdit24
-      ImageIndex = 0
+      Images = Images.PX24
+      ImageIndex = 3
       ParentFont = False
       OnClick = AddButtonClick
     end
@@ -304,10 +303,10 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = AddButton
       Cursor = crHandPoint
-      Left = 342
-      Height = 38
-      Top = 247
-      Width = 125
+      Left = 274
+      Height = 34
+      Top = 249
+      Width = 100
       Anchors = [akTop, akRight]
       AutoSize = True
       Constraints.MinHeight = 30
@@ -446,8 +445,8 @@ object CargoEditForm: TCargoEditForm
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000
       }
-      Images = MainForm.ImageListEdit24
-      ImageIndex = 1
+      Images = Images.PX24
+      ImageIndex = 4
       ParentFont = False
       OnClick = DelButtonClick
     end
@@ -456,9 +455,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Control = ReceiverNameComboBox
       AnchorSideTop.Side = asrCenter
       Left = 2
-      Height = 20
-      Top = 44
-      Width = 118
+      Height = 15
+      Top = 45
+      Width = 95
       BorderSpacing.Left = 2
       BorderSpacing.Top = 10
       Caption = 'Грузополучатель'
@@ -473,9 +472,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Left = 103
-      Height = 28
+      Height = 23
       Top = 41
-      Width = 463
+      Width = 371
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -492,9 +491,9 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Control = SeriesEdit
       AnchorSideTop.Side = asrCenter
       Left = 2
-      Height = 20
-      Top = 254
-      Width = 102
+      Height = 15
+      Top = 259
+      Width = 80
       BorderSpacing.Left = 2
       Caption = 'Номер партии'
       ParentColor = False
@@ -506,8 +505,8 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Control = DelButton
       AnchorSideTop.Side = asrCenter
       Left = 103
-      Height = 28
-      Top = 251
+      Height = 23
+      Top = 255
       Width = 100
       BorderSpacing.Left = 6
       BorderSpacing.Top = 12
@@ -523,8 +522,8 @@ object CargoEditForm: TCargoEditForm
       AnchorSideRight.Side = asrBottom
       Left = 2
       Height = 91
-      Top = 144
-      Width = 589
+      Top = 146
+      Width = 472
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 2
       BorderSpacing.Top = 12
@@ -538,18 +537,18 @@ object CargoEditForm: TCargoEditForm
     end
   end
   object ButtonPanel: TPanel
-    Left = 3
-    Height = 58
-    Top = 645
-    Width = 599
+    Left = 2
+    Height = 49
+    Top = 514
+    Width = 480
     Align = alBottom
     AutoSize = True
     BorderSpacing.Left = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 6
     BevelOuter = bvNone
-    ClientHeight = 58
-    ClientWidth = 599
+    ClientHeight = 49
+    ClientWidth = 480
     TabOrder = 1
     object CancelButton: TSpeedButton
       AnchorSideTop.Control = DividerBevel1
@@ -557,10 +556,10 @@ object CargoEditForm: TCargoEditForm
       AnchorSideRight.Control = ButtonPanel
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 471
-      Height = 38
-      Top = 16
-      Width = 125
+      Left = 378
+      Height = 34
+      Top = 15
+      Width = 100
       Anchors = [akTop, akRight]
       AutoSize = True
       BorderSpacing.Right = 2
@@ -699,8 +698,8 @@ object CargoEditForm: TCargoEditForm
         00FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FC800000780000
         0000000000000000000000000000000000000000000000000000
       }
-      Images = MainForm.ImageListEdit24
-      ImageIndex = 4
+      Images = Images.PX24
+      ImageIndex = 7
       ParentFont = False
       OnClick = CancelButtonClick
     end
@@ -709,10 +708,10 @@ object CargoEditForm: TCargoEditForm
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = CancelButton
       Cursor = crHandPoint
-      Left = 346
-      Height = 38
-      Top = 16
-      Width = 125
+      Left = 278
+      Height = 34
+      Top = 15
+      Width = 100
       Anchors = [akTop, akRight]
       AutoSize = True
       BorderSpacing.Top = 12
@@ -851,26 +850,26 @@ object CargoEditForm: TCargoEditForm
         00FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FF7F0000FC800000780000
         0000000000000000000000000000000000000000000000000000
       }
-      Images = MainForm.ImageListEdit24
-      ImageIndex = 3
+      Images = Images.PX24
+      ImageIndex = 6
       ParentFont = False
       OnClick = SaveButtonClick
     end
     object DividerBevel1: TDividerBevel
       Left = 0
-      Height = 20
+      Height = 15
       Top = 0
-      Width = 599
+      Width = 480
       Align = alTop
       Font.Style = [fsBold]
       ParentFont = False
     end
   end
   object VT2: TVirtualStringTree
-    Left = 3
-    Height = 280
-    Top = 365
-    Width = 599
+    Left = 2
+    Height = 217
+    Top = 297
+    Width = 480
     Align = alClient
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 2
