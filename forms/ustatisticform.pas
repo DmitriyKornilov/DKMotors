@@ -384,24 +384,24 @@ var
 begin
   case AParamType of
     0: Drawer:= TStatisticSinglePeriodAtMotorNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, ReasonList.Checkeds,
+                  Grid1.Worksheet, Grid1, GridFont, ReasonList.Checkeds,
                   ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     1: Drawer:= TStatisticSinglePeriodAtDefectNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, ReasonList.Checkeds,
+                  Grid1.Worksheet, Grid1, GridFont, ReasonList.Checkeds,
                   ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, ReasonList.Checkeds,
+                  Grid1.Worksheet, Grid1, GridFont, ReasonList.Checkeds,
                   ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     3: if MonthReportTypeList.SelectedIndex=0 then
          Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, ReasonList.Checkeds,
+                  Grid1.Worksheet, Grid1, GridFont, ReasonList.Checkeds,
                   ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked)
        else
          Drawer:= TStatisticSinglePeriodAtMonthNamesSumSheet.Create(
-                  Grid1.Worksheet, Grid1, ReasonList.Checkeds,
+                  Grid1.Worksheet, Grid1, GridFont, ReasonList.Checkeds,
                   ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
-                  Grid1.Worksheet, Grid1, ReasonList.Checkeds,
+                  Grid1.Worksheet, Grid1, GridFont, ReasonList.Checkeds,
                   ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
   end;
 
@@ -422,24 +422,24 @@ var
 begin
   case AParamType of
     0: Drawer:= TStatisticSeveralPeriodsAtMotorNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                  Grid1.Worksheet, Grid1, GridFont, AdditionYearCountSpinEdit.Value,
                   ReasonList.Checkeds, ShowPercentCheckBox.Checked);
     1: Drawer:= TStatisticSeveralPeriodsAtDefectNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                  Grid1.Worksheet, Grid1, GridFont, AdditionYearCountSpinEdit.Value,
                   ReasonList.Checkeds, ShowPercentCheckBox.Checked);
     2: Drawer:= TStatisticSeveralPeriodsAtPlaceNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                  Grid1.Worksheet, Grid1, GridFont, AdditionYearCountSpinEdit.Value,
                   ReasonList.Checkeds, ShowPercentCheckBox.Checked);
     3: if MonthReportTypeList.SelectedIndex=0 then
          Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
-                  Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                  Grid1.Worksheet, Grid1, GridFont, AdditionYearCountSpinEdit.Value,
                   ReasonList.Checkeds, ShowPercentCheckBox.Checked)
        else
          Drawer:= TStatisticSeveralPeriodsAtMonthNamesSumSheet.Create(
-                  Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                  Grid1.Worksheet, Grid1, GridFont, AdditionYearCountSpinEdit.Value,
                   ReasonList.Checkeds, ShowPercentCheckBox.Checked);
     4: Drawer:= TStatisticSeveralPeriodsAtMileagesSheet.Create(
-                  Grid1.Worksheet, Grid1, AdditionYearCountSpinEdit.Value,
+                  Grid1.Worksheet, Grid1, GridFont, AdditionYearCountSpinEdit.Value,
                   ReasonList.Checkeds, ShowPercentCheckBox.Checked);
  end;
 
@@ -484,19 +484,19 @@ begin
 
     case AParamType of
       0: Drawer:= TStatisticSinglePeriodAtMotorNamesSheet.Create(
-                    Sheet, nil, ReasonList.Checkeds,
+                    Sheet, nil, GridFont, ReasonList.Checkeds,
                     ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
       1: Drawer:= TStatisticSinglePeriodAtDefectNamesSheet.Create(
-                    Sheet, nil, ReasonList.Checkeds,
+                    Sheet, nil, GridFont, ReasonList.Checkeds,
                     ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
       2: Drawer:= TStatisticSinglePeriodAtPlaceNamesSheet.Create(
-                    Sheet, nil, ReasonList.Checkeds,
+                    Sheet, nil, GridFont, ReasonList.Checkeds,
                     ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
       3: Drawer:= TStatisticSinglePeriodAtMonthNamesSheet.Create(
-                    Sheet, nil, ReasonList.Checkeds,
+                    Sheet, nil, GridFont, ReasonList.Checkeds,
                     ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
       4: Drawer:= TStatisticSinglePeriodAtMileagesSheet.Create(
-                    Sheet, nil, ReasonList.Checkeds,
+                    Sheet, nil, GridFont, ReasonList.Checkeds,
                     ShowPercentCheckBox.Checked, ShowLinePercentCheckBox.Checked);
     end;
 
@@ -509,7 +509,7 @@ begin
     finally
       FreeAndNil(Drawer);
     end;
-    Exporter.PageSettings(spoPortrait);
+    Exporter.PageSettings(spoPortrait, pfWidth, True, False);
     Exporter.Save('Выполнено!');
   finally
     FreeAndNil(Exporter);
@@ -528,19 +528,19 @@ begin
 
     case AParamType of
       0: Drawer:= TStatisticSeveralPeriodsAtMotorNamesSheet.Create(
-                      Sheet, nil, AdditionYearCountSpinEdit.Value,
+                      Sheet, nil, GridFont, AdditionYearCountSpinEdit.Value,
                       ReasonList.Checkeds, ShowPercentCheckBox.Checked);
       1: Drawer:= TStatisticSeveralPeriodsAtDefectNamesSheet.Create(
-                      Sheet, nil, AdditionYearCountSpinEdit.Value,
+                      Sheet, nil, GridFont, AdditionYearCountSpinEdit.Value,
                       ReasonList.Checkeds, ShowPercentCheckBox.Checked);
       2: Drawer:= TStatisticSeveralPeriodsAtPlaceNamesSheet.Create(
-                      Sheet, nil, AdditionYearCountSpinEdit.Value,
+                      Sheet, nil, GridFont, AdditionYearCountSpinEdit.Value,
                       ReasonList.Checkeds, ShowPercentCheckBox.Checked);
       3: Drawer:= TStatisticSeveralPeriodsAtMonthNamesSheet.Create(
-                      Sheet, nil, AdditionYearCountSpinEdit.Value,
+                      Sheet, nil, GridFont, AdditionYearCountSpinEdit.Value,
                       ReasonList.Checkeds, ShowPercentCheckBox.Checked);
       4: Drawer:= TStatisticSeveralPeriodsAtMileagesSheet.Create(
-                      Sheet, nil, AdditionYearCountSpinEdit.Value,
+                      Sheet, nil, GridFont, AdditionYearCountSpinEdit.Value,
                       ReasonList.Checkeds, ShowPercentCheckBox.Checked);
     end;
 
@@ -553,7 +553,7 @@ begin
     finally
       FreeAndNil(Drawer);
     end;
-    Exporter.PageSettings(spoLandscape);
+    Exporter.PageSettings(spoLandscape, pfWidth, True, False);
     Exporter.Save('Выполнено!');
   finally
     FreeAndNil(Exporter);

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics,  fpstypes, fpspreadsheetgrid, fpspreadsheet, DateUtils,
   //DK packages utils
-  DK_Vector, DK_Matrix, DK_Fonts, DK_SheetConst, DK_Const, DK_PPI, DK_SheetWriter,
+  DK_Vector, DK_Matrix, DK_Fonts, DK_SheetConst, DK_Const, DK_SheetWriter,
   DK_DateUtils, DK_StatPlotter, DK_Math, DK_StrUtils, DK_Graph,
   DK_SheetUtils, DK_SheetTables, DK_Color, DK_SheetTypes;
 
@@ -85,14 +85,9 @@ type
       FMotorNames: String;
       FParamNames, FReasonNames: TStrVector;
 
-    procedure CalcHistCommonParams(const AAlignment: TAlignment;
-                                   out AWidth, AFontHeight: Integer);
-    procedure CalcHorizHistHeightParams(out AHeight, ARowHeight: Integer;
-                                        const ARowCount: Integer;
-                                        const ADataInRowCount: Integer = 1);
-    procedure CalcVertHistHeightParams(out AHeight, ARowHeight: Integer);
-
-
+    function CalcHistWidth(const AAlignment: TAlignment): Integer;
+    function CalcHorizHistHeight(const ARowCount: Integer; const ADataInRowCount: Integer = 1): Integer;
+    function CalcVertHistHeight: Integer;
 
     procedure DrawEmptyRow(var ARow: Integer; const AHeight: Integer = EMPTY_ROW_HEIGHT);
 
@@ -103,7 +98,6 @@ type
                                        const ASortIndexes: TIntVector;
                                        const AUsedParams: TBoolVector;
                                        const AAlignment: TAlignment);
-
     procedure DrawGraphForTotalCounts(var ARow: Integer;
                                        const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
                                        const AParamNames: TStrVector;
@@ -113,7 +107,6 @@ type
                                        const AHistType: TDirectionType;
                                        const AAlignment: TAlignment;
                                        const AOneColorPerTick: Boolean = False);
-
     procedure DrawLinesForReasonCounts(var ARow: Integer;
                                        const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
                                        const AParamNames: TStrVector;
@@ -147,17 +140,15 @@ type
 
     procedure DrawVertHistForDataVector(var ARow: Integer;
                                     const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                                    const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                                    const AGraphWidth, AGraphHeight: Integer;
                                     const AParamNames: TStrVector;
                                     const ADataValues: TIntVector;
                                     const AAlignment: TAlignment;
                                     const AOneColorPerTick: Boolean = False;
                                     const AColorIndexes: TIntVector = nil);
-
-
     procedure DrawVertHistForDataMatrix(var ARow: Integer;
                                     const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                                    const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                                    const AGraphWidth, AGraphHeight: Integer;
                                     const AParamNames, ALegend: TStrVector;
                                     const ADataValues: TIntMatrix;
                                     const AAlignment: TAlignment;
@@ -165,7 +156,7 @@ type
                                     const AColorIndexes: TIntVector = nil);
     procedure DrawHorizHistForDataVector(var ARow: Integer;
                                     const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                                    const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                                    const AGraphWidth, AGraphHeight: Integer;
                                     const AParamNames: TStrVector;
                                     const ADataValues: TIntVector;
                                     const AAlignment: TAlignment;
@@ -173,7 +164,7 @@ type
                                     const AColorIndexes: TIntVector = nil);
     procedure DrawHorizHistForDataMatrix(var ARow: Integer;
                                     const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                                    const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                                    const AGraphWidth, AGraphHeight: Integer;
                                     const AParamNames, ALegend: TStrVector;
                                     const ADataValues: TIntMatrix;
                                     const AAlignment: TAlignment;
@@ -194,7 +185,6 @@ type
                                    const AAlignment: TAlignment;
                                    const AOneColorPerTick: Boolean = False;
                                    const AColorIndexes: TIntVector = nil);
-
     procedure DrawLinesForMatrix(var ARow: Integer;
                                    const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
                                    const AParamNames, ALegend: TStrVector;
@@ -209,7 +199,6 @@ type
                                    const AAlignment: TAlignment;
                                    const AOneColorPerTick: Boolean = False;
                                    const AColorIndexes: TIntVector = nil);
-
 
     function CalcSumCountForReason(const AValues: TIntVector;
                                    const AUsedParams: TBoolVector): Integer;
@@ -230,9 +219,14 @@ type
 
     function CalcAccumCounts(const ACounts: TIntMatrix): TIntMatrix;
     function CalcAccumCounts(const ACounts: TIntMatrix3D): TIntMatrix3D;
+
+    procedure MouseWheel(Sender: TObject; {%H-}Shift: TShiftState;
+                         {%H-}WheelDelta: Integer; {%H-}MousePos: TPoint;
+                         var {%H-}Handled: Boolean);
   public
     constructor Create(const AWorksheet: TsWorksheet;
                        const AGrid: TsWorksheetGrid;
+                       const AFont: TFont; //if nil -> SHEET_FONT_NAME, SHEET_FONT_SIZE
                        const AColWidths: TIntVector;
                        const AUsedReasonsCount: Integer;
                        const AUsedReasons: TBoolVector;
@@ -272,7 +266,6 @@ type
                                  const ATotalCounts: TIntVector;
                                  const AShowResumeRow: Boolean;
                                  const AParamColumnHorAlignment: TsHorAlignment);
-
 
     procedure DrawLinesForTotalCountsInTime(var ARow: Integer;
                                        const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
@@ -320,6 +313,7 @@ type
   public
     constructor Create(const AWorksheet: TsWorksheet;
                        const AGrid: TsWorksheetGrid;
+                       const AFont: TFont; //if nil -> SHEET_FONT_NAME, SHEET_FONT_SIZE
                        const AAdditionYearCount: Integer;
                        const AUsedReasons: TBoolVector;
                        const AShowPercentColumn: Boolean = False);
@@ -373,7 +367,6 @@ type
     procedure DrawReport; override;
   end;
 
-
   { TStatisticSinglePeriodSheet }
 
   TStatisticSinglePeriodSheet = class (TStatisticSheet)
@@ -397,12 +390,13 @@ type
                                  const AShowResumeRow: Boolean;
                                  const AParamColumnHorAlignment: TsHorAlignment);
 
-
     procedure DrawParamsReport(const ATableTitlePart, AParamColumnCaption: String);
 
     procedure DrawReport; virtual; abstract;
   public
-    constructor Create(const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
+    constructor Create(const AWorksheet: TsWorksheet;
+                       const AGrid: TsWorksheetGrid;
+                       const AFont: TFont; //if nil -> SHEET_FONT_NAME, SHEET_FONT_SIZE
                        const AUsedReasons: TBoolVector;
                        const AShowPercentColumn: Boolean = False;
                        const AShowLinePercentColumn: Boolean = False);
@@ -475,7 +469,6 @@ type
                    const AMotorNames, AMotorNums, ARotorNums: TStrVector;
                    const ATotalMotorNames: TStrVector;
                    const ATotalMotorCount: TIntVector);
-
   end;
 
   { TMotorTestSheet }
@@ -518,7 +511,6 @@ type
                    const ARecieverMotorCounts: TIntMatrix;
                    const AListSendDates: TDateVector;
                    const AListMotorNames, AListMotorNums, AListReceiverNames: TStrVector);
-
   end;
 
   { TStoreSheet }
@@ -622,53 +614,49 @@ type
                          AMotorNames, AMotorNums: TStrVector);
   end;
 
-  function LinesForDataVector(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+  function LinesForDataVector(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames: TStrVector;
                                const ADataValues: TIntVector;
-                               const AZoomFactor: Double;
                                const AColorIndexes: TIntVector = nil): TStatPlotterLine;
 
-
-  function VertHistForDataVector(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+  function VertHistForDataVector(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames: TStrVector;
                                const ADataValues: TIntVector;
                                const AOneColorPerTick: Boolean = False;
                                const AColorIndexes: TIntVector = nil): TStatPlotterVertHist;
 
-  function LinesForDataMatrix(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+  function LinesForDataMatrix(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames, ALegend: TStrVector;
                                const ADataValues: TIntMatrix;
-                               const AZoomFactor: Double;
                                const AColorIndexes: TIntVector = nil): TStatPlotterLine;
 
-  function VertHistForDataMatrix(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+  function VertHistForDataMatrix(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames, ALegend: TStrVector;
                                const ADataValues: TIntMatrix;
                                const AOneColorPerTick: Boolean = False;
                                const AColorIndexes: TIntVector = nil): TStatPlotterVertHist;
 
-  function HorizHistForDataVector(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+  function HorizHistForDataVector(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames: TStrVector;
                                const ADataValues: TIntVector;
                                const AOneColorPerTick: Boolean = False;
                                const AColorIndexes: TIntVector = nil): TStatPlotterHorizHist;
-  function HorizHistForDataMatrix(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+  function HorizHistForDataMatrix(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames, ALegend: TStrVector;
                                const ADataValues: TIntMatrix;
                                const AOneColorPerTick: Boolean = False;
                                const AColorIndexes: TIntVector = nil): TStatPlotterHorizHist;
-
 
 implementation
 
-function HorizHistForDataVector(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+function HorizHistForDataVector(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames: TStrVector;
                                const ADataValues: TIntVector;
                                const AOneColorPerTick: Boolean = False;
@@ -680,18 +668,28 @@ begin
     Result.FrameColor:= clBlack;
     Result.FrameWidth:= 1;
     Result.DataFrameColor:= clGray;
-    Result.TitleFont.Height:= AFontHeight;
+
+    Result.TitleFont.Name:= AFontName;
+    Result.TitleFont.Size:= AFontSize + 1;
     Result.TitleFont.Style:= [fsBold];
     Result.Title:= ATitle;
-    Result.YTicksFont.Height:= AFontHeight;
+
+    Result.YTicksFont.Name:= AFontName;
+    Result.YTicksFont.Size:= AFontSize;
     Result.YTicks:= AParamNames;
-    Result.XTicksFont.Height:= AFontHeight;
+
+    Result.XTicksFont.Name:= AFontName;
+    Result.XTicksFont.Size:= AFontSize;
     Result.XSeriesAdd(ADataValues);
     Result.XAxisType:= hatBoth;
     Result.XAxisTitle:= AHorizAxisTitle;
-    Result.XAxisTitleFont.Height:= AFontHeight;
+
+    Result.XAxisTitleFont.Name:= AFontName;
+    Result.XAxisTitleFont.Size:= AFontSize;
     Result.YAxisTitle:= AVertAxisTitle;
-    Result.YAxisTitleFont.Height:= AFontHeight;
+
+    Result.YAxisTitleFont.Name:= AFontName;
+    Result.YAxisTitleFont.Size:= AFontSize;
     Result.OneColorPerTick:= AOneColorPerTick;
     Result.ColorIndexes:= AColorIndexes;
     Result.Calc;
@@ -700,32 +698,41 @@ begin
   end;
 end;
 
-function LinesForDataVector(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+function LinesForDataVector(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames: TStrVector;
                                const ADataValues: TIntVector;
-                               const AZoomFactor: Double;
                                const AColorIndexes: TIntVector = nil): TStatPlotterLine;
 begin
   Result:= TStatPlotterLine.Create(AWidth, AHeight);
   try
-    Result.LineWidth:= Round(3*AZoomFactor);
-    Result.PointRadius:= Round(6*AZoomFactor);
+    Result.LineWidth:= 2;
+    Result.PointRadius:= 4;
     Result.FrameColor:= clBlack;
     Result.FrameWidth:= 1;
     Result.DataFrameColor:= clGray;
-    Result.TitleFont.Height:= AFontHeight;
+
+    Result.TitleFont.Name:= AFontName;
+    Result.TitleFont.Size:= AFontSize + 1;
     Result.TitleFont.Style:= [fsBold];
     Result.Title:= ATitle;
-    Result.XTicksFont.Height:= AFontHeight;
+
+    Result.XTicksFont.Name:= AFontName;
+    Result.XTicksFont.Size:= AFontSize;
     Result.XTicks:= AParamNames;
-    Result.YTicksFont.Height:= AFontHeight;
+
+    Result.YTicksFont.Name:= AFontName;
+    Result.YTicksFont.Size:= AFontSize;
     Result.YSeriesAdd(ADataValues);
     Result.XAxisTitle:= AHorizAxisTitle;
-    Result.XAxisTitleFont.Height:= AFontHeight;
+
+    Result.XAxisTitleFont.Name:= AFontName;
+    Result.XAxisTitleFont.Size:= AFontSize;
     Result.YAxisType:= vatBoth;
     Result.YAxisTitle:= AVertAxisTitle;
-    Result.YAxisTitleFont.Height:= AFontHeight;
+
+    Result.YAxisTitleFont.Name:= AFontName;
+    Result.YAxisTitleFont.Size:= AFontSize;
     Result.ColorIndexes:= AColorIndexes;
     Result.Calc;
   except
@@ -733,8 +740,8 @@ begin
   end;
 end;
 
-function VertHistForDataVector(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+function VertHistForDataVector(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames: TStrVector;
                                const ADataValues: TIntVector;
                                const AOneColorPerTick: Boolean = False;
@@ -746,18 +753,28 @@ begin
     Result.FrameColor:= clBlack;
     Result.FrameWidth:= 1;
     Result.DataFrameColor:= clGray;
-    Result.TitleFont.Height:= AFontHeight;
+
+    Result.TitleFont.Name:= AFontName;
+    Result.TitleFont.Size:= AFontSize + 1;
     Result.TitleFont.Style:= [fsBold];
     Result.Title:= ATitle;
-    Result.XTicksFont.Height:= AFontHeight;
+
+    Result.XTicksFont.Name:= AFontName;
+    Result.XTicksFont.Size:= AFontSize;
     Result.XTicks:= AParamNames;
-    Result.YTicksFont.Height:= AFontHeight;
+
+    Result.YTicksFont.Name:= AFontName;
+    Result.YTicksFont.Size:= AFontSize;
     Result.YSeriesAdd(ADataValues);
     Result.XAxisTitle:= AHorizAxisTitle;
-    Result.XAxisTitleFont.Height:= AFontHeight;
+
+    Result.XAxisTitleFont.Name:= AFontName;
+    Result.XAxisTitleFont.Size:= AFontSize;
     Result.YAxisType:= vatBoth;
     Result.YAxisTitle:= AVertAxisTitle;
-    Result.YAxisTitleFont.Height:= AFontHeight;
+
+    Result.YAxisTitleFont.Name:= AFontName;
+    Result.YAxisTitleFont.Size:= AFontSize;
     Result.OneColorPerTick:= AOneColorPerTick;
     Result.ColorIndexes:= AColorIndexes;
     Result.Calc;
@@ -766,34 +783,45 @@ begin
   end;
 end;
 
-function LinesForDataMatrix(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+function LinesForDataMatrix(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames, ALegend: TStrVector;
                                const ADataValues: TIntMatrix;
-                               const AZoomFactor: Double;
                                const AColorIndexes: TIntVector = nil): TStatPlotterLine;
 begin
   Result:= TStatPlotterLine.Create(AWidth, AHeight);
   try
-    Result.LineWidth:= Round(3*AZoomFactor);
-    Result.PointRadius:= Round(6*AZoomFactor);
+    Result.LineWidth:= 2;
+    Result.PointRadius:= 4;
     Result.FrameColor:= clBlack;
     Result.FrameWidth:= 1;
     Result.DataFrameColor:= clGray;
-    Result.TitleFont.Height:= AFontHeight;
+
+    Result.TitleFont.Name:= AFontName;
+    Result.TitleFont.Size:= AFontSize + 1;
     Result.TitleFont.Style:= [fsBold];
     Result.Title:= ATitle;
-    Result.LegendFont.Height:= AFontHeight;
+
+    Result.LegendFont.Name:= AFontName;
+    Result.LegendFont.Size:= AFontSize;
     Result.Legend:= ALegend;
-    Result.XTicksFont.Height:= AFontHeight;
+
+    Result.XTicksFont.Name:= AFontName;
+    Result.XTicksFont.Size:= AFontSize;
     Result.XTicks:= AParamNames;
-    Result.YTicksFont.Height:= AFontHeight;
+
+    Result.YTicksFont.Name:= AFontName;
+    Result.YTicksFont.Size:= AFontSize;
     Result.YSeries:= ADataValues;
     Result.YAxisType:= vatBoth;
     Result.XAxisTitle:= AHorizAxisTitle;
-    Result.XAxisTitleFont.Height:= AFontHeight;
+
+    Result.XAxisTitleFont.Name:= AFontName;
+    Result.XAxisTitleFont.Size:= AFontSize;
     Result.YAxisTitle:= AVertAxisTitle;
-    Result.YAxisTitleFont.Height:= AFontHeight;
+
+    Result.YAxisTitleFont.Name:= AFontName;
+    Result.YAxisTitleFont.Size:= AFontSize;
     Result.ColorIndexes:= AColorIndexes;
     Result.Calc;
   except
@@ -801,8 +829,8 @@ begin
   end;
 end;
 
-function VertHistForDataMatrix(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+function VertHistForDataMatrix(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames, ALegend: TStrVector;
                                const ADataValues: TIntMatrix;
                                const AOneColorPerTick: Boolean = False;
@@ -814,20 +842,32 @@ begin
     Result.FrameColor:= clBlack;
     Result.FrameWidth:= 1;
     Result.DataFrameColor:= clGray;
-    Result.TitleFont.Height:= AFontHeight;
+
+    Result.TitleFont.Name:= AFontName;
+    Result.TitleFont.Size:= AFontSize + 1;
     Result.TitleFont.Style:= [fsBold];
     Result.Title:= ATitle;
-    Result.LegendFont.Height:= AFontHeight;
+
+    Result.LegendFont.Name:= AFontName;
+    Result.LegendFont.Size:= AFontSize;
     Result.Legend:= ALegend;
-    Result.XTicksFont.Height:= AFontHeight;
+
+    Result.XTicksFont.Name:= AFontName;
+    Result.XTicksFont.Size:= AFontSize;
     Result.XTicks:= AParamNames;
-    Result.YTicksFont.Height:= AFontHeight;
+
+    Result.YTicksFont.Name:= AFontName;
+    Result.YTicksFont.Size:= AFontSize;
     Result.YSeries:= ADataValues;
     Result.XAxisTitle:= AHorizAxisTitle;
-    Result.XAxisTitleFont.Height:= AFontHeight;
+
+    Result.XAxisTitleFont.Name:= AFontName;
+    Result.XAxisTitleFont.Size:= AFontSize;
     Result.YAxisType:= vatBoth;
     Result.YAxisTitle:= AVertAxisTitle;
-    Result.YAxisTitleFont.Height:= AFontHeight;
+
+    Result.YAxisTitleFont.Name:= AFontName;
+    Result.YAxisTitleFont.Size:= AFontSize;
     Result.OneColorPerTick:= AOneColorPerTick;
     Result.ColorIndexes:= AColorIndexes;
     Result.Calc;
@@ -836,8 +876,8 @@ begin
   end;
 end;
 
-function HorizHistForDataMatrix(const AWidth, AHeight, AFontHeight: Integer;
-                               const ATitle, AVertAxisTitle, AHorizAxisTitle: String;
+function HorizHistForDataMatrix(const AWidth, AHeight, AFontSize: Integer;
+                               const AFontName, ATitle, AVertAxisTitle, AHorizAxisTitle: String;
                                const AParamNames, ALegend: TStrVector;
                                const ADataValues: TIntMatrix;
                                const AOneColorPerTick: Boolean = False;
@@ -849,20 +889,32 @@ begin
     Result.FrameColor:= clBlack;
     Result.FrameWidth:= 1;
     Result.DataFrameColor:= clGray;
-    Result.TitleFont.Height:= AFontHeight;
+
+    Result.TitleFont.Name:= AFontName;
+    Result.TitleFont.Size:= AFontSize + 1;
     Result.TitleFont.Style:= [fsBold];
     Result.Title:= ATitle;
-    Result.LegendFont.Height:= AFontHeight;
+
+    Result.LegendFont.Name:= AFontName;
+    Result.LegendFont.Size:= AFontSize;
     Result.Legend:= ALegend;
-    Result.YTicksFont.Height:= AFontHeight;
+
+    Result.YTicksFont.Name:= AFontName;
+    Result.YTicksFont.Size:= AFontSize;
     Result.YTicks:= AParamNames;
-    Result.XTicksFont.Height:= AFontHeight;
+
+    Result.XTicksFont.Name:= AFontName;
+    Result.XTicksFont.Size:= AFontSize;
     Result.XSeries:= ADataValues;
     Result.XAxisType:= hatBoth;
     Result.XAxisTitle:= AHorizAxisTitle;
-    Result.XAxisTitleFont.Height:= AFontHeight;
+
+    Result.XAxisTitleFont.Name:= AFontName;
+    Result.XAxisTitleFont.Size:= AFontSize;
     Result.YAxisTitle:= AVertAxisTitle;
-    Result.YAxisTitleFont.Height:= AFontHeight;
+
+    Result.YAxisTitleFont.Name:= AFontName;
+    Result.YAxisTitleFont.Size:= AFontSize;
     Result.OneColorPerTick:= AOneColorPerTick;
     Result.ColorIndexes:= AColorIndexes;
     Result.Calc;
@@ -1024,12 +1076,7 @@ begin
                              EmptyStr, EmptyStr,
                              FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
                              taRightJustify);
-      //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
-      //                          ' месяцам и '+
-      //                          'причинам возникновения неисправностей за ' + S,
-      //                       EmptyStr, EmptyStr,
-      //                       FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
-      //                       dtVertical, taRightJustify);
+
       R2:= R;
       R:= R1;
       DrawLinesForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
@@ -1037,11 +1084,7 @@ begin
                             EmptyStr, EmptyStr,
                             FParamNames, SumAccumCounts, nil {нет сортировки}, UsedParams,
                             taLeftJustify);
-      //DrawGraphForTotalCounts(R, 'Распределение накопленного общего количества рекламационных случаев по ' +
-      //                          'месяцам за ' + S,
-      //                      EmptyStr, EmptyStr,
-      //                      FParamNames, SumAccumCounts, nil{no sort}, UsedParams,
-      //                      dtVertical, taLeftJustify);
+
       DrawGraphForSumReasonCounts(R, 'Распределение общего количества рекламационных случаев по ' +
                                 'причинам возникновения неисправностей за ' + S,
                                 EmptyStr, EmptyStr,
@@ -1141,16 +1184,6 @@ begin
                              FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
                              taCenter);
 
-    //DrawGraphForTotalCounts(R, 'Накопление общего количества рекламационных случаев по '+
-    //                        'месяцам',
-    //                        EmptyStr, EmptyStr,
-    //                        FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-    //                        dtVertical, taCenter);
-    //DrawGraphForReasonCounts(R, 'Распределение накопленного количества рекламационных случаев по ' +
-    //                            'причинам возникновения неисправностей',
-    //                         EmptyStr, EmptyStr,
-    //                         FParamNames, AccumCounts, nil {нет сортировки}, UsedParams,
-    //                         dtVertical, taCenter);
     DrawEmptyRow(R, ROW_HEIGHT_DEFAULT);
   end;
 end;
@@ -1250,7 +1283,6 @@ begin
                                        EmptyStr, 'Пробег локомотива, тыс.км',
                                    FParamNames, FCounts, UsedParams,
                                    dtVertical, taRightJustify);
-
   end;
 end;
 
@@ -1339,7 +1371,6 @@ begin
                                 FCounts, UsedParams, True{сортировка},
                                 dtHorizontal, taLeftJustify,
                                 DIFFERENT_COLORS_FOR_EACH_REASON {отдельный цвет для каждой причины});
-
 
     R2:= R;
     R:= R1;
@@ -1445,15 +1476,9 @@ begin
   FWriter.SetFont(FFontName, FFontSize+2, [fsBold], clBlack);
   FWriter.WriteText(R, 1, R, FWriter.ColCount, S, cbtNone, True, True);
 
-
-  //EmptyRow
   DrawEmptyRow(R);
-  //R:= R + 1;
-  //FWriter.WriteText(R, 1, R, FWriter.ColCount, EmptyStr, cbtNone);
-  //FWriter.SetRowHeight(R, 10);
 
   ARow:= R + 1;
-
 end;
 
 procedure TStatisticSeveralPeriodsSheet.DrawSinglePeriodDataTableTop(
@@ -1825,7 +1850,6 @@ begin
 
   DrawLinesForMatrix(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                      ParamNames, Legend, DataMatrix, AAlignment, ASortIndexes);
-
 end;
 
 procedure TStatisticSeveralPeriodsSheet.DrawGraphForTotalCountsInTime(var ARow: Integer;
@@ -1879,8 +1903,6 @@ begin
     MAppend(DataMatrix, ParamValues);
   end;
 
-
-
   ColorIndexes:= nil;
   if AOneColorPerTick then
     ColorIndexes:= ASortIndexes;
@@ -1888,7 +1910,6 @@ begin
   DrawGraphForMatrix(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                      ParamNames, Legend, DataMatrix, AHistType, AAlignment,
                      AOneColorPerTick, ColorIndexes);
-
 end;
 
 procedure TStatisticSeveralPeriodsSheet.DrawGraphForSumReasonCountsInTime(var ARow: Integer;
@@ -1949,8 +1970,6 @@ begin
   DrawGraphForMatrix(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                      ParamNames, Legend, DataMatrix, AHistType, AAlignment,
                      AOneColorPerTick, ColorIndexes);
-
-
 end;
 
 procedure TStatisticSeveralPeriodsSheet.DrawLinesForParamCountsInTime(var ARow: Integer;
@@ -1988,7 +2007,6 @@ begin
     DrawLinesForMatrix(ARow, GraphTitle, AVertAxisTitle, AHorizAxisTitle,
                      ParamNames, Legend, DataMatrix, AAlignment);
   end;
-
 end;
 
 procedure TStatisticSeveralPeriodsSheet.DrawGraphsForParamCountsInTime(var ARow: Integer;
@@ -2029,7 +2047,6 @@ begin
                      ParamNames, Legend, DataMatrix, AHistType, AAlignment,
                      AOneColorPerTick);
   end;
-
 end;
 
 procedure TStatisticSeveralPeriodsSheet.DrawParamsReport(
@@ -2042,7 +2059,6 @@ var
   TotalCounts: TIntVector;
   S: String;
 begin
-
   R:= 1;
   DrawReportTitle(R, 'Отчет по рекламационным случаям электродвигателей');
 
@@ -2145,12 +2161,12 @@ begin
                                        ATableTitlePart, EmptyStr, EmptyStr,
                                    FParamNames, FCounts, UsedParams,
                                    dtHorizontal, taRightJustify);
-
   end;
 end;
 
 constructor TStatisticSeveralPeriodsSheet.Create(const AWorksheet: TsWorksheet;
                        const AGrid: TsWorksheetGrid;
+                       const AFont: TFont; //if nil -> SHEET_FONT_NAME, SHEET_FONT_SIZE
                        const AAdditionYearCount: Integer;
                        const AUsedReasons: TBoolVector;
                        const AShowPercentColumn: Boolean = False);
@@ -2176,7 +2192,7 @@ begin
   W:= TotalWidth - W*ColCount - MARGIN_COLUMN_WIDTH;
   ColWidths[1]:= W;
 
-  inherited Create(AWorksheet, AGrid, ColWidths,
+  inherited Create(AWorksheet, AGrid, AFont, ColWidths,
                    UsedReasonsCount, AUsedReasons, AShowPercentColumn);
   FAdditionYearCount:= AAdditionYearCount;
 end;
@@ -2206,32 +2222,31 @@ end;
 
 { TStatisticSheet }
 
-procedure TStatisticSheet.CalcHistCommonParams(const AAlignment: TAlignment;
-                                               out AWidth, AFontHeight: Integer);
+function TStatisticSheet.CalcHistWidth(const AAlignment: TAlignment): Integer;
 begin
-  FGraphWidth:= FWriter.ColsWidth(2, FWriter.ColCount-1);
-  if AAlignment<>taCenter then
-    FGraphWidth:= (FGraphWidth div 2) - 2{1????}*MARGIN_COLUMN_WIDTH;
-  AWidth:= WidthFromDefaultToScreen(FWriter.ApplyZoom(FGraphWidth));
-  AFontHeight:= FWriter.ApplyZoom(GetFontHeight(FFontName, FFontSize));
+  if AAlignment=taCenter then
+    Result:= FGraphWidth
+  else begin
+    if FWriter.HasGrid then
+      Result:= (FGraphWidth - MARGIN_COLUMN_WIDTH) div 2
+    else
+      Result:= (FGraphWidth - 8*MARGIN_COLUMN_WIDTH) div 2;
+  end;
 end;
 
-procedure TStatisticSheet.CalcHorizHistHeightParams(out AHeight, ARowHeight: Integer;
-                                        const ARowCount: Integer;
-                                        const ADataInRowCount: Integer = 1);
+function TStatisticSheet.CalcHorizHistHeight(const ARowCount: Integer;
+  const ADataInRowCount: Integer): Integer;
 var
   H: Integer;
 begin
   H:= Round(ADataInRowCount*HORIZ_HIST_DATAROW_HEIGHT*0.45);
   H:= Max(H, HORIZ_HIST_DATAROW_HEIGHT);
-  ARowHeight:= ARowCount*H + HORIZ_HIST_ADDITION_HEIGHT;
-  AHeight:= HeightFromDefaultToScreen(FWriter.ApplyZoom(ARowHeight));
+  Result:= ARowCount*H + HORIZ_HIST_ADDITION_HEIGHT;
 end;
 
-procedure TStatisticSheet.CalcVertHistHeightParams(out AHeight, ARowHeight: Integer);
+function TStatisticSheet.CalcVertHistHeight: Integer;
 begin
-  ARowHeight:= Round(0.4*FGraphWidth);
-  AHeight:= HeightFromDefaultToScreen(FWriter.ApplyZoom(ARowHeight));
+  Result:= Round(0.4*FGraphWidth);
 end;
 
 procedure TStatisticSheet.DrawEmptyRow(var ARow: Integer; const AHeight: Integer = EMPTY_ROW_HEIGHT);
@@ -2271,7 +2286,6 @@ begin
 
   DrawLinesForVector(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                      ParamNames, ParamValues, AAlignment, ASortIndexes);
-
 end;
 
 procedure TStatisticSheet.DrawGraphForTotalCounts(var ARow: Integer;
@@ -2322,7 +2336,7 @@ procedure TStatisticSheet.DrawLinesForReasonCounts(var ARow: Integer;
 var
   i: Integer;
   ParamNames: TStrVector;
-  ParamValues{, ColorIndexes}: TIntVector;
+  ParamValues: TIntVector;
   UsedParams: TBoolVector;
   Legend: TStrVector;
   DataMatrix: TIntMatrix;
@@ -2358,7 +2372,6 @@ begin
 
   DrawLinesForMatrix(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                      ParamNames, Legend, DataMatrix, AAlignment, ASortIndexes);
-
 end;
 
 procedure TStatisticSheet.DrawGraphForReasonCounts(var ARow: Integer;
@@ -2458,24 +2471,20 @@ procedure TStatisticSheet.DrawHistOnSheet(var ARow: Integer;
                               const APlotter: TStatPlotterCustom);
 var
   i, R, ColNum, RowCount, RowNum, RowHeight: Integer;
-  ScaleX, ScaleY, OffsetX, OffsetY, x: Double;
+  ScaleX, ScaleY, OffsetX, OffsetY: Double;
   Stream: TMemoryStream;
 
   procedure CalcParams;
   begin
-    ScaleX:= 1; //XFactorDefaultDivScreen;
-    ScaleY:= 1; //YFactorDefaultDivScreen;
+    ScaleX:= 1;
+    ScaleY:= 1;
     OffsetX:= 0;
     OffsetY:= 0;
     ColNum:= 2;
     if AAlignment=taRightJustify then
     begin
       ColNum:= FWriter.ColCount;
-      x:= - PixelToMillimeter(FWriter.ApplyZoom(FGraphWidth));
-      if FWriter.HasGrid then
-        OffsetX:= x
-      else
-        OffsetY:= x;
+      OffsetX:= - PixelToMillimeter(CalcHistWidth(AAlignment));
     end;
   end;
 
@@ -2507,7 +2516,7 @@ end;
 
 procedure TStatisticSheet.DrawVertHistForDataVector(var ARow: Integer;
                     const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                    const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                    const AGraphWidth, AGraphHeight: Integer;
                     const AParamNames: TStrVector;
                     const ADataValues: TIntVector;
                     const AAlignment: TAlignment;
@@ -2516,22 +2525,20 @@ procedure TStatisticSheet.DrawVertHistForDataVector(var ARow: Integer;
 var
   Plotter: TStatPlotterVertHist;
 begin
-  Plotter:= VertHistForDataVector(AGraphWidth, AGraphHeight, AFontHeight,
+  Plotter:= VertHistForDataVector(AGraphWidth, AGraphHeight, FFontSize, FFontName,
                                   AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                                   AParamNames, ADataValues,
                                   AOneColorPerTick, AColorIndexes);
   try
-    DrawHistOnSheet(ARow, ARowHeight, AAlignment, Plotter);
+    DrawHistOnSheet(ARow, AGraphHeight, AAlignment, Plotter);
   finally
     FreeAndNil(Plotter);
   end;
 end;
 
-
-
 procedure TStatisticSheet.DrawVertHistForDataMatrix(var ARow: Integer;
                     const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                    const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                    const AGraphWidth, AGraphHeight: Integer;
                     const AParamNames, ALegend: TStrVector;
                     const ADataValues: TIntMatrix;
                     const AAlignment: TAlignment;
@@ -2540,12 +2547,12 @@ procedure TStatisticSheet.DrawVertHistForDataMatrix(var ARow: Integer;
 var
   Plotter: TStatPlotterVertHist;
 begin
-  Plotter:= VertHistForDataMatrix(AGraphWidth, AGraphHeight, AFontHeight,
+  Plotter:= VertHistForDataMatrix(AGraphWidth, AGraphHeight, FFontSize, FFontName,
                                   AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                                   AParamNames, ALegend, ADataValues,
                                   AOneColorPerTick, AColorIndexes);
   try
-    DrawHistOnSheet(ARow, ARowHeight, AAlignment, Plotter);
+    DrawHistOnSheet(ARow, AGraphHeight, AAlignment, Plotter);
   finally
     FreeAndNil(Plotter);
   end;
@@ -2553,7 +2560,7 @@ end;
 
 procedure TStatisticSheet.DrawHorizHistForDataVector(var ARow: Integer;
                   const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                  const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                  const AGraphWidth, AGraphHeight: Integer;
                   const AParamNames: TStrVector;
                   const ADataValues: TIntVector;
                   const AAlignment: TAlignment;
@@ -2562,12 +2569,12 @@ procedure TStatisticSheet.DrawHorizHistForDataVector(var ARow: Integer;
 var
   Plotter: TStatPlotterHorizHist;
 begin
-  Plotter:= HorizHistForDataVector(AGraphWidth, AGraphHeight, AFontHeight,
+  Plotter:= HorizHistForDataVector(AGraphWidth, AGraphHeight, FFontSize, FFontName,
                                    AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                                    AParamNames, ADataValues,
                                    AOneColorPerTick, AColorIndexes);
   try
-    DrawHistOnSheet(ARow, ARowHeight, AAlignment, Plotter);
+    DrawHistOnSheet(ARow, AGraphHeight, AAlignment, Plotter);
   finally
     FreeAndNil(Plotter);
   end;
@@ -2575,7 +2582,7 @@ end;
 
 procedure TStatisticSheet.DrawHorizHistForDataMatrix(var ARow: Integer;
                   const AGraphTitle, AVertAxisTitle, AHorizAxisTitle: String;
-                  const AGraphWidth, AGraphHeight, ARowHeight, AFontHeight: Integer;
+                  const AGraphWidth, AGraphHeight: Integer;
                   const AParamNames, ALegend: TStrVector;
                   const ADataValues: TIntMatrix;
                   const AAlignment: TAlignment;
@@ -2584,12 +2591,12 @@ procedure TStatisticSheet.DrawHorizHistForDataMatrix(var ARow: Integer;
 var
   Plotter: TStatPlotterHorizHist;
 begin
-  Plotter:= HorizHistForDataMatrix(AGraphWidth, AGraphHeight, AFontHeight,
+  Plotter:= HorizHistForDataMatrix(AGraphWidth, AGraphHeight, FFontSize, FFontName,
                                   AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
                                   AParamNames, ALegend, ADataValues,
                                   AOneColorPerTick, AColorIndexes);
   try
-    DrawHistOnSheet(ARow, ARowHeight, AAlignment, Plotter);
+    DrawHistOnSheet(ARow, AGraphHeight, AAlignment, Plotter);
   finally
     FreeAndNil(Plotter);
   end;
@@ -2602,18 +2609,17 @@ procedure TStatisticSheet.DrawLinesForVector(var ARow: Integer;
                                    const AAlignment: TAlignment;
                                    const AColorIndexes: TIntVector = nil);
 var
-  FontHeight, GraphWidth, GraphHeight, GraphRowHeight: Integer;
+  GraphWidth, GraphHeight: Integer;
   Plotter: TStatPlotterLine;
 begin
-  CalcHistCommonParams(AAlignment, GraphWidth, FontHeight);
-  CalcVertHistHeightParams(GraphHeight, GraphRowHeight);
+  GraphWidth:= CalcHistWidth(AAlignment);
+  GraphHeight:= CalcVertHistHeight;
 
-  Plotter:= LinesForDataVector(GraphWidth, GraphHeight, FontHeight,
+  Plotter:= LinesForDataVector(GraphWidth, GraphHeight, FFontSize, FFontName,
                                   AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
-                                  AParamNames, AParamValues,
-                                  FWriter.Worksheet.ZoomFactor, AColorIndexes);
+                                  AParamNames, AParamValues, AColorIndexes);
   try
-    DrawHistOnSheet(ARow, GraphRowHeight, AAlignment, Plotter);
+    DrawHistOnSheet(ARow, GraphHeight, AAlignment, Plotter);
   finally
     FreeAndNil(Plotter);
   end;
@@ -2631,24 +2637,24 @@ procedure TStatisticSheet.DrawGraphForVector(var ARow: Integer;
                    const AColorIndexes: TIntVector = nil);
 var
   DataRowCount: Integer;
-  FontHeight, GraphWidth, GraphHeight, GraphRowHeight: Integer;
+  GraphWidth, GraphHeight: Integer;
 begin
   DataRowCount:= Length(AParamNames);
   if DataRowCount<2 then Exit;
 
-  CalcHistCommonParams(AAlignment, GraphWidth, FontHeight);
+  GraphWidth:= CalcHistWidth(AAlignment);
   if AHistType=dtHorizontal then
   begin
-    CalcHorizHistHeightParams(GraphHeight, GraphRowHeight, DataRowCount);
+    GraphHeight:= CalcHorizHistHeight(DataRowCount);
     DrawHorizHistForDataVector(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
-                              GraphWidth, GraphHeight, GraphRowHeight, FontHeight,
+                              GraphWidth, GraphHeight,
                               AParamNames, AParamValues, AAlignment,
                               AOneColorPerTick, AColorIndexes);
   end
   else begin  //dtVertical
-    CalcVertHistHeightParams(GraphHeight, GraphRowHeight);
+    GraphHeight:= CalcVertHistHeight;
     DrawVertHistForDataVector(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
-                              GraphWidth, GraphHeight, GraphRowHeight, FontHeight,
+                              GraphWidth, GraphHeight,
                               AParamNames, AParamValues, AAlignment,
                               AOneColorPerTick, AColorIndexes);
   end;
@@ -2663,18 +2669,17 @@ procedure TStatisticSheet.DrawLinesForMatrix(var ARow: Integer;
                                    const AAlignment: TAlignment;
                                    const AColorIndexes: TIntVector = nil);
 var
-  FontHeight, GraphWidth, GraphHeight, GraphRowHeight: Integer;
+  GraphWidth, GraphHeight: Integer;
   Plotter: TStatPlotterLine;
 begin
-  CalcHistCommonParams(AAlignment, GraphWidth, FontHeight);
-  CalcVertHistHeightParams(GraphHeight, GraphRowHeight);
+  GraphWidth:= CalcHistWidth(AAlignment);
+  GraphHeight:= CalcVertHistHeight;
 
-  Plotter:= LinesForDataMatrix(GraphWidth, GraphHeight, FontHeight,
+  Plotter:= LinesForDataMatrix(GraphWidth, GraphHeight, FFontSize, FFontName,
                                   AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
-                                  AParamNames, ALegend, AParamValues,
-                                  FWriter.Worksheet.ZoomFactor, AColorIndexes);
+                                  AParamNames, ALegend, AParamValues, AColorIndexes);
   try
-    DrawHistOnSheet(ARow, GraphRowHeight, AAlignment, Plotter);
+    DrawHistOnSheet(ARow, GraphHeight, AAlignment, Plotter);
   finally
     FreeAndNil(Plotter);
   end;
@@ -2692,7 +2697,7 @@ procedure TStatisticSheet.DrawGraphForMatrix(var ARow: Integer;
                    const AColorIndexes: TIntVector = nil);
 var
   DataRowCount, DataInRowCount: Integer;
-  FontHeight, GraphWidth, GraphHeight, GraphRowHeight: Integer;
+  GraphWidth, GraphHeight: Integer;
 begin
   DataInRowCount:= Length(AParamValues);
   if DataInRowCount<2 then Exit;
@@ -2700,19 +2705,19 @@ begin
   DataRowCount:= Length(AParamNames);
   if DataRowCount<2 then Exit;
 
-  CalcHistCommonParams(AAlignment, GraphWidth, FontHeight);
+  GraphWidth:= CalcHistWidth(AAlignment);
   if AHistType=dtHorizontal then
   begin
-    CalcHorizHistHeightParams(GraphHeight, GraphRowHeight, DataRowCount, DataInRowCount);
+    GraphHeight:= CalcHorizHistHeight(DataRowCount, DataInRowCount);
     DrawHorizHistForDataMatrix(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
-                              GraphWidth, GraphHeight, GraphRowHeight, FontHeight,
+                              GraphWidth, GraphHeight,
                               AParamNames, ALegend, AParamValues, AAlignment,
                               AOneColorPerTick, AColorIndexes);
   end
   else begin  //dtVertical
-    CalcVertHistHeightParams(GraphHeight, GraphRowHeight);
+    GraphHeight:= CalcVertHistHeight;
     DrawVertHistForDataMatrix(ARow, AGraphTitle, AVertAxisTitle, AHorizAxisTitle,
-                              GraphWidth, GraphHeight, GraphRowHeight, FontHeight,
+                              GraphWidth, GraphHeight,
                               AParamNames, ALegend, AParamValues, AAlignment,
                               AOneColorPerTick, AColorIndexes);
   end;
@@ -2858,15 +2863,29 @@ begin
     Result[i]:= CalcAccumCounts(ACounts[i]);
 end;
 
+procedure TStatisticSheet.MouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  (Sender as TsWorksheetGrid).Invalidate;
+end;
+
 constructor TStatisticSheet.Create(const AWorksheet: TsWorksheet;
                                    const AGrid: TsWorksheetGrid;
+                                   const AFont: TFont; //if nil -> SHEET_FONT_NAME, SHEET_FONT_SIZE
                                    const AColWidths: TIntVector;
                                    const AUsedReasonsCount: Integer;
                                    const AUsedReasons: TBoolVector;
                                    const AShowPercentColumn: Boolean = False);
 begin
-  FFontName:= SHEET_FONT_NAME;
-  FFontSize:= SHEET_FONT_SIZE;
+  if Assigned(AFont) then
+  begin
+    FFontName:= AFont.Name;
+    FFontSize:= AFont.Size;
+  end
+  else begin
+    FFontName:= SHEET_FONT_NAME;
+    FFontSize:= SHEET_FONT_SIZE;
+  end;
 
   FUsedReasons:= AUsedReasons;
   FShowPercentColumn:= AShowPercentColumn;
@@ -2874,8 +2893,10 @@ begin
   FShowGraphics:= False;
 
   FWriter:= TSheetWriter.Create(AColWidths, AWorksheet, AGrid);
+  if FWriter.HasGrid then
+    FWriter.Grid.OnMouseWheel:= @MouseWheel;
 
-  //FGraphWidth:= VSum(AColWidths, 1, High(AColWidths)-1);
+  FGraphWidth:= FWriter.ColsWidth(2, FWriter.ColCount-1);
 end;
 
 destructor TStatisticSheet.Destroy;
@@ -2891,14 +2912,12 @@ end;
 
 { TStatisticSinglePeriodAtPlaceNamesSheet }
 
-
 procedure TStatisticSinglePeriodAtPlaceNamesSheet.DrawReport;
 begin
   DrawParamsReport('предприятиям', 'Предприятие');
 end;
 
 { TStatisticSinglePeriodAtMileagesSheet }
-
 
 procedure TStatisticSinglePeriodAtMileagesSheet.DrawReport;
 var
@@ -2951,11 +2970,8 @@ begin
                              EmptyStr, 'Пробег локомотива, тыс.км',
                              FParamNames, FCounts, nil {нет сортировки}, UsedParams,
                              dtVertical, taCenter);
-
   end;
 end;
-
-
 
 { TStatisticSinglePeriodAtMonthNamesSheet }
 
@@ -3183,7 +3199,7 @@ var
       Inc(ReasonCount);
 
       if k=0 then
-        DataValue:= LineTotalValue//CalcSumCountForParam(ACounts, AUsedParams, AIndex)
+        DataValue:= LineTotalValue
       else
         DataValue:= ACounts[k,AIndex];
 
@@ -3266,15 +3282,15 @@ begin
                              EmptyStr, EmptyStr,
                              FParamNames, FCounts, Indexes, UsedParams,
                              dtHorizontal, taCenter);
-
   end;
 end;
 
-constructor TStatisticSinglePeriodSheet.Create(
-  const AWorksheet: TsWorksheet; const AGrid: TsWorksheetGrid;
-  const AUsedReasons: TBoolVector;
-  const AShowPercentColumn: Boolean = False;
-  const AShowLinePercentColumn: Boolean = False);
+constructor TStatisticSinglePeriodSheet.Create(const AWorksheet: TsWorksheet;
+                                        const AGrid: TsWorksheetGrid;
+                                        const AFont: TFont; //if nil -> SHEET_FONT_NAME, SHEET_FONT_SIZE
+                                        const AUsedReasons: TBoolVector;
+                                        const AShowPercentColumn: Boolean = False;
+                                        const AShowLinePercentColumn: Boolean = False);
 var
   ColWidths: TIntVector;
   ColCount, W, UsedReasonsCount: Integer;
@@ -3290,15 +3306,11 @@ begin
   W:= TOTAL_WIDTH - W*ColCount - MARGIN_COLUMN_WIDTH;
   ColWidths[1]:= W;
 
-  inherited Create(AWorksheet, AGrid, ColWidths,
+  inherited Create(AWorksheet, AGrid, AFont, ColWidths,
                    UsedReasonsCount, AUsedReasons, AShowPercentColumn);
 
   FShowLinePercentColumn:= AShowLinePercentColumn;
 end;
-
-
-
-
 
 procedure TStatisticSinglePeriodSheet.Draw(const ABeginDate, AEndDate: TDate;
   const AMotorNames: String;
@@ -3859,7 +3871,6 @@ begin
       Writer.WriteText(R, 9, ARecNotes[i], cbtOuter, True, True);
     end;
   end;
-
 
   R:= R + 1;
   Writer.WriteText(R, 1,  EmptyStr);
