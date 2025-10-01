@@ -285,7 +285,7 @@ begin
   if SelectedIndex=StatisticList.SelectedIndex then Exit;
   SelectedIndex:= StatisticList.SelectedIndex;
   ANEMPanel.Visible:= SelectedIndex=0;
-  VT3.Visible:= SelectedIndex=3;
+  MonthReportTypeList.Visible:= SelectedIndex=3;
   ViewUpdate;
 end;
 
@@ -333,6 +333,7 @@ begin
   ]);
   MonthReportTypeList:= TVSTStringList.Create(VT3, S, @SelectMonthReportType);
   MonthReportTypeList.Update(V);
+  MonthReportTypeList.Visible:= False;
 end;
 
 procedure TStatisticForm.SelectMonthReportType;
