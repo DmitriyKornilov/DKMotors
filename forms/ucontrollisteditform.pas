@@ -9,6 +9,7 @@ uses
   StdCtrls, VirtualTrees, DividerBevel,
   //DK packages utils
   DK_VSTTables, DK_Vector, DK_Dialogs, DK_StrUtils, DK_Const, DK_CtrlUtils,
+  DK_Filter,
   //Project utils
   UVars, USheets;
 
@@ -20,11 +21,11 @@ type
     ButtonPanel: TPanel;
     CancelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
+    FilterPanel: TPanel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     MotorNameComboBox: TComboBox;
-    MotorNumEdit: TEdit;
     Panel2: TPanel;
     NoteMemo: TMemo;
     RepairPanel: TPanel;
@@ -34,14 +35,17 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
   private
+    FilterString: String;
+    Filter: TDKFilter;
+
     VSTTable: TVSTTable;
 
     NameIDs, MotorIDs: TIntVector;
     MotorNums, Series: TStrVector;
 
+    procedure FilterMotors(const AFilterString: String);
     procedure LoadMotors;
     procedure LoadControl;
   public
@@ -65,6 +69,9 @@ begin
     Inform('Отсутствует список наименований двигателей!');
 
   VSTTable:= TVSTTable.Create(VT1);
+
+  FilterString:= EmptyStr;
+  Filter:= DKFilterCreate('Номер двигателя', FilterPanel, @FilterMotors, -1, 300);
 end;
 
 procedure TControlListEditForm.FormDestroy(Sender: TObject);
@@ -87,11 +94,6 @@ begin
   if MotorID>0 then LoadControl;
 end;
 
-procedure TControlListEditForm.MotorNumEditChange(Sender: TObject);
-begin
-  LoadMotors;
-end;
-
 procedure TControlListEditForm.CancelButtonClick(Sender: TObject);
 begin
   ModalResult:= mrCancel;
@@ -112,15 +114,18 @@ begin
   ModalResult:= mrOK;
 end;
 
-procedure TControlListEditForm.LoadMotors;
-var
-  MotorNumberLike: String;
+procedure TControlListEditForm.FilterMotors(const AFilterString: String);
 begin
+  FilterString:= AFilterString;
+  LoadMotors;
+end;
+
+procedure TControlListEditForm.LoadMotors;
+begin
+  if not SEmpty(MotorNum) then Exit;
   if VIsNil(NameIDs) then Exit;
 
-  MotorNumberLike:= STrim(MotorNumEdit.Text);
-
-  DataBase.MotorListToControl(NameIDs[MotorNameComboBox.ItemIndex], MotorNumberLike,
+  DataBase.MotorListToControl(NameIDs[MotorNameComboBox.ItemIndex], STrim(FilterString),
                             MotorIDs, MotorNums, Series);
 
   VSTTable.ValuesClear;
@@ -133,8 +138,9 @@ procedure TControlListEditForm.LoadControl;
 begin
   MotorNameComboBox.ItemIndex:= MotorNameComboBox.Items.IndexOf(MotorName);
   MotorNameComboBox.Enabled:= False;
-  MotorNumEdit.Text:= MotorNum;
-  MotorNumEdit.Enabled:= False;
+
+  Filter.FilterString:= MotorNum;
+  Filter.FilterEnabled:= False;
 
   DataBase.MotorListOnControl(MotorID, MotorIDs, MotorNums, Series);
   VSTTable.ValuesClear;

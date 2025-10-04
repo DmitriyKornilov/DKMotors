@@ -40,7 +40,7 @@ type
     MainPanel: TPanel;
     Panel1: TPanel;
     Panel10: TPanel;
-    Panel2: TPanel;
+    StatisticPanel: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
@@ -52,9 +52,9 @@ type
     Splitter2: TSplitter;
     ToolPanel: TPanel;
     ClientPanel: TPanel;
-    VT1: TVirtualStringTree;
-    VT2: TVirtualStringTree;
-    VT3: TVirtualStringTree;
+    StatisticVT: TVirtualStringTree;
+    ReasonVT: TVirtualStringTree;
+    MonthReportTypeVT: TVirtualStringTree;
     ZoomPanel: TPanel;
     procedure ANEMAsSameNameCheckBoxChange(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
@@ -160,6 +160,10 @@ procedure TStatisticForm.FormShow(Sender: TObject);
 begin
   SetToolPanels([ToolPanel]);
   Images.ToButtons([ExportButton]);
+
+  StatisticPanel.Height:= StatisticList.AutoHeightValue + 10;
+  ReasonVT.Height:= ReasonList.AutoHeightValue;
+  MonthReportTypeVT.Height:= MonthReportTypeList.AutoHeightValue;
 end;
 
 procedure TStatisticForm.DateTimePicker1Change(Sender: TObject);
@@ -275,9 +279,9 @@ begin
     'Распределение по пробегу локомотива'
   ]);
   SelectedIndex:= 0;
-  StatisticList:= TVSTStringList.Create(VT1, S, @SelectStatistic);
+  StatisticList:= TVSTStringList.Create(StatisticVT, S, @SelectStatistic);
   StatisticList.Update(V, SelectedIndex);
-  Panel2.Height:= StatisticList.AutoHeightValue + 10;
+  StatisticPanel.Height:= StatisticList.AutoHeightValue + 10;
 end;
 
 procedure TStatisticForm.SelectStatistic;
@@ -317,7 +321,7 @@ begin
     V[i]:= SFirstLower(ReasonNames[i]);
   S:= 'Включать в отчёт:';
   B:= VCreateBool(Length(V), True);
-  ReasonList:= TVSTCheckList.Create(VT2, S, @ViewUpdate);
+  ReasonList:= TVSTCheckList.Create(ReasonVT, S, @ViewUpdate);
   ReasonList.Update(V, B);
 end;
 
@@ -331,7 +335,7 @@ begin
     'распределение количества рекламаций',
     'накопление количества рекламаций'
   ]);
-  MonthReportTypeList:= TVSTStringList.Create(VT3, S, @SelectMonthReportType);
+  MonthReportTypeList:= TVSTStringList.Create(MonthReportTypeVT, S, @SelectMonthReportType);
   MonthReportTypeList.Update(V);
   MonthReportTypeList.Visible:= False;
 end;

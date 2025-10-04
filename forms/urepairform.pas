@@ -9,7 +9,7 @@ uses
   Buttons, DividerBevel, VirtualTrees,
   //DK packages utils
   DK_VSTTables, DK_StrUtils, DK_Dialogs, DK_Const, DK_Vector, DK_SheetExporter,
-  DK_VSTTableTools, DK_CtrlUtils, DK_Filter,
+  DK_VSTParamList, DK_CtrlUtils, DK_Filter,
   //Project utils
   UVars, USheets, UCalendar,
   //Forms
@@ -33,15 +33,13 @@ type
     Panel2: TPanel;
     Panel3: TPanel;
     Panel5: TPanel;
-    LeftPanel: TPanel;
+    SettingClientPanel: TPanel;
     FilterPanel: TPanel;
     MainPanel: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     ToolPanel: TPanel;
     VT1: TVirtualStringTree;
-    VT2: TVirtualStringTree;
-    VT3: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
@@ -53,9 +51,9 @@ type
     procedure VT1DblClick(Sender: TObject);
   private
     CardForm: TCardForm;
+    ParamList: TVSTParamList;
     VSTMotorsTable: TVSTTable;
-    VSTTypeList: TVSTStringList;
-    VSTOrderList: TVSTStringList;
+
     RecIDs, MotorIDs: TIntVector;
     FilterString: String;
 
@@ -63,12 +61,11 @@ type
     Passports, DayCounts: TIntVector;
     MotorNames, MotorNums, RepairNotes: TStrVector;
 
+    procedure CreateParamList;
+
     procedure CreateMotorsTable;
     procedure SelectMotor;
     procedure FilterMotor(const AFilterString: String);
-
-    procedure CreateTypeList;
-    procedure CreateOrderList;
 
     procedure OpenRepairEditForm(const AEditType: Byte);
   public
@@ -91,18 +88,16 @@ begin
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(RepairForm, CardPanel);
   CreateMotorsTable;
-  CreateTypeList;
-  CreateOrderList;
+  CreateParamList;
   FilterString:= EmptyStr;
-  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 250, 500);
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 300, 500);
   MotorCardCheckBox.Checked:= False;
 end;
 
 procedure TRepairForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(VSTMotorsTable) then FreeAndNil(VSTMotorsTable);
-  if Assigned(VSTTypeList) then FreeAndNil(VSTTypeList);
-  if Assigned(VSTOrderList) then FreeAndNil(VSTOrderList);
+  if Assigned(ParamList) then FreeAndNil(ParamList);
   if Assigned(CardForm) then FreeAndNil(CardForm);
 end;
 
@@ -111,7 +106,7 @@ begin
   SetToolPanels([ToolPanel]);
   SetToolButtons([AddButton, DelButton, EditButton]);
   Images.ToButtons([ExportButton, AddButton, DelButton, EditButton]);
-
+  ParamList.AutoHeight;
   ViewUpdate;
 end;
 
@@ -186,10 +181,10 @@ begin
   VSTMotorsTable.AddColumn('№ п/п', 50);
   VSTMotorsTable.AddColumn('Наименование', 200);
   VSTMotorsTable.AddColumn('Номер', 100);
-  VSTMotorsTable.AddColumn('Наличие паспорта', 130);
-  VSTMotorsTable.AddColumn('Дата прибытия', 100);
-  VSTMotorsTable.AddColumn('Дата убытия', 100);
-  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 200);
+  VSTMotorsTable.AddColumn('Наличие паспорта', 140);
+  VSTMotorsTable.AddColumn('Дата прибытия', 120);
+  VSTMotorsTable.AddColumn('Дата убытия', 120);
+  VSTMotorsTable.AddColumn('Срок ремонта (рабочих дней)', 220);
   VSTMotorsTable.AddColumn('Примечание');
   VSTMotorsTable.CanSelect:= True;
   VSTMotorsTable.Draw;
@@ -214,34 +209,28 @@ begin
   ViewUpdate;
 end;
 
-procedure TRepairForm.CreateTypeList;
+procedure TRepairForm.CreateParamList;
 var
   S: String;
   V: TStrVector;
 begin
+  ParamList:= TVSTParamList.Create(SettingClientPanel);
+
   S:= 'Отображать:';
   V:= VCreateStr([
     'все',
     'в ремонте',
     'отремонтированные'
   ]);
-  VSTTypeList:= TVSTStringList.Create(VT2, S, @ViewUpdate);
-  VSTTypeList.Update(V, 1);
-end;
+  ParamList.AddStringList('TypeList', S, V, @ViewUpdate, 1);
 
-procedure TRepairForm.CreateOrderList;
-var
-  S: String;
-  V: TStrVector;
-begin
   S:= 'Упорядочить по:';
   V:= VCreateStr([
     'дате прибытия',
     'дате убытия',
     'номеру'
   ]);
-  VSTOrderList:= TVSTStringList.Create(VT3, S, @ViewUpdate);
-  VSTOrderList.Update(V);
+  ParamList.AddStringList('OrderList', S, V, @ViewUpdate);
 end;
 
 procedure TRepairForm.OpenRepairEditForm(const AEditType: Byte);
@@ -268,14 +257,12 @@ var
   i: Integer;
   PassStrs, DayCountsStrs, SendingDatesStrs, ArrivalDatesStrs: TStrVector;
 begin
-  if (not VSTTypeList.IsSelected) or (not VSTOrderList.IsSelected) then Exit;
-
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
 
     DataBase.RepairListLoad(MainForm.UsedNameIDs, STrim(FilterString),
-                          VSTOrderList.SelectedIndex+1, VSTTypeList.SelectedIndex,
+                          ParamList.Selected['OrderList']+1, ParamList.Selected['TypeList'],
                           ArrivalDates, SendingDates,
                           RecIDs, MotorIDs, Passports, DayCounts,
                           MotorNames, MotorNums, RepairNotes);

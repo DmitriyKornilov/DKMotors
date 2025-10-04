@@ -1,38 +1,39 @@
 object CardForm: TCardForm
   Left = 699
-  Height = 271
+  Height = 339
   Top = 244
-  Width = 640
+  Width = 800
   Align = alClient
   BorderStyle = bsNone
   Caption = 'CardForm'
-  ClientHeight = 271
-  ClientWidth = 640
+  ClientHeight = 339
+  ClientWidth = 800
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   object ToolPanel: TPanel
     Left = 0
-    Height = 32
+    Height = 40
     Top = 0
-    Width = 640
+    Width = 800
     Align = alTop
     AutoSize = True
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 636
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 796
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     TabOrder = 0
     object ExportButton: TSpeedButton
       Cursor = crHandPoint
       Left = 0
-      Height = 28
+      Height = 36
       Hint = 'Экспорт в формат электронной таблицы XLSX или ODS'
       Top = 0
-      Width = 91
+      Width = 104
       Align = alLeft
       AutoSize = True
       Caption = ' Экспорт '
@@ -47,20 +48,20 @@ object CardForm: TCardForm
   end
   object CardPanel: TPanel
     Left = 0
-    Height = 237
-    Top = 34
-    Width = 640
+    Height = 297
+    Top = 42
+    Width = 800
     Align = alClient
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 233
-    ClientWidth = 636
+    ClientHeight = 293
+    ClientWidth = 796
     TabOrder = 1
     object CardGrid: TsWorksheetGrid
       Left = 0
-      Height = 213
+      Height = 269
       Top = 0
-      Width = 636
+      Width = 796
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenCols = 0
@@ -92,9 +93,9 @@ object CardForm: TCardForm
     end
     object ZoomPanel: TPanel
       Left = 0
-      Height = 18
-      Top = 215
-      Width = 636
+      Height = 22
+      Top = 271
+      Width = 796
       Align = alBottom
       BevelOuter = bvNone
       Color = clWindow
@@ -105,8 +106,8 @@ object CardForm: TCardForm
     object Bevel1: TBevel
       Left = 0
       Height = 2
-      Top = 213
-      Width = 636
+      Top = 269
+      Width = 796
       Align = alBottom
       Shape = bsBottomLine
       Style = bsRaised

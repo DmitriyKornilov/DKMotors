@@ -157,7 +157,7 @@ type
                 out ASendDates: TDateVector;
                 out AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
     function ShipmentTotalLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs: TIntVector;
+                const ANameIDs, AReceiverIDs: TIntVector;
                 out AMotorNames: TStrVector;
                 out AMotorCounts: TIntVector): Boolean;
     function ShipmentRecieversTotalLoad(const ABeginDate, AEndDate: TDate;
@@ -781,6 +781,7 @@ var
   OrderStr, WhereStr: String;
   SendDates, BuildDates: TDateVector;
   ReceiverNames: TStrVector;
+  Indexes: TIntVector;
 begin
   Result:= False;
   AMotorIDs:= nil;
@@ -850,14 +851,25 @@ begin
   end;
   QClose;
 
-  if Result then
+  if not Result then Exit;
+
+  if ANeedOrderByNumber then
   begin
-    ABuildDates:= VFormatDateTime('dd.mm.yyyy', BuildDates);
-    AShippings:= VFormatDateTime('dd.mm.yyyy – ', SendDates);
-    VChangeIf(AShippings, '30.12.1899 – ', EmptyStr);
-    VChangeIf(ReceiverNames, '<не указан>', EmptyStr);
-    AShippings:= VSum(AShippings, ReceiverNames);
+    VSortNum(AMotorNums, Indexes);
+
+    AMotorIDs:= VReplace(AMotorIDs, Indexes);
+    BuildDates:= VReplace(BuildDates, Indexes);
+    AMotorNames:= VReplace(AMotorNames, Indexes);
+    AMotorNums:= VReplace(AMotorNums, Indexes);
+    SendDates:= VReplace(SendDates, Indexes);
+    ReceiverNames:= VReplace(ReceiverNames, Indexes);
   end;
+
+  ABuildDates:= VFormatDateTime('dd.mm.yyyy', BuildDates);
+  AShippings:= VFormatDateTime('dd.mm.yyyy – ', SendDates);
+  VChangeIf(AShippings, '30.12.1899 – ', EmptyStr);
+  VChangeIf(ReceiverNames, '<не указан>', EmptyStr);
+  AShippings:= VSum(AShippings, ReceiverNames);
 end;
 
 procedure TDataBase.MotorInfoLoad(const AMotorID: Integer; out ABuildDate,
@@ -945,7 +957,7 @@ function TDataBase.BuildListLoad(const ABeginDate, AEndDate: TDate;
                   out AMotorNames, AMotorNums, ARotorNums: TStrVector): Boolean;
 var
   S, WhereStr, OrderStr: String;
-
+  Indexes: TIntVector;
 begin
   Result:= False;
   AMotorIDs:= nil;
@@ -997,6 +1009,19 @@ begin
     Result:= True;
   end;
   QClose;
+
+  if not Result then Exit;
+  if not ANeedOrderByNumber then Exit;
+
+  VSortNum(AMotorNums, Indexes);
+
+  AMotorIDs:= VReplace(AMotorIDs, Indexes);
+  AOldMotors:= VReplace(AOldMotors, Indexes);
+  ANameIDs:= VReplace(ANameIDs, Indexes);
+  ABuildDates:= VReplace(ABuildDates, Indexes);
+  AMotorNames:= VReplace(AMotorNames, Indexes);
+  AMotorNums:= VReplace(AMotorNums, Indexes);
+  ARotorNums:= VReplace(ARotorNums, Indexes);
 end;
 
 function TDataBase.BuildTotalLoad(const ABeginDate, AEndDate: TDate;
@@ -1132,6 +1157,7 @@ var
   TestFails, MotorIDs: TIntVector;
   TestDates: TDateVector;
   TestNotes: TStrVector;
+  Indexes: TIntVector;
 begin
   Result:= False;
 
@@ -1182,7 +1208,6 @@ begin
 
   if not Result then Exit;
 
-
   if ANeedOrderByNumber then
     OrderStr:= 'ORDER BY t1.MotorNum, t1.BuildDate'
   else
@@ -1212,6 +1237,16 @@ begin
   end;
   QClose;
 
+  if ANeedOrderByNumber then
+  begin
+    VSortNum(AMotorNums, Indexes);
+
+    MotorIDs:= VReplace(MotorIDs, Indexes);
+    ABuildDates:= VReplace(ABuildDates, Indexes);
+    AMotorNames:= VReplace(AMotorNames, Indexes);
+    AMotorNums:= VReplace(AMotorNums, Indexes);
+  end;
+
   QSetSQL(
   'SELECT TestDate, Fail, TestNote ' +
   'FROM MOTORTEST ' +
@@ -1240,7 +1275,6 @@ begin
     MAppend(ATestFails, TestFails);
     MAppend(ATestNotes, TestNotes);
   end;
-
 end;
 
 function TDataBase.TestListLoad(const ABeginBuildDate, AEndBuildDate: TDate;
@@ -1250,6 +1284,7 @@ function TDataBase.TestListLoad(const ABeginBuildDate, AEndBuildDate: TDate;
 var
   OrderStr: String;
   WhereStr: String;
+  Indexes: TIntVector;
 begin
   Result:= False;
   ATestIDs:= nil;
@@ -1298,6 +1333,18 @@ begin
     Result:= True;
   end;
   QClose;
+
+  if not Result then Exit;
+  if not ANeedOrderByNumber then Exit;
+
+  VSortNum(AMotorNums, Indexes);
+
+  ATestIDs:= VReplace(ATestIDs, Indexes);
+  ATestResults:= VReplace(ATestResults, Indexes);
+  ATestDates:= VReplace(ATestDates, Indexes);
+  AMotorNames:= VReplace(AMotorNames, Indexes);
+  AMotorNums:= VReplace(AMotorNums, Indexes);
+  ATestNotes:= VReplace(ATestNotes, Indexes);
 end;
 
 function TDataBase.TestTotalLoad(const ABeginBuildDate, AEndBuildDate: TDate;
@@ -1393,7 +1440,7 @@ begin
   ABuildDates:= nil;
   ATests:= nil;
 
-  if ANumberLike=EmptyStr then Exit;
+  if SEmpty(ANumberLike) then Exit;
 
   BuildDates:= nil;
 
@@ -1690,7 +1737,7 @@ var
   TestDates: TDateVector;
   MotorNames, MotorNums: TStrVector;
   i, n: Integer;
-
+  Indexes: TIntVector;
 begin
   Result:= False;
   ATestDates:= nil;
@@ -1762,9 +1809,18 @@ begin
     end;
   end;
 
-  ATestDates:= VReverse(ATestDates);
-  AMotorNames:= VReverse(AMotorNames);
-  AMotorNums:= VReverse(AMotorNums);
+  if ANeedOrderByNumber then
+  begin
+    VSortNum(AMotorNums, Indexes);
+    ATestDates:= VReplace(ATestDates, Indexes);
+    AMotorNames:= VReplace(AMotorNames, Indexes);
+    AMotorNums:= VReplace(AMotorNums, Indexes);
+  end
+  else begin
+    ATestDates:= VReverse(ATestDates);
+    AMotorNames:= VReverse(AMotorNames);
+    AMotorNums:= VReverse(AMotorNums);
+  end;
 end;
 
 function TDataBase.StoreTotalLoad(const ANameIDs: TIntVector;
@@ -1857,13 +1913,17 @@ function TDataBase.ShipmentMotorListLoad(const ABeginDate, AEndDate: TDate;
   const ANameIDs, AReceiverIDs: TIntVector; const ANeedOrderByNumber: Boolean;
   out ASendDates: TDateVector; out AMotorNames, AMotorNums, AReceiverNames: TStrVector): Boolean;
 var
+  i: Integer;
   WhereStr, OrderStr: String;
+  Indexes: TIntVector;
+  Series: TStrVector;
 begin
   Result:= False;
   ASendDates:= nil;
   AMotorNames:= nil;
   AMotorNums:= nil;
   AReceiverNames:= nil;
+  Series:= nil;
 
   WhereStr:= 'WHERE (t1.CargoID>0) AND (t2.SendDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
@@ -1899,17 +1959,34 @@ begin
     begin
       VAppend(ASendDates, QFieldDT('SendDate'));
       VAppend(AMotorNames, QFieldStr('MotorName'));
-      VAppend(AMotorNums, QFieldStr('MotorNum') + ' (' + QFieldStr('Series') + ')');
+      //VAppend(AMotorNums, QFieldStr('MotorNum') + ' (' + QFieldStr('Series') + ')');
+      VAppend(AMotorNums, QFieldStr('MotorNum'));
+      VAppend(Series, QFieldStr('Series'));
       VAppend(AReceiverNames, QFieldStr('ReceiverName'));
       QNext;
     end;
     Result:= True;
   end;
   QClose;
+
+  if not Result then Exit;
+
+  if ANeedOrderByNumber then
+  begin
+    VSortNum(AMotorNums, Indexes);
+    ASendDates:= VReplace(ASendDates, Indexes);
+    AMotorNames:= VReplace(AMotorNames, Indexes);
+    AMotorNums:= VReplace(AMotorNums, Indexes);
+    AReceiverNames:= VReplace(AReceiverNames, Indexes);
+    Series:= VReplace(Series, Indexes);
+  end;
+
+  for i:= 0 to High(AMotorNums) do
+    AMotorNums[i]:= AMotorNums[i] + ' (' + Series[i] + ')';
 end;
 
 function TDataBase.ShipmentTotalLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out AMotorNames: TStrVector; out
+  const ANameIDs, AReceiverIDs: TIntVector; out AMotorNames: TStrVector; out
   AMotorCounts: TIntVector): Boolean;
 var
   WhereStr: String;
@@ -1920,7 +1997,9 @@ begin
 
   WhereStr:= 'WHERE (t1.CargoID>0) AND (t2.SendDate BETWEEN :BD AND :ED) ';
   if not VIsNil(ANameIDs) then
-    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
+    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs), 'NameID');
+  if not VIsNil(AReceiverIDs) then
+    WhereStr:= WhereStr + 'AND' + SqlIN('t2','ReceiverID', Length(AReceiverIDs), 'ReceiverID');
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -1933,8 +2012,8 @@ begin
     'ORDER BY t3.MotorName');
   QParamDT('BD', ABeginDate);
   QParamDT('ED', AEndDate);
-  if not VIsNil(ANameIDs) then
-    QParamsInt(ANameIDs);
+  QParamsInt(ANameIDs, 'NameID');
+  QParamsInt(AReceiverIDs, 'ReceiverID');
   QOpen;
   if not QIsEmpty then
   begin
@@ -2577,6 +2656,7 @@ function TDataBase.ReclamationListLoad(const ABeginDate, AEndDate: TDate;
   ARecNotes, AMotorNames, AMotorNums: TStrVector): Boolean;
 var
   WhereStr, OrderStr: String;
+  Indexes: TIntVector;
 begin
   Result:= False;
 
@@ -2680,6 +2760,29 @@ begin
   end;
   QClose;
 
+  if not Result then Exit;
+  if AOrderIndex<>1{MotorNum} then Exit;
+
+  VSortNum(AMotorNums, Indexes);
+
+  ARecDates:= VReplace(ARecDates, Indexes);
+  ARecIDs:= VReplace(ARecIDs, Indexes);
+  AMotorIDs:= VReplace(AMotorIDs, Indexes);
+  AMileages:= VReplace(AMileages, Indexes);
+  AOpinions:= VReplace(AOpinions, Indexes);
+  APlaceNames:= VReplace(APlaceNames, Indexes);
+  AFactoryNames:= VReplace(AFactoryNames, Indexes);
+  ADepartures:= VReplace(ADepartures, Indexes);
+  ADefectNames:= VReplace(ADefectNames, Indexes);
+  AReasonNames:= VReplace(AReasonNames, Indexes);
+  ARecNotes:= VReplace(ARecNotes, Indexes);
+  AMotorNames:= VReplace(AMotorNames, Indexes);
+  AMotorNums:= VReplace(AMotorNums, Indexes);
+  ABuildDates:= VReplace(ABuildDates, Indexes);
+  AColors:= VReplace(AColors, Indexes);
+  AArrivalDates:= VReplace(AArrivalDates, Indexes);
+  ASendingDates:= VReplace(ASendingDates, Indexes);
+  APassports:= VReplace(APassports, Indexes);
 end;
 
 function TDataBase.ReclamationChooseListLoad(const ANameID: Integer;
@@ -2699,6 +2802,8 @@ begin
   SendDates:= nil;
   BuildDates:= nil;
   ReceiverNames:= nil;
+
+  if SEmpty(ANumberLike) then Exit;
 
   QSetQuery(FQuery);
   QSetSQL(
@@ -2868,6 +2973,7 @@ function TDataBase.RepairListLoad(const ANameIDs: TIntVector; const ANumberLike:
 var
   i: Integer;
   WhereStr, OrderStr: String;
+  Indexes: TIntVector;
 begin
   Result:= False;
 
@@ -2938,6 +3044,20 @@ begin
   QClose;
 
   if not Result then Exit;
+
+  if AOrderType=3 then //MotorNum
+  begin
+    VSortNum(AMotorNums, Indexes);
+    ARecIDs:= VReplace(ARecIDs, Indexes);
+    AMotorIDs:= VReplace(AMotorIDs, Indexes);
+    AMotorNames:= VReplace(AMotorNames, Indexes);
+    AMotorNums:= VReplace(AMotorNums, Indexes);
+    ARepairNotes:= VReplace(ARepairNotes, Indexes);
+    AArrivalDates:= VReplace(AArrivalDates, Indexes);
+    ASendingDates:= VReplace(ASendingDates, Indexes);
+    APassports:= VReplace(APassports, Indexes);
+  end;
+
   VDim(AWorkDayCounts{%H-}, Length(AArrivalDates));
     for i:= 0 to High(AWorkDayCounts) do
       AWorkDayCounts[i]:= LoadWorkDaysCountInPeriod(AArrivalDates[i], ASendingDates[i]);

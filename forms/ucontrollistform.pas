@@ -77,7 +77,7 @@ begin
   CardForm:= CreateCardForm(ControlListForm, CardPanel);
   CreateMotorsTable;
   FilterString:= EmptyStr;
-  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 250, 500);
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 300, 500);
   MotorCardCheckBox.Checked:= False;
 end;
 

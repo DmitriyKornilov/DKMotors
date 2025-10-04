@@ -21,12 +21,11 @@ type
 
   TTestLogForm = class(TForm)
     AddButton: TSpeedButton;
-    CheckBox1: TCheckBox;
+    OrderByNumCheckBox: TCheckBox;
     CheckBox2: TCheckBox;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
     DividerBevel2: TDividerBevel;
-    DividerBevel3: TDividerBevel;
     EditButtonPanel: TPanel;
     LogGrid: TsWorksheetGrid;
     Panel1: TPanel;
@@ -41,7 +40,7 @@ type
     VT: TVirtualStringTree;
     YearPanel: TPanel;
     procedure AddButtonClick(Sender: TObject);
-    procedure CheckBox1Change(Sender: TObject);
+    procedure OrderByNumCheckBoxChange(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -92,7 +91,7 @@ begin
   Screen.Cursor:= crHourGlass;
   try
     DataBase.TestBeforeListLoad(MainForm.UsedNameIDs,
-                         Checkbox1.Checked, BuildDates, MNames, MNums,
+                         OrderByNumCheckBox.Checked, BuildDates, MNames, MNums,
                          TotalMNames, TotalMCounts,
                          BTestDates, BTestFails, BTestNotes);
     BeforeTestSheet.Draw(BuildDates, MNames, MNums,
@@ -165,7 +164,7 @@ begin
   SelectedDate:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
 
   DataBase.TestListLoad(SelectedDate,SelectedDate, MainForm.UsedNameIDs,
-                    CheckBox1.Checked, TestIDs, TestResults, X,
+                    OrderByNumCheckBox.Checked, TestIDs, TestResults, X,
                     MotorNames, MotorNums, TestNotes);
   DataBase.TestTotalLoad(SelectedDate,SelectedDate, MainForm.UsedNameIDs, TotalMotorNames,
                        TotalMotorCounts, TotalFailCounts);
@@ -181,7 +180,7 @@ begin
   ViewUpdate;
 end;
 
-procedure TTestLogForm.CheckBox1Change(Sender: TObject);
+procedure TTestLogForm.OrderByNumCheckBoxChange(Sender: TObject);
 begin
   SelectDate;
   OpenBeforeTestList;

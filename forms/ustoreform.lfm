@@ -1,21 +1,22 @@
 object StoreForm: TStoreForm
   Left = 487
-  Height = 220
+  Height = 275
   Top = 321
-  Width = 918
+  Width = 1148
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StoreForm'
-  ClientHeight = 220
-  ClientWidth = 918
+  ClientHeight = 275
+  ClientWidth = 1148
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   object ToolPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 914
+    Width = 1144
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 2
@@ -24,78 +25,78 @@ object StoreForm: TStoreForm
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 910
-    Constraints.MaxHeight = 32
-    Constraints.MinHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1140
+    Constraints.MaxHeight = 40
+    Constraints.MinHeight = 40
     ParentFont = False
     TabOrder = 0
     object Panel5: TPanel
       Left = 0
-      Height = 28
+      Height = 36
       Top = 0
-      Width = 600
+      Width = 749
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 600
+      ClientHeight = 36
+      ClientWidth = 749
       ParentFont = False
       TabOrder = 0
-      object CheckBox1: TCheckBox
+      object OrderByNumCheckBox: TCheckBox
         AnchorSideLeft.Control = Panel5
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 5
-        Height = 19
-        Top = 5
-        Width = 152
-        BorderSpacing.Left = 5
+        Left = 6
+        Height = 24
+        Top = 6
+        Width = 192
+        BorderSpacing.Left = 6
         Caption = 'Упорядочить по номеру'
         ParentFont = False
         TabOrder = 0
-        OnClick = CheckBox1Click
+        OnClick = OrderByNumCheckBoxClick
       end
-      object CheckBox2: TCheckBox
-        AnchorSideLeft.Control = CheckBox1
+      object GroupByNameCheckBox: TCheckBox
+        AnchorSideLeft.Control = OrderByNumCheckBox
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 163
-        Height = 19
-        Top = 5
-        Width = 207
-        BorderSpacing.Left = 6
+        Left = 206
+        Height = 24
+        Top = 6
+        Width = 262
+        BorderSpacing.Left = 8
         Caption = 'Сгруппировать по наименованию'
         ParentFont = False
         TabOrder = 1
-        OnClick = CheckBox2Click
+        OnClick = GroupByNameCheckBoxClick
       end
-      object CheckBox3: TCheckBox
-        AnchorSideLeft.Control = CheckBox2
+      object LongTimeCheckBox: TCheckBox
+        AnchorSideLeft.Control = GroupByNameCheckBox
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 376
-        Height = 19
-        Top = 5
-        Width = 133
-        BorderSpacing.Left = 6
+        Left = 476
+        Height = 24
+        Top = 6
+        Width = 165
+        BorderSpacing.Left = 8
         Caption = 'Хранящиеся дольше'
         ParentFont = False
         TabOrder = 2
-        OnClick = CheckBox3Click
+        OnClick = LongTimeCheckBoxClick
       end
       object SpinEdit1: TSpinEdit
-        AnchorSideLeft.Control = CheckBox3
+        AnchorSideLeft.Control = LongTimeCheckBox
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel5
         AnchorSideTop.Side = asrCenter
-        Left = 514
-        Height = 23
-        Top = 3
-        Width = 50
-        BorderSpacing.Left = 5
+        Left = 647
+        Height = 28
+        Top = 4
+        Width = 62
+        BorderSpacing.Left = 6
         Enabled = False
         MaxValue = 10000
         MinValue = 2
@@ -110,22 +111,21 @@ object StoreForm: TStoreForm
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = Panel5
         AnchorSideRight.Side = asrBottom
-        Left = 569
-        Height = 15
-        Top = 7
-        Width = 26
+        Left = 715
+        Height = 20
+        Top = 8
+        Width = 34
         Anchors = [akTop, akLeft, akRight]
-        BorderSpacing.Left = 5
-        BorderSpacing.Right = 5
+        BorderSpacing.Left = 6
         Caption = 'дней'
         ParentColor = False
       end
     end
     object DividerBevel1: TDividerBevel
-      Left = 600
-      Height = 28
+      Left = 749
+      Height = 36
       Top = 0
-      Width = 18
+      Width = 21
       Caption = 'DividerBevel1'
       Align = alLeft
       BevelWidth = 2
@@ -135,11 +135,11 @@ object StoreForm: TStoreForm
     end
     object ExportButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 618
-      Height = 28
+      Left = 770
+      Height = 36
       Hint = 'Экспорт в формат электронной таблицы XLSX или ODS'
       Top = 0
-      Width = 91
+      Width = 104
       Align = alLeft
       AutoSize = True
       Caption = ' Экспорт '
@@ -154,9 +154,9 @@ object StoreForm: TStoreForm
   end
   object Panel2: TPanel
     Left = 2
-    Height = 182
-    Top = 36
-    Width = 914
+    Height = 229
+    Top = 44
+    Width = 1144
     Align = alClient
     BorderSpacing.Left = 2
     BorderSpacing.Right = 2
@@ -164,14 +164,14 @@ object StoreForm: TStoreForm
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Caption = 'Panel2'
-    ClientHeight = 178
-    ClientWidth = 910
+    ClientHeight = 225
+    ClientWidth = 1140
     TabOrder = 1
     object ReportGrid: TsWorksheetGrid
       Left = 0
-      Height = 178
+      Height = 225
       Top = 0
-      Width = 910
+      Width = 1140
       AutoExpand = []
       DisplayFixedColRow = False
       FrozenBorderPen.Style = psClear

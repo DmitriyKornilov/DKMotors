@@ -9,6 +9,7 @@ uses
   StdCtrls, DateTimePicker, LCLType, VirtualTrees, DividerBevel,
   //DK packages utils
   DK_VSTTables, DK_Vector, DK_Dialogs, DK_StrUtils, DK_Const, DK_CtrlUtils,
+  DK_Filter,
   //Project utils
   UVars, USheets;
 
@@ -30,10 +31,10 @@ type
     Label4: TLabel;
     Memo1: TMemo;
     MotorNameComboBox: TComboBox;
-    MotorNumEdit: TEdit;
+    FilterPanel: TPanel;
     Panel2: TPanel;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
+    NormRadioButton: TRadioButton;
+    DefectRadioButton: TRadioButton;
     SaveButton: TSpeedButton;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
@@ -44,10 +45,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MotorNameComboBoxChange(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
-    procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
-      {%H-}Shift: TShiftState);
-    procedure RadioButton2Click(Sender: TObject);
+    procedure DefectRadioButtonClick(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
     procedure VT1MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
@@ -56,6 +54,9 @@ type
     procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
+    FilterString: String;
+    Filter: TDKFilter;
+
     NameIDs: TIntVector;
 
     VSTViewTable, VSTTestTable: TVSTTable;
@@ -75,7 +76,10 @@ type
 
     procedure ShowTestList(const ANeedSelect: Boolean);
 
+    procedure FilterMotors(const AFilterString: String);
     procedure LoadMotors;
+
+    procedure MotorNumKeyDown(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
   public
     UsedNameID: Integer;
   end;
@@ -98,6 +102,9 @@ begin
 
   VSTViewTable:= TVSTTable.Create(VT1);
   VSTTestTable:= TVSTTable.Create(VT2);
+
+  FilterString:= EmptyStr;
+  Filter:= DKFilterCreate('Номер двигателя', FilterPanel, @FilterMotors, -1, 300, @MotorNumKeyDown);
 end;
 
 procedure TTestAddForm.FormDestroy(Sender: TObject);
@@ -148,15 +155,10 @@ end;
 
 procedure TTestAddForm.MotorNameComboBoxChange(Sender: TObject);
 begin
-  MotorNumEdit.SetFocus;
+  Filter.Focus;
 end;
 
-procedure TTestAddForm.MotorNumEditChange(Sender: TObject);
-begin
-  LoadMotors;
-end;
-
-procedure TTestAddForm.MotorNumEditKeyDown(Sender: TObject; var Key: Word;
+procedure TTestAddForm.MotorNumKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if VIsNil(ViewMotorIDs) then Exit;
@@ -171,7 +173,7 @@ begin
   end;
 end;
 
-procedure TTestAddForm.RadioButton2Click(Sender: TObject);
+procedure TTestAddForm.DefectRadioButtonClick(Sender: TObject);
 begin
   Memo1.SetFocus;
 end;
@@ -237,7 +239,7 @@ var
 begin
   if not VSTViewTable.IsSelected then Exit;
 
-  x:= Ord(RadioButton2.Checked);
+  x:= Ord(DefectRadioButton.Checked);
   Note:= STrim(Memo1.Text);
 
   VAppend(TestMotorIDs, ViewMotorIDs[VSTViewTable.SelectedIndex]);
@@ -252,12 +254,12 @@ begin
     VAppend(TestResultsStr, 'брак');
   ShowTestList(False);
 
-  MotorNumEdit.Text:= EmptyStr;
+  NormRadioButton.Checked:= True;
+  AddButton.Enabled:= False;
   Memo1.Lines.Clear;
 
-  RadioButton1.Checked:= True;
-  AddButton.Enabled:= False;
-  MotorNumEdit.SetFocus;
+  Filter.Clear;
+  Filter.Focus;
 end;
 
 procedure TTestAddForm.DelTest;
@@ -285,6 +287,7 @@ begin
   if VSTTestTable.IsSelected then
     Ind:= VSTTestTable.SelectedIndex;
 
+  VSTTestTable.ValuesClear;
   VSTTestTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(TestMotorNames))));
   VSTTestTable.SetColumn('Наименование', TestMotorNames, taLeftJustify);
   VSTTestTable.SetColumn('Номер', TestMotorNums);
@@ -307,15 +310,17 @@ begin
   DelButton.Enabled:= VSTTestTable.IsSelected;
 end;
 
+procedure TTestAddForm.FilterMotors(const AFilterString: String);
+begin
+  FilterString:= AFilterString;
+  LoadMotors;
+end;
+
 procedure TTestAddForm.LoadMotors;
-var
-  MotorNumberLike: String;
 begin
   if VIsNil(NameIDs) then Exit;
 
-  MotorNumberLike:= STrim(MotorNumEdit.Text);
-
-  DataBase.TestChooseListLoad(NameIDs[MotorNameComboBox.ItemIndex], MotorNumberLike,
+  DataBase.TestChooseListLoad(NameIDs[MotorNameComboBox.ItemIndex], STrim(FilterString),
                       ViewMotorIDs, ViewMotorNums, ViewBuildDates, ViewTests);
 
   VSTViewTable.ValuesClear;

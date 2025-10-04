@@ -20,7 +20,7 @@ type
 
   TBuildLogForm = class(TForm)
     AddButton: TSpeedButton;
-    CheckBox1: TCheckBox;
+    OrderByNumCheckBox: TCheckBox;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
     DividerBevel2: TDividerBevel;
@@ -35,7 +35,7 @@ type
     ToolPanel: TPanel;
     VT: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
-    procedure CheckBox1Change(Sender: TObject);
+    procedure OrderByNumCheckBoxChange(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -126,7 +126,7 @@ begin
 
   SelectedDate:= Dates[VSTDateList.SelectedIndex1, VSTDateList.SelectedIndex2];
   DataBase.BuildListLoad(SelectedDate, SelectedDate, MainForm.UsedNameIDs,
-                    CheckBox1.Checked, MotorIDs, NameIDs, OldMotors,
+                    OrderByNumCheckBox.Checked, MotorIDs, NameIDs, OldMotors,
                     Tmp, MotorNames, MotorNums, RotorNums);
   BuildLog.Update(SelectedDate, MotorNames, MotorNums, RotorNums);
 end;
@@ -184,7 +184,7 @@ begin
   EditMotor;
 end;
 
-procedure TBuildLogForm.CheckBox1Change(Sender: TObject);
+procedure TBuildLogForm.OrderByNumCheckBoxChange(Sender: TObject);
 begin
   ViewUpdate;
 end;

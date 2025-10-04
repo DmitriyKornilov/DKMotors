@@ -9,6 +9,7 @@ uses
   Buttons, DateTimePicker, LCLType, VirtualTrees, DividerBevel,
   //DK packages utils
   DK_Vector, DK_Dialogs, DK_VSTTables, DK_StrUtils, DK_Const, DK_CtrlUtils,
+  DK_Filter,
   //Project utils
   UVars, USheets;
 
@@ -23,6 +24,7 @@ type
     DateTimePicker1: TDateTimePicker;
     DelButton: TSpeedButton;
     DividerBevel1: TDividerBevel;
+    FilterPanel: TPanel;
     SaveButton: TSpeedButton;
     SeriesEdit: TEdit;
     Label1: TLabel;
@@ -32,21 +34,16 @@ type
     Label5: TLabel;
     MotorNameComboBox: TComboBox;
     ReceiverNameComboBox: TComboBox;
-    MotorNumEdit: TEdit;
     Panel2: TPanel;
     VT1: TVirtualStringTree;
     VT2: TVirtualStringTree;
     procedure AddButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
-    procedure DateTimePicker1Change(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MotorNameComboBoxChange(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
-    procedure MotorNumEditKeyDown(Sender: TObject; var Key: Word;
-      {%H-}Shift: TShiftState);
     procedure ReceiverNameComboBoxChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
     procedure SeriesEditKeyDown(Sender: TObject; var Key: Word;
@@ -58,6 +55,9 @@ type
     procedure VT2MouseUp(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
   private
+    FilterString: String;
+    Filter: TDKFilter;
+
     NameIDs: TIntVector;
     ReceiverIDs: TIntVector;
 
@@ -77,10 +77,13 @@ type
     procedure AddMotor;
     procedure DelMotor;
 
+    procedure FilterMotors(const AFilterString: String);
     procedure LoadMotors;
     procedure LoadCargo;
 
     procedure ShowCargoList(const ANeedSelect: Boolean);
+
+    procedure MotorNumKeyDown(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
   public
     CargoID: Integer;
   end;
@@ -101,6 +104,9 @@ begin
   DateTimePicker1.Date:= Date;
   LoadMotorNames;
   LoadReceiverNames;
+
+  FilterString:= EmptyStr;
+  Filter:= DKFilterCreate('Номер двигателя', FilterPanel, @FilterMotors, -1, 300, @MotorNumKeyDown);
 end;
 
 procedure TCargoEditForm.FormDestroy(Sender: TObject);
@@ -151,15 +157,10 @@ end;
 
 procedure TCargoEditForm.MotorNameComboBoxChange(Sender: TObject);
 begin
-  MotorNumEdit.SetFocus;
+  Filter.Focus;
 end;
 
-procedure TCargoEditForm.MotorNumEditChange(Sender: TObject);
-begin
-  LoadMotors;
-end;
-
-procedure TCargoEditForm.MotorNumEditKeyDown(Sender: TObject; var Key: Word;
+procedure TCargoEditForm.MotorNumKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if VIsNil(ViewMotorIDs) then Exit;
@@ -174,7 +175,7 @@ end;
 
 procedure TCargoEditForm.ReceiverNameComboBoxChange(Sender: TObject);
 begin
-  MotorNumEdit.SetFocus;
+  Filter.Focus;
 end;
 
 procedure TCargoEditForm.CancelButtonClick(Sender: TObject);
@@ -254,11 +255,6 @@ begin
   AddMotor;
 end;
 
-procedure TCargoEditForm.DateTimePicker1Change(Sender: TObject);
-begin
-  MotorNumEdit.SetFocus;
-end;
-
 procedure TCargoEditForm.DelButtonClick(Sender: TObject);
 begin
   DelMotor;
@@ -287,9 +283,10 @@ begin
 
   ShowCargoList(False);
 
-  MotorNumEdit.Text:= EmptyStr;
   AddButton.Enabled:= False;
-  MotorNumEdit.SetFocus;
+
+  Filter.Clear;
+  Filter.Focus;
 end;
 
 procedure TCargoEditForm.DelMotor;
@@ -306,6 +303,12 @@ begin
   ShowCargoList(True);
 end;
 
+procedure TCargoEditForm.FilterMotors(const AFilterString: String);
+begin
+  FilterString:= AFilterString;
+  LoadMotors;
+end;
+
 procedure TCargoEditForm.ShowCargoList(const ANeedSelect: Boolean);
 var
   Ind, LastInd: Integer;
@@ -314,6 +317,7 @@ begin
   if VSTCargoTable.IsSelected then
     Ind:= VSTCargoTable.SelectedIndex;
 
+  VSTCargoTable.ValuesClear;
   VSTCargoTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorNames))));
   VSTCargoTable.SetColumn('Наименование', MotorNames, taLeftJustify);
   VSTCargoTable.SetColumn('Номер', MotorNums);
@@ -337,16 +341,13 @@ end;
 
 procedure TCargoEditForm.LoadMotors;
 var
-  MotorNumberLike: String;
   i, n: Integer;
 begin
   SeriesEdit.Text:= EmptyStr;
   AddButton.Enabled:= False;
   if VIsNil(NameIDs) then Exit;
 
-  MotorNumberLike:= STrim(MotorNumEdit.Text);
-
-  DataBase.CargoChooseListLoad(NameIDs[MotorNameComboBox.ItemIndex], MotorNumberLike,
+  DataBase.CargoChooseListLoad(NameIDs[MotorNameComboBox.ItemIndex], STrim(FilterString),
                       ViewMotorIDs, ViewMotorNums, ViewBuildDates, ViewSeries);
 
   //убираем из списка просмотра двигатели, которые уже есть в списке этой отгрузки

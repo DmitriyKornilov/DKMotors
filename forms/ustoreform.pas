@@ -17,9 +17,9 @@ type
   { TStoreForm }
 
   TStoreForm = class(TForm)
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
+    OrderByNumCheckBox: TCheckBox;
+    GroupByNameCheckBox: TCheckBox;
+    LongTimeCheckBox: TCheckBox;
     DividerBevel1: TDividerBevel;
     ExportButton: TSpeedButton;
     Label2: TLabel;
@@ -28,9 +28,9 @@ type
     ToolPanel: TPanel;
     ReportGrid: TsWorksheetGrid;
     SpinEdit1: TSpinEdit;
-    procedure CheckBox1Click(Sender: TObject);
-    procedure CheckBox2Click(Sender: TObject);
-    procedure CheckBox3Click(Sender: TObject);
+    procedure OrderByNumCheckBoxClick(Sender: TObject);
+    procedure GroupByNameCheckBoxClick(Sender: TObject);
+    procedure LongTimeCheckBoxClick(Sender: TObject);
     procedure ExportButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -58,7 +58,7 @@ procedure TStoreForm.FormCreate(Sender: TObject);
 begin
   MainForm.SetNamesPanelsVisible(True, False);
   StoreSheet:= TStoreSheet.Create(ReportGrid.Worksheet, ReportGrid, GridFont);
-  Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;
+  GroupByNameCheckBox.Visible:= Length(MainForm.UsedNameIDs)<>1;
 end;
 
 procedure TStoreForm.FormDestroy(Sender: TObject);
@@ -74,19 +74,19 @@ begin
   ViewUpdate;
 end;
 
-procedure TStoreForm.CheckBox1Click(Sender: TObject);
+procedure TStoreForm.OrderByNumCheckBoxClick(Sender: TObject);
 begin
   ViewUpdate;
 end;
 
-procedure TStoreForm.CheckBox2Click(Sender: TObject);
+procedure TStoreForm.GroupByNameCheckBoxClick(Sender: TObject);
 begin
   ViewUpdate;
 end;
 
-procedure TStoreForm.CheckBox3Click(Sender: TObject);
+procedure TStoreForm.LongTimeCheckBoxClick(Sender: TObject);
 begin
-  SpinEdit1.Enabled:= CheckBox3.Checked;
+  SpinEdit1.Enabled:= LongTimeCheckBox.Checked;
   ViewUpdate;
 end;
 
@@ -107,17 +107,17 @@ var
   TestDates: TDateVector;
   DeltaDays: Integer;
 begin
-  Checkbox2.Visible:= Length(MainForm.UsedNameIDs)<>1;
+  GroupByNameCheckBox.Visible:= Length(MainForm.UsedNameIDs)<>1;
 
   Screen.Cursor:= crHourGlass;
   try
 
     DeltaDays:= 0;
-    if CheckBox3.Checked then
+    if LongTimeCheckBox.Checked then
       DeltaDays:= SpinEdit1.Value;
 
     DataBase.StoreListLoad(MainForm.UsedNameIDs, DeltaDays,
-                       Checkbox1.Checked, Checkbox2.Checked,
+                       OrderByNumCheckBox.Checked, GroupByNameCheckBox.Checked,
                        TestDates, MotorNames, MotorNums);
     DataBase.StoreTotalLoad(MainForm.UsedNameIDs, DeltaDays,
                         TotalMotorNames, TotalMotorCounts);

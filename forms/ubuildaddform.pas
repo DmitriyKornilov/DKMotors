@@ -270,6 +270,7 @@ begin
   if VSTTable.IsSelected then
     Ind:= VSTTable.SelectedIndex;
 
+  VSTTable.ValuesClear;
   VSTTable.SetColumn('№ п/п', VIntToStr(VOrder(Length(MotorNames))));
   VSTTable.SetColumn('Наименование', MotorNames, taLeftJustify);
   VSTTable.SetColumn('Номер', MotorNums);

@@ -96,7 +96,7 @@ type
     procedure ExportReclamation;
     procedure FilterReclamation(const AFilterString: String);
 
-    procedure ParamListCreate;
+    procedure CreateParamList;
   public
     procedure ViewUpdate;
   end;
@@ -126,13 +126,13 @@ begin
   ReclamationSheet:= TReclamationSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
   ReclamationSheet.Font.Size:= ReclamationSheet.Font.Size-1;
 
-  ParamListCreate;
+  CreateParamList;
 
   DateTimePicker2.Date:= FirstDayInYear(Date);
   DateTimePicker1.Date:= LastDayInYear(Date);
 
   FilterString:= EmptyStr;
-  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterReclamation, 250, 500);
+  DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterReclamation, 300, 500);
 
   CanShow:= True;
 end;
@@ -155,6 +155,7 @@ begin
     AddButton, DelButton, EditButton, RepairButton, ControlButton
   ]);
 
+  ParamList.AutoHeight;
   ViewUpdate;
 end;
 
@@ -313,7 +314,7 @@ begin
   ViewUpdate;
 end;
 
-procedure TReclamationForm.ParamListCreate;
+procedure TReclamationForm.CreateParamList;
 var
   S: String;
   V: TStrVector;
@@ -373,7 +374,6 @@ begin
     FreeAndNil(ReclamationEditForm);
   end;
   ClearSelection;
-  ViewUpdate;
 end;
 
 procedure TReclamationForm.OpenRepairEditForm;

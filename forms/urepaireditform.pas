@@ -9,6 +9,7 @@ uses
   Buttons, DateTimePicker, VirtualTrees, DividerBevel, DateUtils,
   //DK packages utils
   DK_VSTTables, DK_Vector, DK_StrUtils, DK_Const, DK_Dialogs, DK_CtrlUtils,
+  DK_Filter,
   //Project utils
   UVars, USheets;
 
@@ -22,12 +23,12 @@ type
     DateTimePicker1: TDateTimePicker;
     DateTimePicker2: TDateTimePicker;
     DividerBevel1: TDividerBevel;
+    FilterPanel: TPanel;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     MotorNameComboBox: TComboBox;
-    MotorNumEdit: TEdit;
     Panel2: TPanel;
     PassportCheckBox: TCheckBox;
     RecNoteMemo: TMemo;
@@ -39,16 +40,19 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
     procedure SendingCheckBoxChange(Sender: TObject);
   private
+    FilterString: String;
+    Filter: TDKFilter;
+
     VSTTable: TVSTTable;
 
     NameIDs, RecIDs, MotorNameIDs: TIntVector;
     MotorNums, PlaceNames: TStrVector;
     BuildDates, RecDates: TDateVector;
 
+    procedure FilterMotors(const AFilterString: String);
     procedure LoadMotors;
     procedure LoadRepair;
   public
@@ -74,6 +78,9 @@ begin
   DateTimePicker1.Date:= Date;
   DateTimePicker2.Date:= Date;
   VSTTable:= TVSTTable.Create(VT1);
+
+  FilterString:= EmptyStr;
+  Filter:= DKFilterCreate('Номер двигателя', FilterPanel, @FilterMotors, -1, 300);
 end;
 
 procedure TRepairEditForm.FormDestroy(Sender: TObject);
@@ -102,16 +109,20 @@ begin
   DateTimePicker2.Enabled:= SendingCheckBox.Checked;
 end;
 
-procedure TRepairEditForm.LoadMotors;
-var
-  MotorNumberLike: String;
+procedure TRepairEditForm.FilterMotors(const AFilterString: String);
 begin
+  FilterString:= AFilterString;
+  LoadMotors;
+end;
+
+procedure TRepairEditForm.LoadMotors;
+begin
+  if not SEmpty(MotorNum) then Exit;
   if VIsNil(NameIDs) then Exit;
 
-  MotorNumberLike:= STrim(MotorNumEdit.Text);
-
   DataBase.MotorListToRepair(NameIDs[MotorNameComboBox.ItemIndex],
-          MotorNumberLike, RecIDs, MotorNameIDs, BuildDates, RecDates, MotorNums, PlaceNames);
+                             STrim(FilterString), RecIDs, MotorNameIDs,
+                             BuildDates, RecDates, MotorNums, PlaceNames);
 
   VSTTable.ValuesClear;
   VSTTable.SetColumn('Дата сборки', VFormatDateTime('dd.mm.yyyy', BuildDates));
@@ -129,8 +140,9 @@ var
 begin
   MotorNameComboBox.ItemIndex:= MotorNameComboBox.Items.IndexOf(MotorName);
   MotorNameComboBox.Enabled:= False;
-  MotorNumEdit.Text:= MotorNum;
-  MotorNumEdit.Enabled:= False;
+
+  Filter.FilterString:= MotorNum;
+  Filter.FilterEnabled:= False;
 
   DataBase.MotorListOnRepair(RecID, RecIDs, MotorNameIDs, BuildDates,
                            RecDates, MotorNums, PlaceNames);
@@ -156,11 +168,6 @@ begin
       DateTimePicker2.Date:= SendingDate;
     RecNoteMemo.Text:= RepairNote;
   end;
-end;
-
-procedure TRepairEditForm.MotorNumEditChange(Sender: TObject);
-begin
-  LoadMotors;
 end;
 
 procedure TRepairEditForm.CancelButtonClick(Sender: TObject);

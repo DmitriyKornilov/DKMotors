@@ -5,10 +5,11 @@ unit UReclamationEditForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, DividerBevel,
-  StdCtrls, DateTimePicker, VirtualTrees,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
+  DividerBevel, StdCtrls, DateTimePicker, VirtualTrees,
   //DK packages utils
   DK_Vector, DK_Dialogs, DK_VSTTables, DK_StrUtils, DK_Const, DK_CtrlUtils,
+  DK_Filter,
   //Project utils
   UVars, USheets;
 
@@ -20,6 +21,7 @@ type
     ArrivalCheckBox: TCheckBox;
     DateTimePicker2: TDateTimePicker;
     DateTimePicker3: TDateTimePicker;
+    FilterPanel: TPanel;
     RepairPanel: TPanel;
     ButtonPanel: TPanel;
     CancelButton: TSpeedButton;
@@ -43,7 +45,6 @@ type
     MotorNameComboBox: TComboBox;
     PlaceNameComboBox: TComboBox;
     FactoryNameComboBox: TComboBox;
-    MotorNumEdit: TEdit;
     MileageEdit: TEdit;
     Panel2: TPanel;
     DefectNameComboBox: TComboBox;
@@ -55,10 +56,12 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MotorNumEditChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
     procedure SendingCheckBoxChange(Sender: TObject);
   private
+    FilterString: String;
+    Filter: TDKFilter;
+
     VSTTable: TVSTTable;
 
     MotorIDs: TIntVector;
@@ -68,6 +71,7 @@ type
     PlaceNames, FactoryNames, DefectNames, ReasonNames: TStrVector;
 
     procedure LoadNames;
+    procedure FilterMotors(const AFilterString: String);
     procedure LoadMotors;
     procedure LoadRec;
   public
@@ -89,6 +93,9 @@ begin
   DateTimePicker2.Date:= Date;
   VSTTable:= TVSTTable.Create(VT1);
   LoadNames;
+
+  FilterString:= EmptyStr;
+  Filter:= DKFilterCreate('Номер двигателя', FilterPanel, @FilterMotors, -1, 300);
 end;
 
 procedure TReclamationEditForm.FormDestroy(Sender: TObject);
@@ -109,11 +116,6 @@ begin
   VSTTable.Draw;
 
   if RecID>0 then LoadRec;
-end;
-
-procedure TReclamationEditForm.MotorNumEditChange(Sender: TObject);
-begin
-  LoadMotors;
 end;
 
 procedure TReclamationEditForm.CancelButtonClick(Sender: TObject);
@@ -227,16 +229,18 @@ begin
   ReasonNameComboBox.ItemIndex:= 0;
 end;
 
+procedure TReclamationEditForm.FilterMotors(const AFilterString: String);
+begin
+  FilterString:= AFilterString;
+  LoadMotors;
+end;
+
 procedure TReclamationEditForm.LoadMotors;
-var
-  MotorNumberLike: String;
 begin
   if VIsNil(NameIDs) then Exit;
 
-  MotorNumberLike:= STrim(MotorNumEdit.Text);
-
   DataBase.ReclamationChooseListLoad(NameIDs[MotorNameComboBox.ItemIndex],
-       MotorNumberLike, MotorIDs, MotorNums, BuildDates, Shippings);
+       STrim(FilterString), MotorIDs, MotorNums, BuildDates, Shippings);
 
   VSTTable.ValuesClear;
   VSTTable.SetColumn('Дата сборки', BuildDates);
@@ -288,7 +292,7 @@ begin
 
   PassportCheckBox.Checked:= Passport=1;
 
-  MotorNumEdit.Text:= MotorNum;
+  Filter.FilterString:= MotorNum;
   VSTTable.Select(VIndexOf(MotorIDs, MotorID));
 end;
 

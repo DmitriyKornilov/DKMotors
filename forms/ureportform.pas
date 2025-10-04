@@ -26,7 +26,7 @@ type
     DateTimePicker2: TDateTimePicker;
     Label1: TLabel;
     LogGrid: TsWorksheetGrid;
-    OrderNumCheckBox: TCheckBox;
+    OrderByNumCheckBox: TCheckBox;
     Panel1: TPanel;
     Panel2: TPanel;
     NumberListPanel: TPanel;
@@ -37,7 +37,7 @@ type
     ToolPanel: TPanel;
     procedure ExportButtonClick(Sender: TObject);
     procedure NumberListCheckBoxChange(Sender: TObject);
-    procedure OrderNumCheckBoxChange(Sender: TObject);
+    procedure OrderByNumCheckBoxChange(Sender: TObject);
     procedure DateTimePicker1Change(Sender: TObject);
     procedure DateTimePicker2Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -104,7 +104,7 @@ begin
   ViewUpdate;
 end;
 
-procedure TReportForm.OrderNumCheckBoxChange(Sender: TObject);
+procedure TReportForm.OrderByNumCheckBoxChange(Sender: TObject);
 begin
   ViewUpdate;
 end;
@@ -156,7 +156,7 @@ end;
 procedure TReportForm.SetControlsVisible;
 begin
   MainForm.SetNamesPanelsVisible(True, RadioButton3.Checked);
-  OrderNumCheckBox.Visible:= NumberListCheckBox.Checked;
+  OrderByNumCheckBox.Visible:= NumberListCheckBox.Checked;
 end;
 
 procedure TReportForm.ViewUpdate;
@@ -191,7 +191,7 @@ begin
   if BD>ED then Exit;
 
   DataBase.BuildListLoad(BD, ED, MainForm.UsedNameIDs,
-                    OrderNumCheckBox.Checked, X, Y, Z,
+                    OrderByNumCheckBox.Checked, X, Y, Z,
                     BuildDates, MotorNames, MotorNums, RotorNums);
   DataBase.BuildTotalLoad(BD, ED, MainForm.UsedNameIDs,
                      TotalMotorNames, TotalMotorCounts);
@@ -216,7 +216,7 @@ begin
   if BD>ED then Exit;
 
   DataBase.TestListLoad(BD, ED, MainForm.UsedNameIDs,
-              OrderNumCheckBox.Checked, X, TestResults, TestDates,
+              OrderByNumCheckBox.Checked, X, TestResults, TestDates,
               MotorNames, MotorNums, TestNotes);
 
   DataBase.TestTotalLoad(BD, ED, MainForm.UsedNameIDs,
@@ -245,11 +245,12 @@ begin
   BD:= DateTimePicker2.Date;
   if BD>ED then Exit;
 
-  DataBase.ShipmentTotalLoad(BD, ED, MainForm.UsedNameIDs, TotalMotorNames, TotalMotorCounts);
+  DataBase.ShipmentTotalLoad(BD, ED, MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
+                             TotalMotorNames, TotalMotorCounts);
   DataBase.ShipmentRecieversTotalLoad(BD, ED, MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
                 RecieverNames, RecieverMotorNames, RecieverMotorCounts);
   DataBase.ShipmentMotorListLoad(BD, ED, MainForm.UsedNameIDs, MainForm.UsedReceiverIDs,
-                OrderNumCheckBox.Checked,
+                OrderByNumCheckBox.Checked,
                 ListSendDates, ListMotorNames, ListMotorNums, ListReceiverNames);
 
   ReportShipmentSheet:= TReportShipmentSheet.Create(LogGrid.Worksheet, LogGrid, GridFont);
