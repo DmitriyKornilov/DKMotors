@@ -35,29 +35,6 @@ const
     $004D50C0  //red
   );
 
-  //AxisTicksScale - масштабирование меток оси
-  //Input:
-  //  AMinValue - наименьшее значение данных по оси
-  //  AMaxValue - наибольшее значение данных по оси
-  //  AMaxTicksCount - наибольшее количество меток оси
-  //Output:
-  //  AMinTick - наименьшее значение метки оси
-  //  AMaxTick - наибольшее значение метки оси
-  //  AStep - шаг изменения меток оси
-  //procedure AxisTicksScale(const AMinValue, AMaxValue: Double;
-  //                         out AMinTick, AMaxTick, AStep: Double;
-  //                         const AMaxTicksCount: Integer = 10);
-
-  //AxisTicks - вектор меток оси
-  //Input:
-  //  AMinValue - наименьшее значение данных по оси
-  //  AMaxValue - наибольшее значение данных по оси
-  //  AMaxTicksCount - наибольшее количество меток оси
-  //function AxisTicks(const AMinValue, AMaxValue: Double;
-  //                   const AMaxTicksCount: Integer = 10): TDblVector;
-  //function AxisTicksInt(const AMinValue, AMaxValue: Integer;
-  //                      const AMaxTicksCount: Integer = 10): TIntVector;
-
 type
 
   { TStatSheet }
@@ -81,70 +58,6 @@ type
 
 
 implementation
-
-//procedure AxisTicksScale(const AMinValue, AMaxValue: Double;
-//                         out AMinTick, AMaxTick, AStep: Double;
-//                         const AMaxTicksCount: Integer = 10);
-//var
-//  Range: Double;
-//
-//  function NiceNum(const ARange: Double; ARound: Boolean): Double;
-//  var
-//    Exponent: Integer;
-//    Fraction, NiceFraction: Double;
-//  begin
-//    Exponent:= Floor(Log10(ARange));
-//    Fraction:= ARange/IntPower(10, Exponent);
-//    NiceFraction:= 10;
-//    if ARound then
-//    begin
-//      if Fraction<1.5    then NiceFraction:= 1
-//      else if Fraction<3 then NiceFraction:= 2
-//      else if Fraction<7 then NiceFraction:= 5;
-//    end
-//    else begin
-//      if Fraction<=1      then NiceFraction:= 1
-//      else if Fraction<=2 then NiceFraction:= 2
-//      else if Fraction<=5 then NiceFraction:= 5;
-//    end;
-//    Result:= NiceFraction*IntPower(10, Exponent);
-//  end;
-//
-//begin
-//  Range:= NiceNum(AMaxValue - AMinValue, False);
-//  AStep:= NiceNum(Range/(AMaxTicksCount - 1), True);
-//  AMinTick:= Floor(AMinValue/AStep)*AStep;
-//  AMaxTick:= Ceil(AMaxValue/AStep)*AStep;
-//end;
-//
-//function AxisTicks(const AMinValue, AMaxValue: Double;
-//                   const AMaxTicksCount: Integer = 10): TDblVector;
-//var
-//  MinTick, MaxTick, Step, TickValue: Double;
-//begin
-//  Result:= nil;
-//  AxisTicksScale(AMinValue, AMaxValue, MinTick, MaxTick, Step, AMaxTicksCount);
-//  TickValue:= MinTick;
-//  while TickValue<(MaxTick+Step) do
-//  begin
-//    VAppend(Result, TickValue);
-//    TickValue:= TickValue + Step;
-//  end;
-//end;
-//
-//function AxisTicksInt(const AMinValue, AMaxValue: Integer;
-//                      const AMaxTicksCount: Integer = 10): TIntVector;
-//var
-//  V: TDblVector;
-//  i: Integer;
-//begin
-//  Result:= nil;
-//  V:= AxisTicks(AMinValue, AMaxValue, AMaxTicksCount);
-//  VDim(Result, Length(V));
-//  for i:= 0 to High(V) do
-//    Result[i]:= Round(V[i]);
-//  Result:= VUnique(Result);
-//end;
 
 { TStatSheet }
 
@@ -202,26 +115,20 @@ procedure TStatSheet.HorizBarHistogramDraw(var ARow: Integer;
                                     const ANames: TStrVector;
                                     const AValues: TIntVector);
 var
-  R, i: Integer;
+  R, i, MaxValue: Integer;
   Names: TStrVector;
   Values, Indexes: TIntVector;
-
-  //Ticks: TIntVector;
-  MaxValue{, MaxTick}: Integer;
 begin
   R:= ARow;
 
   MaxValue:= VMax(AValues);
-  //Ticks:= AxisTicksInt(0, MaxValue);
-  //MaxTick:= VLast(Ticks);
-  //MaxTick:= MaxValue;
 
   VSort(AValues, Indexes, True{DESC});
   Names:= VReplace(ANames, Indexes);
   Values:= VReplace(AValues, Indexes);
 
   for i:= 0 to High(Names) do
-    HorizBarDraw(R, Names[i], Values[i], MaxValue{MaxTick});
+    HorizBarDraw(R, Names[i], Values[i], MaxValue);
 
 
 
