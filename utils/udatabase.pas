@@ -268,7 +268,7 @@ type
                 const AANEMAsSameName: Boolean;
                 out AMotorNames: TStrVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
-    function ReclamationMotorNamesLoad(const ABeginDate, AEndDate: TDate;
+    function ReclamationByMotorNamesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
                 const AANEMAsSameName: Boolean;
@@ -3456,7 +3456,7 @@ begin
   Result:= True;
 end;
 
-function TDataBase.ReclamationMotorNamesLoad(const ABeginDate, AEndDate: TDate;
+function TDataBase.ReclamationByMotorNamesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
                 const AANEMAsSameName: Boolean;

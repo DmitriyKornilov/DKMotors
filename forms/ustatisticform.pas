@@ -61,8 +61,10 @@ type
     StatisticList: TVSTStringList;
     ParamList: TVSTParamList;
 
-    //MotorNames - список наименований двигателей, включаемых в отчет
-    MotorNames: String;
+    //MotorNamesStr - список наименований двигателей, включаемых в отчет
+    MotorNamesStr: String;
+    //PeriodStr - отчетный период
+    PeriodStr: String;
     //AdditionYearsCount - количество предыдущих лет для сопроставления данных
     AdditionYearsCount: Integer;
 
@@ -111,13 +113,13 @@ type
     procedure LoadStatistic;
 
     procedure Draw(const AZoomPercent: Integer);
-    procedure DrawStatistic(const AParamType: Integer);
-    procedure DrawStatisticForSinglePeriod(const AParamType: Integer);
-    procedure DrawStatisticForSeveralPeriods(const AParamType: Integer);
+    procedure DrawStatistic;
+    procedure DrawStatisticForSinglePeriod;
+    procedure DrawStatisticForSeveralPeriods;
 
-    procedure ExportStatistic(const AParamType: Integer);
-    procedure ExportStatisticForSinglePeriod(const AParamType: Integer);
-    procedure ExportStatisticForSeveralPeriods(const AParamType: Integer);
+    procedure ExportStatistic;
+    procedure ExportStatisticForSinglePeriod;
+    procedure ExportStatisticForSeveralPeriods;
 
   public
     procedure ViewUpdate;
@@ -217,7 +219,7 @@ end;
 
 procedure TStatisticForm.ExportButtonClick(Sender: TObject);
 begin
-  ExportStatistic(StatSelectedIndex);
+  ExportStatistic;
 end;
 
 procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);
@@ -255,7 +257,7 @@ var
 begin
   S:= 'Статистика:';
   V:= VCreateStr([
-    'Распределение по наименованиям двигателей',
+    'Распределение по наименованиям электродвигателей',
     'Распределение по неисправным элементам',
     'Распределение по предприятиям',
     'Распределение по месяцам',
@@ -283,7 +285,7 @@ var
 begin
   ParamList:= TVSTParamList.Create(SettingClientPanel);
 
-  S:= 'Включать в отчёт столбцы:';
+  S:= 'Включать в отчёт критерии неисправности:';
   VDim(V{%H-}, Length(ReasonNames));
   for i:= 0 to High(ReasonNames) do
     V[i]:= SFirstLower(ReasonNames[i]);
@@ -325,7 +327,6 @@ end;
 procedure TStatisticForm.LoadStatistic;
 var
   BD, ED: TDate;
-  V: TIntVector;
 begin
   if StatSelectedIndex<0 then Exit;               //не выбрана статистика
   if (not ParamList.IsSelected['ReasonList']) and //не выбран ни один критерий
@@ -337,6 +338,8 @@ begin
     AdditionYearsCount:= 0;
     BD:= BeginDatePicker.Date;
     ED:= EndDateTimePicker.Date;
+    PeriodStr:= 'с ' + FormatDateTime('dd.mm.yyyy', BD) +
+                ' по ' + FormatDateTime('dd.mm.yyyy', ED);
   end
   else if ReportTypeComboBox.ItemIndex=1 then
   begin
@@ -345,12 +348,12 @@ begin
     ED:= EndDateTimePicker.Date;//???
   end;
 
-  MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
+  MotorNamesStr:= VVectorToStr(MainForm.UsedNames, ', ');
   case StatSelectedIndex of
     0: begin
          ParamNames:= VCut(MainForm.UsedNames);
          //TODO ANEMIsSingleName !!!!
-         DataBase.ReclamationMotorNamesLoad(BD, ED, AdditionYearsCount,
+         DataBase.ReclamationByMotorNamesLoad(BD, ED, AdditionYearsCount,
                                   MainForm.UsedNameIDs,
                                   ParamList.Checked['ANEMIsSingleName', 0],
                                   ParamNames, ClaimCounts);
@@ -361,7 +364,7 @@ begin
     4: ;
   end;
 
-  BD:= BeginDatePicker.Date;
+  DrawStatistic;
 
 
   //if not ParamList.IsSelected['ReasonList'] then Exit;
@@ -369,7 +372,7 @@ begin
   //if AParamType<0 then Exit;
   //BD:= BeginDatePicker.Date;
   //ED:= EndDateTimePicker.Date;
-  //MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
+  //MotorNamesStr:= VVectorToStr(MainForm.UsedNames, ', ');
   //
   //AdditionYearsCount:= 0;
   //if SeveralPeriodsCheckBox.Checked then
@@ -396,30 +399,28 @@ end;
 procedure TStatisticForm.Draw(const AZoomPercent: Integer);
 begin
   ZoomPercent:= AZoomPercent;
-  DrawStatistic(StatSelectedIndex);
+  DrawStatistic;
 end;
 
-procedure TStatisticForm.DrawStatisticForSinglePeriod(const AParamType: Integer);
+procedure TStatisticForm.DrawStatisticForSinglePeriod;
 var
-  Drawer: TStatisticSinglePeriodSheet;
-  //Drawer: TStatSheet;
-  //TmpReasonValues, TmpParamValues: TIntVector;
-  //TmpReasonNames: TStrVector;
+  //Drawer: TStatisticSinglePeriodSheet;
+  Drawer: TStatSheet;
 begin
-  //if AParamType<>0 then Exit;
-  //
-  //TmpReasonValues:= VCreateInt([0, 4, 25, 10, 3]);
-  //TmpParamValues:= VCreateInt([39, 3]);
-  //TmpReasonNames:= VCut(ReasonNames, 1);
-  //
-  //Drawer:= TStatSheet.Create(ViewGrid.Worksheet, ViewGrid, GridFont);
-  //try
-  //  Drawer.Zoom(ZoomPercent);
-  //  Drawer.Draw('наименованиям двигателей',
-  //              TmpReasonNames, ParamNames, TmpReasonValues, TmpParamValues);
-  //finally
-  //  FreeAndNil(Drawer);
-  //end;
+
+
+  Drawer:= TStatSheet.Create(ViewGrid.Worksheet, ViewGrid, GridFont);
+  try
+    Drawer.Zoom(ZoomPercent);
+    Drawer.Draw('Наименование электродвигателя', 'наименованиям электродвигателей',
+                MotorNamesStr, PeriodStr,
+                ParamList.Checkeds['ReasonList'], ReasonNames,
+                ParamNames, ClaimCounts,
+                ParamList.Checked['AdditionShow', 0{гистограммы}]
+                );
+  finally
+    FreeAndNil(Drawer);
+  end;
 
 
 
@@ -469,7 +470,7 @@ begin
   //try
   //  Drawer.Zoom(ZoomPercent);
   //  Drawer.Draw(BeginDatePicker.Date, EndDateTimePicker.Date,
-  //             MotorNames, ParamNames, ReasonNames, ClaimCounts[0],
+  //             MotorNamesStr, ParamNames, ReasonNames, ClaimCounts[0],
   //             ParamList.Selected['SumTypeList']=1, //общее кол-во только по включенным в отчёт критериям
   //             ParamList.Checked['AdditionShow', 0] //отображать гистограммы
   //             );
@@ -478,7 +479,7 @@ begin
   //end;
 end;
 
-procedure TStatisticForm.DrawStatisticForSeveralPeriods(const AParamType: Integer);
+procedure TStatisticForm.DrawStatisticForSeveralPeriods;
 var
   Drawer: TStatisticSeveralPeriodsSheet;
 begin
@@ -520,7 +521,7 @@ begin
  // try
  //   Drawer.Zoom(ZoomPercent);
  //   Drawer.Draw(BeginDatePicker.Date, EndDateTimePicker.Date,
- //              MotorNames, ParamNames, ReasonNames, ClaimCounts,
+ //              MotorNamesStr, ParamNames, ReasonNames, ClaimCounts,
  //              ParamList.Selected['SumTypeList']=1, //общее кол-во только по включенным в отчёт критериям
  //              ParamList.Checked['AdditionShow', 0] //отображать гистограммы
  //              );
@@ -529,57 +530,52 @@ begin
  // end;
 end;
 
-procedure TStatisticForm.DrawStatistic(const AParamType: Integer);
+procedure TStatisticForm.DrawStatistic;
 begin
   if MIsNil(ClaimCounts) then Exit;
   if ReportTypeComboBox.ItemIndex=0 then
-    DrawStatisticForSinglePeriod(AParamType)
+    DrawStatisticForSinglePeriod
   else if ReportTypeComboBox.ItemIndex=1 then
-    DrawStatisticForSeveralPeriods(AParamType);
+    DrawStatisticForSeveralPeriods;
 end;
 
-procedure TStatisticForm.ExportStatistic(const AParamType: Integer);
+procedure TStatisticForm.ExportStatistic;
 begin
   if MIsNil(ClaimCounts) then Exit;
   if ReportTypeComboBox.ItemIndex=0 then
-    ExportStatisticForSinglePeriod(AParamType)
+    ExportStatisticForSinglePeriod
   else if ReportTypeComboBox.ItemIndex=1 then
-    ExportStatisticForSeveralPeriods(AParamType);
+    ExportStatisticForSeveralPeriods;
 end;
 
-procedure TStatisticForm.ExportStatisticForSinglePeriod(const AParamType: Integer);
+procedure TStatisticForm.ExportStatisticForSinglePeriod;
 var
-  Drawer: TStatisticSinglePeriodSheet;
+  //Drawer: TStatisticSinglePeriodSheet;
 
   Sheet: TsWorksheet;
   Exporter: TSheetsExporter;
-
-  //Drawer: TStatSheet;
-  //TmpReasonValues, TmpParamValues: TIntVector;
-  //TmpReasonNames: TStrVector;
+  Drawer: TStatSheet;
 begin
-  //if AParamType<>0 then Exit;
-  //Exporter:= TSheetsExporter.Create;
-  //try
-  //  Sheet:= Exporter.AddWorksheet('Лист1');
-  //
-  //  TmpReasonValues:= VCreateInt([0, 4, 25, 10, 3]);
-  //  TmpParamValues:= VCreateInt([39, 3]);
-  //  TmpReasonNames:= VCut(ReasonNames, 1);
-  //
-  //  Drawer:= TStatSheet.Create(Sheet, nil, GridFont);
-  //  try
-  //    Drawer.Draw('наименованиям двигателей',
-  //                TmpReasonNames, ParamNames, TmpReasonValues, TmpParamValues);
-  //  finally
-  //    FreeAndNil(Drawer);
-  //  end;
-  //
-  //Exporter.PageSettings(spoPortrait, pfWidth, True, False);
-  //  Exporter.Save('Выполнено!');
-  //finally
-  //  FreeAndNil(Exporter);
-  //end;
+  Exporter:= TSheetsExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    Drawer:= TStatSheet.Create(Sheet, nil, GridFont);
+    try
+      Drawer.Draw('Наименование электродвигателя', 'наименованиям электродвигателей',
+                  MotorNamesStr, PeriodStr,
+                  ParamList.Checkeds['ReasonList'], ReasonNames,
+                  ParamNames, ClaimCounts,
+                  ParamList.Checked['AdditionShow', 0{гистограммы}]
+                  );
+    finally
+      FreeAndNil(Drawer);
+    end;
+
+    Exporter.PageSettings(spoPortrait, pfWidth, True, False);
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
 
 
   //Exporter:= TSheetsExporter.Create;
@@ -622,7 +618,7 @@ begin
   //
   //  try
   //    Drawer.Draw(BeginDatePicker.Date, EndDateTimePicker.Date,
-  //                MotorNames, ParamNames, ReasonNames, ClaimCounts[0],
+  //                MotorNamesStr, ParamNames, ReasonNames, ClaimCounts[0],
   //                ParamList.Selected['SumTypeList']=1, //общее кол-во только по включенным в отчёт критериям
   //                ParamList.Checked['AdditionShow', 0] //отображать гистограммы
   //                );
@@ -637,7 +633,7 @@ begin
   //end;
 end;
 
-procedure TStatisticForm.ExportStatisticForSeveralPeriods(const AParamType: Integer);
+procedure TStatisticForm.ExportStatisticForSeveralPeriods;
 var
   Drawer: TStatisticSeveralPeriodsSheet;
   Sheet: TsWorksheet;
@@ -684,7 +680,7 @@ begin
   //
   //  try
   //    Drawer.Draw(BeginDatePicker.Date, EndDateTimePicker.Date,
-  //                MotorNames, ParamNames, ReasonNames, ClaimCounts,
+  //                MotorNamesStr, ParamNames, ReasonNames, ClaimCounts,
   //                ParamList.Selected['SumTypeList']=1, //общее кол-во только по включенным в отчёт критериям
   //                ParamList.Checked['AdditionShow', 0] //отображать гистограммы
   //                );
