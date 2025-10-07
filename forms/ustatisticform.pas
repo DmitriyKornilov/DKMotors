@@ -11,7 +11,7 @@ uses
   DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetExporter, DK_SheetConst,
   DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils, DK_VSTParamList,
   //Project utils
-  UVars, UStatSheets, UStatSheetNew;
+  UVars, UStatSheets, UStatistic;
 
 type
 
@@ -57,7 +57,7 @@ type
   private
     CanShow: Boolean;
     ZoomPercent: Integer;
-    SelectedIndex: Integer;
+    StatSelectedIndex: Integer;
     StatisticList: TVSTStringList;
     ParamList: TVSTParamList;
 
@@ -86,8 +86,8 @@ type
 
     //ClaimCounts - количество рекламаций
     // - Index1 - индекс периода
-    //      0 - данные за текущий произвольный период (в этом случае это единственный индекс)
-    //          или указанный период года
+    //      0 - данные за произвольный период (в этом случае это единственный индекс)
+    //          или указанный период года, который нужно сопоставить с предыдущими
     //      1 - данные за указанный период 1-ого предшествующего года
     //      2 - данные за указанный период 2-ого предшествующего года
     //      3 - данные за указанный период 3-его предшествующего года
@@ -108,7 +108,7 @@ type
     //2 - Распределение по предприятиям
     //3 - Распределение по месяцам
     //4 - Распределение по пробегу локомотива
-    procedure LoadStatistic(const AParamType: Integer);
+    procedure LoadStatistic;
 
     procedure Draw(const AZoomPercent: Integer);
     procedure DrawStatistic(const AParamType: Integer);
@@ -143,12 +143,12 @@ begin
   ZoomPercent:= 100;
   CreateZoomControls(50, 150, ZoomPercent, ZoomPanel, @Draw, True);
 
-  DataBase.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName', ReasonIDs, ReasonNames);
+  DataBase.KeyPickList('RECLAMATIONREASONS', 'ReasonID', 'ReasonName', ReasonIDs, ReasonNames, False, 'ReasonID');
   ReasonNames[0]:= 'Не расследовано';
 
   CreateParamList;
 
-  SelectedIndex:= -1;
+  StatSelectedIndex:= -1;
   CreateStatisticList;
 
   BeginDatePicker.Date:= FirstDayInYear(Date);
@@ -196,7 +196,7 @@ begin
     BD:= EndDateTimePicker.Date;
   end;
 
-  if ( ReportTypeComboBox.ItemIndex=1) or (SelectedIndex=3) then
+  if ( ReportTypeComboBox.ItemIndex=1) or (StatSelectedIndex=3) then
   begin
     if YearOfDate(BD)<>YearOfDate(ED) then
       ED:= LastDayInYear(BD);
@@ -217,7 +217,7 @@ end;
 
 procedure TStatisticForm.ExportButtonClick(Sender: TObject);
 begin
-  ExportStatistic(SelectedIndex);
+  ExportStatistic(StatSelectedIndex);
 end;
 
 procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);
@@ -226,14 +226,23 @@ begin
 end;
 
 procedure TStatisticForm.ViewUpdate;
+var
+  IsANEMUsed: Boolean;
 begin
   if not CanShow then Exit;
+
+  IsANEMUsed:= (VIndexOf(MainForm.UsedNameIDs, 1{IM1001})>=0) or
+               (VIndexOf(MainForm.UsedNameIDs, 2{IM1002})>=0);
+
+  ParamList.Visibles['ANEMIsSingleName']:= (StatSelectedIndex=0) and IsANEMUsed;
+  ParamList.Visibles['MonthTypeList']:= StatSelectedIndex=3;
+
   VerifyDates;
 
   Screen.Cursor:= crHourGlass;
   try
     ViewGrid.Clear;
-    LoadStatistic(SelectedIndex);
+    LoadStatistic;
   finally
     Screen.Cursor:= crDefault;
   end;
@@ -260,12 +269,8 @@ end;
 
 procedure TStatisticForm.SelectStatistic;
 begin
-  if SelectedIndex=StatisticList.SelectedIndex then Exit;
-  SelectedIndex:= StatisticList.SelectedIndex;
-
-  ParamList.Visibles['ANEMIsSingleName']:= SelectedIndex=0;
-  ParamList.Visibles['MonthTypeList']:= SelectedIndex=3;
-
+  if StatSelectedIndex=StatisticList.SelectedIndex then Exit;
+  StatSelectedIndex:= StatisticList.SelectedIndex;
   ViewUpdate;
 end;
 
@@ -317,11 +322,47 @@ begin
   ParamList.AddCheckList('ANEMIsSingleName', S, V, @ViewUpdate);
 end;
 
-procedure TStatisticForm.LoadStatistic(const AParamType: Integer);
+procedure TStatisticForm.LoadStatistic;
 var
   BD, ED: TDate;
+  V: TIntVector;
 begin
-  if not ParamList.IsSelected['ReasonList'] then Exit;
+  if StatSelectedIndex<0 then Exit;               //не выбрана статистика
+  if (not ParamList.IsSelected['ReasonList']) and //не выбран ни один критерий
+     (ParamList.Selected['SumTypeList']>0) then   //не указано считать кол-во по всем критериям
+       Exit;
+
+  if ReportTypeComboBox.ItemIndex=0 then //текущий произвольный период
+  begin
+    AdditionYearsCount:= 0;
+    BD:= BeginDatePicker.Date;
+    ED:= EndDateTimePicker.Date;
+  end
+  else if ReportTypeComboBox.ItemIndex=1 then
+  begin
+    AdditionYearsCount:= AdditionYearCountSpinEdit.Value;
+    BD:= BeginDatePicker.Date; //???
+    ED:= EndDateTimePicker.Date;//???
+  end;
+
+  MotorNames:= VVectorToStr(MainForm.UsedNames, ', ');
+  case StatSelectedIndex of
+    0: begin
+         ParamNames:= VCut(MainForm.UsedNames);
+         //TODO ANEMIsSingleName !!!!
+         DataBase.ReclamationMotorNamesLoad(BD, ED, AdditionYearsCount,
+                                  MainForm.UsedNameIDs,
+                                  ParamList.Checked['ANEMIsSingleName', 0],
+                                  ParamNames, ClaimCounts);
+       end;
+    1: ;
+    2: ;
+    3: ;
+    4: ;
+  end;
+
+  BD:= BeginDatePicker.Date;
+
 
   //if not ParamList.IsSelected['ReasonList'] then Exit;
   //
@@ -355,7 +396,7 @@ end;
 procedure TStatisticForm.Draw(const AZoomPercent: Integer);
 begin
   ZoomPercent:= AZoomPercent;
-  DrawStatistic(SelectedIndex);
+  DrawStatistic(StatSelectedIndex);
 end;
 
 procedure TStatisticForm.DrawStatisticForSinglePeriod(const AParamType: Integer);

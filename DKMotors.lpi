@@ -330,9 +330,9 @@
         <UnitName Value="UStatSheets"/>
       </Unit>
       <Unit>
-        <Filename Value="utils\ustatsheetnew.pas"/>
+        <Filename Value="utils\ustatistic.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="UStatSheetNew"/>
+        <UnitName Value="UStatistic"/>
       </Unit>
     </Units>
   </ProjectOptions>

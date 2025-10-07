@@ -16,7 +16,7 @@ uses
   UTestLogForm, UCargoForm, UReclamationEditForm, UDataBase, UStatisticForm,
   URepairForm, UControlListForm, UCalendar, UCalendarForm, UCalendarEditForm,
   UCardForm, URepairEditForm, UControlListEditForm, UVars,
-  UPackingSheetForm, UStatSheets, UStatSheetNew;
+  UPackingSheetForm, UStatSheets, UStatistic;
 
 {$R *.res}
 
