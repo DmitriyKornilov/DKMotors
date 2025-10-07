@@ -1,12 +1,12 @@
 object StatisticForm: TStatisticForm
   Left = 632
-  Height = 651
+  Height = 600
   Top = 149
   Width = 1195
   Align = alClient
   BorderStyle = bsNone
   Caption = 'StatisticForm'
-  ClientHeight = 651
+  ClientHeight = 600
   ClientWidth = 1195
   DesignTimePPI = 120
   OnCreate = FormCreate
@@ -215,35 +215,35 @@ object StatisticForm: TStatisticForm
   end
   object ClientPanel: TPanel
     Left = 0
-    Height = 609
+    Height = 558
     Top = 42
     Width = 1195
     Align = alClient
-    ClientHeight = 609
+    ClientHeight = 558
     ClientWidth = 1195
     TabOrder = 1
-    object Panel1: TPanel
+    object LeftPanel: TPanel
       Left = 1
-      Height = 607
+      Height = 556
       Top = 1
-      Width = 400
+      Width = 450
       Align = alLeft
       BevelOuter = bvNone
-      ClientHeight = 607
-      ClientWidth = 400
+      ClientHeight = 556
+      ClientWidth = 450
       TabOrder = 0
       object StatisticPanel: TPanel
         Left = 2
         Height = 89
         Top = 2
-        Width = 398
+        Width = 448
         Align = alTop
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
         ClientHeight = 85
-        ClientWidth = 394
+        ClientWidth = 444
         Color = clWindow
         ParentBackground = False
         ParentColor = False
@@ -252,7 +252,7 @@ object StatisticForm: TStatisticForm
           Left = 0
           Height = 85
           Top = 0
-          Width = 394
+          Width = 444
           Align = alClient
           BorderStyle = bsNone
           DefaultNodeHeight = 25
@@ -269,261 +269,75 @@ object StatisticForm: TStatisticForm
         Left = 0
         Height = 6
         Top = 91
-        Width = 400
+        Width = 450
         Align = alTop
         ResizeAnchor = akTop
       end
-      object Panel3: TPanel
-        Left = 2
-        Height = 506
-        Top = 99
-        Width = 398
+      object SettingClientPanel: TPanel
+        Left = 0
+        Height = 457
+        Top = 97
+        Width = 450
         Align = alClient
-        BorderSpacing.Left = 2
-        BorderSpacing.Top = 2
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
-        ClientHeight = 502
-        ClientWidth = 394
+        Caption = 'SettingClientPanel'
         Color = clWindow
         ParentBackground = False
         ParentColor = False
         TabOrder = 2
-        object ReasonVT: TVirtualStringTree
-          Left = 0
-          Height = 66
-          Top = 0
-          Width = 394
-          Align = alTop
-          BorderStyle = bsNone
-          DefaultNodeHeight = 25
-          DefaultText = 'Node'
-          Header.AutoSizeIndex = 0
-          Header.Columns = <>
-          Header.Height = 25
-          Header.MainColumn = -1
-          TabOrder = 0
-        end
-        object Label7: TLabel
-          Left = 6
-          Height = 20
-          Top = 156
-          Width = 388
-          Align = alTop
-          BorderSpacing.Left = 6
-          BorderSpacing.Top = 20
-          BorderSpacing.Bottom = 2
-          Caption = 'Дополнительно отображать:'
-          Color = clWindow
-          Font.Style = [fsBold]
-          ParentColor = False
-          ParentFont = False
-          Transparent = False
-        end
-        object Panel9: TPanel
-          AnchorSideTop.Control = ReasonVT
-          Left = 0
-          Height = 84
-          Top = 178
-          Width = 394
-          Align = alTop
-          AutoSize = True
-          BevelOuter = bvNone
-          ClientHeight = 84
-          ClientWidth = 394
-          ParentBackground = False
-          TabOrder = 1
-          object ShowPercentCheckBox: TCheckBox
-            Left = 6
-            Height = 24
-            Top = 32
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            BorderSpacing.Bottom = 4
-            Caption = ' % от общего количества рекламаций за период '
-            TabOrder = 0
-            OnChange = ShowPercentCheckBoxChange
-          end
-          object ShowGraphicsCheckBox: TCheckBox
-            Left = 6
-            Height = 24
-            Top = 4
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            BorderSpacing.Bottom = 4
-            Caption = ' графики и гистограммы'
-            TabOrder = 1
-            OnChange = ShowGraphicsCheckBoxChange
-          end
-          object ShowLinePercentCheckBox: TCheckBox
-            Left = 6
-            Height = 24
-            Top = 60
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            Caption = ' % от общего количества рекламаций в строке'
-            TabOrder = 2
-            OnChange = ShowLinePercentCheckBoxChange
-          end
-        end
-        object Label9: TLabel
-          Left = 6
-          Height = 20
-          Top = 86
-          Width = 388
-          Align = alTop
-          BorderSpacing.Left = 6
-          BorderSpacing.Top = 20
-          BorderSpacing.Bottom = 2
-          Caption = 'Считать общее количество'
-          Color = clWindow
-          Font.Style = [fsBold]
-          ParentColor = False
-          ParentFont = False
-          Transparent = False
-        end
-        object Panel10: TPanel
-          AnchorSideTop.Control = ReasonVT
-          Left = 0
-          Height = 28
-          Top = 108
-          Width = 394
-          Align = alTop
-          AutoSize = True
-          BevelOuter = bvNone
-          ClientHeight = 28
-          ClientWidth = 394
-          ParentBackground = False
-          TabOrder = 2
-          object TotalCountForUsedParamsOnlyCheckBox: TCheckBox
-            Left = 6
-            Height = 24
-            Top = 4
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            Caption = ' только для отображаемых параметров'
-            TabOrder = 0
-            OnChange = TotalCountForUsedParamsOnlyCheckBoxChange
-          end
-        end
-        object ANEMPanel: TPanel
-          Left = 0
-          Height = 68
-          Top = 262
-          Width = 394
-          Align = alTop
-          AutoSize = True
-          BevelOuter = bvNone
-          ClientHeight = 68
-          ClientWidth = 394
-          ParentBackground = False
-          TabOrder = 3
-          object Label10: TLabel
-            Left = 6
-            Height = 20
-            Top = 20
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 20
-            BorderSpacing.Bottom = 2
-            Caption = 'Считать оба исполнения'
-            Color = clWindow
-            Font.Style = [fsBold]
-            ParentColor = False
-            ParentFont = False
-            Transparent = False
-          end
-          object ANEMAsSameNameCheckBox: TCheckBox
-            Left = 6
-            Height = 24
-            Top = 44
-            Width = 388
-            Align = alTop
-            BorderSpacing.Left = 6
-            BorderSpacing.Top = 4
-            Caption = ' АНЭМ225 как одно наименование'
-            TabOrder = 0
-            OnChange = ANEMAsSameNameCheckBoxChange
-          end
-        end
-        object MonthReportTypeVT: TVirtualStringTree
-          Left = 0
-          Height = 42
-          Top = 350
-          Width = 394
-          Align = alTop
-          BorderSpacing.Top = 20
-          BorderStyle = bsNone
-          DefaultNodeHeight = 25
-          DefaultText = 'Node'
-          Header.AutoSizeIndex = 0
-          Header.Columns = <>
-          Header.Height = 25
-          Header.MainColumn = -1
-          TabOrder = 4
-          Visible = False
-        end
       end
     end
     object Splitter1: TSplitter
-      Left = 401
-      Height = 607
+      Left = 451
+      Height = 556
       Top = 1
       Width = 6
       ResizeStyle = rsLine
     end
-    object Panel4: TPanel
-      Left = 407
-      Height = 607
+    object RightPanel: TPanel
+      Left = 457
+      Height = 556
       Top = 1
-      Width = 787
+      Width = 737
       Align = alClient
       BevelOuter = bvNone
-      Caption = 'Panel4'
-      ClientHeight = 607
-      ClientWidth = 787
+      Caption = 'RightPanel'
+      ClientHeight = 556
+      ClientWidth = 737
       TabOrder = 2
       object MainPanel: TPanel
         Left = 2
-        Height = 603
+        Height = 552
         Top = 2
-        Width = 783
+        Width = 733
         Align = alClient
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
         BorderSpacing.Right = 2
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
-        ClientHeight = 603
-        ClientWidth = 783
+        ClientHeight = 552
+        ClientWidth = 733
         TabOrder = 0
-        object Panel7: TPanel
+        object GridPanel: TPanel
           Left = 0
-          Height = 603
+          Height = 552
           Top = 0
-          Width = 783
+          Width = 733
           Align = alClient
           BevelOuter = bvNone
           BorderStyle = bsSingle
-          Caption = 'Panel7'
-          ClientHeight = 599
-          ClientWidth = 779
+          Caption = 'GridPanel'
+          ClientHeight = 548
+          ClientWidth = 729
           TabOrder = 0
-          object Grid1: TsWorksheetGrid
+          object ViewGrid: TsWorksheetGrid
             Left = 0
-            Height = 575
+            Height = 524
             Top = 0
-            Width = 779
+            Width = 729
             AutoExpand = []
             DisplayFixedColRow = False
             FrozenBorderPen.Style = psClear
@@ -537,7 +351,7 @@ object StatisticForm: TStatisticForm
             SelectionPen.Width = 0
             ShowGridLines = False
             ShowHeaders = False
-            WorkbookSource = Grid1.internal
+            WorkbookSource = ViewGrid.internal
             Align = alClient
             AutoAdvance = aaNone
             AutoEdit = False
@@ -557,8 +371,8 @@ object StatisticForm: TStatisticForm
           object ZoomPanel: TPanel
             Left = 0
             Height = 22
-            Top = 577
-            Width = 779
+            Top = 526
+            Width = 729
             Align = alBottom
             BevelOuter = bvNone
             Color = clWindow
@@ -569,8 +383,8 @@ object StatisticForm: TStatisticForm
           object Bevel1: TBevel
             Left = 0
             Height = 2
-            Top = 575
-            Width = 779
+            Top = 524
+            Width = 729
             Align = alBottom
             Shape = bsBottomLine
             Style = bsRaised

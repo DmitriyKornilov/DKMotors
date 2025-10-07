@@ -781,9 +781,9 @@ begin
   DrawYear;
   Writer.WriteText(13,25, EmptyStr);
 
-  Writer.SetRowHeight(2, FRowHeight-4);
+  Writer.RowHeight[2]:= FRowHeight - 4;
   for i:= 3 to Writer.RowCount-1 do
-    Writer.SetRowHeight(i, FRowHeight);
+    Writer.RowHeight[i]:= FRowHeight;
 
   Writer.EndEdit;
 end;

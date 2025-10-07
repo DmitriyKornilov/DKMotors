@@ -324,6 +324,16 @@
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="UImages"/>
       </Unit>
+      <Unit>
+        <Filename Value="utils\ustatsheets.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UStatSheets"/>
+      </Unit>
+      <Unit>
+        <Filename Value="utils\ustatsheetnew.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UStatSheetNew"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
