@@ -3497,12 +3497,14 @@ var
         AClaimCounts[APeriodIndex, ReasonIndex, MotorIndex]:=
           AClaimCounts[APeriodIndex, ReasonIndex, MotorIndex] + QFieldInt('ClaimCount');
         QNext;
+        Result:= True;
       end;
     end;
     QClose;
   end;
 
 begin
+  Result:= False;
   AClaimCounts:= nil;
   if VIsNil(AUsedNameIDs) then Exit;
 

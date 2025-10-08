@@ -170,6 +170,7 @@ begin
   Images.ToButtons([ExportButton]);
 
   StatisticPanel.Height:= StatisticList.AutoHeightValue + 10;
+  ParamList.AutoHeight;
 
   ViewUpdate;
 end;

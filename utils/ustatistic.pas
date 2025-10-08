@@ -60,15 +60,21 @@ type
     FPercentBySum: Boolean;        //выводить % от общего кол-ва рекламаций по строке (параметру)
 
     procedure HorizBarDraw(var ARow: Integer;
-                              const AName: String;
-                              const AValue, AMaxValue, ATotalCount: Integer);
+                           const AName: String;
+                           const AValue, AMaxValue, ATotalCount: Integer);
     procedure HorizBarHistogramDraw(var ARow: Integer;
                                     const ANames: TStrVector;
                                     const AValues: TIntVector;
                                     const ANeeds: TBoolVector;
                                     const ATotalCount: Integer);
+
+    procedure HorizBarReasonDraw(var ARow: Integer;
+                           const AName: String;
+                           const AValues: TIntVector;
+                           const AMaxValue, ATotalCount: Integer);
     procedure HorizBarReasonHistogramDraw(var ARow: Integer;
-                                    const ANeeds: TBoolVector);
+                                    const ANeeds: TBoolVector;
+                                    const ATotalCount: Integer);
 
     procedure SumTableDraw(var ARow: Integer);
     procedure ReasonTableDraw(var ARow: Integer);
@@ -156,7 +162,7 @@ function ClaimCountForReason(const APeriodIndex, AParamIndex: Integer;
 begin
   Result:= nil;
   if High(AClaimCounts)<APeriodIndex then Exit;
-  if High(AClaimCounts[APeriodIndex])<AParamIndex then Exit;
+  if High(AClaimCounts[APeriodIndex, 0])<AParamIndex then Exit;
   Result:= MRowGet(AClaimCounts[APeriodIndex], AParamIndex);
 end;
 
@@ -247,7 +253,7 @@ begin
     if not FPercentByTotal then
       Writer.WriteNumber(R, C2+1, R, C2+COL_COUNT_VALUE, AValue, cbtNone)
     else begin
-      S:= IntToStr(AValue) + '  (' + Format(' %.1f', [100*AValue/ATotalCount]) + '%)';
+      S:= IntToStr(AValue) + '  (' + Format('%.1f', [100*AValue/ATotalCount]) + '%)';
       Writer.WriteText(R, C2+1, R, C2+COL_COUNT_VALUE, S, cbtNone);
     end;
   end;
@@ -288,14 +294,92 @@ begin
   ARow:= R;
 end;
 
-procedure TStatSheet.HorizBarReasonHistogramDraw(var ARow: Integer;
-                                                 const ANeeds: TBoolVector);
+procedure TStatSheet.HorizBarReasonDraw(var ARow: Integer;
+                           const AName: String;
+                           const AValues: TIntVector;
+                           const AMaxValue, ATotalCount: Integer);
 var
-  i, j, R, MaxValue: Integer;
+  R, RR, i, C1, C2, ColorColCount: Integer;
+  S: String;
+begin
+
+
+  R:= ARow;
+  Writer.SetBackgroundClear;
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
+
+  //EmptyRow
+  Writer.WriteText(R, 1, EmptyStr, cbtRight);
+  Writer.RowHeight[R]:= ROW_EMPTY_HEIGH;
+
+  //data row
+  R:= R + 1;
+  Writer.WriteText(R, 1, R+4, 1, AName, cbtRight);
+
+
+  C1:= 1{ParamNames} + 1;
+  RR:= R;
+  R:= R - 1;
+  for i:= 0 to 4 do
+  begin
+    if not FReasonNeeds[i] then continue;
+    if AMaxValue=0 then
+      ColorColCount:= 0
+    else
+      ColorColCount:= Round(COL_COUNT_USED*AValues[i]/AMaxValue);
+    R:= R + 1;
+    C2:= C1 + ColorColCount - 1;
+    Writer.SetBackground(GRAPH_COLORS_DEFAULT[i]);
+    Writer.WriteText(R, C1, R, C2, EmptyStr);
+  end;
+  Writer.SetBackgroundClear;
+  if R<RR then R:= RR;
+
+  //Writer.SetAlignment(haLeft, vaCenter);
+  //if AValue=0 then
+  //begin
+  //  if not FPercentByTotal then
+  //    Writer.WriteNumber(R, C2+1, R, C2+COL_COUNT_VALUE, AValue, cbtLeft)
+  //  else begin
+  //    S:= '0  (0%)';
+  //    Writer.WriteText(R, C2+1, R, C2+COL_COUNT_VALUE, S, cbtLeft)
+  //  end;
+  //end
+  //else begin
+  //  if not FPercentByTotal then
+  //    Writer.WriteNumber(R, C2+1, R, C2+COL_COUNT_VALUE, AValue, cbtNone)
+  //  else begin
+  //    S:= IntToStr(AValue) + '  (' + Format('%.1f', [100*AValue/ATotalCount]) + '%)';
+  //    Writer.WriteText(R, C2+1, R, C2+COL_COUNT_VALUE, S, cbtNone);
+  //  end;
+  //end;
+  //Writer.SetAlignment(haCenter, vaCenter);
+
+  //EmptyRow
+  R:= R + 1;
+  Writer.WriteText(R, 1, EmptyStr, cbtRight);
+  Writer.RowHeight[R]:= ROW_EMPTY_HEIGH;
+
+  ARow:= R + 1;
+end;
+
+procedure TStatSheet.HorizBarReasonHistogramDraw(var ARow: Integer;
+                                                 const ANeeds: TBoolVector;
+                                                 const ATotalCount: Integer);
+var
+  R, i, MaxValue: Integer;
+  Values: TIntVector;
 begin
   R:= ARow;
 
   MaxValue:= MMax(FCounts[0{period_index}]);
+
+  for i:= 0 to High(FParamNames) do
+  begin
+    Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
+    HorizBarReasonDraw(R, FParamNames[i], Values, MaxValue, ATotalCount);
+  end;
 
   ARow:= R;
 end;
@@ -454,7 +538,7 @@ begin
   Order:= 0;
 
   //data calculation
-  Writer.ColWidth[1]:= MMaxWidth([FReasonNames, FParamNames], Font);
+  Writer.ColWidth[1]:= MMaxWidth([FReasonNames, FParamNames], Font) + 20;
   FSumCounts:= ClaimCountSum(FCounts);
   FTotalCounts:= ClaimTotalSum(FSumCounts);
   FReasonCounts:= ClaimReasonSum(FCounts);
@@ -487,7 +571,7 @@ begin
       ') Распределение общего количества рекламационных случаев по ' +
       APartTitle;
   Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
-  R:= R + 1;
+  R:= R + 2;
   SumTableDraw(R);
   if AHistogramNeed then
   begin
@@ -502,7 +586,7 @@ begin
   Inc(Order);
   S:= IntToStr(Order) +  ') Распределение количества рекламационных случаев по критериям неисправности';
   Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
-  R:= R + 1;
+  R:= R + 2;
   ReasonTableDraw(R);
   if AHistogramNeed then
   begin
@@ -511,7 +595,7 @@ begin
     HorizBarHistogramDraw(R, FReasonNames, FReasonCounts[0{period_index}], Needs, FTotalCounts[0{period_index}]);
 
     R:= R + 2;
-    HorizBarReasonHistogramDraw(R, Needs);
+    HorizBarReasonHistogramDraw(R, Needs, FTotalCounts[0{period_index}]);
   end;
 
 
