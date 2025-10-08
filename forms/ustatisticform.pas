@@ -416,7 +416,9 @@ begin
                 MotorNamesStr, PeriodStr,
                 ParamList.Checkeds['ReasonList'], ReasonNames,
                 ParamNames, ClaimCounts,
-                ParamList.Checked['AdditionShow', 0{гистограммы}]
+                ParamList.Checked['AdditionShow', 0{гистограммы}],
+                ParamList.Checked['AdditionShow', 1{% от итого}],
+                ParamList.Checked['AdditionShow', 2{% по строке}]
                 );
   finally
     FreeAndNil(Drawer);
@@ -565,7 +567,9 @@ begin
                   MotorNamesStr, PeriodStr,
                   ParamList.Checkeds['ReasonList'], ReasonNames,
                   ParamNames, ClaimCounts,
-                  ParamList.Checked['AdditionShow', 0{гистограммы}]
+                  ParamList.Checked['AdditionShow', 0{гистограммы}],
+                  ParamList.Checked['AdditionShow', 1{% от итого}],
+                  ParamList.Checked['AdditionShow', 2{% по строке}]
                   );
     finally
       FreeAndNil(Drawer);
