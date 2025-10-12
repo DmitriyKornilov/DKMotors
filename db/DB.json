@@ -6,6 +6,7 @@
     "MOTORLIST",
     "MOTORNAMES",
     "MOTORTEST",
+    "MOTORTYPES",
     "RECLAMATIONDEFECTS",
     "RECLAMATIONFACTORIES",
     "RECLAMATIONPLACES",
@@ -467,7 +468,8 @@
     ],
     "FieldsList" : [
       "NameID",
-      "MotorName"
+      "MotorName",
+      "TypeID"
     ],
     "NameID" : {
       "FieldType" : "INTEGER",
@@ -523,6 +525,37 @@
         "FieldName" : "",
         "OnDelete" : 4,
         "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "TypeID" : {
+      "FieldType" : "INTEGER",
+      "PrimaryKey" : false,
+      "Status" : false,
+      "NotNull" : true,
+      "DefaultValue" : "0",
+      "Description" : [
+      ],
+      "ExistingValues" : [
+        "0",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "ReferenceTo" : {
+        "TableName" : "MOTORTYPES",
+        "FieldName" : "TypeID",
+        "OnDelete" : 2,
+        "OnUpdate" : 0
       },
       "ReferenceFrom" : {
         "TableNames" : [
@@ -652,6 +685,79 @@
         "Примечания"
       ],
       "ExistingValues" : [
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+        ],
+        "FieldNames" : [
+        ]
+      }
+    },
+    "IndexesList" : [
+    ]
+  },
+  "MOTORTYPES" : {
+    "Description" : "Типы двигателей",
+    "Notes" : [
+    ],
+    "FieldsList" : [
+      "TypeID",
+      "MotorType"
+    ],
+    "TypeID" : {
+      "FieldType" : "INTEGER",
+      "PrimaryKey" : true,
+      "Status" : true,
+      "NotNull" : true,
+      "DefaultValue" : "",
+      "Description" : [
+      ],
+      "ExistingValues" : [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "ReferenceTo" : {
+        "TableName" : "",
+        "FieldName" : "",
+        "OnDelete" : 4,
+        "OnUpdate" : 4
+      },
+      "ReferenceFrom" : {
+        "TableNames" : [
+          "MOTORNAMES"
+        ],
+        "FieldNames" : [
+          "TypeID"
+        ]
+      }
+    },
+    "MotorType" : {
+      "FieldType" : "TEXT",
+      "PrimaryKey" : false,
+      "Status" : true,
+      "NotNull" : true,
+      "DefaultValue" : "",
+      "Description" : [
+      ],
+      "ExistingValues" : [
+        "<не указан>",
+        "АНЭМ225",
+        "7АЖ225",
+        "АЭВ71",
+        "АЖВ180",
+        "АЭВ180",
+        "АЭК200"
       ],
       "ReferenceTo" : {
         "TableName" : "",

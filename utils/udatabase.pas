@@ -9,7 +9,7 @@ uses
   //DK packages utils
   DK_Vector, DK_Matrix, DK_Const, DK_StrUtils, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
   //Project utils
-  UCalendar;
+  UCalendar, UStatistic;
 
 type
 
@@ -256,23 +256,25 @@ type
 
 
     {--- СТАТИСТИКА РЕКЛАМАЦИЙ ------}
-    //общее количество
+    {//общее количество
     function ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
                 const ANameIDs: TIntVector;
                 out AExistsNameIDs: TIntVector;
                 out AMotorNames: TStrVector;
-                out AMotorCounts: TIntVector): Boolean;
-    function ReclamationMotorsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                out AMotorCounts: TIntVector): Boolean;  }
+    {function ReclamationMotorsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs, AReasonIDs: TIntVector;
                 const AANEMAsSameName: Boolean;
                 out AMotorNames: TStrVector;
-                out AClaimCounts: TIntMatrix3D): Boolean;
+                out AClaimCounts: TIntMatrix3D): Boolean; }
     function ReclamationByMotorNamesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
-                const AANEMAsSameName: Boolean;
+                const AMotorTypeAsSingleName: Boolean;
+                const ADoNotUseZeroClaimMotor: Boolean;
                 var AMotorNames: TStrVector;
+                out AMotorNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
     function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
@@ -3282,7 +3284,7 @@ begin
   QClose;
 end;
 
-function TDataBase.ReclamationMotorsWithReasonsLoad(const ABeginDate,
+{function TDataBase.ReclamationMotorsWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer; const AUsedNameIDs,
   AReasonIDs: TIntVector; const AANEMAsSameName: Boolean;
   out AMotorNames: TStrVector; out AClaimCounts: TIntMatrix3D): Boolean;
@@ -3454,16 +3456,55 @@ begin
     RecalcANEM;
 
   Result:= True;
-end;
+end; }
 
 function TDataBase.ReclamationByMotorNamesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
-                const AANEMAsSameName: Boolean;
+                const AMotorTypeAsSingleName: Boolean;
+                const ADoNotUseZeroClaimMotor: Boolean;
                 var AMotorNames: TStrVector;
+                out AMotorNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 var
-  i, j: Integer;
+  i, j, k: Integer;
+  SumCounts: TIntMatrix;
+  TypeIDs: TIntVector;
+
+  procedure GetMotorTypes;
+  var
+    TypeID: Integer;
+    TypeNames: TStrVector;
+  begin
+    TypeIDs:= nil;
+    TypeNames:= nil;
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT t1.TypeID, t2.MotorType ' +
+      'FROM MOTORNAMES t1 ' +
+      'INNER JOIN MOTORTYPES t2 ON (t1.TypeID=t2.TypeID) ' +
+      'WHERE ' + SqlIN('t1','NameID', Length(AUsedNameIDs)) +
+      'ORDER BY t1.NameID'
+    );
+    QParamsInt(AUsedNameIDs);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        TypeID:= QFieldInt('TypeID');
+        if VIndexOf(TypeIDs, TypeID)<0 then
+        begin
+          VAppend(TypeIDs, TypeID);
+          VAppend(TypeNames, QFieldStr('MotorType'));
+        end;
+        QNext;
+      end;
+    end;
+    QClose;
+    AMotorNames:= TypeNames;
+  end;
 
   procedure GetData(const APeriodIndex: Integer);
   var
@@ -3475,10 +3516,11 @@ var
 
     QSetQuery(FQuery);
     QSetSQL(
-      'SELECT COUNT(t2.NameID) As ClaimCount, t2.NameID, t1.ReasonID ' +
+      'SELECT COUNT(t2.NameID) As ClaimCount, t2.NameID, t1.ReasonID, t3.TypeID, t4.MotorType ' +
       'FROM RECLAMATIONS t1 ' +
       'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
       'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+      'INNER JOIN MOTORTYPES t4 ON (t3.TypeID=t4.TypeID) ' +
       'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
              SqlIN('t2','NameID', Length(AUsedNameIDs)) +
       'GROUP BY t2.NameID, t1.ReasonID ' +
@@ -3492,7 +3534,10 @@ var
       QFirst;
       while not QEOF do
       begin
-        MotorIndex:= VIndexOf(AUsedNameIDs, QFieldInt('NameID'));
+        if AMotorTypeAsSingleName then
+          MotorIndex:= VIndexOf(TypeIDs, QFieldInt('TypeID'))
+        else
+          MotorIndex:= VIndexOf(AUsedNameIDs, QFieldInt('NameID'));
         ReasonIndex:= QFieldInt('ReasonID');
         AClaimCounts[APeriodIndex, ReasonIndex, MotorIndex]:=
           AClaimCounts[APeriodIndex, ReasonIndex, MotorIndex] + QFieldInt('ClaimCount');
@@ -3506,29 +3551,40 @@ var
 begin
   Result:= False;
   AClaimCounts:= nil;
+  AMotorNeeds:= nil;
   if VIsNil(AUsedNameIDs) then Exit;
+
+  if AMotorTypeAsSingleName then
+    GetMotorTypes;
 
   MDim(AClaimCounts,
        AAdditionYearsCount+1, //кол-во периодов
        5,                     //кол-во критериев (ReasonNames)
-       Length(AUsedNameIDs),  //кол-во используемых наименований двигателей
+       Length(AMotorNames),   //кол-во используемых наименований двигателей
        0                      //кол-во рекламаций
   );
+
   for i:= 0 to AAdditionYearsCount do
     GetData(i);
 
-  if not AANEMAsSameName then Exit;
-
-  //TODO !!!!
-  i:= VIndexOf(AUsedNameIDs, 1{IM1001});
-  j:= VIndexOf(AUsedNameIDs, 2{IM1002});
-  if (i>=0) and (j>=0) then
+  AMotorNeeds:= VCreateBool(Length(AMotorNames), True);
+  //ставим метки на двигатели, где нет рекламаций
+  if ADoNotUseZeroClaimMotor then
   begin
-
+    SumCounts:= ClaimCountSum(AClaimCounts, VCreateBool(5{кол-во критериев}, True));
+    for j:= 0 to High(AMotorNames) do //params (motors)
+    begin
+      k:= 0;
+      for i:= 0 to AAdditionYearsCount do  //years
+        k:= k + SumCounts[i, j];
+      if k=0 then
+        AMotorNeeds[j]:= False;
+    end;
   end;
+
 end;
 
-function TDataBase.ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
+{function TDataBase.ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
   const ANameIDs: TIntVector;
   out AExistsNameIDs: TIntVector;
   out AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
@@ -3571,7 +3627,7 @@ begin
     Result:= True;
   end;
   QClose;
-end;
+end;  }
 
 function TDataBase.ReclamationDefectsWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer;

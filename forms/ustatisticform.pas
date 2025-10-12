@@ -75,6 +75,8 @@ type
     // - месяцы
     // - пробеги локомотива
     ParamNames: TStrVector;
+    // ParamNeeds - флаги использования параметров
+    ParamNeeds: TBoolVector;
 
     //ReasonIDs - ID критерия статистики
     //ReasonNames - наименование критерия статистики
@@ -229,15 +231,10 @@ begin
 end;
 
 procedure TStatisticForm.ViewUpdate;
-var
-  IsANEMUsed: Boolean;
 begin
   if not CanShow then Exit;
 
-  IsANEMUsed:= (VIndexOf(MainForm.UsedNameIDs, 1{IM1001})>=0) or
-               (VIndexOf(MainForm.UsedNameIDs, 2{IM1002})>=0);
-
-  ParamList.Visibles['ANEMIsSingleName']:= (StatSelectedIndex=0) and IsANEMUsed;
+  ParamList.Visibles['MotorTypeAsSingleName']:= StatSelectedIndex=0;
   ParamList.Visibles['MonthTypeList']:= StatSelectedIndex=3;
 
   VerifyDates;
@@ -256,7 +253,7 @@ var
   S: String;
   V: TStrVector;
 begin
-  S:= 'Статистика:';
+  S:= 'Вид статистики:';
   V:= VCreateStr([
     'Распределение по наименованиям электродвигателей',
     'Распределение по неисправным элементам',
@@ -293,21 +290,31 @@ begin
   B:= VCreateBool(Length(V), True);
   ParamList.AddCheckList('ReasonList', S, V, @ViewUpdate, B);
 
+  S:= 'Включать в отчёт данные рекламаций:';
+  V:= VCreateStr([
+    'Общее количество по виду статистики',
+    'Общее количество по критериям неисправности',
+    'Количество по виду статистики и критериям неисправности'
+  ]);
+  B:= VCreateBool(Length(V), True);
+  ParamList.AddCheckList('DataList', S, V, @ViewUpdate, B);
+
   S:= 'Считать общее количество (сумму) рекламаций:';
   V:= VCreateStr([
     'по всем критериям',
-    'только по включенным в отчёт критериям',
-    'не считать и не отображать'
+    'только по включенным в отчёт критериям'//,
+    //'не считать и не отображать'
   ]);
   ParamList.AddStringList('SumTypeList', S, V, @ViewUpdate);
 
   S:= 'Дополнительно отображать:';
   V:= VCreateStr([
     'гистограммы',
-    '% от общего количества рекламаций за период',
-    '% от общего количества рекламаций в строке'
+    '% от общего количества рекламаций',
+    'данные с общим количеством рекламаций = 0'
   ]);
-  ParamList.AddCheckList('AdditionShow', S, V, @ViewUpdate);
+  B:= VCreateBool(Length(V), True);
+  ParamList.AddCheckList('AdditionShow', S, V, @ViewUpdate, B);
 
   //для отчета по месяцам
   S:= 'Вид отчёта:';
@@ -318,11 +325,11 @@ begin
   ParamList.AddStringList('MonthTypeList', S, V, @ViewUpdate);
 
   //для отчета по наименованиям двигателей
-  S:= 'Оба исполнения АНЭМ225L4УХЛ2 IM1001 и IM1002:';
+  S:= 'Все наименования электродвигателей одного типа:';
   V:= VCreateStr([
     'считать одним наименованием электродвигателя'
   ]);
-  ParamList.AddCheckList('ANEMIsSingleName', S, V, @ViewUpdate);
+  ParamList.AddCheckList('MotorTypeAsSingleName', S, V, @ViewUpdate);
 end;
 
 procedure TStatisticForm.LoadStatistic;
@@ -353,11 +360,12 @@ begin
   case StatSelectedIndex of
     0: begin
          ParamNames:= VCut(MainForm.UsedNames);
-         //TODO ANEMIsSingleName !!!!
+         //TODO MotorTypeAsSingleName !!!!
          DataBase.ReclamationByMotorNamesLoad(BD, ED, AdditionYearsCount,
                                   MainForm.UsedNameIDs,
-                                  ParamList.Checked['ANEMIsSingleName', 0],
-                                  ParamNames, ClaimCounts);
+                                  ParamList.Checked['MotorTypeAsSingleName', 0],
+                                  not ParamList.Checked['AdditionShow', 2{отображать count=0}],
+                                  ParamNames, ParamNeeds, ClaimCounts);
        end;
     1: ;
     2: ;
@@ -382,7 +390,7 @@ begin
   //case AParamType of
   //  0: DataBase.ReclamationMotorsWithReasonsLoad(BD, ED, AdditionYearsCount,
   //                                MainForm.UsedNameIDs, ReasonIDs,
-  //                                ParamList.Checked['ANEMIsSingleName', 0],
+  //                                ParamList.Checked['MotorTypeAsSingleName', 0],
   //                                ParamNames, ClaimCounts);
   //  1: DataBase.ReclamationDefectsWithReasonsLoad(BD, ED, AdditionYearsCount,
   //                                MainForm.UsedNameIDs, ReasonIDs, ParamNames, ClaimCounts);
@@ -413,13 +421,17 @@ begin
   Drawer:= TStatSheet.Create(ViewGrid.Worksheet, ViewGrid, GridFont);
   try
     Drawer.Zoom(ZoomPercent);
-    Drawer.Draw('Наименование электродвигателя', 'наименованиям электродвигателей',
+    Drawer.Draw('Наименование электродвигателя',
+                'наименованиям электродвигателей',
+                'наименованию электродвигателя',
                 MotorNamesStr, PeriodStr,
                 ParamList.Checkeds['ReasonList'], ReasonNames,
-                ParamNames, ClaimCounts,
+                ParamNeeds, ParamNames, ClaimCounts,
+                ParamList.Checkeds['DataList'],
+                ParamList.Selected['SumTypeList'],
                 ParamList.Checked['AdditionShow', 0{гистограммы}],
-                ParamList.Checked['AdditionShow', 1{% от итого}],
-                ParamList.Checked['AdditionShow', 2{% по строке}]
+                ParamList.Checked['AdditionShow', 1{% от кол-ва}]//,
+                //ParamList.Checked['AdditionShow', 2{подробные гистограммы}]
                 );
   finally
     FreeAndNil(Drawer);
@@ -564,13 +576,17 @@ begin
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TStatSheet.Create(Sheet, nil, GridFont);
     try
-      Drawer.Draw('Наименование электродвигателя', 'наименованиям электродвигателей',
+      Drawer.Draw('Наименование электродвигателя',
+                  'наименованиям электродвигателей',
+                  'наименованию электродвигателя',
                   MotorNamesStr, PeriodStr,
                   ParamList.Checkeds['ReasonList'], ReasonNames,
-                  ParamNames, ClaimCounts,
+                  ParamNeeds, ParamNames, ClaimCounts,
+                  ParamList.Checkeds['DataList'],
+                  ParamList.Selected['SumTypeList'],
                   ParamList.Checked['AdditionShow', 0{гистограммы}],
-                  ParamList.Checked['AdditionShow', 1{% от итого}],
-                  ParamList.Checked['AdditionShow', 2{% по строке}]
+                  ParamList.Checked['AdditionShow', 1{% от кол-ва}]//,
+                  //ParamList.Checked['AdditionShow', 2{подробные гистограммы}]
                   );
     finally
       FreeAndNil(Drawer);

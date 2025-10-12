@@ -34,6 +34,7 @@ type
     DividerBevel1: TDividerBevel;
     DividerBevel2: TDividerBevel;
     FactoryListMenuItem: TMenuItem;
+    MotorTypesMenuItem: TMenuItem;
     ProductButton: TSpeedButton;
     PlaceListMenuItem: TMenuItem;
     ClaimButton: TSpeedButton;
@@ -93,6 +94,7 @@ type
     procedure MotorNamesLabelClick(Sender: TObject);
     procedure MotorNamesMenuItemClick(Sender: TObject);
     procedure MotorNamesPanelClick(Sender: TObject);
+    procedure MotorTypesMenuItemClick(Sender: TObject);
     procedure PlaceListMenuItemClick(Sender: TObject);
     procedure ProductButtonClick(Sender: TObject);
     procedure ReasonListMenuItemClick(Sender: TObject);
@@ -226,6 +228,11 @@ end;
 procedure TMainForm.PlaceListMenuItemClick(Sender: TObject);
 begin
   DictionaryChoose(6);
+end;
+
+procedure TMainForm.MotorTypesMenuItemClick(Sender: TObject);
+begin
+  DictionaryChoose(7);
 end;
 
 procedure TMainForm.MotorNamesPanelClick(Sender: TObject);
@@ -425,10 +432,25 @@ end;
 procedure TMainForm.DictionaryChoose(const ADictionary: Byte);
 var
   IsOK: Boolean;
+  TypeIDs: TIntVector;
+  MotorTypes: TStrVector;
 begin
   case ADictionary of
-    1: IsOK:= DataBase.EditList('Наименования электродвигателей',
-                              'MOTORNAMES', 'NameID', 'MotorName', False, True);
+    1: begin
+         DataBase.KeyPickList('MOTORTYPES', 'TypeID', 'MotorType',
+                              TypeIDs, MotorTypes, False, 'TypeID');
+         IsOK:= DataBase.EditTable('Наименования электродвигателей',
+                          'MOTORNAMES', 'NameID',
+                          ['MotorName',    'TypeID'     ],
+                          ['Наименование', 'Тип'        ],
+                          [ ctString,       ctKeyPick   ],
+                          [ True,           True        ],
+                          [ 300,            300         ],
+                          [ taLeftJustify,  taCenter    ],
+                          True, ['MotorName'], 1,
+                          [nil,             TypeIDs     ],
+                          [nil,             MotorTypes  ]);
+       end;
     2: IsOK:= DataBase.EditList('Грузополучатели',
                               'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', True, True);
     3: IsOK:= DataBase.EditList('Элементы электродвигателей',
@@ -446,6 +468,8 @@ begin
                               'RECLAMATIONFACTORIES', 'FactoryID', 'FactoryName', True, True);
     6: IsOK:= DataBase.EditList('Предприятия (депо)',
                               'RECLAMATIONPLACES', 'PlaceID', 'PlaceName', True, True);
+    7: IsOK:= DataBase.EditList('Типы электродвигателей',
+                              'MOTORTYPES', 'TypeID', 'MotorType', False, True);
   end;
   if IsOK then ViewUpdate;
 end;

@@ -277,24 +277,24 @@ object StatisticForm: TStatisticForm
       Left = 1
       Height = 556
       Top = 1
-      Width = 450
+      Width = 500
       Align = alLeft
       BevelOuter = bvNone
       ClientHeight = 556
-      ClientWidth = 450
+      ClientWidth = 500
       TabOrder = 0
       object StatisticPanel: TPanel
         Left = 2
         Height = 89
         Top = 2
-        Width = 448
+        Width = 498
         Align = alTop
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
         ClientHeight = 85
-        ClientWidth = 444
+        ClientWidth = 494
         Color = clWindow
         ParentBackground = False
         ParentColor = False
@@ -303,7 +303,7 @@ object StatisticForm: TStatisticForm
           Left = 0
           Height = 85
           Top = 0
-          Width = 444
+          Width = 494
           Align = alClient
           BorderStyle = bsNone
           DefaultNodeHeight = 25
@@ -320,7 +320,7 @@ object StatisticForm: TStatisticForm
         Left = 0
         Height = 6
         Top = 91
-        Width = 450
+        Width = 500
         Align = alTop
         ResizeAnchor = akTop
       end
@@ -328,7 +328,7 @@ object StatisticForm: TStatisticForm
         Left = 0
         Height = 457
         Top = 97
-        Width = 450
+        Width = 500
         Align = alClient
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
@@ -341,28 +341,28 @@ object StatisticForm: TStatisticForm
       end
     end
     object Splitter1: TSplitter
-      Left = 451
+      Left = 501
       Height = 556
       Top = 1
       Width = 6
       ResizeStyle = rsLine
     end
     object RightPanel: TPanel
-      Left = 457
+      Left = 507
       Height = 556
       Top = 1
-      Width = 737
+      Width = 687
       Align = alClient
       BevelOuter = bvNone
       Caption = 'RightPanel'
       ClientHeight = 556
-      ClientWidth = 737
+      ClientWidth = 687
       TabOrder = 2
       object MainPanel: TPanel
         Left = 2
         Height = 552
         Top = 2
-        Width = 733
+        Width = 683
         Align = alClient
         BorderSpacing.Left = 2
         BorderSpacing.Top = 2
@@ -370,25 +370,25 @@ object StatisticForm: TStatisticForm
         BorderSpacing.Bottom = 2
         BevelOuter = bvNone
         ClientHeight = 552
-        ClientWidth = 733
+        ClientWidth = 683
         TabOrder = 0
         object GridPanel: TPanel
           Left = 0
           Height = 552
           Top = 0
-          Width = 733
+          Width = 683
           Align = alClient
           BevelOuter = bvNone
           BorderStyle = bsSingle
           Caption = 'GridPanel'
           ClientHeight = 548
-          ClientWidth = 729
+          ClientWidth = 679
           TabOrder = 0
           object ViewGrid: TsWorksheetGrid
             Left = 0
             Height = 524
             Top = 0
-            Width = 729
+            Width = 679
             AutoExpand = []
             DisplayFixedColRow = False
             FrozenBorderPen.Style = psClear
@@ -423,7 +423,7 @@ object StatisticForm: TStatisticForm
             Left = 0
             Height = 22
             Top = 526
-            Width = 729
+            Width = 679
             Align = alBottom
             BevelOuter = bvNone
             Color = clWindow
@@ -435,7 +435,7 @@ object StatisticForm: TStatisticForm
             Left = 0
             Height = 2
             Top = 524
-            Width = 729
+            Width = 679
             Align = alBottom
             Shape = bsBottomLine
             Style = bsRaised
