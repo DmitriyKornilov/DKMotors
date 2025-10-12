@@ -360,15 +360,20 @@ begin
   case StatSelectedIndex of
     0: begin
          ParamNames:= VCut(MainForm.UsedNames);
-         //TODO MotorTypeAsSingleName !!!!
          DataBase.ReclamationByMotorNamesLoad(BD, ED, AdditionYearsCount,
                                   MainForm.UsedNameIDs,
                                   ParamList.Checked['MotorTypeAsSingleName', 0],
                                   not ParamList.Checked['AdditionShow', 2{отображать count=0}],
                                   ParamNames, ParamNeeds, ClaimCounts);
        end;
-    1: ;
-    2: ;
+    1: DataBase.ReclamationByDefectsLoad(BD, ED, AdditionYearsCount,
+                                  MainForm.UsedNameIDs,
+                                  not ParamList.Checked['AdditionShow', 2{отображать count=0}],
+                                  ParamNames, ParamNeeds, ClaimCounts);
+    2: DataBase.ReclamationByPlacesLoad(BD, ED, AdditionYearsCount,
+                                  MainForm.UsedNameIDs,
+                                  not ParamList.Checked['AdditionShow', 2{отображать count=0}],
+                                  ParamNames, ParamNeeds, ClaimCounts);
     3: ;
     4: ;
   end;
@@ -415,16 +420,36 @@ procedure TStatisticForm.DrawStatisticForSinglePeriod;
 var
   //Drawer: TStatisticSinglePeriodSheet;
   Drawer: TStatSheet;
+  ParamColName, PartTitle, PartTitle2: String;
 begin
+  case StatSelectedIndex of
+    0: begin
+         ParamColName:= 'Наименование электродвигателя';
+         PartTitle:= 'наименованиям электродвигателей';
+         PartTitle2:= 'наименованию электродвигателя';
+       end;
+    1: begin
+         ParamColName:= 'Неисправный элемент';
+         PartTitle:= 'неисправным элементам';
+         PartTitle2:= 'неисправному элементу';
+       end;
+    2: begin
+         ParamColName:= 'Предприятие';
+         PartTitle:= 'предприятиям';
+         PartTitle2:= 'предприятию';
+       end;
+    3: begin
 
+       end;
+    4: begin
+
+       end;
+  end;
 
   Drawer:= TStatSheet.Create(ViewGrid.Worksheet, ViewGrid, GridFont);
   try
     Drawer.Zoom(ZoomPercent);
-    Drawer.Draw('Наименование электродвигателя',
-                'наименованиям электродвигателей',
-                'наименованию электродвигателя',
-                MotorNamesStr, PeriodStr,
+    Drawer.Draw(ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
                 ParamList.Checkeds['ReasonList'], ReasonNames,
                 ParamNeeds, ParamNames, ClaimCounts,
                 ParamList.Checkeds['DataList'],
@@ -570,16 +595,38 @@ var
   Sheet: TsWorksheet;
   Exporter: TSheetsExporter;
   Drawer: TStatSheet;
+  ParamColName, PartTitle, PartTitle2: String;
 begin
+  case StatSelectedIndex of
+    0: begin
+         ParamColName:= 'Наименование электродвигателя';
+         PartTitle:= 'наименованиям электродвигателей';
+         PartTitle2:= 'наименованию электродвигателя';
+       end;
+    1: begin
+         ParamColName:= 'Неисправный элемент';
+         PartTitle:= 'неисправным элементам';
+         PartTitle2:= 'неисправному элементу';
+       end;
+    2: begin
+         ParamColName:= 'Предприятие';
+         PartTitle:= 'предприятиям';
+         PartTitle2:= 'предприятию';
+       end;
+    3: begin
+
+       end;
+    4: begin
+
+       end;
+  end;
+
   Exporter:= TSheetsExporter.Create;
   try
     Sheet:= Exporter.AddWorksheet('Лист1');
     Drawer:= TStatSheet.Create(Sheet, nil, GridFont);
     try
-      Drawer.Draw('Наименование электродвигателя',
-                  'наименованиям электродвигателей',
-                  'наименованию электродвигателя',
-                  MotorNamesStr, PeriodStr,
+      Drawer.Draw(ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
                   ParamList.Checkeds['ReasonList'], ReasonNames,
                   ParamNeeds, ParamNames, ClaimCounts,
                   ParamList.Checkeds['DataList'],

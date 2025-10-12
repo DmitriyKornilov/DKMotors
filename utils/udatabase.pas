@@ -277,18 +277,36 @@ type
                 out AMotorNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
-    function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+    {function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 //const AIsZeroIDNeed: Boolean;
                 const ANameIDs, AReasonIDs: TIntVector;
                 out ADefectNames: TStrVector;
-                out AMotorCounts: TIntMatrix3D): Boolean;
-    function ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+                out AMotorCounts: TIntMatrix3D): Boolean;  }
+    function ReclamationByDefectsLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimDefect: Boolean;
+                out ADefectNames: TStrVector;
+                out ADefectNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+
+
+    {function ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 //const AIsZeroIDNeed: Boolean;
                 const ANameIDs, AReasonIDs: TIntVector;
                 out APlaceNames: TStrVector;
-                out AMotorCounts: TIntMatrix3D): Boolean;
+                out AMotorCounts: TIntMatrix3D): Boolean;   }
+    function ReclamationByPlacesLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimPlace: Boolean;
+                out APlaceNames: TStrVector;
+                out APlaceNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+
+
     function ReclamationMonthsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const ANameIDs, AReasonIDs: TIntVector;
@@ -3581,7 +3599,178 @@ begin
         AMotorNeeds[j]:= False;
     end;
   end;
+end;
 
+function TDataBase.ReclamationByDefectsLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimDefect: Boolean;
+                out ADefectNames: TStrVector;
+                out ADefectNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+var
+  i, j, k: Integer;
+  SumCounts: TIntMatrix;
+  DefectIDs: TIntVector;
+
+  procedure GetData(const APeriodIndex: Integer);
+  var
+    DefectIndex, ReasonIndex: Integer;
+    BD, ED: TDate;
+  begin
+    BD:= IncYear(ABeginDate, -APeriodIndex);
+    ED:= IncYear(AEndDate, -APeriodIndex);
+
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT COUNT(t1.DefectID) As ClaimCount, t1.DefectID, t1.ReasonID ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
+             SqlIN('t2','NameID', Length(AUsedNameIDs)) +
+      'GROUP BY t1.DefectID, t1.ReasonID ' +
+      'ORDER BY t1.DefectID');
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QParamsInt(AUsedNameIDs);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        DefectIndex:= VIndexOf(DefectIDs, QFieldInt('DefectID'));
+        ReasonIndex:= QFieldInt('ReasonID');
+        AClaimCounts[APeriodIndex, ReasonIndex, DefectIndex]:=
+          AClaimCounts[APeriodIndex, ReasonIndex, DefectIndex] + QFieldInt('ClaimCount');
+        QNext;
+        Result:= True;
+      end;
+    end;
+    QClose;
+  end;
+
+begin
+  Result:= False;
+  AClaimCounts:= nil;
+  ADefectNames:= nil;
+  ADefectNeeds:= nil;
+  if VIsNil(AUsedNameIDs) then Exit;
+
+  KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
+               DefectIDs, ADefectNames, True{ID>0}, 'DefectName');
+
+  MDim(AClaimCounts,
+       AAdditionYearsCount+1, //кол-во периодов
+       5,                     //кол-во критериев (ReasonNames)
+       Length(ADefectNames),   //кол-во используемых наименований двигателей
+       0                      //кол-во рекламаций
+  );
+
+  for i:= 0 to AAdditionYearsCount do
+    GetData(i);
+
+  ADefectNeeds:= VCreateBool(Length(ADefectNames), True);
+  //ставим метки на дефекты, где нет рекламаций
+  if ADoNotUseZeroClaimDefect then
+  begin
+    SumCounts:= ClaimCountSum(AClaimCounts, VCreateBool(5{кол-во критериев}, True));
+    for j:= 0 to High(ADefectNames) do //params (defects)
+    begin
+      k:= 0;
+      for i:= 0 to AAdditionYearsCount do  //years
+        k:= k + SumCounts[i, j];
+      if k=0 then
+        ADefectNeeds[j]:= False;
+    end;
+  end;
+end;
+
+function TDataBase.ReclamationByPlacesLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimPlace: Boolean;
+                out APlaceNames: TStrVector;
+                out APlaceNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+var
+  i, j, k: Integer;
+  SumCounts: TIntMatrix;
+  PlaceIDs: TIntVector;
+
+  procedure GetData(const APeriodIndex: Integer);
+  var
+    PlaceIndex, ReasonIndex: Integer;
+    BD, ED: TDate;
+  begin
+    BD:= IncYear(ABeginDate, -APeriodIndex);
+    ED:= IncYear(AEndDate, -APeriodIndex);
+
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT COUNT(t1.PlaceID) As ClaimCount, t1.PlaceID, t1.ReasonID ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
+             SqlIN('t2','NameID', Length(AUsedNameIDs)) +
+      'GROUP BY t1.PlaceID, t1.ReasonID ' +
+      'ORDER BY t1.PlaceID');
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QParamsInt(AUsedNameIDs);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        PlaceIndex:= VIndexOf(PlaceIDs, QFieldInt('PlaceID'));
+        ReasonIndex:= QFieldInt('ReasonID');
+        AClaimCounts[APeriodIndex, ReasonIndex, PlaceIndex]:=
+          AClaimCounts[APeriodIndex, ReasonIndex, PlaceIndex] + QFieldInt('ClaimCount');
+        QNext;
+        Result:= True;
+      end;
+    end;
+    QClose;
+  end;
+
+begin
+  Result:= False;
+  AClaimCounts:= nil;
+  APlaceNames:= nil;
+  APlaceNeeds:= nil;
+  if VIsNil(AUsedNameIDs) then Exit;
+
+  KeyPickList('RECLAMATIONPLACES', 'PlaceID', 'PlaceName',
+               PlaceIDs, APlaceNames, True{ID>0}, 'PlaceName');
+
+  MDim(AClaimCounts,
+       AAdditionYearsCount+1, //кол-во периодов
+       5,                     //кол-во критериев (ReasonNames)
+       Length(APlaceNames),   //кол-во используемых наименований двигателей
+       0                      //кол-во рекламаций
+  );
+
+  for i:= 0 to AAdditionYearsCount do
+    GetData(i);
+
+  APlaceNeeds:= VCreateBool(Length(APlaceNames), True);
+  //ставим метки на предприятия, где нет рекламаций
+  if ADoNotUseZeroClaimPlace then
+  begin
+    SumCounts:= ClaimCountSum(AClaimCounts, VCreateBool(5{кол-во критериев}, True));
+    for j:= 0 to High(APlaceNames) do //params (places)
+    begin
+      k:= 0;
+      for i:= 0 to AAdditionYearsCount do  //years
+        k:= k + SumCounts[i, j];
+      if k=0 then
+        APlaceNeeds[j]:= False;
+    end;
+  end;
 end;
 
 {function TDataBase.ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
@@ -3629,7 +3818,7 @@ begin
   QClose;
 end;  }
 
-function TDataBase.ReclamationDefectsWithReasonsLoad(const ABeginDate,
+{function TDataBase.ReclamationDefectsWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer;
   {const AIsZeroIDNeed: Boolean;} const ANameIDs, AReasonIDs: TIntVector; out
   ADefectNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
@@ -3638,9 +3827,9 @@ begin
              'DefectID', 'DefectName', ABeginDate, AEndDate, AAdditionYearsCount,
              {AIsZeroIDNeed,} ANameIDs, AReasonIDs,
              ADefectNames, AMotorCounts);
-end;
+end; }
 
-function TDataBase.ReclamationPlacesWithReasonsLoad(const ABeginDate,
+{function TDataBase.ReclamationPlacesWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer;
   {const AIsZeroIDNeed: Boolean;} const ANameIDs, AReasonIDs: TIntVector; out
   APlaceNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
@@ -3649,7 +3838,7 @@ begin
              'PlaceID', 'PlaceName', ABeginDate, AEndDate, AAdditionYearsCount,
              {AIsZeroIDNeed,} ANameIDs, AReasonIDs,
              APlaceNames, AMotorCounts);
-end;
+end; }
 
 function TDataBase.ReclamationMonthsWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
