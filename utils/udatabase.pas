@@ -16,17 +16,17 @@ type
   { TDataBase }
 
   TDataBase = class (TSQLite3)
-  private
-    function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
+  //private
+    {function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
        const ABeginDate, AEndDate: TDate; const ANameIDs: TIntVector;
-       out AExistsIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector): Boolean;
+       out AExistsIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector): Boolean;  }
 
-    function ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName, ANameFieldName: String;
+    {function ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName, ANameFieldName: String;
        const ABeginDate, AEndDate: TDate;
        const AAdditionYearsCount: Integer;
        //const AIsZeroIDNeed: Boolean;
        const ANameIDs, AReasonIDs: TIntVector;
-       out AParamNames: TStrVector; out AParamCounts: TIntMatrix3D): Boolean;
+       out AParamNames: TStrVector; out AParamCounts: TIntMatrix3D): Boolean; }
   public
     {КАЛЕНДАРЬ}
     //особые даты производственного календаря
@@ -307,11 +307,19 @@ type
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
 
-    function ReclamationMonthsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+    {function ReclamationMonthsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const ANameIDs, AReasonIDs: TIntVector;
                 out AMonthNames: TStrVector;
-                out AMotorCounts{, AAccumCounts}: TIntMatrix3D): Boolean;
+                out AMotorCounts{, AAccumCounts}: TIntMatrix3D): Boolean;  }
+    function ReclamationByMonthsLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimMonth: Boolean;
+                out AMonthNames: TStrVector;
+                out AMonthNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+
     function ReclamationMileagesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const ANameIDs, AReasonIDs: TIntVector;
@@ -475,7 +483,7 @@ begin
                   AKeyValueNotZero{, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ'});
 end;
 
-function TDataBase.ReclamationReportWithReasonsLoad(const ATableName,
+{function TDataBase.ReclamationReportWithReasonsLoad(const ATableName,
   AIDFieldName, ANameFieldName: String; const ABeginDate, AEndDate: TDate;
   const AAdditionYearsCount: Integer; {const AIsZeroIDNeed: Boolean; }
   const ANameIDs, AReasonIDs: TIntVector; out AParamNames: TStrVector; out
@@ -640,10 +648,10 @@ begin
   end;
 
   Result:= True;
-end;
+end; }
 
 
-function TDataBase.ReclamationReportLoad(const ATableName, AIDFieldName,
+{function TDataBase.ReclamationReportLoad(const ATableName, AIDFieldName,
   ANameFieldName: String; const ABeginDate, AEndDate: TDate;
   const ANameIDs: TIntVector; out AExistsIDs: TIntVector;
   out ANames: TStrVector; out ACounts: TIntVector): Boolean;
@@ -689,7 +697,7 @@ begin
     Result:= True;
   end;
   QClose;
-end;
+end;  }
 
 function TDataBase.MonthAndDatesForBuildLogLoad(const AYear: Word;
   const AUsedNameIDs: TIntVector;
@@ -3571,6 +3579,7 @@ begin
   AClaimCounts:= nil;
   AMotorNeeds:= nil;
   if VIsNil(AUsedNameIDs) then Exit;
+  if CompareDate(ABeginDate, AEndDate)>0 then Exit;
 
   if AMotorTypeAsSingleName then
     GetMotorTypes;
@@ -3657,6 +3666,7 @@ begin
   ADefectNames:= nil;
   ADefectNeeds:= nil;
   if VIsNil(AUsedNameIDs) then Exit;
+  if CompareDate(ABeginDate, AEndDate)>0 then Exit;
 
   KeyPickList('RECLAMATIONDEFECTS', 'DefectID', 'DefectName',
                DefectIDs, ADefectNames, True{ID>0}, 'DefectName');
@@ -3743,6 +3753,7 @@ begin
   APlaceNames:= nil;
   APlaceNeeds:= nil;
   if VIsNil(AUsedNameIDs) then Exit;
+  if CompareDate(ABeginDate, AEndDate)>0 then Exit;
 
   KeyPickList('RECLAMATIONPLACES', 'PlaceID', 'PlaceName',
                PlaceIDs, APlaceNames, True{ID>0}, 'PlaceName');
@@ -3769,6 +3780,117 @@ begin
         k:= k + SumCounts[i, j];
       if k=0 then
         APlaceNeeds[j]:= False;
+    end;
+  end;
+end;
+
+function TDataBase.ReclamationByMonthsLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimMonth: Boolean;
+                out AMonthNames: TStrVector;
+                out AMonthNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+var
+  i, j, k: Integer;
+  SumCounts: TIntMatrix;
+  BDs, EDs: TDateVector;
+
+  procedure GetMonths;
+  var
+    n, M: Integer;
+    BD, ED: TDate;
+    S: String;
+  begin
+    BDs:= nil;
+    EDs:= nil;
+    M:= MonthsBetween(ABeginDate, AEndDate);
+    for n:= 0 to M do
+    begin
+      if n=0 then
+        BD:= ABeginDate
+      else
+        BD:= FirstDayInMonth(IncMonth(ABeginDate, n));
+      if n=M then
+        ED:= AEndDate
+      else
+        ED:= LastDayInMonth(BD);
+      VAppend(BDs, BD);
+      VAppend(EDs, ED);
+      S:= SFirstUpper(MONTHSNOM[MonthOfDate(BD)]) + SYMBOL_SPACE + IntToStr(YearOfDate(BD));
+      VAppend(AMonthNames, S);
+    end;
+  end;
+
+  procedure GetData(const APeriodIndex: Integer);
+  var
+    MonthIndex, ReasonIndex: Integer;
+    BD, ED: TDate;
+  begin
+    BD:= IncYear(ABeginDate, -APeriodIndex);
+    ED:= IncYear(AEndDate, -APeriodIndex);
+
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT t1.RecDate, t1.ReasonID ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
+             SqlIN('t2','NameID', Length(AUsedNameIDs)) +
+      'ORDER BY t1.RecDate');
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QParamsInt(AUsedNameIDs);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        MonthIndex:= VIndexOfDate(BDs, EDs, QFieldDT('RecDate'));
+        ReasonIndex:= QFieldInt('ReasonID');
+        AClaimCounts[APeriodIndex, ReasonIndex, MonthIndex]:=
+          AClaimCounts[APeriodIndex, ReasonIndex, MonthIndex] + 1;
+        QNext;
+        Result:= True;
+      end;
+    end;
+    QClose;
+  end;
+
+begin
+  Result:= False;
+  AClaimCounts:= nil;
+  AMonthNames:= nil;
+  AMonthNeeds:= nil;
+  if VIsNil(AUsedNameIDs) then Exit;
+  if CompareDate(ABeginDate, AEndDate)>0 then Exit;
+
+  GetMonths;
+
+  MDim(AClaimCounts,
+       AAdditionYearsCount+1, //кол-во периодов
+       5,                     //кол-во критериев (ReasonNames)
+       Length(AMonthNames),   //кол-во используемых наименований двигателей
+       0                      //кол-во рекламаций
+  );
+
+  for i:= 0 to AAdditionYearsCount do
+    GetData(i);
+
+  AMonthNeeds:= VCreateBool(Length(AMonthNames), True);
+  //ставим метки на месяцы, где нет рекламаций
+  if ADoNotUseZeroClaimMonth then
+  begin
+    SumCounts:= ClaimCountSum(AClaimCounts, VCreateBool(5{кол-во критериев}, True));
+    for j:= 0 to High(AMonthNames) do //params (places)
+    begin
+      k:= 0;
+      for i:= 0 to AAdditionYearsCount do  //years
+        k:= k + SumCounts[i, j];
+      if k=0 then
+        AMonthNeeds[j]:= False;
     end;
   end;
 end;
@@ -3840,7 +3962,7 @@ begin
              APlaceNames, AMotorCounts);
 end; }
 
-function TDataBase.ReclamationMonthsWithReasonsLoad(const ABeginDate,
+{function TDataBase.ReclamationMonthsWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
   AReasonIDs: TIntVector; out AMonthNames: TStrVector;
   out AMotorCounts{, AAccumCounts}: TIntMatrix3D): Boolean;
@@ -3949,7 +4071,7 @@ begin
   end;
 
   Result:= True;
-end;
+end;}
 
 function TDataBase.ReclamationMileagesWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,

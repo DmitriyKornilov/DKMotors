@@ -114,6 +114,9 @@ type
     //4 - Распределение по пробегу локомотива
     procedure LoadStatistic;
 
+    procedure StatisticSettings(out AParamColName, APartTitle, APartTitle2: String;
+                                out ATotalCountHistSort: Boolean);
+
     procedure Draw(const AZoomPercent: Integer);
     procedure DrawStatistic;
     procedure DrawStatisticForSinglePeriod;
@@ -374,7 +377,10 @@ begin
                                   MainForm.UsedNameIDs,
                                   not ParamList.Checked['AdditionShow', 2{отображать count=0}],
                                   ParamNames, ParamNeeds, ClaimCounts);
-    3: ;
+    3: DataBase.ReclamationByMonthsLoad(BD, ED, AdditionYearsCount,
+                                  MainForm.UsedNameIDs,
+                                  not ParamList.Checked['AdditionShow', 2{отображать count=0}],
+                                  ParamNames, ParamNeeds, ClaimCounts);
     4: ;
   end;
 
@@ -410,6 +416,43 @@ begin
   //DrawStatistic(AParamType);
 end;
 
+procedure TStatisticForm.StatisticSettings(out AParamColName, APartTitle, APartTitle2: String;
+                                           out ATotalCountHistSort: Boolean);
+begin
+  case StatSelectedIndex of
+    0: begin
+         AParamColName:= 'Наименование электродвигателя';
+         APartTitle:= 'наименованиям электродвигателей';
+         APartTitle2:= 'наименованию электродвигателя';
+         ATotalCountHistSort:= True;
+       end;
+    1: begin
+         AParamColName:= 'Неисправный элемент';
+         APartTitle:= 'неисправным элементам';
+         APartTitle2:= 'неисправному элементу';
+         ATotalCountHistSort:= True;
+       end;
+    2: begin
+         AParamColName:= 'Предприятие';
+         APartTitle:= 'предприятиям';
+         APartTitle2:= 'предприятию';
+         ATotalCountHistSort:= True;
+       end;
+    3: begin
+         AParamColName:= 'Месяц';
+         APartTitle:= 'месяцам';
+         APartTitle2:= 'месяцу';
+         ATotalCountHistSort:= False;
+       end;
+    4: begin
+         AParamColName:= 'Пробег локомотива, тыс. км';
+         APartTitle:= 'пробегам локомотва';
+         APartTitle2:= 'пробегу локомотива';
+         ATotalCountHistSort:= False;
+       end;
+  end;
+end;
+
 procedure TStatisticForm.Draw(const AZoomPercent: Integer);
 begin
   ZoomPercent:= AZoomPercent;
@@ -421,30 +464,9 @@ var
   //Drawer: TStatisticSinglePeriodSheet;
   Drawer: TStatSheet;
   ParamColName, PartTitle, PartTitle2: String;
+  TotalCountHistSort: Boolean;
 begin
-  case StatSelectedIndex of
-    0: begin
-         ParamColName:= 'Наименование электродвигателя';
-         PartTitle:= 'наименованиям электродвигателей';
-         PartTitle2:= 'наименованию электродвигателя';
-       end;
-    1: begin
-         ParamColName:= 'Неисправный элемент';
-         PartTitle:= 'неисправным элементам';
-         PartTitle2:= 'неисправному элементу';
-       end;
-    2: begin
-         ParamColName:= 'Предприятие';
-         PartTitle:= 'предприятиям';
-         PartTitle2:= 'предприятию';
-       end;
-    3: begin
-
-       end;
-    4: begin
-
-       end;
-  end;
+  StatisticSettings(ParamColName, PartTitle, PartTitle2, TotalCountHistSort);
 
   Drawer:= TStatSheet.Create(ViewGrid.Worksheet, ViewGrid, GridFont);
   try
@@ -455,8 +477,8 @@ begin
                 ParamList.Checkeds['DataList'],
                 ParamList.Selected['SumTypeList'],
                 ParamList.Checked['AdditionShow', 0{гистограммы}],
-                ParamList.Checked['AdditionShow', 1{% от кол-ва}]//,
-                //ParamList.Checked['AdditionShow', 2{подробные гистограммы}]
+                ParamList.Checked['AdditionShow', 1{% от кол-ва}],
+                TotalCountHistSort
                 );
   finally
     FreeAndNil(Drawer);
@@ -596,30 +618,9 @@ var
   Exporter: TSheetsExporter;
   Drawer: TStatSheet;
   ParamColName, PartTitle, PartTitle2: String;
+  TotalCountHistSort: Boolean;
 begin
-  case StatSelectedIndex of
-    0: begin
-         ParamColName:= 'Наименование электродвигателя';
-         PartTitle:= 'наименованиям электродвигателей';
-         PartTitle2:= 'наименованию электродвигателя';
-       end;
-    1: begin
-         ParamColName:= 'Неисправный элемент';
-         PartTitle:= 'неисправным элементам';
-         PartTitle2:= 'неисправному элементу';
-       end;
-    2: begin
-         ParamColName:= 'Предприятие';
-         PartTitle:= 'предприятиям';
-         PartTitle2:= 'предприятию';
-       end;
-    3: begin
-
-       end;
-    4: begin
-
-       end;
-  end;
+  StatisticSettings(ParamColName, PartTitle, PartTitle2, TotalCountHistSort);
 
   Exporter:= TSheetsExporter.Create;
   try
@@ -632,8 +633,8 @@ begin
                   ParamList.Checkeds['DataList'],
                   ParamList.Selected['SumTypeList'],
                   ParamList.Checked['AdditionShow', 0{гистограммы}],
-                  ParamList.Checked['AdditionShow', 1{% от кол-ва}]//,
-                  //ParamList.Checked['AdditionShow', 2{подробные гистограммы}]
+                  ParamList.Checked['AdditionShow', 1{% от кол-ва}],
+                  TotalCountHistSort
                   );
     finally
       FreeAndNil(Drawer);

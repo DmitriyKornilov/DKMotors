@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, fpstypes, {Math,}
   //DK packages utils
-  DK_Vector, DK_Matrix, DK_SheetWriter, DK_SheetTypes, DK_StrUtils, DK_Const, DK_Math;
+  DK_Vector, DK_Matrix, DK_SheetWriter, DK_SheetTypes, DK_Const, DK_Math;
 
 const
 
@@ -75,7 +75,8 @@ type
                                     const AMaxValue: Integer;
                                     const ANeeds: TBoolVector;
                                     const ATotalCount: Integer;
-                                    const ANeedPercent: Boolean);
+                                    const ANeedPercent: Boolean;
+                                    const ANeedSort: Boolean);
 
     procedure HorizBarReasonHistogramRowDraw(var ARow: Integer;
                            const AName: String;
@@ -112,8 +113,8 @@ type
                                                      // =0 - по всем критериям
                                                      // =1 - только по включенным в отчёт критериям
                    const AHistogramNeed,             //выводить гистограммы
-                         APercentNeed{,               //выводить % от кол-ва
-                         ADetailNeed}: Boolean        //выводить гистограммы с подробной разбивкой данных по списку параметров
+                         APercentNeed,               //выводить % от кол-ва
+                         ASortNeed: Boolean          //сортировать данные в гистограмме общего кол-ва по основному параметру
                    );
   end;
 
@@ -316,15 +317,32 @@ procedure TStatSheet.HorizBarHistogramDraw(var ARow: Integer;
                                     const AMaxValue: Integer;
                                     const ANeeds: TBoolVector;
                                     const ATotalCount: Integer;
-                                    const ANeedPercent: Boolean);
+                                    const ANeedPercent: Boolean;
+                                    const ANeedSort: Boolean);
 var
   R, i: Integer;
+  Names: TStrVector;
+  Values, Indexes: TIntVector;
+  Needs: TBoolVector;
 begin
   R:= ARow;
 
-  for i:= 0 to High(ANames) do
-    if ANeeds[i] then
-      HorizBarHistogramRowDraw(R, ANames[i], AValues[i], AMaxValue, ATotalCount, ANeedPercent);
+  if ANeedSort then
+  begin
+    VSort(AValues, Indexes, True{desc});
+    Names:= VReplace(ANames, Indexes);
+    Values:= VReplace(AValues, Indexes);
+    Needs:= VReplace(ANeeds, Indexes);
+  end
+  else begin
+    Names:= ANames;
+    Values:= AValues;
+    Needs:= ANeeds;
+  end;
+
+  for i:= 0 to High(Names) do
+    if Needs[i] then
+      HorizBarHistogramRowDraw(R, Names[i], Values[i], AMaxValue, ATotalCount, ANeedPercent);
 
   ARow:= R;
 end;
@@ -540,7 +558,7 @@ procedure TStatSheet.Draw(const AParamColName, APartTitle{дательный п�
                           const AClaimCounts: TIntMatrix3D;
                           const ADataNeed: TBoolVector;
                           const ASumType: Integer;
-                          const AHistogramNeed, APercentNeed{, ADetailNeed}: Boolean);
+                          const AHistogramNeed, APercentNeed, ASortNeed: Boolean);
 var
   R, Order, MaxValue, TotalCount: Integer;
   S: String;
@@ -589,7 +607,7 @@ var
     Needs:= FParamNeeds;//VCreateBool(Length(FParamNames), True);
     Values:= FSumCounts[0{period_index}];
     MaxValue:= VMax(Values);
-    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed);
+    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed, ASortNeed{sort});
   end;
 
   procedure CountTotalForReasonDraw;
@@ -625,7 +643,8 @@ var
     Needs:= FReasonNeeds;
     Values:= FReasonCounts[0{period_index}];
     MaxValue:= VMax(VCut(Values, Needs));
-    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed);
+    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed, False{no sort});
+
     //addition caption
     R:= R + 1;
     Writer.SetAlignment(haLeft, vaCenter);
@@ -650,7 +669,7 @@ var
       R:= R + 1;
       //Names, Needs, MaxValue, TotalCount - рассчитаны выше
       Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
-      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed);
+      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed, False{no sort});
     end;
   end;
 
@@ -699,7 +718,7 @@ var
       Needs:= FReasonNeeds;
       Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
       MaxValue:= VMax(VCut(Values, Needs));
-      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs,TotalCount, FPercentNeed);
+      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs,TotalCount, FPercentNeed, False{no sort});
     end;
   end;
 
