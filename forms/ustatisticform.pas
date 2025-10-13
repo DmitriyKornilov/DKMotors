@@ -381,7 +381,10 @@ begin
                                   MainForm.UsedNameIDs,
                                   not ParamList.Checked['AdditionShow', 2{отображать count=0}],
                                   ParamNames, ParamNeeds, ClaimCounts);
-    4: ;
+    4: DataBase.ReclamationByMileagesLoad(BD, ED, AdditionYearsCount,
+                                  MainForm.UsedNameIDs,
+                                  not ParamList.Checked['AdditionShow', 2{отображать count=0}],
+                                  ParamNames, ParamNeeds, ClaimCounts);
   end;
 
   DrawStatistic;

@@ -320,11 +320,18 @@ type
                 out AMonthNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
-    function ReclamationMileagesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
+    {function ReclamationMileagesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const ANameIDs, AReasonIDs: TIntVector;
                 out AMileageNames: TStrVector;
-                out AMotorCounts: TIntMatrix3D): Boolean;
+                out AMotorCounts: TIntMatrix3D): Boolean; }
+    function ReclamationByMileagesLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimMileage: Boolean;
+                out AMileageNames: TStrVector;
+                out AMileageNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
 
   end;
 
@@ -3895,6 +3902,108 @@ begin
   end;
 end;
 
+function TDataBase.ReclamationByMileagesLoad(const ABeginDate, AEndDate: TDate;
+                const AAdditionYearsCount: Integer;
+                const AUsedNameIDs: TIntVector;
+                const ADoNotUseZeroClaimMileage: Boolean;
+                out AMileageNames: TStrVector;
+                out AMileageNeeds: TBoolVector;
+                out AClaimCounts: TIntMatrix3D): Boolean;
+var
+  i, j, k: Integer;
+  SumCounts: TIntMatrix;
+  MileageMins, MileageMaxs: TIntVector;
+
+  procedure GetMileages;
+  var
+    n: Integer;
+  begin
+    //MileageMins:= VCreateInt([0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325]);
+    //MileageMaxs:= VSumValue(MileageMins, 25);
+    MileageMins:= VCreateInt([0, 50, 100, 150, 200, 250, 300]);
+    MileageMaxs:= VSumValue(MileageMins, 50);
+    VDim(AMileageNames, Length(MileageMins));
+    for n:=0 to High(MileageMins) do
+      AMileageNames[n]:= IntToStr(MileageMins[n]) + '-' + IntToStr(MileageMaxs[n]);
+
+    MileageMins:= VSumValue(VMultValue(MileageMins, 1000), 1);
+    MileageMins[0]:= 0;
+    MileageMaxs:= VMultValue(MileageMaxs, 1000);
+  end;
+
+  procedure GetData(const APeriodIndex: Integer);
+  var
+    MileageIndex, ReasonIndex: Integer;
+    BD, ED: TDate;
+  begin
+    BD:= IncYear(ABeginDate, -APeriodIndex);
+    ED:= IncYear(AEndDate, -APeriodIndex);
+
+    QSetQuery(FQuery);
+    QSetSQL(
+      'SELECT t1.Mileage, t1.ReasonID ' +
+      'FROM RECLAMATIONS t1 ' +
+      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
+      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
+      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
+             SqlIN('t2','NameID', Length(AUsedNameIDs)) +
+      'ORDER BY t1.RecDate');
+    QParamDT('BD', BD);
+    QParamDT('ED', ED);
+    QParamsInt(AUsedNameIDs);
+    QOpen;
+    if not QIsEmpty then
+    begin
+      QFirst;
+      while not QEOF do
+      begin
+        MileageIndex:= VIndexOf(MileageMins, MileageMaxs, QFieldInt('Mileage'));
+        ReasonIndex:= QFieldInt('ReasonID');
+        AClaimCounts[APeriodIndex, ReasonIndex, MileageIndex]:=
+          AClaimCounts[APeriodIndex, ReasonIndex, MileageIndex] + 1;
+        QNext;
+        Result:= True;
+      end;
+    end;
+    QClose;
+  end;
+
+begin
+  Result:= False;
+  AClaimCounts:= nil;
+  AMileageNames:= nil;
+  AMileageNeeds:= nil;
+  if VIsNil(AUsedNameIDs) then Exit;
+  if CompareDate(ABeginDate, AEndDate)>0 then Exit;
+
+  GetMileages;
+
+  MDim(AClaimCounts,
+       AAdditionYearsCount+1, //кол-во периодов
+       5,                     //кол-во критериев (ReasonNames)
+       Length(AMileageNames),   //кол-во используемых наименований двигателей
+       0                      //кол-во рекламаций
+  );
+
+  for i:= 0 to AAdditionYearsCount do
+    GetData(i);
+
+  AMileageNeeds:= VCreateBool(Length(AMileageNames), True);
+  //ставим метки на месяцы, где нет рекламаций
+  if ADoNotUseZeroClaimMileage then
+  begin
+    SumCounts:= ClaimCountSum(AClaimCounts, VCreateBool(5{кол-во критериев}, True));
+    for j:= 0 to High(AMileageNames) do //params (places)
+    begin
+      k:= 0;
+      for i:= 0 to AAdditionYearsCount do  //years
+        k:= k + SumCounts[i, j];
+      if k=0 then
+        AMileageNeeds[j]:= False;
+    end;
+  end;
+end;
+
 {function TDataBase.ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
   const ANameIDs: TIntVector;
   out AExistsNameIDs: TIntVector;
@@ -4073,7 +4182,7 @@ begin
   Result:= True;
 end;}
 
-function TDataBase.ReclamationMileagesWithReasonsLoad(const ABeginDate,
+{function TDataBase.ReclamationMileagesWithReasonsLoad(const ABeginDate,
   AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
   AReasonIDs: TIntVector; out AMileageNames: TStrVector; out
   AMotorCounts: TIntMatrix3D): Boolean;
@@ -4185,7 +4294,7 @@ begin
   end;
 
   Result:= True;
-end;
+end;}
 
 
 
