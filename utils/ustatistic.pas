@@ -5,9 +5,9 @@ unit UStatistic;
 interface
 
 uses
-  Classes, SysUtils, Graphics, fpstypes, {Math,}
+  Classes, SysUtils, Graphics,
   //DK packages utils
-  DK_Vector, DK_Matrix, DK_SheetWriter, DK_SheetTypes, DK_Const, DK_Math;
+  DK_Vector, DK_Matrix, DK_SheetTypes, DK_Const, DK_Math;
 
 const
 
@@ -57,7 +57,7 @@ type
     FCellColCount: Integer;        //кол-во стобцов для целой ячейки (без %)
     FHalfCellColCount: Integer;    //кол-во столбцов для половины ячейки (если нужен столбец %)
 
-    FPercentNeed: Boolean;         //выводить % от кол-ва
+    //FPercentNeed: Boolean;         //выводить % от кол-ва
 
     procedure HorizBarDraw(const ARow: Integer;
                            const AColor: TColor;
@@ -87,15 +87,23 @@ type
                                     const ATotalCount: Integer;
                                     const ANeedPercent: Boolean);
 
-    procedure SumTableDraw(var ARow: Integer);
+    procedure SumTableDraw(var ARow: Integer;
+                            const AValueColumnTitle: String;
+                            const ANames: TStrVector;
+                            const AValues: TIntVector;
+                            const ANeeds: TBoolVector;
+                            const ATotalCount: Integer;
+                            const ANeedPercent: Boolean;
+                            const ANeedResume: Boolean);
     procedure ReasonTableDraw(var ARow: Integer;
                                const AParamSumCountForPercents: TIntVector;
                                const ATotalSumCountForPercent: Integer;
+                               const ANeedPercent: Boolean;
                                const ANeedResume: Boolean);
 
 
   public
-    procedure Draw(const AParamColName,       //наименование столбца параметров (напр., "Наименование электродвигателя")
+    procedure PeriodDraw(const AParamColName, //наименование столбца параметров (напр., "Наименование электродвигателя")
                          APartTitle,          //наименование параметров (дат. падеж, мн. ч.) (напр., "наименованиям электродвигателей")
                          APartTitle2,         //наименование параметров (дат. падеж, ед. ч.) (напр., "наименованию электродвигателя")
                          AMotorNamesStr,      //строка с перечислением используемых типов(наименований) двигателей (напр., "7АЖ225М6У2 IМ2001, АЭВ71А2У2 IМ2003")
@@ -114,6 +122,7 @@ type
                                                      // =1 - только по включенным в отчёт критериям
                    const AHistogramNeed,             //выводить гистограммы
                          APercentNeed,               //выводить % от кол-ва
+                         AAccumNeed,                 //общее кол-во по основному параметру считать с накоплением
                          ASortNeed: Boolean          //сортировать данные в гистограмме общего кол-ва по основному параметру
                    );
   end;
@@ -407,9 +416,16 @@ begin
   ARow:= R;
 end;
 
-procedure TStatSheet.SumTableDraw(var ARow: Integer);
+procedure TStatSheet.SumTableDraw(var ARow: Integer;
+                                  const AValueColumnTitle: String;
+                                  const ANames: TStrVector;
+                                  const AValues: TIntVector;
+                                  const ANeeds: TBoolVector;
+                                  const ATotalCount: Integer;
+                                  const ANeedPercent: Boolean;
+                                  const ANeedResume: Boolean);
 var
-  R, C1, C2, i, Value: Integer;
+  R, C1, C2, i{, Value}: Integer;
   Percent: Double;
 begin
   R:= ARow;
@@ -422,40 +438,45 @@ begin
   C2:= C1 + FCellColCount - 1;
   Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
   Writer.WriteText(R, 1, FParamColName, cbtOuter, True, True);
-  Writer.WriteText(R, C1, R, C2, 'Количество рекламаций' + SYMBOL_BREAK + 'за период', cbtOuter, True, True);
+  Writer.WriteText(R, C1, R, C2, AValueColumnTitle, cbtOuter, True, True);
   Writer.DrawBorders(R, C2+1, cbtLeft);
 
   //данные
   Writer.SetFont(Font.Name, Font.Size, [], clBlack);
-  for i:= 0 to High(FParamNames) do
+  for i:= 0 to High(ANames) do
   begin
-    if not FParamNeeds[i] then continue;
+    if not ANeeds[i] then continue;
 
     R:= R + 1;
-    Writer.WriteText(R, 1, FParamNames[i], cbtOuter);
-    Value:= FSumCounts[0{period_index}, i{param_index}];
-    if not FPercentNeed then
-      Writer.WriteNumber(R, C1, R, C2, Value, cbtOuter)
+    Writer.WriteText(R, 1, ANames[i], cbtOuter);
+    //Value:= FSumCounts[0{period_index}, i{param_index}];
+    if not ANeedPercent then
+      Writer.WriteNumber(R, C1, R, C2, AValues[i], cbtOuter)
     else begin
       C1:= 2;
       C2:= C1 + FHalfCellColCount - 1;
-      Writer.WriteNumber(R, C1, R, C2, Value, cbtOuter);
+      Writer.WriteNumber(R, C1, R, C2, AValues[i], cbtOuter);
       C1:= C2 + 1;
       C2:= C1 + FHalfCellColCount - 1;
-      Percent:= Part(Value, FTotalCounts[0{period_index}]);
+      //Percent:= Part(Value, FTotalCounts[0{period_index}]);
+      Percent:= Part(AValues[i], ATotalCount);
       Writer.WriteNumber(R, C1, R, C2, Percent, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
     end;
     Writer.DrawBorders(R, C2+1, cbtLeft);
   end;
 
   //итого
-  R:= R + 1;
-  C1:= 2;
-  C2:= C1 + FCellColCount - 1;
-  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
-  Writer.WriteText(R, 1, 'ИТОГО', cbtOuter);
-  Writer.WriteNumber(R, C1, R, C2, FTotalCounts[0{period_index}], cbtOuter);
-  Writer.DrawBorders(R, C2+1, cbtLeft);
+  if ANeedResume then
+  begin
+    R:= R + 1;
+    C1:= 2;
+    C2:= C1 + FCellColCount - 1;
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.WriteText(R, 1, 'ИТОГО', cbtOuter);
+    //Writer.WriteNumber(R, C1, R, C2, FTotalCounts[0{period_index}], cbtOuter);
+    Writer.WriteNumber(R, C1, R, C2, ATotalCount, cbtOuter);
+    Writer.DrawBorders(R, C2+1, cbtLeft);
+  end;
 
   ARow:= R;
 end;
@@ -463,6 +484,7 @@ end;
 procedure TStatSheet.ReasonTableDraw(var ARow: Integer;
                                      const AParamSumCountForPercents: TIntVector;
                                      const ATotalSumCountForPercent: Integer;
+                                     const ANeedPercent: Boolean;
                                      const ANeedResume: Boolean);
 var
   R, C1, C2, i, j, Value: Integer;
@@ -500,7 +522,7 @@ begin
       if not FReasonNeeds[j] then continue;
       C1:= C2 + 1;
       Value:= FCounts[0{period_index}, j{reason_index}, i{param_index}];
-      if not FPercentNeed then
+      if not ANeedPercent then
       begin
         C2:= C1 + FCellColCount - 1;
         Writer.WriteNumber(R, C1, R, C2, Value, cbtOuter);
@@ -529,7 +551,7 @@ begin
       if not FReasonNeeds[i] then continue;
       C1:= C2 + 1;
       Value:= FReasonCounts[0{period_index}, i{reason_index}];
-      if not FPercentNeed then
+      if not ANeedPercent then
       begin
         C2:= C1 + FCellColCount - 1;
         Writer.WriteNumber(R, C1, R, C2, Value, cbtOuter);
@@ -549,7 +571,7 @@ begin
   ARow:= R;
 end;
 
-procedure TStatSheet.Draw(const AParamColName, APartTitle{дательный падеж}, APartTitle2,
+procedure TStatSheet.PeriodDraw(const AParamColName, APartTitle{дательный падеж}, APartTitle2,
                                 AMotorNamesStr, APeriodStr: String;
                           const AReasonNeeds: TBoolVector;
                           const AReasonNames: TStrVector;
@@ -558,7 +580,7 @@ procedure TStatSheet.Draw(const AParamColName, APartTitle{дательный п�
                           const AClaimCounts: TIntMatrix3D;
                           const ADataNeed: TBoolVector;
                           const ASumType: Integer;
-                          const AHistogramNeed, APercentNeed, ASortNeed: Boolean);
+                          const AHistogramNeed, APercentNeed, AAccumNeed, ASortNeed: Boolean);
 var
   R, Order, MaxValue, TotalCount: Integer;
   S: String;
@@ -584,30 +606,41 @@ var
 
   procedure CountTotalForStatisticTypeDraw;
   begin
+    Names:= FParamNames;
+    Needs:= FParamNeeds;
+    Values:= FSumCounts[0{period_index}];
+    if AAccumNeed then
+      Values:= VAccum(Values);
+    MaxValue:= VMax(Values);
     TotalCount:= FTotalCounts[0{period_index}];
 
     Writer.SetAlignment(haLeft, vaCenter);
     Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+
     R:= R + 2;
     Inc(Order);
+    if AAccumNeed then
+      S:= 'Накопление'
+    else
+      S:= 'Распределение';
     S:= IntToStr(Order) +
-        ') Распределение общего количества рекламационных случаев по ' +
+        ') ' + S + ' общего количества рекламационных случаев по ' +
         APartTitle;
-    if FPercentNeed then
+    if APercentNeed then
       S:= S + ' (с % от суммы рекламаций по всем ' + APartTitle +
          ' за период = ' + IntToStr(TotalCount) + ')';
     Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+
     R:= R + 2;
-    SumTableDraw(R);
+    if AAccumNeed then
+      S:= 'Накопление количества' + SYMBOL_BREAK + 'рекламаций'
+    else
+      S:= 'Количество рекламаций' + SYMBOL_BREAK + 'за период';
+    SumTableDraw(R, S, Names, Values, Needs, TotalCount, APercentNeed, not AAccumNeed);
 
     if not AHistogramNeed then Exit;
-
     R:= R + 2;
-    Names:= FParamNames;
-    Needs:= FParamNeeds;//VCreateBool(Length(FParamNames), True);
-    Values:= FSumCounts[0{period_index}];
-    MaxValue:= VMax(Values);
-    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed, ASortNeed{sort});
+    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, ASortNeed{sort});
   end;
 
   procedure CountTotalForReasonDraw;
@@ -624,16 +657,16 @@ var
     Inc(Order);
     S:= IntToStr(Order) +
         ') Распределение общего количества рекламационных случаев по критериям неисправности';
-    if FPercentNeed then
+    if APercentNeed then
       S:= S + ' (с % от суммы рекламаций по всем ' + APartTitle +
          ' за период = ' + IntToStr(TotalCount) + ')';
     Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
     //data grid
     R:= R + 2;
     ParamSumCounts:= nil;
-    if FPercentNeed then
+    if APercentNeed then
       ParamSumCounts:= VCreateInt(Length(FParamNames), TotalCount);
-    ReasonTableDraw(R, ParamSumCounts, TotalCount, True{строка итого});
+    ReasonTableDraw(R, ParamSumCounts, TotalCount, APercentNeed, True{строка итого});
 
     if not AHistogramNeed then Exit;
 
@@ -643,7 +676,7 @@ var
     Needs:= FReasonNeeds;
     Values:= FReasonCounts[0{period_index}];
     MaxValue:= VMax(VCut(Values, Needs));
-    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed, False{no sort});
+    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
 
     //addition caption
     R:= R + 1;
@@ -661,7 +694,7 @@ var
       Writer.SetAlignment(haLeft, vaCenter);
       Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
       S:= FParamNames[i] + ' - количество рекламаций';
-      if FPercentNeed then
+      if APercentNeed then
         S:= S + ' (с % от суммы рекламаций по всем ' + APartTitle +
             ' за период = ' + IntToStr(TotalCount) + ')';
       Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
@@ -669,7 +702,7 @@ var
       R:= R + 1;
       //Names, Needs, MaxValue, TotalCount - рассчитаны выше
       Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
-      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, FPercentNeed, False{no sort});
+      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
     end;
   end;
 
@@ -686,13 +719,13 @@ var
     S:= IntToStr(Order) +
         ') Распределение количества рекламационных случаев по ' +
         APartTitle + ' и критериям неисправности';
-    if FPercentNeed then
+    if APercentNeed then
       S:= S + ' (с % от суммы рекламаций по ' + APartTitle2 + ')';
     Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
     //data grid
     R:= R + 2;
     ParamSumCounts:= FSumCounts[0{period_index}];
-    ReasonTableDraw(R, ParamSumCounts, 0{not need}, False{без итого});
+    ReasonTableDraw(R, ParamSumCounts, 0{not need}, APercentNeed, False{без итого});
 
     if not AHistogramNeed then Exit;
 
@@ -708,7 +741,7 @@ var
       Writer.SetAlignment(haLeft, vaCenter);
       Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
       S:= FParamNames[i] + ' - количество рекламаций';
-      if FPercentNeed then
+      if APercentNeed then
         S:= S + ' (с % от суммы рекламаций ' + FParamNames[i] +
             ' за период = ' + IntToStr(TotalCount) + ')';
       Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
@@ -718,7 +751,7 @@ var
       Needs:= FReasonNeeds;
       Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
       MaxValue:= VMax(VCut(Values, Needs));
-      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs,TotalCount, FPercentNeed, False{no sort});
+      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs,TotalCount, APercentNeed, False{no sort});
     end;
   end;
 
@@ -734,7 +767,7 @@ begin
   FParamNeeds:= AParamNeeds;
   FParamNames:= AParamNames;
   FCounts:= AClaimCounts;
-  FPercentNeed:= APercentNeed;
+  //FPercentNeed:= APercentNeed;
   Order:= 0;
 
   //data calculation

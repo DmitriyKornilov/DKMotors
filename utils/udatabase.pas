@@ -326,7 +326,7 @@ type
                 out AMileageNames: TStrVector;
                 out AMotorCounts: TIntMatrix3D): Boolean; }
     function ReclamationByMileagesLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
+                const AMileageStep, AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
                 const ADoNotUseZeroClaimMileage: Boolean;
                 out AMileageNames: TStrVector;
@@ -3903,7 +3903,7 @@ begin
 end;
 
 function TDataBase.ReclamationByMileagesLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
+                const AMileageStep, AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
                 const ADoNotUseZeroClaimMileage: Boolean;
                 out AMileageNames: TStrVector;
@@ -3918,10 +3918,8 @@ var
   var
     n: Integer;
   begin
-    //MileageMins:= VCreateInt([0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325]);
-    //MileageMaxs:= VSumValue(MileageMins, 25);
-    MileageMins:= VCreateInt([0, 50, 100, 150, 200, 250, 300]);
-    MileageMaxs:= VSumValue(MileageMins, 50);
+    MileageMins:= VStep(0, 350-AMileageStep, AMileageStep);
+    MileageMaxs:= VSumValue(MileageMins, AMileageStep);
     VDim(AMileageNames, Length(MileageMins));
     for n:=0 to High(MileageMins) do
       AMileageNames[n]:= IntToStr(MileageMins[n]) + '-' + IntToStr(MileageMaxs[n]);
