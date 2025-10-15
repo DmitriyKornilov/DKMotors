@@ -9,7 +9,6 @@ object StatisticForm: TStatisticForm
   ClientHeight = 600
   ClientWidth = 1195
   DesignTimePPI = 120
-  LCLVersion = '4.2.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -25,29 +24,29 @@ object StatisticForm: TStatisticForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 40
-    ClientWidth = 1191
+    ClientHeight = 36
+    ClientWidth = 1187
     Constraints.MaxHeight = 40
     Constraints.MinHeight = 40
     TabOrder = 0
-    object ReportPeriodPanel: TPanel
+    object PeriodPanel: TPanel
       Left = 421
       Height = 36
       Top = 0
-      Width = 290
+      Width = 590
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
       ClientHeight = 36
-      ClientWidth = 290
+      ClientWidth = 590
       ParentFont = False
       TabOrder = 0
-      object EndDateTimePicker: TDateTimePicker
+      object EndDatePicker: TDateTimePicker
         AnchorSideLeft.Control = Label3
         AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideTop.Control = PeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 191
+        Left = 304
         Height = 28
         Top = 4
         Width = 99
@@ -69,14 +68,14 @@ object StatisticForm: TStatisticForm
         UseDefaultSeparators = True
         HideDateTimeParts = []
         MonthNames = 'Long'
-        OnChange = EndDateTimePickerChange
+        OnChange = EndDatePickerChange
       end
       object BeginDatePicker: TDateTimePicker
         AnchorSideLeft.Control = Label1
         AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideTop.Control = PeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 65
+        Left = 178
         Height = 28
         Top = 4
         Width = 99
@@ -105,7 +104,7 @@ object StatisticForm: TStatisticForm
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = BeginDatePicker
         AnchorSideTop.Side = asrCenter
-        Left = 170
+        Left = 283
         Height = 20
         Top = 8
         Width = 15
@@ -115,81 +114,114 @@ object StatisticForm: TStatisticForm
         ParentFont = False
       end
       object Label1: TLabel
-        AnchorSideLeft.Control = ReportPeriodPanel
-        AnchorSideTop.Control = ReportPeriodPanel
+        AnchorSideLeft.Control = YearPanel
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = PeriodPanel
         AnchorSideTop.Side = asrCenter
-        Left = 0
+        Left = 113
         Height = 20
         Top = 8
         Width = 57
         Caption = 'Период:'
       end
-    end
-    object AdditionYearsPanel: TPanel
-      Left = 732
-      Height = 36
-      Top = 0
-      Width = 202
-      Align = alLeft
-      AutoSize = True
-      BevelOuter = bvNone
-      ClientHeight = 36
-      ClientWidth = 202
-      TabOrder = 1
-      Visible = False
-      object AdditionYearCountSpinEdit: TSpinEdit
-        AnchorSideLeft.Control = Label4
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = AdditionYearsPanel
-        AnchorSideTop.Side = asrCenter
-        Left = 118
-        Height = 28
-        Top = 4
-        Width = 63
-        Align = alCustom
-        Alignment = taCenter
-        BorderSpacing.Left = 8
-        MaxValue = 4
-        MinValue = 1
-        TabOrder = 0
-        Value = 2
-        OnChange = AdditionYearCountSpinEditChange
-      end
-      object Label4: TLabel
-        AnchorSideLeft.Control = AdditionYearsPanel
-        AnchorSideTop.Control = AdditionYearsPanel
-        AnchorSideTop.Side = asrCenter
-        Left = 0
-        Height = 20
-        Top = 8
-        Width = 110
-        Caption = 'Количество лет:'
-        ParentColor = False
-      end
-      object DividerBevel2: TDividerBevel
-        AnchorSideLeft.Control = AdditionYearCountSpinEdit
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = AdditionYearsPanel
-        AnchorSideRight.Control = AdditionYearsPanel
-        AnchorSideRight.Side = asrBottom
-        AnchorSideBottom.Control = AdditionYearsPanel
+      object YearPanel: TPanel
+        AnchorSideLeft.Control = PeriodPanel
+        AnchorSideTop.Control = PeriodPanel
+        AnchorSideBottom.Control = PeriodPanel
         AnchorSideBottom.Side = asrBottom
-        Left = 181
+        Left = 0
         Height = 36
         Top = 0
-        Width = 21
-        Caption = 'DividerBevel2'
-        Align = alCustom
+        Width = 105
         Anchors = [akTop, akLeft, akBottom]
-        BevelWidth = 2
-        Font.Style = [fsBold]
-        Orientation = trVertical
-        ParentFont = False
+        AutoSize = True
+        BorderSpacing.Right = 8
+        BevelOuter = bvNone
+        ClientHeight = 36
+        ClientWidth = 105
+        TabOrder = 2
+        Visible = False
+        object YearSpinEdit: TSpinEdit
+          AnchorSideLeft.Control = Label2
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = YearPanel
+          AnchorSideTop.Side = asrCenter
+          Left = 35
+          Height = 28
+          Top = 4
+          Width = 70
+          Alignment = taCenter
+          BorderSpacing.Left = 8
+          BorderSpacing.Top = 4
+          BorderSpacing.Bottom = 2
+          MinValue = 2010
+          TabOrder = 0
+          Value = 2022
+          OnChange = YearSpinEditChange
+        end
+        object Label2: TLabel
+          AnchorSideLeft.Control = YearPanel
+          AnchorSideTop.Control = YearPanel
+          AnchorSideTop.Side = asrCenter
+          Left = 0
+          Height = 20
+          Top = 8
+          Width = 27
+          Caption = 'Год:'
+        end
+      end
+      object AdditionYearsPanel: TPanel
+        AnchorSideLeft.Control = EndDatePicker
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = PeriodPanel
+        AnchorSideBottom.Control = PeriodPanel
+        AnchorSideBottom.Side = asrBottom
+        Left = 409
+        Height = 36
+        Top = 0
+        Width = 181
+        Anchors = [akTop, akLeft, akBottom]
+        AutoSize = True
+        BorderSpacing.Left = 6
+        BevelOuter = bvNone
+        ClientHeight = 36
+        ClientWidth = 181
+        TabOrder = 3
+        Visible = False
+        object AdditionYearCountSpinEdit: TSpinEdit
+          AnchorSideLeft.Control = Label4
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = AdditionYearsPanel
+          AnchorSideTop.Side = asrCenter
+          Left = 118
+          Height = 28
+          Top = 4
+          Width = 63
+          Align = alCustom
+          Alignment = taCenter
+          BorderSpacing.Left = 8
+          MaxValue = 4
+          MinValue = 1
+          TabOrder = 0
+          Value = 2
+          OnChange = AdditionYearCountSpinEditChange
+        end
+        object Label4: TLabel
+          AnchorSideLeft.Control = AdditionYearsPanel
+          AnchorSideTop.Control = AdditionYearsPanel
+          AnchorSideTop.Side = asrCenter
+          Left = 0
+          Height = 20
+          Top = 8
+          Width = 110
+          Caption = 'Количество лет:'
+          ParentColor = False
+        end
       end
     end
     object ExportButton: TSpeedButton
       Cursor = crHandPoint
-      Left = 934
+      Left = 1032
       Height = 36
       Hint = 'Экспорт в формат электронной таблицы XLSX или ODS'
       Top = 0
@@ -205,18 +237,6 @@ object StatisticForm: TStatisticForm
       ParentShowHint = False
       OnClick = ExportButtonClick
     end
-    object DividerBevel1: TDividerBevel
-      Left = 711
-      Height = 36
-      Top = 0
-      Width = 21
-      Caption = 'DividerBevel1'
-      Align = alLeft
-      BevelWidth = 2
-      Font.Style = [fsBold]
-      Orientation = trVertical
-      ParentFont = False
-    end
     object ReportTypePanel: TPanel
       Left = 0
       Height = 36
@@ -226,7 +246,7 @@ object StatisticForm: TStatisticForm
       BevelOuter = bvNone
       ClientHeight = 36
       ClientWidth = 400
-      TabOrder = 2
+      TabOrder = 1
       object ReportTypeComboBox: TComboBox
         AnchorSideLeft.Control = ReportTypePanel
         AnchorSideTop.Control = ReportTypePanel
@@ -264,6 +284,19 @@ object StatisticForm: TStatisticForm
       Orientation = trVertical
       ParentFont = False
     end
+    object DividerBevel2: TDividerBevel
+      AnchorSideRight.Side = asrBottom
+      Left = 1011
+      Height = 36
+      Top = 0
+      Width = 21
+      Caption = 'DividerBevel2'
+      Align = alLeft
+      BevelWidth = 2
+      Font.Style = [fsBold]
+      Orientation = trVertical
+      ParentFont = False
+    end
   end
   object ClientPanel: TPanel
     Left = 0
@@ -294,8 +327,8 @@ object StatisticForm: TStatisticForm
         BorderSpacing.Top = 2
         BevelOuter = bvNone
         BorderStyle = bsSingle
-        ClientHeight = 89
-        ClientWidth = 498
+        ClientHeight = 85
+        ClientWidth = 494
         Color = clWindow
         ParentBackground = False
         ParentColor = False
@@ -382,8 +415,8 @@ object StatisticForm: TStatisticForm
           BevelOuter = bvNone
           BorderStyle = bsSingle
           Caption = 'GridPanel'
-          ClientHeight = 552
-          ClientWidth = 683
+          ClientHeight = 548
+          ClientWidth = 679
           TabOrder = 0
           object ViewGrid: TsWorksheetGrid
             Left = 0

@@ -7,8 +7,9 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons, ComCtrls,
   fpspreadsheetgrid, VirtualTrees, LCLType, StdCtrls, Spin, DateTimePicker, DividerBevel,
+  DateUtils,
   //DK packages utils
-  DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetTypes,
+  DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetTypes, DK_Const,
   DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils, DK_VSTParamList,
   //Project utils
   UVars, UStatSheets, UStatistic;
@@ -18,42 +19,45 @@ type
   { TStatisticForm }
 
   TStatisticForm = class(TForm)
+    AdditionYearCountSpinEdit: TSpinEdit;
+    AdditionYearsPanel: TPanel;
     Bevel1: TBevel;
     DividerBevel2: TDividerBevel;
     DividerBevel3: TDividerBevel;
     Label1: TLabel;
+    Label2: TLabel;
+    Label4: TLabel;
     ReportTypeComboBox: TComboBox;
-    DividerBevel1: TDividerBevel;
     ExportButton: TSpeedButton;
     ReportTypePanel: TPanel;
     SettingClientPanel: TPanel;
-    EndDateTimePicker: TDateTimePicker;
+    EndDatePicker: TDateTimePicker;
     BeginDatePicker: TDateTimePicker;
+    YearSpinEdit: TSpinEdit;
     ViewGrid: TsWorksheetGrid;
     Label3: TLabel;
-    Label4: TLabel;
     MainPanel: TPanel;
     LeftPanel: TPanel;
     StatisticPanel: TPanel;
     RightPanel: TPanel;
-    AdditionYearsPanel: TPanel;
     GridPanel: TPanel;
-    ReportPeriodPanel: TPanel;
-    AdditionYearCountSpinEdit: TSpinEdit;
+    PeriodPanel: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     ToolPanel: TPanel;
     ClientPanel: TPanel;
     StatisticVT: TVirtualStringTree;
+    YearPanel: TPanel;
     ZoomPanel: TPanel;
     procedure ExportButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ReportTypeComboBoxChange(Sender: TObject);
-    procedure EndDateTimePickerChange(Sender: TObject);
+    procedure EndDatePickerChange(Sender: TObject);
     procedure BeginDatePickerChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure AdditionYearCountSpinEditChange(Sender: TObject);
+    procedure YearSpinEditChange(Sender: TObject);
   private
     CanShow: Boolean;
     ZoomPercent: Integer;
@@ -105,23 +109,16 @@ type
 
     procedure CreateStatisticList;
     procedure SelectStatistic;
-    //AParamType
-    //0 - Распределение по наименованиям двигателей
-    //1 - Распределение по неисправным элементам
-    //2 - Распределение по предприятиям
-    //3 - Распределение по месяцам
-    //4 - Распределение по пробегу локомотива
     procedure LoadStatistic;
+    procedure ExportStatistic;
 
     procedure StatisticSettings(out AParamColName, APartTitle, APartTitle2: String;
                                 out ANeedAccumCount, ATotalCountHistSort: Boolean);
 
     procedure Draw(const AZoomPercent: Integer);
     procedure DrawStatistic;
-    procedure DrawStatisticPeriod;
-    procedure DrawStatisticComparison;
 
-    procedure ExportStatistic;
+    procedure LimitDatePickers;
   public
     procedure ViewUpdate;
   end;
@@ -155,8 +152,9 @@ begin
   StatSelectedIndex:= -1;
   CreateStatisticList;
 
+  YearSpinEdit.Value:= YearOfDate(Date);
   BeginDatePicker.Date:= FirstDayInYear(Date);
-  EndDateTimePicker.Date:= LastDayInMonth(Date);
+  EndDatePicker.Date:= LastDayInMonth(Date);
   CanShow:= True;
 end;
 
@@ -178,7 +176,7 @@ begin
   ViewUpdate;
 end;
 
-procedure TStatisticForm.EndDateTimePickerChange(Sender: TObject);
+procedure TStatisticForm.EndDatePickerChange(Sender: TObject);
 begin
   ViewUpdate;
 end;
@@ -188,9 +186,30 @@ begin
   ViewUpdate;
 end;
 
+procedure TStatisticForm.LimitDatePickers;
+begin
+  BeginDatePicker.MinDate:= NULDATE;
+  BeginDatePicker.MaxDate:= INFDATE;
+  EndDatePicker.MinDate:= BeginDatePicker.MinDate;
+  EndDatePicker.MaxDate:= BeginDatePicker.MaxDate;
+
+  if ReportTypeComboBox.ItemIndex=1 then //comparison
+  begin
+    BeginDatePicker.Date:= RecodeYear(BeginDatePicker.Date, YearSpinEdit.Value);
+    EndDatePicker.Date:= RecodeYear(EndDatePicker.Date, YearSpinEdit.Value);
+    BeginDatePicker.MinDate:= FirstDayInYear(YearSpinEdit.Value);
+    BeginDatePicker.MaxDate:= LastDayInYear(YearSpinEdit.Value);
+    EndDatePicker.MinDate:= BeginDatePicker.MinDate;
+    EndDatePicker.MaxDate:= BeginDatePicker.MaxDate;
+  end;
+end;
+
 procedure TStatisticForm.ReportTypeComboBoxChange(Sender: TObject);
 begin
+  YearPanel.Visible:= ReportTypeComboBox.ItemIndex=1;
   AdditionYearsPanel.Visible:= ReportTypeComboBox.ItemIndex=1;
+  Application.ProcessMessages;
+  LimitDatePickers;
   ParamList.ItemVisibles['AdditionShow']:= VCreateBool([True, True, ReportTypeComboBox.ItemIndex=0]);
   ViewUpdate;
 end;
@@ -202,6 +221,12 @@ end;
 
 procedure TStatisticForm.AdditionYearCountSpinEditChange(Sender: TObject);
 begin
+  ViewUpdate;
+end;
+
+procedure TStatisticForm.YearSpinEditChange(Sender: TObject);
+begin
+  LimitDatePickers;
   ViewUpdate;
 end;
 
@@ -317,26 +342,29 @@ end;
 procedure TStatisticForm.LoadStatistic;
 var
   BD, ED: TDate;
-  MileageStep: Integer;
+  i: Integer;
 begin
   if StatSelectedIndex<0 then Exit;               //не выбрана статистика
   if (not ParamList.IsSelected['ReasonList']) and //не выбран ни один критерий
      (ParamList.Selected['SumTypeList']>0) then   //не указано считать кол-во по всем критериям
        Exit;
 
+  BD:= BeginDatePicker.Date;
+  ED:= EndDatePicker.Date;
   if ReportTypeComboBox.ItemIndex=0 then //текущий произвольный период
   begin
     AdditionYearsCount:= 0;
-    BD:= BeginDatePicker.Date;
-    ED:= EndDateTimePicker.Date;
-    PeriodStr:= 'с ' + FormatDateTime('dd.mm.yyyy', BD) +
-                ' по ' + FormatDateTime('dd.mm.yyyy', ED);
+    PeriodStr:= FormatDateTime('с dd.mm.yyyy', BD) + FormatDateTime(' по dd.mm.yyyy', ED);
   end
   else if ReportTypeComboBox.ItemIndex=1 then
   begin
     AdditionYearsCount:= AdditionYearCountSpinEdit.Value;
-    BD:= BeginDatePicker.Date; //???
-    ED:= EndDateTimePicker.Date;//???
+    PeriodStr:= IntToStr(YearSpinEdit.Value-AdditionYearsCount);
+    for i:= AdditionYearsCount-1 downto 0 do
+      PeriodStr:= PeriodStr + '/' + IntToStr(YearSpinEdit.Value-i);
+    PeriodStr:= FormatDateTime('с dd ', BD) + MONTHSGEN[MonthOf(BD)] +
+                FormatDateTime(' по dd ', ED) + MONTHSGEN[MonthOf(ED)] +
+                SYMBOL_SPACE + PeriodStr + ' гг.';
   end;
 
   MotorNamesStr:= VVectorToStr(MainForm.UsedNames, ', ');
@@ -362,12 +390,13 @@ begin
                                   not ParamList.Checked['AdditionShow', 2{отображать count=0}],
                                   ParamNames, ParamNeeds, ClaimCounts);
     4: begin
+         //MileageStep
          case ParamList.Selected['MileageStepList'] of
-           0: MileageStep:= 50;
-           1: MileageStep:= 25;
-           2: MileageStep:= 10;
+           0: i:= 50;
+           1: i:= 25;
+           2: i:= 10;
          end;
-         DataBase.ReclamationByMileagesLoad(BD, ED, MileageStep, AdditionYearsCount,
+         DataBase.ReclamationByMileagesLoad(BD, ED, i, AdditionYearsCount,
                                   MainForm.UsedNameIDs,
                                   not ParamList.Checked['AdditionShow', 2{отображать count=0}],
                                   ParamNames, ParamNeeds, ClaimCounts);
@@ -425,35 +454,33 @@ begin
   DrawStatistic;
 end;
 
-procedure TStatisticForm.DrawStatisticPeriod;
+procedure TStatisticForm.DrawStatistic;
 var
   ParamColName, PartTitle, PartTitle2: String;
   NeedAccumCount, TotalCountHistSort: Boolean;
 begin
-  StatisticSettings(ParamColName, PartTitle, PartTitle2, NeedAccumCount, TotalCountHistSort);
-  Drawer.PeriodDraw(ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
-              ParamList.Checkeds['ReasonList'], ReasonNames,
-              ParamNeeds, ParamNames, ClaimCounts,
-              ParamList.Checkeds['DataList'],
-              ParamList.Selected['SumTypeList'],
-              ParamList.Checked['AdditionShow', 0{гистограммы}],
-              ParamList.Checked['AdditionShow', 1{% от кол-ва}],
-              NeedAccumCount, TotalCountHistSort);
-end;
-
-procedure TStatisticForm.DrawStatisticComparison;
-begin
-
-end;
-
-procedure TStatisticForm.DrawStatistic;
-begin
   if MIsNil(ClaimCounts) then Exit;
+
+  StatisticSettings(ParamColName, PartTitle, PartTitle2, NeedAccumCount, TotalCountHistSort);
   Drawer.Zoom(ZoomPercent);
   if ReportTypeComboBox.ItemIndex=0 then
-    DrawStatisticPeriod
+    Drawer.PeriodDraw(ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
+                      ParamList.Checkeds['ReasonList'], ReasonNames,
+                      ParamNeeds, ParamNames, ClaimCounts,
+                      ParamList.Checkeds['DataList'],
+                      ParamList.Selected['SumTypeList'],
+                      ParamList.Checked['AdditionShow', 0{гистограммы}],
+                      ParamList.Checked['AdditionShow', 1{% от кол-ва}],
+                      NeedAccumCount, TotalCountHistSort)
   else if ReportTypeComboBox.ItemIndex=1 then
-    DrawStatisticComparison;
+    Drawer.ComparisonDraw(YearSpinEdit.Value, AdditionYearCountSpinEdit.Value,
+                      ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
+                      ParamList.Checkeds['ReasonList'], ReasonNames,
+                      ParamNeeds, ParamNames, ClaimCounts,
+                      //ParamList.Checkeds['DataList'],
+                      ParamList.Selected['SumTypeList'],
+                      ParamList.Checked['AdditionShow', 0{гистограммы}],
+                      ParamList.Checked['AdditionShow', 1{% от кол-ва}]);
 end;
 
 procedure TStatisticForm.ExportStatistic;

@@ -87,6 +87,7 @@ type
                                     const ATotalCount: Integer;
                                     const ANeedPercent: Boolean);
 
+
     procedure SumTableDraw(var ARow: Integer;
                             const AValueColumnTitle: String;
                             const ANames: TStrVector;
@@ -101,7 +102,15 @@ type
                                const ANeedPercent: Boolean;
                                const ANeedResume: Boolean);
 
+    procedure ReportTitleDraw(var ARow: Integer; const AMotorNamesStr, APeriodStr: String);
 
+    procedure PrepareData(const AParamColName: String;
+                           const AReasonNeeds: TBoolVector;
+                           const AReasonNames: TStrVector;
+                           const AParamNeeds: TBoolVector;
+                           const AParamNames: TStrVector;
+                           const AClaimCounts: TIntMatrix3D;
+                           const ASumType: Integer);
   public
     procedure PeriodDraw(const AParamColName, //наименование столбца параметров (напр., "Наименование электродвигателя")
                          APartTitle,          //наименование параметров (дат. падеж, мн. ч.) (напр., "наименованиям электродвигателей")
@@ -124,6 +133,28 @@ type
                          APercentNeed,               //выводить % от кол-ва
                          AAccumNeed,                 //общее кол-во по основному параметру считать с накоплением
                          ASortNeed: Boolean          //сортировать данные в гистограмме общего кол-ва по основному параметру
+                   );
+
+    procedure ComparisonDraw(const AYear, AYearCounts: Integer;
+                         const AParamColName, //наименование столбца параметров (напр., "Наименование электродвигателя")
+                         APartTitle,          //наименование параметров (дат. падеж, мн. ч.) (напр., "наименованиям электродвигателей")
+                         APartTitle2,         //наименование параметров (дат. падеж, ед. ч.) (напр., "наименованию электродвигателя")
+                         AMotorNamesStr,      //строка с перечислением используемых типов(наименований) двигателей (напр., "7АЖ225М6У2 IМ2001, АЭВ71А2У2 IМ2003")
+                         APeriodStr: String;  //строка с описанием периода, за который выводится отчет (напр., "с 01.01.2020 по 31.12.2020")
+                   const AReasonNeeds: TBoolVector;  //флаги использования критериев (причин) неисправностей
+                   const AReasonNames: TStrVector;   //вектор значений критериев (причин) неисправностей
+                   const AParamNeeds: TBoolVector;   //флаги использования параметров
+                   const AParamNames: TStrVector;    //вектор значений параметров
+                   const AClaimCounts: TIntMatrix3D; //кол-во рекламаций
+                   //const ADataNeed: TBoolVector;     //включать данные
+                                                     // [0] - общее количество по виду статистики
+                                                     // [1] - общее количество по критериям неисправности
+                                                     // [2] - количество по виду статистики и критериям неисправности
+                   const ASumType: Integer;          // Подсчет суммы рекламаций
+                                                     // =0 - по всем критериям
+                                                     // =1 - только по включенным в отчёт критериям
+                   const AHistogramNeed,             //выводить гистограммы
+                         APercentNeed: Boolean       //выводить % от кол-ва
                    );
   end;
 
@@ -571,6 +602,26 @@ begin
   ARow:= R;
 end;
 
+procedure TStatSheet.ReportTitleDraw(var ARow: Integer; const AMotorNamesStr, APeriodStr: String);
+var
+  R: Integer;
+  S: String;
+begin
+  R:= ARow;
+  Writer.SetAlignment(haCenter, vaCenter);
+  Writer.SetFont(Font.Name, Font.Size+4, [fsBold], clBlack);
+  S:= 'Отчет по рекламационным случаям электродвигателей';
+  Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+  R:= R + 1;
+  Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+  Writer.WriteText(R, 1, R, Writer.ColCount, AMotorNamesStr, cbtNone, True, True);
+  R:= R + 1;
+  Writer.SetFont(Font.Name, Font.Size+4, [fsBold], clBlack);
+  S:= 'за период ' + APeriodStr;
+  Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+  ARow:= R;
+end;
+
 procedure TStatSheet.PeriodDraw(const AParamColName, APartTitle{дательный падеж}, APartTitle2,
                                 AMotorNamesStr, APeriodStr: String;
                           const AReasonNeeds: TBoolVector;
@@ -587,22 +638,6 @@ var
   Needs: TBoolVector;
   Values: TIntVector;
   Names: TStrVector;
-
-  procedure ReportTitleDraw;
-  begin
-    R:= 1;
-    Writer.SetAlignment(haCenter, vaCenter);
-    Writer.SetFont(Font.Name, Font.Size+4, [fsBold], clBlack);
-    S:= 'Отчет по рекламационным случаям электродвигателей';
-    Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
-    R:= R + 1;
-    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
-    Writer.WriteText(R, 1, R, Writer.ColCount, AMotorNamesStr, cbtNone, True, True);
-    R:= R + 1;
-    Writer.SetFont(Font.Name, Font.Size+4, [fsBold], clBlack);
-    S:= 'за период ' + APeriodStr;
-    Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
-  end;
 
   procedure CountTotalForStatisticTypeDraw;
   begin
@@ -760,6 +795,35 @@ begin
      VIsAllFalse(AReasonNeeds) or
      VIsAllFalse(AParamNeeds) then Exit;
 
+  PrepareData(AParamColName, AReasonNeeds, AReasonNames, AParamNeeds, AParamNames,
+              AClaimCounts, ASumType);
+  FHalfCellColCount:= FCellColCount div 2;
+  Order:= 0;
+
+  //drawing
+  Writer.BeginEdit;
+  Writer.SetBackgroundClear;
+  R:= 1;
+  ReportTitleDraw(R, AMotorNamesStr, APeriodStr);
+  if ADataNeed[0] then //[0] - общее количество по виду статистики
+    CountTotalForStatisticTypeDraw;
+  if ADataNeed[1] then //[1] - общее количество по критериям неисправности
+    CountTotalForReasonDraw;
+  if ADataNeed[2] then //[2] - количество по виду статистики и критериям неисправности
+    CountForStatisticTypeAndReasonDraw;
+  Writer.EndEdit;
+end;
+
+procedure TStatSheet.PrepareData(const AParamColName: String;
+                                 const AReasonNeeds: TBoolVector;
+                                 const AReasonNames: TStrVector;
+                                 const AParamNeeds: TBoolVector;
+                                 const AParamNames: TStrVector;
+                                 const AClaimCounts: TIntMatrix3D;
+                                 const ASumType: Integer);
+var
+  Needs: TBoolVector;
+begin
   //source data
   FParamColName:= AParamColName;
   FReasonNeeds:= AReasonNeeds;
@@ -767,8 +831,6 @@ begin
   FParamNeeds:= AParamNeeds;
   FParamNames:= AParamNames;
   FCounts:= AClaimCounts;
-  //FPercentNeed:= APercentNeed;
-  Order:= 0;
 
   //data calculation
   Writer.ColWidth[1]:= MMaxWidth([FReasonNames, FParamNames], Font) + 20;
@@ -780,19 +842,79 @@ begin
   FTotalCounts:= ClaimTotalSum(FSumCounts);   //общая сумма рекламаций по периодам [period_index]
   FReasonCounts:= ClaimReasonSum(FCounts);    //общая сумма рекламаций по критериям (причинам) [period_index, reason_index]
   FCellColCount:= COL_COUNT_GRAPH div 5;
+  //FHalfCellColCount:= FCellColCount div 2;
+end;
+
+procedure TStatSheet.ComparisonDraw(const AYear, AYearCounts: Integer;
+                                    const AParamColName, APartTitle, APartTitle2,
+                                          AMotorNamesStr, APeriodStr: String;
+                                    const AReasonNeeds: TBoolVector;
+                                    const AReasonNames: TStrVector;
+                                    const AParamNeeds: TBoolVector;
+                                    const AParamNames: TStrVector;
+                                    const AClaimCounts: TIntMatrix3D;
+                                    //const ADataNeed: TBoolVector;
+                                    const ASumType: Integer;
+                                    const AHistogramNeed, APercentNeed: Boolean);
+var
+  R, Order, MaxValue: Integer;
+  S: String;
+  Needs: TBoolVector;
+  Values: TIntMatrix;
+  Names: TStrVector;
+  TotalCounts: TIntVector;
+
+  procedure CountTotalForStatisticTypeDraw;
+  begin
+    Names:= FParamNames;
+    Needs:= FParamNeeds;
+    Values:= FSumCounts;
+    MaxValue:= MMax(Values);
+    TotalCounts:= FTotalCounts;
+
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+
+    R:= R + 2;
+    Inc(Order);
+    S:= IntToStr(Order) +
+        ') Распределение общего количества рекламационных случаев по ' +
+        APartTitle;
+    if APercentNeed then
+      S:= S + ' (с % от суммы рекламаций по всем ' + APartTitle + ' за период)';
+         //' за период = ' + IntToStr(TotalCount) + ')';
+    Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+
+    R:= R + 2;
+    S:= 'Количество рекламаций' + SYMBOL_BREAK + 'за период';
+    //SumTableDraw(R, S, Names, Values, Needs, TotalCount, APercentNeed, not AAccumNeed);
+    //
+    //if not AHistogramNeed then Exit;
+    //R:= R + 2;
+    //HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, ASortNeed{sort});
+  end;
+
+begin
+  if //VIsAllFalse(ADataNeed) or
+     VIsAllFalse(AReasonNeeds) or
+     VIsAllFalse(AParamNeeds) then Exit;
+
+  PrepareData(AParamColName, AReasonNeeds, AReasonNames, AParamNeeds, AParamNames,
+              AClaimCounts, ASumType);
   FHalfCellColCount:= FCellColCount div 2;
+  Order:= 0;
 
   //drawing
   Writer.BeginEdit;
   Writer.SetBackgroundClear;
-  ReportTitleDraw;
-  if ADataNeed[0] then //[0] - общее количество по виду статистики
+  R:= 1;
+  ReportTitleDraw(R, AMotorNamesStr, APeriodStr);
+  //if ADataNeed[0] then //[0] - общее количество по виду статистики
     CountTotalForStatisticTypeDraw;
-  if ADataNeed[1] then //[1] - общее количество по критериям неисправности
-    CountTotalForReasonDraw;
-  if ADataNeed[2] then //[2] - количество по виду статистики и критериям неисправности
-    CountForStatisticTypeAndReasonDraw;
-
+  //if ADataNeed[1] then //[1] - общее количество по критериям неисправности
+  //  CountTotalForReasonDraw;
+  //if ADataNeed[2] then //[2] - количество по виду статистики и критериям неисправности
+  //  CountForStatisticTypeAndReasonDraw;
   Writer.EndEdit;
 end;
 
