@@ -3575,8 +3575,8 @@ var
         AClaimCounts[APeriodIndex, ReasonIndex, MotorIndex]:=
           AClaimCounts[APeriodIndex, ReasonIndex, MotorIndex] + QFieldInt('ClaimCount');
         QNext;
-        Result:= True;
       end;
+      Result:= True;
     end;
     QClose;
   end;
@@ -3661,8 +3661,8 @@ var
         AClaimCounts[APeriodIndex, ReasonIndex, DefectIndex]:=
           AClaimCounts[APeriodIndex, ReasonIndex, DefectIndex] + QFieldInt('ClaimCount');
         QNext;
-        Result:= True;
       end;
+      Result:= True;
     end;
     QClose;
   end;
@@ -3748,8 +3748,8 @@ var
         AClaimCounts[APeriodIndex, ReasonIndex, PlaceIndex]:=
           AClaimCounts[APeriodIndex, ReasonIndex, PlaceIndex] + QFieldInt('ClaimCount');
         QNext;
-        Result:= True;
       end;
+      Result:= True;
     end;
     QClose;
   end;
@@ -3801,7 +3801,7 @@ function TDataBase.ReclamationByMonthsLoad(const ABeginDate, AEndDate: TDate;
 var
   i, j, k: Integer;
   SumCounts: TIntMatrix;
-  BDs, EDs: TDateVector;
+  BeginDates, EndDates: TDateVector;
 
   procedure GetMonths;
   var
@@ -3809,8 +3809,8 @@ var
     BD, ED: TDate;
     S: String;
   begin
-    BDs:= nil;
-    EDs:= nil;
+    BeginDates:= nil;
+    EndDates:= nil;
     M:= MonthsBetween(ABeginDate, AEndDate);
     for n:= 0 to M do
     begin
@@ -3822,9 +3822,11 @@ var
         ED:= AEndDate
       else
         ED:= LastDayInMonth(BD);
-      VAppend(BDs, BD);
-      VAppend(EDs, ED);
-      S:= SFirstUpper(MONTHSNOM[MonthOfDate(BD)]) + SYMBOL_SPACE + IntToStr(YearOfDate(BD));
+      VAppend(BeginDates, BD);
+      VAppend(EndDates, ED);
+      S:= SFirstUpper(MONTHSNOM[MonthOfDate(BD)]);
+      if AAdditionYearsCount=0 then
+        S:= S + SYMBOL_SPACE + IntToStr(YearOfDate(BD));
       VAppend(AMonthNames, S);
     end;
   end;
@@ -3833,9 +3835,12 @@ var
   var
     MonthIndex, ReasonIndex: Integer;
     BD, ED: TDate;
+    BDs, EDs: TDateVector;
   begin
     BD:= IncYear(ABeginDate, -APeriodIndex);
     ED:= IncYear(AEndDate, -APeriodIndex);
+    BDs:= VIncYear(BeginDates, -APeriodIndex);
+    EDs:= VIncYear(EndDates, -APeriodIndex);
 
     QSetQuery(FQuery);
     QSetSQL(
@@ -3860,8 +3865,8 @@ var
         AClaimCounts[APeriodIndex, ReasonIndex, MonthIndex]:=
           AClaimCounts[APeriodIndex, ReasonIndex, MonthIndex] + 1;
         QNext;
-        Result:= True;
       end;
+      Result:= True;
     end;
     QClose;
   end;

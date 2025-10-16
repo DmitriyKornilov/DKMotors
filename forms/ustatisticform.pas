@@ -473,7 +473,7 @@ begin
                       ParamList.Checked['AdditionShow', 1{% от кол-ва}],
                       NeedAccumCount, TotalCountHistSort)
   else if ReportTypeComboBox.ItemIndex=1 then
-    Drawer.ComparisonDraw(YearSpinEdit.Value, AdditionYearCountSpinEdit.Value,
+    Drawer.ComparisonDraw(YearSpinEdit.Value,
                       ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
                       ParamList.Checkeds['ReasonList'], ReasonNames,
                       ParamNeeds, ParamNames, ClaimCounts,

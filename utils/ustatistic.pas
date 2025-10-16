@@ -65,11 +65,11 @@ type
                            const APercent: Double;
                            const ANeedPercent: Boolean);
 
-    procedure HorizBarHistogramRowDraw(var ARow: Integer;
+    procedure SimpleHistogramRowDraw(var ARow: Integer;
                            const AName: String;
                            const AValue, AMaxValue, ATotalCount: Integer;
                            const ANeedPercent: Boolean);
-    procedure HorizBarHistogramDraw(var ARow: Integer;
+    procedure SimpleHistogramDraw(var ARow: Integer;
                                     const ANames: TStrVector;
                                     const AValues: TIntVector;
                                     const AMaxValue: Integer;
@@ -78,17 +78,25 @@ type
                                     const ANeedPercent: Boolean;
                                     const ANeedSort: Boolean);
 
-    procedure HorizBarReasonHistogramRowDraw(var ARow: Integer;
-                           const AName: String;
-                           const AValues: TIntVector;
-                           const AMaxValue, ATotalCount: Integer;
-                           const ANeedPercent: Boolean);
-    procedure HorizBarReasonHistogramDraw(var ARow: Integer;
-                                    const ATotalCount: Integer;
+    procedure ComparisonHistogramRowDraw(var ARow: Integer;
+                                    const AName: String;
+                                    const AValues: TIntVector;
+                                    const AMaxValue: Integer;
+                                    const ATotalCounts: TIntVector;
+                                    const ANeedPercent: Boolean);
+    procedure ComparisonHistogramDraw(var ARow: Integer;
+                                    //params
+                                    const ANames: TStrVector;
+                                    const AValues: TIntMatrix;
+                                    const AMaxValue: Integer;
+                                    const ANeeds: TBoolVector;
+                                    //categories
+                                    const ATotalCounts: TIntVector;
+                                    const ACategories: TStrVector;
                                     const ANeedPercent: Boolean);
 
 
-    procedure SumTableDraw(var ARow: Integer;
+    procedure SumTablePeriodDraw(var ARow: Integer;
                             const AValueColumnTitle: String;
                             const ANames: TStrVector;
                             const AValues: TIntVector;
@@ -96,6 +104,17 @@ type
                             const ATotalCount: Integer;
                             const ANeedPercent: Boolean;
                             const ANeedResume: Boolean);
+
+    procedure SumTableComparisonDraw(var ARow: Integer;
+                            const AYear: Integer;
+                            const ANames: TStrVector;
+                            const AValues: TIntMatrix;
+                            const ANeeds: TBoolVector;
+                            const ATotalCounts: TIntVector;
+                            const ANeedPercent: Boolean;
+                            const ANeedResume: Boolean);
+
+
     procedure ReasonTableDraw(var ARow: Integer;
                                const AParamSumCountForPercents: TIntVector;
                                const ATotalSumCountForPercent: Integer;
@@ -135,7 +154,7 @@ type
                          ASortNeed: Boolean          //сортировать данные в гистограмме общего кол-ва по основному параметру
                    );
 
-    procedure ComparisonDraw(const AYear, AYearCounts: Integer;
+    procedure ComparisonDraw(const AYear: Integer;
                          const AParamColName, //наименование столбца параметров (напр., "Наименование электродвигателя")
                          APartTitle,          //наименование параметров (дат. падеж, мн. ч.) (напр., "наименованиям электродвигателей")
                          APartTitle2,         //наименование параметров (дат. падеж, ед. ч.) (напр., "наименованию электродвигателя")
@@ -320,7 +339,7 @@ begin
   end;
 end;
 
-procedure TStatSheet.HorizBarHistogramRowDraw(var ARow: Integer;
+procedure TStatSheet.SimpleHistogramRowDraw(var ARow: Integer;
                                   const AName: String;
                                   const AValue, AMaxValue, ATotalCount: Integer;
                                   const ANeedPercent: Boolean);
@@ -351,7 +370,7 @@ begin
   ARow:= R + 1;
 end;
 
-procedure TStatSheet.HorizBarHistogramDraw(var ARow: Integer;
+procedure TStatSheet.SimpleHistogramDraw(var ARow: Integer;
                                     const ANames: TStrVector;
                                     const AValues: TIntVector;
                                     const AMaxValue: Integer;
@@ -382,16 +401,17 @@ begin
 
   for i:= 0 to High(Names) do
     if Needs[i] then
-      HorizBarHistogramRowDraw(R, Names[i], Values[i], AMaxValue, ATotalCount, ANeedPercent);
+      SimpleHistogramRowDraw(R, Names[i], Values[i], AMaxValue, ATotalCount, ANeedPercent);
 
   ARow:= R;
 end;
 
-procedure TStatSheet.HorizBarReasonHistogramRowDraw(var ARow: Integer;
-                           const AName: String;
-                           const AValues: TIntVector;
-                           const AMaxValue, ATotalCount: Integer;
-                           const ANeedPercent: Boolean);
+procedure TStatSheet.ComparisonHistogramRowDraw(var ARow: Integer;
+                                    const AName: String;
+                                    const AValues: TIntVector;
+                                    const AMaxValue: Integer;
+                                    const ATotalCounts: TIntVector;
+                                    const ANeedPercent: Boolean);
 var
   R, RR, i: Integer;
   Percent: Double;
@@ -407,15 +427,18 @@ begin
 
   //data row
   R:= R + 1;
-  Writer.WriteText(R, 1, R+4, 1, AName, cbtRight);
+  Writer.WriteText(R, 1, R+2*High(AValues), 1, AName, cbtRight);
   RR:= R;
   R:= R - 1;
-  for i:= 0 to 4 do
+  for i:= High(AValues) downto 0 do
   begin
-    if not FReasonNeeds[i] then continue;
     R:= R + 1;
-    Percent:= Part(100*AValues[i], ATotalCount);
-    HorizBarDraw(R, GRAPH_COLORS_DEFAULT[i], AValues[i], AMaxValue, Percent, ANeedPercent);
+    Percent:= Part(100*AValues[i], ATotalCounts[i]);
+    HorizBarDraw(R, GRAPH_COLORS_DEFAULT[High(AValues)-i], AValues[i], AMaxValue, Percent, ANeedPercent);
+    //EmptyRow
+    R:= R + 1;
+    Writer.WriteText(R, 1, EmptyStr, cbtRight);
+    Writer.RowHeight[R]:= ROW_EMPTY_HEIGH div 2;
   end;
   if R<RR then R:= RR;
 
@@ -424,30 +447,48 @@ begin
   Writer.WriteText(R, 1, EmptyStr, cbtRight);
   Writer.RowHeight[R]:= ROW_EMPTY_HEIGH;
 
+  R:= R + 1;
+  Writer.WriteText(R, 1, EmptyStr, cbtNone);
+  Writer.RowHeight[R]:= ROW_EMPTY_HEIGH;
+
   ARow:= R + 1;
 end;
 
-procedure TStatSheet.HorizBarReasonHistogramDraw(var ARow: Integer;
-                                                 const ATotalCount: Integer;
-                                                 const ANeedPercent: Boolean);
+procedure TStatSheet.ComparisonHistogramDraw(var ARow: Integer;
+                                    const ANames: TStrVector;
+                                    const AValues: TIntMatrix;
+                                    const AMaxValue: Integer;
+                                    const ANeeds: TBoolVector;
+                                    const ATotalCounts: TIntVector;
+                                    const ACategories: TStrVector;
+                                    const ANeedPercent: Boolean);
 var
-  R, i, MaxValue: Integer;
-  Values: TIntVector;
+  R, RR, i, C: Integer;
 begin
   R:= ARow;
+  RR:= ARow;
 
-  MaxValue:= MMax(FCounts[0{period_index}]);
-
-  for i:= 0 to High(FParamNames) do
-  begin
-    Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
-    HorizBarReasonHistogramRowDraw(R, FParamNames[i], Values, MaxValue, ATotalCount, ANeedPercent);
-  end;
+  for i:= 0 to High(ANames) do
+    if ANeeds[i] then
+      ComparisonHistogramRowDraw(R, ANames[i], MRowGet(AValues, i), AMaxValue, ATotalCounts, ANeedPercent);
 
   ARow:= R;
+
+  C:= 2 + COL_COUNT_USED + COL_COUNT_VALUE;
+  Writer.SetAlignment(haLeft, vaCenter);
+  for i:= 0 to High(ACategories) do
+  begin
+    RR:= RR + 1;
+    Writer.SetBackground(GRAPH_COLORS_DEFAULT[i]);
+    Writer.WriteText(RR, C, RR, C+5, EmptyStr);
+    Writer.SetBackgroundDefault;
+    Writer.WriteText(RR, C+7, RR, Writer.ColCount, ACategories[i]);
+    //EmptyRow
+    RR:= RR + 1;
+  end;
 end;
 
-procedure TStatSheet.SumTableDraw(var ARow: Integer;
+procedure TStatSheet.SumTablePeriodDraw(var ARow: Integer;
                                   const AValueColumnTitle: String;
                                   const ANames: TStrVector;
                                   const AValues: TIntVector;
@@ -456,7 +497,7 @@ procedure TStatSheet.SumTableDraw(var ARow: Integer;
                                   const ANeedPercent: Boolean;
                                   const ANeedResume: Boolean);
 var
-  R, C1, C2, i{, Value}: Integer;
+  R, C1, C2, i: Integer;
   Percent: Double;
 begin
   R:= ARow;
@@ -506,6 +547,85 @@ begin
     Writer.WriteText(R, 1, 'ИТОГО', cbtOuter);
     //Writer.WriteNumber(R, C1, R, C2, FTotalCounts[0{period_index}], cbtOuter);
     Writer.WriteNumber(R, C1, R, C2, ATotalCount, cbtOuter);
+    Writer.DrawBorders(R, C2+1, cbtLeft);
+  end;
+
+  ARow:= R;
+end;
+
+procedure TStatSheet.SumTableComparisonDraw(var ARow: Integer;
+                            const AYear: Integer;
+                            const ANames: TStrVector;
+                            const AValues: TIntMatrix;
+                            const ANeeds: TBoolVector;
+                            const ATotalCounts: TIntVector;
+                            const ANeedPercent: Boolean;
+                            const ANeedResume: Boolean);
+var
+  R, C1, C2, i, j: Integer;
+  Percent: Double;
+begin
+  R:= ARow;
+
+  Writer.SetBackgroundClear;
+  Writer.SetAlignment(haCenter, vaCenter);
+
+  //заголовок
+  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+  Writer.WriteText(R, 1, FParamColName, cbtOuter, True, True);
+  C2:= 1;
+  for i:= High(AValues) downto 0 do
+  begin
+    C1:= C2 + 1;
+    C2:= C1 + FCellColCount - 1;
+    Writer.WriteNumber(R, C1, R, C2, AYear-i, cbtOuter);
+  end;
+  Writer.DrawBorders(R, C2+1, cbtLeft);
+
+  //данные
+  Writer.SetFont(Font.Name, Font.Size, [], clBlack);
+  for j:= 0 to High(ANames) do
+  begin
+    if not ANeeds[j] then continue;
+
+    R:= R + 1;
+    Writer.WriteText(R, 1, ANames[j], cbtOuter);
+
+    C2:= 1;
+    for i:= High(AValues) downto 0 do
+    begin
+      C1:= C2 + 1;
+      if not ANeedPercent then
+      begin
+        C2:= C1 + FCellColCount - 1;
+        Writer.WriteNumber(R, C1, R, C2, AValues[i, j], cbtOuter);
+      end
+      else begin
+        C2:= C1 + FHalfCellColCount - 1;
+        Writer.WriteNumber(R, C1, R, C2, AValues[i, j], cbtOuter);
+        C1:= C2 + 1;
+        C2:= C1 + FHalfCellColCount - 1;
+        Percent:= Part(AValues[i, j], ATotalCounts[i]);
+        Writer.WriteNumber(R, C1, R, C2, Percent, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
+      end;
+    end;
+    Writer.DrawBorders(R, C2+1, cbtLeft);
+  end;
+
+  //итого
+  if ANeedResume then
+  begin
+    R:= R + 1;
+    Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+    Writer.WriteText(R, 1, 'ИТОГО', cbtOuter);
+
+    C2:= 1;
+    for i:= High(AValues) downto 0 do
+    begin
+      C1:= C2 + 1;
+      C2:= C1 + FCellColCount - 1;
+      Writer.WriteNumber(R, C1, R, C2, ATotalCounts[i], cbtOuter);
+    end;
     Writer.DrawBorders(R, C2+1, cbtLeft);
   end;
 
@@ -671,11 +791,11 @@ var
       S:= 'Накопление количества' + SYMBOL_BREAK + 'рекламаций'
     else
       S:= 'Количество рекламаций' + SYMBOL_BREAK + 'за период';
-    SumTableDraw(R, S, Names, Values, Needs, TotalCount, APercentNeed, not AAccumNeed);
+    SumTablePeriodDraw(R, S, Names, Values, Needs, TotalCount, APercentNeed, not AAccumNeed);
 
     if not AHistogramNeed then Exit;
     R:= R + 2;
-    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, ASortNeed{sort});
+    SimpleHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, ASortNeed{sort});
   end;
 
   procedure CountTotalForReasonDraw;
@@ -711,7 +831,7 @@ var
     Needs:= FReasonNeeds;
     Values:= FReasonCounts[0{period_index}];
     MaxValue:= VMax(VCut(Values, Needs));
-    HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
+    SimpleHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
 
     //addition caption
     R:= R + 1;
@@ -737,7 +857,7 @@ var
       R:= R + 1;
       //Names, Needs, MaxValue, TotalCount - рассчитаны выше
       Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
-      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
+      SimpleHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
     end;
   end;
 
@@ -786,7 +906,7 @@ var
       Needs:= FReasonNeeds;
       Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
       MaxValue:= VMax(VCut(Values, Needs));
-      HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs,TotalCount, APercentNeed, False{no sort});
+      SimpleHistogramDraw(R, Names, Values, MaxValue, Needs,TotalCount, APercentNeed, False{no sort});
     end;
   end;
 
@@ -845,7 +965,7 @@ begin
   //FHalfCellColCount:= FCellColCount div 2;
 end;
 
-procedure TStatSheet.ComparisonDraw(const AYear, AYearCounts: Integer;
+procedure TStatSheet.ComparisonDraw(const AYear: Integer;
                                     const AParamColName, APartTitle, APartTitle2,
                                           AMotorNamesStr, APeriodStr: String;
                                     const AReasonNeeds: TBoolVector;
@@ -861,7 +981,7 @@ var
   S: String;
   Needs: TBoolVector;
   Values: TIntMatrix;
-  Names: TStrVector;
+  Names, Categories: TStrVector;
   TotalCounts: TIntVector;
 
   procedure CountTotalForStatisticTypeDraw;
@@ -871,6 +991,8 @@ var
     Values:= FSumCounts;
     MaxValue:= MMax(Values);
     TotalCounts:= FTotalCounts;
+    Categories:= VIntToStr(VStep(AYear-High(Values), AYear, 1));
+
 
     Writer.SetAlignment(haLeft, vaCenter);
     Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
@@ -886,12 +1008,11 @@ var
     Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
 
     R:= R + 2;
-    S:= 'Количество рекламаций' + SYMBOL_BREAK + 'за период';
-    //SumTableDraw(R, S, Names, Values, Needs, TotalCount, APercentNeed, not AAccumNeed);
-    //
-    //if not AHistogramNeed then Exit;
-    //R:= R + 2;
-    //HorizBarHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, ASortNeed{sort});
+    SumTableComparisonDraw(R, AYear, Names, Values, Needs, TotalCounts, APercentNeed, True{итого});
+
+    if not AHistogramNeed then Exit;
+    R:= R + 2;
+    ComparisonHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCounts, Categories, APercentNeed);
   end;
 
 begin
