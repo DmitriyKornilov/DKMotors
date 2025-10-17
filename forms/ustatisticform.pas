@@ -210,7 +210,6 @@ begin
   AdditionYearsPanel.Visible:= ReportTypeComboBox.ItemIndex=1;
   Application.ProcessMessages;
   LimitDatePickers;
-  ParamList.ItemVisibles['AdditionShow']:= VCreateBool([True, True, ReportTypeComboBox.ItemIndex=0]);
   ViewUpdate;
 end;
 
@@ -477,7 +476,7 @@ begin
                       ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
                       ParamList.Checkeds['ReasonList'], ReasonNames,
                       ParamNeeds, ParamNames, ClaimCounts,
-                      //ParamList.Checkeds['DataList'],
+                      ParamList.Checkeds['DataList'],
                       ParamList.Selected['SumTypeList'],
                       ParamList.Checked['AdditionShow', 0{гистограммы}],
                       ParamList.Checked['AdditionShow', 1{% от кол-ва}]);
@@ -486,8 +485,12 @@ end;
 procedure TStatisticForm.ExportStatistic;
 begin
   if MIsNil(ClaimCounts) then Exit;
-  Drawer.Save('Лист1', 'Выполнено!', spoPortrait, pfWidth,
-              False{no headers}, False{no grid lines});
+  if ReportTypeComboBox.ItemIndex=1 then
+    Drawer.Save('Лист1', 'Выполнено!', spoLandscape, pfWidth,
+                False{no headers}, False{no grid lines})
+  else
+    Drawer.Save('Лист1', 'Выполнено!', spoPortrait, pfWidth,
+                False{no headers}, False{no grid lines});
 end;
 
 end.
