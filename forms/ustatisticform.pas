@@ -10,7 +10,7 @@ uses
   DateUtils,
   //DK packages utils
   DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetTypes, DK_Const,
-  DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils, DK_VSTParamList,
+  DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils, DK_VSTParamList, DK_SheetExporter,
   //Project utils
   UVars, UStatSheets, UStatistic;
 
@@ -483,14 +483,61 @@ begin
 end;
 
 procedure TStatisticForm.ExportStatistic;
+var
+  ExpDrawer: TStatSheet;
+  Sheet: TsWorksheet;
+  Exporter: TSheetsExporter;
+
+  ParamColName, PartTitle, PartTitle2: String;
+  NeedAccumCount, TotalCountHistSort: Boolean;
 begin
   if MIsNil(ClaimCounts) then Exit;
-  if ReportTypeComboBox.ItemIndex=1 then
-    Drawer.Save('Лист1', 'Выполнено!', spoLandscape, pfWidth,
-                False{no headers}, False{no grid lines})
-  else
-    Drawer.Save('Лист1', 'Выполнено!', spoPortrait, pfWidth,
-                False{no headers}, False{no grid lines});
+
+  StatisticSettings(ParamColName, PartTitle, PartTitle2, NeedAccumCount, TotalCountHistSort);
+
+  Exporter:= TSheetsExporter.Create;
+  try
+    Sheet:= Exporter.AddWorksheet('Лист1');
+    ExpDrawer:= TStatSheet.Create(Sheet, nil, GridFont);
+    try
+      if ReportTypeComboBox.ItemIndex=0 then
+      begin
+        ExpDrawer.PeriodDraw(ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
+                        ParamList.Checkeds['ReasonList'], ReasonNames,
+                        ParamNeeds, ParamNames, ClaimCounts,
+                        ParamList.Checkeds['DataList'],
+                        ParamList.Selected['SumTypeList'],
+                        ParamList.Checked['AdditionShow', 0{гистограммы}],
+                        ParamList.Checked['AdditionShow', 1{% от кол-ва}],
+                        NeedAccumCount, TotalCountHistSort);
+        Exporter.PageSettings(spoPortrait, pfWidth, False, False);
+      end
+      else if ReportTypeComboBox.ItemIndex=1 then
+      begin
+        ExpDrawer.ComparisonDraw(YearSpinEdit.Value,
+                          ParamColName, PartTitle, PartTitle2, MotorNamesStr, PeriodStr,
+                          ParamList.Checkeds['ReasonList'], ReasonNames,
+                          ParamNeeds, ParamNames, ClaimCounts,
+                          ParamList.Checkeds['DataList'],
+                          ParamList.Selected['SumTypeList'],
+                          ParamList.Checked['AdditionShow', 0{гистограммы}],
+                          ParamList.Checked['AdditionShow', 1{% от кол-ва}]);
+        Exporter.PageSettings(spoLandscape, pfWidth, False, False);
+      end;
+    finally
+      FreeAndNil(ExpDrawer);
+    end;
+    Exporter.Save('Выполнено!');
+  finally
+    FreeAndNil(Exporter);
+  end;
+
+  //if ReportTypeComboBox.ItemIndex=1 then
+  //  Drawer.Save('Лист1', 'Выполнено!', spoLandscape, pfWidth,
+  //              False{no headers}, False{no grid lines})
+  //else
+  //  Drawer.Save('Лист1', 'Выполнено!', spoPortrait, pfWidth,
+  //              False{no headers}, False{no grid lines});
 end;
 
 end.
