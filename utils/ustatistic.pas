@@ -27,10 +27,8 @@ const
   //минимально возможное кол-во столбцов отчета-сопоставления, остальные справа делаем colwidth=0
   COL_COUNT_REPORT_MIN = COL_COUNT_CELL_YEAR*3{years}*5{reasons};
 
-
-
   COL_WIDTH_BAR_PERIOD = 6;
-  COL_WIDTH_BAR_COMPAR = 17;
+  COL_WIDTH_BAR_COMPAR = 18;
   COL_WIDTH_NAMES = 200; //defaul
 
   ROW_EMPTY_HEIGH = 5;
@@ -938,8 +936,10 @@ var
       S:= 'Количество рекламаций' + SYMBOL_BREAK + 'за период';
     PeriodSumTableDraw(R, S, Names, Values, Needs, TotalCount, APercentNeed, not AAccumNeed);
 
+    R:= R + 1;
+
     if not AHistogramNeed then Exit;
-    R:= R + 2;
+    R:= R + 1;
     SimpleHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount,
                         COL_COUNT_BAR_USED_PERIOD, COL_COUNT_BAR_VALUE_PERIOD,
                         APercentNeed, ASortNeed{sort});
@@ -969,10 +969,12 @@ var
       ParamSumCounts:= VCreateInt(Length(FParamNames), TotalCount);
     PeriodReasonTableDraw(R, ParamSumCounts, TotalCount, APercentNeed, True{строка итого});
 
+    R:= R + 1;
+
     if not AHistogramNeed then Exit;
 
     //histogram
-    R:= R + 2;
+    R:= R + 1;
     Names:= FReasonNames;
     Needs:= FReasonNeeds;
     Values:= FReasonCounts[0{period_index}];
@@ -1031,9 +1033,10 @@ var
     ParamSumCounts:= FSumCounts[0{period_index}];
     PeriodReasonTableDraw(R, ParamSumCounts, 0{not need}, APercentNeed, False{без итого});
 
+    R:= R + 1;
+
     if not AHistogramNeed then Exit;
 
-    R:= R + 1;
     for i:=0 to High(FParamNames) do
     begin
       if not FParamNeeds[i] then continue;
@@ -1162,9 +1165,11 @@ var
     R:= R + 2;
     ComparisonSumTableDraw(R, AYear, Names, Values, Needs, TotalCounts, APercentNeed, True{итого});
 
+    R:= R + 1;
+
     if not AHistogramNeed then Exit;
     Categories:= VIntToStr(VStep(AYear-High(Values), AYear, 1));
-    R:= R + 2;
+    R:= R + 1;
     ComparisonHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCounts,
                             COL_COUNT_BAR_USED_COMPAR, COL_COUNT_BAR_VALUE_COMPAR,
                             Categories, APercentNeed);
@@ -1172,7 +1177,7 @@ var
 
   procedure CountTotalForReasonDraw;
   var
-    i: Integer;
+    i, j: Integer;
     ParamSumCounts: TIntMatrix;
   begin
     TotalCounts:= FTotalCounts;
@@ -1195,11 +1200,13 @@ var
         MAppend(ParamSumCounts, VCreateInt(Length(FParamNames), TotalCounts[i]));
     ComparisonReasonTableDraw(R, AYear, ParamSumCounts, TotalCounts, APercentNeed, True{строка итого});
 
+    R:= R + 1;
+
     if not AHistogramNeed then Exit;
 
     //histogram
     Categories:= VIntToStr(VStep(AYear-High(Values), AYear, 1));
-    R:= R + 2;
+    R:= R + 1;
     Names:= FReasonNames;
     Needs:= FReasonNeeds;
     Values:= FReasonCounts;
@@ -1209,30 +1216,33 @@ var
                             Categories, APercentNeed);
 
     //addition caption
-    //R:= R + 1;
-    //Writer.SetAlignment(haLeft, vaCenter);
-    //Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
-    //Writer.WriteText(R, 1, R, Writer.ColCount, 'В том числе:', cbtNone, True, True);
-    //
-    //R:= R + 1;
-    //for i:=0 to High(FParamNames) do
-    //begin
-    //  if not FParamNeeds[i] then continue;
-    //
-    //  //histogram caption
-    //  R:= R + 1;
-    //  Writer.SetAlignment(haLeft, vaCenter);
-    //  Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
-    //  S:= FParamNames[i] + ' - количество рекламаций';
-    //  if APercentNeed then
-    //    S:= S + ' (с % от суммы рекламаций по всем ' + APartTitle + ' за период)';
-    //  Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
-    //  //histogram
-    //  R:= R + 1;
-    //  //Names, Needs, MaxValue, TotalCount - рассчитаны выше
-    //  Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
-    //  SimpleHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCount, APercentNeed, False{no sort});
-    //end;
+    R:= R + 1;
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+    Writer.WriteText(R, 1, R, Writer.ColCount, 'В том числе:', cbtNone, True, True);
+
+    R:= R + 1;
+    for i:=0 to High(FParamNames) do
+    begin
+      if not FParamNeeds[i] then continue;
+
+      //histogram caption
+      R:= R + 1;
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+      S:= FParamNames[i] + ' - количество рекламаций';
+      if APercentNeed then
+        S:= S + ' (с % от суммы рекламаций по всем ' + APartTitle + ' за период)';
+      Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+      //histogram
+      R:= R + 1;
+      //Names, Needs, MaxValue, TotalCount - рассчитаны выше
+      for j:= 0 to High(TotalCounts) do
+        Values[j]:= ClaimCountForReason(j{period_index}, i{param_index}, FCounts);
+      ComparisonHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCounts,
+                              COL_COUNT_BAR_USED_COMPAR, COL_COUNT_BAR_VALUE_COMPAR,
+                              Categories, APercentNeed);
+    end;
   end;
 
 begin
