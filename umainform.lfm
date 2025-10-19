@@ -8,6 +8,7 @@ object MainForm: TMainForm
   Constraints.MinHeight = 500
   Constraints.MinWidth = 1200
   DesignTimePPI = 120
+  LCLVersion = '4.2.0.0'
   WindowState = wsMaximized
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -23,8 +24,8 @@ object MainForm: TMainForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1192
+    ClientHeight = 40
+    ClientWidth = 1196
     ParentFont = False
     TabOrder = 0
     object AboutButton: TSpeedButton
@@ -274,8 +275,8 @@ object MainForm: TMainForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1192
+    ClientHeight = 40
+    ClientWidth = 1196
     TabOrder = 2
     OnClick = MotorNamesPanelClick
     object ChooseMotorNamesButton: TSpeedButton
@@ -479,8 +480,8 @@ object MainForm: TMainForm
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 36
-    ClientWidth = 1192
+    ClientHeight = 40
+    ClientWidth = 1196
     TabOrder = 3
     Visible = False
     OnClick = ReceiverNamesPanelClick

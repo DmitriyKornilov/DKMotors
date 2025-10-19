@@ -34,11 +34,6 @@ const
   ROW_EMPTY_HEIGH = 5;
   PERCENT_FRAC_DIGITS = 1;
 
-  //REPORT_TITLE_MAIN = 'Отчет по рекламационным случаям электродвигателей';
-  //
-  //GRAPH_TITLE_MAIN   = 'Распределение количества рекламационных случаев по ';
-  //GRAPH_TITLE_DEFECT = GRAPH_TITLE_MAIN + 'причинам возникновения неисправностей';
-
   //5 years, 5 reasons
   GRAPH_COLORS_DEFAULT: array [0..4] of TColor = (
     $00BD814F, //blue         // [0] : Не расследовано
@@ -105,7 +100,6 @@ type
                                     const ABarUsedColCount, ABarValueColCount: Integer;
                                     const ACategories: TStrVector;
                                     const ANeedPercent: Boolean);
-
 
     procedure PeriodSumTableDraw(var ARow: Integer;
                             const AValueColumnTitle: String;
@@ -218,7 +212,6 @@ type
   function ClaimCountForReason(const APeriodIndex, AParamIndex: Integer;
                                const AClaimCounts: TIntMatrix3D): TIntVector;
 
-
   //ClaimCountSum - сумма рекламаций
   // - Index1 - индекс периода
   //      0 - данные за произвольный период (в этом случае это единственный индекс)
@@ -253,7 +246,6 @@ type
   //      4 - данные за указанный период 4-ого предшествующего года (max значение индекса)
   // AClaimSumCounts - сумма рекламаций (результат ClaimCountSum)
   function ClaimTotalSum(const AClaimSumCounts: TIntMatrix): TIntVector;
-
 
 implementation
 
@@ -600,10 +592,9 @@ begin
   Writer.WriteText(R, 2, R, 1+COL_COUNT_CELL_YEAR*N, 'Количество рекламаций за период', cbtOuter, True, True);
   R:= R + 1;
   C2:= 1;
-  for i:= N-1{High(AValues)} downto 0 do
+  for i:= N-1 downto 0 do
   begin
     C1:= C2 + 1;
-    //C2:= C1 + COL_COUNT_CELL_FULL - 1;
     C2:= C1 + COL_COUNT_CELL_YEAR - 1;
     Writer.WriteNumber(R, C1, R, C2, AYear-i, cbtOuter);
   end;
@@ -620,21 +611,18 @@ begin
     Writer.WriteText(R, 1, ANames[j], cbtOuter);
 
     C2:= 1;
-    for i:= N-1{High(AValues)} downto 0 do
+    for i:= N-1 downto 0 do
     begin
       C1:= C2 + 1;
       if not ANeedPercent then
       begin
-        //C2:= C1 + COL_COUNT_CELL_FULL - 1;
         C2:= C1 + COL_COUNT_CELL_YEAR - 1;
         Writer.WriteNumber(R, C1, R, C2, AValues[i, j], cbtOuter);
       end
       else begin
-        //C2:= C1 + COL_COUNT_CELL_HALF - 1;
         C2:= C1 + COL_COUNT_CELL_PART - 1;
         Writer.WriteNumber(R, C1, R, C2, AValues[i, j], cbtOuter);
         C1:= C2 + 1;
-        //C2:= C1 + COL_COUNT_CELL_HALF - 1;
         C2:= C1 + COL_COUNT_CELL_PART - 1;
         Percent:= Part(AValues[i, j], ATotalCounts[i]);
         Writer.WriteNumber(R, C1, R, C2, Percent, PERCENT_FRAC_DIGITS, cbtOuter, nfPercentage);
@@ -651,10 +639,9 @@ begin
     Writer.WriteText(R, 1, 'ИТОГО', cbtOuter);
 
     C2:= 1;
-    for i:= N-1{High(AValues)} downto 0 do
+    for i:= N-1 downto 0 do
     begin
       C1:= C2 + 1;
-      //C2:= C1 + COL_COUNT_CELL_FULL - 1;
       C2:= C1 + COL_COUNT_CELL_YEAR - 1;
       Writer.WriteNumber(R, C1, R, C2, ATotalCounts[i], cbtOuter);
     end;
@@ -806,7 +793,6 @@ begin
     begin
       if not FReasonNeeds[j] then continue;
 
-      //for k:= 0 to N-1 do
       for k:= N-1 downto 0 do
       begin
         C1:= C2 + 1;
@@ -840,7 +826,6 @@ begin
     begin
       if not FReasonNeeds[i] then continue;
 
-      //for j:= 0 to N-1 do
       for j:= N-1 downto 0 do
       begin
         C1:= C2 + 1;

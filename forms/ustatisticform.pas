@@ -12,7 +12,7 @@ uses
   DK_Vector, DK_VSTTables, DK_DateUtils, DK_Matrix, DK_SheetTypes, DK_Const,
   DK_StrUtils, DK_Zoom, DK_VSTTableTools, DK_CtrlUtils, DK_VSTParamList, DK_SheetExporter,
   //Project utils
-  UVars, UStatSheets, UStatistic;
+  UVars, UStatistic;
 
 type
 

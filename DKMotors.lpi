@@ -325,11 +325,6 @@
         <UnitName Value="UImages"/>
       </Unit>
       <Unit>
-        <Filename Value="utils\ustatsheets.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UStatSheets"/>
-      </Unit>
-      <Unit>
         <Filename Value="utils\ustatistic.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UStatistic"/>
