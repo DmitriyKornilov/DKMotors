@@ -769,7 +769,7 @@ begin
   Writer.SetBackgroundClear;
   Writer.SetAlignment(haCenter, vaCenter);
 
-  N:= Length(ATotalSumCountForPercent); //years count
+  N:= Length(AParamSumCountForPercents); //years count
 
   //заголовок
   Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
@@ -1245,6 +1245,62 @@ var
     end;
   end;
 
+  procedure CountForStatisticTypeAndReasonDraw;
+  var
+    i, j: Integer;
+    ParamSumCounts: TIntMatrix;
+  begin
+    //paragraph caption
+    Writer.SetAlignment(haLeft, vaCenter);
+    Writer.SetFont(Font.Name, Font.Size+2, [fsBold], clBlack);
+    R:= R + 1;
+    Inc(Order);
+    S:= IntToStr(Order) +
+        ') Распределение количества рекламационных случаев по ' +
+        APartTitle + ' и критериям неисправности';
+    if APercentNeed then
+      S:= S + ' (с % от суммы рекламаций по ' + APartTitle2 + ')';
+    Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+    //data grid
+    R:= R + 2;
+    ParamSumCounts:= FSumCounts;
+    ComparisonReasonTableDraw(R, AYear, ParamSumCounts, nil{not need}, APercentNeed, False{без итого});
+
+    R:= R + 1;
+
+    if not AHistogramNeed then Exit;
+
+    Categories:= VIntToStr(VStep(AYear-High(FCounts), AYear, 1));
+
+    for i:=0 to High(FParamNames) do
+    begin
+      if not FParamNeeds[i] then continue;
+
+      for j:= 0 to High(TotalCounts) do
+        TotalCounts[j]:= FSumCounts[j{period_index}, i{param_index}];
+
+      //histogram caption
+      R:= R + 1;
+      Writer.SetAlignment(haLeft, vaCenter);
+      Writer.SetFont(Font.Name, Font.Size, [fsBold], clBlack);
+      S:= FParamNames[i] + ' - количество рекламаций';
+      if APercentNeed then
+        S:= S + ' (с % от суммы рекламаций ' + FParamNames[i] + ' за период)';
+      Writer.WriteText(R, 1, R, Writer.ColCount, S, cbtNone, True, True);
+      //histogram
+      R:= R + 1;
+      Names:= FReasonNames;
+      Needs:= FReasonNeeds;
+      //Values:= ClaimCountForReason(0{period_index}, i{param_index}, FCounts);
+      for j:= 0 to High(TotalCounts) do
+        Values[j]:= ClaimCountForReason(j{period_index}, i{param_index}, FCounts);
+      MaxValue:= MMax(MCut(Values, Needs));
+      ComparisonHistogramDraw(R, Names, Values, MaxValue, Needs, TotalCounts,
+                              COL_COUNT_BAR_USED_COMPAR, COL_COUNT_BAR_VALUE_COMPAR,
+                              Categories, APercentNeed);
+    end;
+  end;
+
 begin
   if VIsAllFalse(ADataNeed) or
      VIsAllFalse(AReasonNeeds) or
@@ -1280,10 +1336,8 @@ begin
     CountTotalForStatisticTypeDraw;
   if ADataNeed[1] then //[1] - общее количество по критериям неисправности
     CountTotalForReasonDraw;
-  //if ADataNeed[2] then //[2] - количество по виду статистики и критериям неисправности
-  //  CountForStatisticTypeAndReasonDraw;
-
-
+  if ADataNeed[2] then //[2] - количество по виду статистики и критериям неисправности
+    CountForStatisticTypeAndReasonDraw;
 
   Writer.EndEdit;
 end;

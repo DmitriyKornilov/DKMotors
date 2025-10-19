@@ -234,7 +234,7 @@ begin
   if not CanShow then Exit;
 
   ParamList.Visibles['MotorTypeAsSingleName']:= StatSelectedIndex=0;
-  ParamList.Visibles['AccumTotalCounts']:= StatSelectedIndex=3;
+  ParamList.Visibles['AccumTotalCounts']:= (StatSelectedIndex=3) and (ReportTypeComboBox.ItemIndex=0);
   ParamList.Visibles['MileageStepList']:= StatSelectedIndex=4;
 
   Screen.Cursor:= crHourGlass;
