@@ -20,7 +20,6 @@ type
   { TMotorListForm }
 
   TMotorListForm = class(TForm)
-    OrderByNumCheckBox: TCheckBox;
     DividerBevel1: TDividerBevel;
     DividerBevel2: TDividerBevel;
     MoreInfoCheckBox: TCheckBox;
@@ -34,7 +33,6 @@ type
     Splitter2: TSplitter;
     VT1: TVirtualStringTree;
     YearPanel: TPanel;
-    procedure OrderByNumCheckBoxChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MoreInfoCheckBoxChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -109,6 +107,7 @@ begin
   MotorsTable.AddColumn('Дата сборки', 100);
   MotorsTable.AddColumn('Наименование', 200);
   MotorsTable.AddColumn('Номер', 100);
+  MotorsTable.AddColumn('Испытан', 150);
   MotorsTable.AddColumn('Отгружен');
   MotorsTable.CanSelect:= True;
   MotorsTable.Draw;
@@ -127,27 +126,38 @@ begin
     'отгруженные',
     'неотгруженные'
   ]);
-
   ParamList.AddStringList('TypeList', S, V, @ViewUpdate);
+
+  S:= 'Сортировать список по:';
+  V:= VCreateStr([
+    'дате сборки',
+    'дате испытаний',
+    'дате отгрузки',
+    'номеру электродвигателя'
+  ]);
+  ParamList.AddStringList('OrderList', S, V, @ViewUpdate);
 end;
 
 procedure TMotorListForm.ViewUpdate;
 var
-  ABuildDates, AMotorNames, AMotorNums, AShippings: TStrVector;
+  ABuildDates, AMotorNames, AMotorNums, AShippings, ATestInfos: TStrVector;
 begin
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
     DataBase.MotorListLoad(SpinEdit1.Value,
-                        ParamList.Selected['TypeList'], MainForm.UsedNameIDs,
-                        STrim(FilterString), OrderByNumCheckBox.Checked,
+                        ParamList.Selected['TypeList'],
+                        ParamList.Selected['OrderList'],
+                        MainForm.UsedNameIDs,
+                        STrim(FilterString),
                         MotorIDs, ABuildDates,
-                        AMotorNames, AMotorNums, AShippings);
+                        AMotorNames, AMotorNums, ATestInfos, AShippings);
 
     MotorsTable.ValuesClear;
     MotorsTable.SetColumn('Дата сборки', ABuildDates);
     MotorsTable.SetColumn('Наименование', AMotorNames, taLeftJustify);
     MotorsTable.SetColumn('Номер', AMotorNums);
+    MotorsTable.SetColumn('Испытан', ATestInfos, taLeftJustify);
     MotorsTable.SetColumn('Отгружен', AShippings, taLeftJustify);
     MotorsTable.Draw;
   finally
@@ -168,11 +178,6 @@ end;
 procedure TMotorListForm.FilterMotor(const AFilterString: String);
 begin
   FilterString:= AFilterString;
-  ViewUpdate;
-end;
-
-procedure TMotorListForm.OrderByNumCheckBoxChange(Sender: TObject);
-begin
   ViewUpdate;
 end;
 
