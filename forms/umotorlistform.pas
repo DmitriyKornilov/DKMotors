@@ -39,6 +39,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
   private
+    CanLoad: Boolean;
     FilterString: String;
 
     CardForm: TCardForm;
@@ -69,6 +70,7 @@ uses UMainForm;
 
 procedure TMotorListForm.FormCreate(Sender: TObject);
 begin
+  CanLoad:= False;
   MainForm.SetNamesPanelsVisible(True, False);
   CardForm:= CreateCardForm(MotorListForm, CardPanel);
   CreateMotorsTable;
@@ -76,6 +78,7 @@ begin
   FilterString:= EmptyStr;
   DKFilterCreate('Поиск по номеру:', FilterPanel, @FilterMotor, 300, 500);
   SpinEdit1.Value:= YearOfDate(Date);
+  CanLoad:= True;
 end;
 
 procedure TMotorListForm.FormDestroy(Sender: TObject);
@@ -104,10 +107,10 @@ begin
   MotorsTable.OnSelect:= @SelectMotor;
   MotorsTable.HeaderFont.Style:= [fsBold];
   MotorsTable.HeaderHeight:= 25;
-  MotorsTable.AddColumn('Дата сборки', 100);
-  MotorsTable.AddColumn('Наименование', 200);
+  MotorsTable.AddColumn('Дата сборки', 130);
+  MotorsTable.AddColumn('Наименование', 250);
   MotorsTable.AddColumn('Номер', 100);
-  MotorsTable.AddColumn('Испытан', 150);
+  MotorsTable.AddColumn('Дата испытаний', 130);
   MotorsTable.AddColumn('Отгружен');
   MotorsTable.CanSelect:= True;
   MotorsTable.Draw;
@@ -142,6 +145,8 @@ procedure TMotorListForm.ViewUpdate;
 var
   ABuildDates, AMotorNames, AMotorNums, AShippings, ATestInfos: TStrVector;
 begin
+  if not CanLoad then Exit;
+
   Screen.Cursor:= crHourGlass;
   try
     CardForm.ShowCard(0);
@@ -157,7 +162,7 @@ begin
     MotorsTable.SetColumn('Дата сборки', ABuildDates);
     MotorsTable.SetColumn('Наименование', AMotorNames, taLeftJustify);
     MotorsTable.SetColumn('Номер', AMotorNums);
-    MotorsTable.SetColumn('Испытан', ATestInfos, taLeftJustify);
+    MotorsTable.SetColumn('Дата испытаний', ATestInfos);
     MotorsTable.SetColumn('Отгружен', AShippings, taLeftJustify);
     MotorsTable.Draw;
   finally

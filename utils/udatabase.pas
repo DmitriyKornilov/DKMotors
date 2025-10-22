@@ -8,6 +8,7 @@ uses
   Classes, SysUtils, StdCtrls, DateUtils,
   //DK packages utils
   DK_Vector, DK_Matrix, DK_Const, DK_StrUtils, DK_SQLite3, DK_SQLUtils, DK_DateUtils,
+  DK_Progress,
   //Project utils
   UCalendar, UStatistic;
 
@@ -54,10 +55,9 @@ type
     function MotorListLoad(const ABuildYear, AShippedType, AOrderType: Integer;
                          const ANameIDs: TIntVector;
                          const ANumberLike: String;
-                         //const ANeedOrderByNumber: Boolean;
                          out AMotorIDs: TIntVector;
                          out ABuildDates, AMotorNames, AMotorNums,
-                             ATestInfos, AShippings: TStrVector): Boolean;
+                             ATestDates, AShippings: TStrVector): Boolean;
     procedure MotorInfoLoad(const AMotorID: Integer;
           out ABuildDate, ASendDate: TDate;
           out AMotorName, AMotorNum, ASeries, ARotorNum, AReceiverName: String;
@@ -109,6 +109,7 @@ type
                            const AMotorIDs, ATestResults: TIntVector;
                            const ATestNotes: TStrVector): Boolean;
     function TestLastFineDatesStr(const AMotorIDs: TIntVector): TStrVector;
+    function TestFineExists(const AMotorID: Integer): Boolean;
 
     //контроль
     function ControlNoteLoad(const AMotorID: Integer): String;
@@ -554,183 +555,119 @@ end;
 function TDataBase.MotorListLoad(const ABuildYear, AShippedType, AOrderType: Integer;
                          const ANameIDs: TIntVector;
                          const ANumberLike: String;
-                         //const ANeedOrderByNumber: Boolean;
                          out AMotorIDs: TIntVector;
                          out ABuildDates, AMotorNames, AMotorNums,
-                             ATestInfos, AShippings: TStrVector): Boolean;
+                             ATestDates, AShippings: TStrVector): Boolean;
 var
-  i: Integer;
   OrderStr, WhereStr, S: String;
-  {SendDates, BuildDates,} TestDates: TDateVector;
-  {ReceiverNames,} //TestNotes: TStrVector;
-  Indexes{, TestFails}: TIntVector;
+  Indexes: TIntVector;
+  Progress: TProgress;
 begin
   Result:= False;
   AMotorIDs:= nil;
   ABuildDates:= nil;
   AMotorNames:= nil;
   AMotorNums:= nil;
-  ATestInfos:= nil;
+  ATestDates:= nil;
   AShippings:= nil;
-  TestDates:= nil;
-  //BuildDates:= nil;
-  //SendDates:= nil;
-  //ReceiverNames:= nil;
 
-  case AOrderType of
-    0, 1, 3: OrderStr:= 'ORDER BY t1.OldMotor, t1.BuildDate ';
-    //1:    OrderStr:= 'ORDER BY t1.OldMotor, t5.TestDate ';
-    2:    OrderStr:= 'ORDER BY t1.OldMotor, t3.SendDate ';
-  end;
+  Progress:= TProgress.Create(nil);
+  try
+    Progress.WriteLine1('Загрузка списка электродвигателей');
+    Progress.WriteLine2(EmptyStr);
+    Progress.Show;
 
-  //if ANeedOrderByNumber then
-  //  OrderStr:= 'ORDER BY t1.OldMotor, t1.MotorNum, t1.BuildDate '
-  //else
-  //  OrderStr:= 'ORDER BY t1.OldMotor, t1.BuildDate, t1.MotorID ';
-
-  if ANumberLike=EmptyStr then
-    WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) AND (t1.OldMotor=0) '
-  else
-    WhereStr:= 'WHERE (UPPER(t1.MotorNum) LIKE :NumberLike) ';
-
-  if not VIsNil(ANameIDs) then
-    WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
-
-  if AShippedType=1 then
-    WhereStr:= WhereStr + 'AND (t1.CargoID > 0) '
-  else if AShippedType=2 then
-    WhereStr:= WhereStr + 'AND (t1.CargoID = 0) ';
-
-  QSetQuery(FQuery);
-  QClose;
-  QSetSQL(
-    'SELECT t1.MotorID, t1.MotorNum, t1.BuildDate, t1.CargoID, ' +
-           't2.MotorName, t3.SendDate, t4.ReceiverName ' +
-           //'t5.TestDate, t5.Fail, t5.TestNote ' +
-    'FROM MOTORLIST t1 ' +
-    'INNER JOIN MOTORNAMES t2 ON (t1.NameID=t2.NameID) ' +
-    'INNER JOIN CARGOLIST t3 ON (t1.CargoID=t3.CargoID) ' +
-    'INNER JOIN CARGORECEIVERS t4 ON (t3.ReceiverID=t4.ReceiverID) ' +
-    //'LEFT OUTER JOIN (' +
-    //    'SELECT TestDate, Fail, TestNote, MotorID ' +
-    //    'FROM MOTORTEST ' +
-    //    'ORDER BY TestDate DESC ' +
-    //    'LIMIT 1 '+
-    //    ') t5 ON (t1.MotorID=t5.MotorID) ' +
-    WhereStr +
-    OrderStr
-  );
-  if ANumberLike=EmptyStr then
-  begin
-    QParamDT('BD', FirstDayInYear(ABuildYear));
-    QParamDT('ED', LastDayInYear(ABuildYear));
-  end
-  else
-    QParamStr('NumberLike', SUpper(ANumberLike)+'%');
-  QParamsInt(ANameIDs);
-  QOpen;
-  if not QIsEmpty then
-  begin
-    QFirst;
-    while not QEOF do
-    begin
-      VAppend(AMotorIDs, QFieldInt('MotorID'));
-      VAppend(ABuildDates, FormatDateTime('dd.mm.yyyy', QFieldDT('BuildDate')));
-      VAppend(AMotorNames, QFieldStr('MotorName'));
-      VAppend(AMotorNums, QFieldStr('MotorNum'));
-      if QFieldInt('CargoID')=0 then
-        S:= EmptyStr
-      else
-        S:= FormatDateTime('dd.mm.yyyy – ', QFieldDT('SendDate')) + QFieldStr('ReceiverName');
-      VAppend(AShippings, S);
-
-      //VAppend(SendDates, QFieldDT('SendDate'));
-      //VAppend(ReceiverNames, QFieldStr('ReceiverName'));
-
-      //if QIsNull('TestDate') then
-      //  S:= EmptyStr
-      //else begin
-      //  S:= FormatDateTime('dd.mm.yyyy – ', QFieldDT('TestDate'));
-      //  if QFieldInt('Fail')=0 then
-      //    S:= S + 'норма '
-      //  else
-      //    S:= S + 'брак ';
-      //  if not SEmpty(QFieldStr('TestNote')) then
-      //    S:= S + '(' + QFieldStr('TestNote') + ')';
-      //end;
-      //VAppend(ATestInfos, S);
-
-      QNext;
+    case AOrderType of
+      0, 3: OrderStr:= 'ORDER BY t1.OldMotor, t1.BuildDate ';
+      1:    OrderStr:= 'ORDER BY t1.OldMotor, t5.TestDate ';
+      2:    OrderStr:= 'ORDER BY t1.OldMotor, t3.SendDate ';
     end;
-    Result:= True;
-  end;
-  QClose;
 
-  if not Result then Exit;
+    if ANumberLike=EmptyStr then
+      WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) AND (t1.OldMotor=0) '
+    else
+      WhereStr:= 'WHERE (UPPER(t1.MotorNum) LIKE :NumberLike) ';
 
-  for i:= 0 to High(AMotorIDs) do
-  begin
+    if not VIsNil(ANameIDs) then
+      WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
+
+    if AShippedType=1 then
+      WhereStr:= WhereStr + 'AND (t1.CargoID > 0) '
+    else if AShippedType=2 then
+      WhereStr:= WhereStr + 'AND (t1.CargoID = 0) ';
+
+    QSetQuery(FQuery);
+    QClose;
     QSetSQL(
-      'SELECT TestDate, Fail, TestNote ' +
-      'FROM MOTORTEST ' +
-      'WHERE MotorID = :MotorID ' +
-      'ORDER BY TestDate DESC ' +
-      'LIMIT 1 '
+      'SELECT t1.MotorID, t1.MotorNum, t1.BuildDate, t1.CargoID, ' +
+             't2.MotorName, t3.SendDate, t4.ReceiverName, t5.TestDate ' +
+      'FROM MOTORLIST t1 ' +
+      'INNER JOIN MOTORNAMES t2 ON (t1.NameID=t2.NameID) ' +
+      'INNER JOIN CARGOLIST t3 ON (t1.CargoID=t3.CargoID) ' +
+      'INNER JOIN CARGORECEIVERS t4 ON (t3.ReceiverID=t4.ReceiverID) ' +
+      'LEFT OUTER JOIN (' +
+          'SELECT TestDate, MotorID ' +
+          'FROM MOTORTEST ' +
+          'WHERE Fail=0 ' +
+          ') t5 ON (t1.MotorID=t5.MotorID) ' +
+      WhereStr +
+      OrderStr
     );
-    QParamInt('MotorID', AMotorIDs[i]);
+    if ANumberLike=EmptyStr then
+    begin
+      QParamDT('BD', FirstDayInYear(ABuildYear));
+      QParamDT('ED', LastDayInYear(ABuildYear));
+    end
+    else
+      QParamStr('NumberLike', SUpper(ANumberLike)+'%');
+    QParamsInt(ANameIDs);
     QOpen;
     if not QIsEmpty then
     begin
       QFirst;
-      S:= FormatDateTime('dd.mm.yyyy – ', QFieldDT('TestDate'));
-      if QFieldInt('Fail')=0 then
-        S:= S + 'норма '
-      else
-        S:= S + 'брак ';
-      if not SEmpty(QFieldStr('TestNote')) then
-        S:= S + '(' + QFieldStr('TestNote') + ')';
-      VAppend(ATestInfos, S);
-      VAppend(TestDates, QFieldDT('TestDate'));
-    end
-    else begin
-      VAppend(ATestInfos, EmptyStr);
-      VAppend(TestDates, 0);
+      while not QEOF do
+      begin
+        Progress.WriteLine2(QFieldStr('MotorName') + ' № ' + QFieldStr('MotorNum'));
+
+        VAppend(AMotorIDs, QFieldInt('MotorID'));
+        VAppend(ABuildDates, FormatDateTime('dd.mm.yyyy', QFieldDT('BuildDate')));
+        VAppend(AMotorNames, QFieldStr('MotorName'));
+        VAppend(AMotorNums, QFieldStr('MotorNum'));
+
+        if QFieldInt('CargoID')=0 then
+          S:= EmptyStr
+        else
+          S:= FormatDateTime('dd.mm.yyyy – ', QFieldDT('SendDate')) + QFieldStr('ReceiverName');
+        VAppend(AShippings, S);
+
+        if QIsNull('TestDate') then
+          S:= EmptyStr
+        else
+          S:= FormatDateTime('dd.mm.yyyy', QFieldDT('TestDate'));
+        VAppend(ATestDates, S);
+
+        QNext;
+      end;
+      Result:= True;
     end;
     QClose;
+
+  finally
+    FreeAndNil(Progress);
   end;
 
-  if AOrderType in [1, 3] then
+  if not Result then Exit;
+
+  if AOrderType=3 then
   begin
-    if AOrderType=1 then
-      VSortDate(TestDates, Indexes)
-    else if AOrderType=3 then
-      VSortNum(AMotorNums, Indexes);
+    VSortNum(AMotorNums, Indexes);
     AMotorIDs:= VReplace(AMotorIDs, Indexes);
     ABuildDates:= VReplace(ABuildDates, Indexes);
     AMotorNames:= VReplace(AMotorNames, Indexes);
     AMotorNums:= VReplace(AMotorNums, Indexes);
     AShippings:= VReplace(AShippings, Indexes);
-    ATestInfos:= VReplace(ATestInfos, Indexes);
+    ATestDates:= VReplace(ATestDates, Indexes);
   end;
-
-
-  //if ANeedOrderByNumber then
-  //begin
-  //  VSortNum(AMotorNums, Indexes);
-  //
-  //  AMotorIDs:= VReplace(AMotorIDs, Indexes);
-  //  BuildDates:= VReplace(BuildDates, Indexes);
-  //  AMotorNames:= VReplace(AMotorNames, Indexes);
-  //  AMotorNums:= VReplace(AMotorNums, Indexes);
-  //  SendDates:= VReplace(SendDates, Indexes);
-  //  ReceiverNames:= VReplace(ReceiverNames, Indexes);
-  //end;
-
-  //ABuildDates:= VFormatDateTime('dd.mm.yyyy', BuildDates);
-  //AShippings:= VFormatDateTime('dd.mm.yyyy – ', SendDates);
-  //VChangeIf(AShippings, '30.12.1899 – ', EmptyStr);
-  //VChangeIf(ReceiverNames, '<не указан>', EmptyStr);
-  //AShippings:= VSum(AShippings, ReceiverNames);
 end;
 
 procedure TDataBase.MotorInfoLoad(const AMotorID: Integer; out ABuildDate,
@@ -1410,6 +1347,21 @@ begin
     end;
     QClose;
   end;
+end;
+
+function TDataBase.TestFineExists(const AMotorID: Integer): Boolean;
+begin
+  QSetQuery(FQuery);
+  QSetSQL(
+    'SELECT TestDate ' +
+    'FROM MOTORTEST ' +
+    'WHERE (Fail=0) AND (MotorID = :MotorID) ' +
+    'LIMIT 1'
+  );
+  QParamInt('MotorID', AMotorID);
+  QOpen;
+  Result:= not QIsEmpty;
+  QClose;
 end;
 
 function TDataBase.ControlNoteLoad(const AMotorID: Integer): String;

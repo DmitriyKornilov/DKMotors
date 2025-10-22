@@ -1,48 +1,49 @@
 object MotorListForm: TMotorListForm
   Left = 354
-  Height = 521
+  Height = 651
   Top = 169
-  Width = 900
+  Width = 1125
   Align = alClient
   BorderStyle = bsNone
   Caption = 'MotorListForm'
-  ClientHeight = 521
-  ClientWidth = 900
+  ClientHeight = 651
+  ClientWidth = 1125
+  DesignTimePPI = 120
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   object ToolPanel: TPanel
     Left = 2
-    Height = 32
+    Height = 40
     Top = 2
-    Width = 896
+    Width = 1121
     Align = alTop
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BevelOuter = bvNone
     BorderStyle = bsSingle
-    ClientHeight = 28
-    ClientWidth = 892
-    Constraints.MaxHeight = 32
+    ClientHeight = 36
+    ClientWidth = 1117
+    Constraints.MaxHeight = 40
     TabOrder = 0
     object FilterPanel: TPanel
-      Left = 75
-      Height = 28
+      Left = 92
+      Height = 36
       Top = 0
-      Width = 240
+      Width = 300
       Align = alLeft
       BevelOuter = bvNone
       Caption = 'FilterPanel'
       TabOrder = 0
     end
     object MoreInfoCheckBox: TCheckBox
-      Left = 339
-      Height = 28
+      Left = 421
+      Height = 36
       Top = 0
-      Width = 216
+      Width = 270
       Align = alLeft
-      BorderSpacing.Left = 6
+      BorderSpacing.Left = 8
       Caption = 'Учётная карточка электродвигателя'
       Checked = True
       State = cbChecked
@@ -51,26 +52,26 @@ object MotorListForm: TMotorListForm
     end
     object YearPanel: TPanel
       Left = 0
-      Height = 28
+      Height = 36
       Top = 0
-      Width = 57
+      Width = 71
       Align = alLeft
       AutoSize = True
       BevelOuter = bvNone
-      ClientHeight = 28
-      ClientWidth = 57
+      ClientHeight = 36
+      ClientWidth = 71
       TabOrder = 2
       object SpinEdit1: TSpinEdit
         AnchorSideLeft.Control = YearPanel
         AnchorSideTop.Control = YearPanel
         AnchorSideTop.Side = asrCenter
         Left = 1
-        Height = 23
-        Top = 3
-        Width = 56
+        Height = 28
+        Top = 4
+        Width = 70
         Alignment = taCenter
         BorderSpacing.Left = 1
-        BorderSpacing.Top = 3
+        BorderSpacing.Top = 4
         BorderSpacing.Bottom = 2
         MinValue = 2010
         TabOrder = 0
@@ -79,10 +80,10 @@ object MotorListForm: TMotorListForm
       end
     end
     object DividerBevel1: TDividerBevel
-      Left = 57
-      Height = 28
+      Left = 71
+      Height = 36
       Top = 0
-      Width = 18
+      Width = 21
       Caption = 'DividerBevel1'
       Align = alLeft
       BevelWidth = 2
@@ -91,10 +92,10 @@ object MotorListForm: TMotorListForm
       ParentFont = False
     end
     object DividerBevel2: TDividerBevel
-      Left = 315
-      Height = 28
+      Left = 392
+      Height = 36
       Top = 0
-      Width = 18
+      Width = 21
       Caption = 'DividerBevel2'
       Align = alLeft
       BevelWidth = 2
@@ -105,9 +106,9 @@ object MotorListForm: TMotorListForm
   end
   object SettingClientPanel: TPanel
     Left = 2
-    Height = 483
-    Top = 36
-    Width = 170
+    Height = 605
+    Top = 44
+    Width = 212
     Align = alLeft
     BorderSpacing.Left = 2
     BorderSpacing.Top = 2
@@ -120,30 +121,30 @@ object MotorListForm: TMotorListForm
     TabOrder = 1
   end
   object Splitter1: TSplitter
-    Left = 172
-    Height = 487
-    Top = 34
-    Width = 5
+    Left = 214
+    Height = 609
+    Top = 42
+    Width = 6
     ResizeStyle = rsLine
   end
   object MainPanel: TPanel
-    Left = 177
-    Height = 483
-    Top = 36
-    Width = 721
+    Left = 220
+    Height = 605
+    Top = 44
+    Width = 903
     Align = alClient
     BorderSpacing.Top = 2
     BorderSpacing.Right = 2
     BorderSpacing.Bottom = 2
     BevelOuter = bvNone
-    ClientHeight = 483
-    ClientWidth = 721
+    ClientHeight = 605
+    ClientWidth = 903
     TabOrder = 3
     object CardPanel: TPanel
       Left = 0
-      Height = 440
-      Top = 43
-      Width = 721
+      Height = 550
+      Top = 55
+      Width = 903
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 0
@@ -152,9 +153,9 @@ object MotorListForm: TMotorListForm
       AnchorSideBottom.Control = CardPanel
       Cursor = crVSplit
       Left = 0
-      Height = 5
-      Top = 38
-      Width = 721
+      Height = 6
+      Top = 49
+      Width = 903
       Align = alBottom
       ResizeAnchor = akBottom
       ResizeStyle = rsLine
@@ -162,12 +163,12 @@ object MotorListForm: TMotorListForm
     object VT1: TVirtualStringTree
       AnchorSideBottom.Control = Splitter2
       Left = 0
-      Height = 38
+      Height = 49
       Top = 0
-      Width = 719
+      Width = 901
       Align = alClient
       BorderSpacing.Right = 2
-      DefaultNodeHeight = 25
+      DefaultNodeHeight = 31
       DefaultText = 'Node'
       Header.AutoSizeIndex = 0
       Header.Columns = <>

@@ -234,32 +234,57 @@ end;
 
 procedure TTestAddForm.AddTest;
 var
-  x: Integer;
-  Note: String;
+  x, MotorID: Integer;
+  MotorNum, Note: String;
+
+  procedure TestInfoClear;
+  begin
+    NormRadioButton.Checked:= True;
+    AddButton.Enabled:= False;
+    Memo1.Lines.Clear;
+    Filter.Clear;
+    Filter.Focus;
+  end;
+
 begin
   if not VSTViewTable.IsSelected then Exit;
+
+  MotorID:= ViewMotorIDs[VSTViewTable.SelectedIndex];
+  MotorNum:=  ViewMotorNums[VSTViewTable.SelectedIndex];
+
+  if VIndexOf(TestMotorIDs, TestResults, MotorID, 0)>=0 then
+  begin
+    Inform('В списке уже есть успешные испытания ' +
+           MotorNameComboBox.Text + ' № ' + MotorNum + '!');
+    TestInfoClear;
+    Exit;
+  end;
+
+  if DataBase.TestFineExists(MotorID) then
+    if not Confirm('В базе данных уже есть успешные испытания ' +
+                   MotorNameComboBox.Text + ' № ' + MotorNum +
+                   '! Всё равно записать?' ) then
+  begin
+    TestInfoClear;
+    Exit;
+  end;
 
   x:= Ord(DefectRadioButton.Checked);
   Note:= STrim(Memo1.Text);
 
-  VAppend(TestMotorIDs, ViewMotorIDs[VSTViewTable.SelectedIndex]);
+  VAppend(TestMotorIDs, MotorID);
   VAppend(TestResults, x);
   VAppend(TestNotes, Note);
 
   VAppend(TestMotorNames, MotorNameComboBox.Text);
-  VAppend(TestMotorNums, ViewMotorNums[VSTViewTable.SelectedIndex]);
+  VAppend(TestMotorNums, MotorNum);
   if x=0 then
     VAppend(TestResultsStr, 'норма')
   else
     VAppend(TestResultsStr, 'брак');
   ShowTestList(False);
 
-  NormRadioButton.Checked:= True;
-  AddButton.Enabled:= False;
-  Memo1.Lines.Clear;
-
-  Filter.Clear;
-  Filter.Focus;
+  TestInfoClear;
 end;
 
 procedure TTestAddForm.DelTest;
