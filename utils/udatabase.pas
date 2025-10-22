@@ -16,17 +16,6 @@ type
   { TDataBase }
 
   TDataBase = class (TSQLite3)
-  //private
-    {function ReclamationReportLoad(const ATableName, AIDFieldName, ANameFieldName: String;
-       const ABeginDate, AEndDate: TDate; const ANameIDs: TIntVector;
-       out AExistsIDs: TIntVector; out ANames: TStrVector; out ACounts: TIntVector): Boolean;  }
-
-    {function ReclamationReportWithReasonsLoad(const ATableName, AIDFieldName, ANameFieldName: String;
-       const ABeginDate, AEndDate: TDate;
-       const AAdditionYearsCount: Integer;
-       //const AIsZeroIDNeed: Boolean;
-       const ANameIDs, AReasonIDs: TIntVector;
-       out AParamNames: TStrVector; out AParamCounts: TIntMatrix3D): Boolean; }
   public
     {КАЛЕНДАРЬ}
     //особые даты производственного календаря
@@ -256,18 +245,6 @@ type
 
 
     {--- СТАТИСТИКА РЕКЛАМАЦИЙ ------}
-    {//общее количество
-    function ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
-                const ANameIDs: TIntVector;
-                out AExistsNameIDs: TIntVector;
-                out AMotorNames: TStrVector;
-                out AMotorCounts: TIntVector): Boolean;  }
-    {function ReclamationMotorsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
-                const AUsedNameIDs, AReasonIDs: TIntVector;
-                const AANEMAsSameName: Boolean;
-                out AMotorNames: TStrVector;
-                out AClaimCounts: TIntMatrix3D): Boolean; }
     function ReclamationByMotorNamesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
@@ -277,12 +254,6 @@ type
                 out AMotorNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
-    {function ReclamationDefectsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
-                //const AIsZeroIDNeed: Boolean;
-                const ANameIDs, AReasonIDs: TIntVector;
-                out ADefectNames: TStrVector;
-                out AMotorCounts: TIntMatrix3D): Boolean;  }
     function ReclamationByDefectsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
@@ -291,13 +262,6 @@ type
                 out ADefectNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
-
-    {function ReclamationPlacesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
-                //const AIsZeroIDNeed: Boolean;
-                const ANameIDs, AReasonIDs: TIntVector;
-                out APlaceNames: TStrVector;
-                out AMotorCounts: TIntMatrix3D): Boolean;   }
     function ReclamationByPlacesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
@@ -306,12 +270,6 @@ type
                 out APlaceNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
-
-    {function ReclamationMonthsWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
-                const ANameIDs, AReasonIDs: TIntVector;
-                out AMonthNames: TStrVector;
-                out AMotorCounts{, AAccumCounts}: TIntMatrix3D): Boolean;  }
     function ReclamationByMonthsLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
@@ -320,11 +278,6 @@ type
                 out AMonthNeeds: TBoolVector;
                 out AClaimCounts: TIntMatrix3D): Boolean;
 
-    {function ReclamationMileagesWithReasonsLoad(const ABeginDate, AEndDate: TDate;
-                const AAdditionYearsCount: Integer;
-                const ANameIDs, AReasonIDs: TIntVector;
-                out AMileageNames: TStrVector;
-                out AMotorCounts: TIntMatrix3D): Boolean; }
     function ReclamationByMileagesLoad(const ABeginDate, AEndDate: TDate;
                 const AMileageStep, AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
@@ -453,7 +406,6 @@ begin
   end;
 end;
 
-
 function TDataBase.NameIDsAndMotorNamesSelectedLoad(ALabel: TLabel;
   const ANeedEdit: Boolean; var ANameIDs: TIntVector;
   var AMotorNames: TStrVector): Boolean;
@@ -489,222 +441,6 @@ begin
                   'CARGORECEIVERS', 'ReceiverID', 'ReceiverName', 'ReceiverName',
                   AKeyValueNotZero{, 'ВСЕ ГРУЗОПОЛУЧАТЕЛИ'});
 end;
-
-{function TDataBase.ReclamationReportWithReasonsLoad(const ATableName,
-  AIDFieldName, ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-  const AAdditionYearsCount: Integer; {const AIsZeroIDNeed: Boolean; }
-  const ANameIDs, AReasonIDs: TIntVector; out AParamNames: TStrVector; out
-  AParamCounts: TIntMatrix3D): Boolean;
-var
-  ExistNameIDs: TIntVector;
-  ParamCounts: TIntMatrix;
-  BD, ED: TDate;
-  i: Integer;
-
-  procedure GetParamNamesSinglePeriod(const ABD, AED: TDate;
-                          out AExistNames: TStrVector;
-                          out AExistNameIDs: TIntVector);
-  var
-    WhereStr, KeyFieldName, PickFieldName: String;
-  begin
-    Result:= False;
-    AExistNames:= nil;
-    AExistNameIDs:= nil;
-
-    KeyFieldName:= SqlEsc(AIDFieldName, False);
-    PickFieldName:= SqlEsc(ANameFieldName, False);
-
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
-    if not VIsNil(ANameIDs) then
-      WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
-
-    //if not AIsZeroIDNeed then
-    //  WhereStr:= WhereStr + 'AND (t3.' + KeyFieldName + '>0) ';
-
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t1.' + KeyFieldName + ') AS MotorCount, t1.' + KeyFieldName + ', t3.' + PickFieldName + ' ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + KeyFieldName + '=t3.' + KeyFieldName + ') ' +
-      WhereStr +
-      'GROUP BY t1.' + KeyFieldName + ' ' +
-      'ORDER BY t3.' + PickFieldName);
-    QParamDT('BD', ABD);
-    QParamDT('ED', AED);
-    if not VIsNil(ANameIDs) then
-      QParamsInt(ANameIDs);
-    QOpen;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      while not QEOF do
-      begin
-        VAppend(AExistNameIDs, QFieldInt(AIDFieldName));
-        VAppend(AExistNames, QFieldStr(ANameFieldName));
-        QNext;
-      end;
-      Result:= True;
-    end;
-    QClose;
-  end;
-
-  procedure GetParamNamesAllPeriods(const ABD, AED: TDate;
-                          const AAdditionYearsCount: Integer;
-                          out AExistNames: TStrVector;
-                          out AExistNameIDs: TIntVector);
-  var
-    ExistNames: TStrVector;
-    ExistNameIDs: TIntVector;
-    n: Integer;
-  begin
-    AExistNames:= nil;
-    AExistNameIDs:= nil;
-    for n:= AAdditionYearsCount downto 0 do
-    begin
-      GetParamNamesSinglePeriod(IncYear(ABD, -n), IncYear(AED, -n),
-                                ExistNames, ExistNameIDs);
-      AExistNames:= VUnion(AExistNames, ExistNames);
-      AExistNameIDs:= VUnion(AExistNameIDs, ExistNameIDs);
-    end;
-  end;
-
-  procedure GetDataForReason(const ABD, AED: TDate; const AReasonID: Integer; out ACounts: TIntVector);
-  var
-    KeyFieldName, PickFieldName: String;
-    n: Integer;
-    WhereStr: String;
-  begin
-    ACounts:= nil;
-    VDim(ACounts, Length(ExistNameIDs), 0);
-
-    KeyFieldName:= SqlEsc(AIDFieldName, False);
-    PickFieldName:= SqlEsc(ANameFieldName, False);
-
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-               SqlIN('t2','NameID', Length(ANameIDs), 'NameID') + 'AND' +
-               SqlIN('t1',AIDFieldName, Length(ExistNameIDs), AIDFieldName);
-
-    if AReasonID>=0 then
-      WhereStr:= WhereStr + ' AND (t1.ReasonID = :ReasonID) ';
-
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t1.' + KeyFieldName + ') As MotorCount, t1.' + KeyFieldName + ', t3.' + PickFieldName + ' ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + KeyFieldName + '=t3.' + KeyFieldName + ') ' +
-      WhereStr +
-      'GROUP BY t1.' + KeyFieldName + ' ' +
-      'ORDER BY t3.' + PickFieldName);
-    QParamDT('BD', ABD);
-    QParamDT('ED', AED);
-    if AReasonID>=0 then
-      QParamInt('ReasonID', AReasonID);
-    QParamsInt(ANameIDs, 'NameID');
-    QParamsInt(ExistNameIDs, AIDFieldName);
-    QOpen;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      while not QEOF do
-      begin
-        n:= VIndexOf(ExistNameIDs, QFieldInt(AIDFieldName));
-        if n>=0 then
-          ACounts[n]:= QFieldInt('MotorCount');
-        QNext;
-      end;
-    end;
-    QClose;
-  end;
-
-  procedure GetDataForSinglePeriod(const ABD, AED: TDate; out ACounts: TIntMatrix);
-  var
-    Counts: TIntVector;
-    n: Integer;
-  begin
-    ACounts:= nil;
-    for n:=0 to High(AReasonIDs) do
-    begin
-      GetDataForReason(ABD, AED, AReasonIDs[n], Counts);
-      MAppend(ACounts, Counts);
-    end;
-  end;
-
-begin
-  Result:= False;
-  AParamNames:= nil;
-  AParamCounts:= nil;
-
-  if VIsNil(AReasonIDs) then Exit;
-
-  //список наименований параметра распределения с существующими рекламациями, их общее количество за все годы
-  GetParamNamesAllPeriods(ABeginDate, AEndDate, AAdditionYearsCount,
-                          AParamNames, ExistNameIDs);
-  //нет рекламаций в запрашиваемые периоды
-  if VIsNil(ExistNameIDs) then Exit;
-
-  //матрица данных для каждого периода
-  for i:= AAdditionYearsCount downto 0 do
-  begin
-    BD:= IncYear(ABeginDate, -i);
-    ED:= IncYear(AEndDate, -i);
-    GetDataForSinglePeriod(BD, ED, ParamCounts);
-    //итоговая матрица для всех периодов
-    MAppend(AParamCounts, ParamCounts);
-  end;
-
-  Result:= True;
-end; }
-
-
-{function TDataBase.ReclamationReportLoad(const ATableName, AIDFieldName,
-  ANameFieldName: String; const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector; out AExistsIDs: TIntVector;
-  out ANames: TStrVector; out ACounts: TIntVector): Boolean;
-var
-  WhereStr, KeyFieldName, PickFieldName: String;
-begin
-  Result:= False;
-  ANames:= nil;
-  ACounts:= nil;
-  AExistsIDs:= nil;
-
-  KeyFieldName:= SqlEsc(AIDFieldName, False);
-  PickFieldName:= SqlEsc(ANameFieldName, False);
-
-  WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
-  if not VIsNil(ANameIDs) then
-    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
-
-  QSetQuery(FQuery);
-  QSetSQL(
-    'SELECT COUNT(t1.' + KeyFieldName + ') AS MotorCount, t1.' + KeyFieldName + ', t3.' + PickFieldName + ' ' +
-    'FROM RECLAMATIONS t1 ' +
-    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-    'INNER JOIN ' + SqlEsc(ATableName) + ' t3 ON (t1.' + KeyFieldName + '=t3.' + KeyFieldName + ') ' +
-    WhereStr +
-    'GROUP BY t1.' + KeyFieldName + ' ' +
-    'ORDER BY t3.' + PickFieldName);
-  QParamDT('BD', ABeginDate);
-  QParamDT('ED', AEndDate);
-  if not VIsNil(ANameIDs) then
-    QParamsInt(ANameIDs);
-  QOpen;
-  if not QIsEmpty then
-  begin
-    QFirst;
-    while not QEOF do
-    begin
-      VAppend(AExistsIDs, QFieldInt(AIDFieldName));
-      VAppend(ACounts, QFieldInt('MotorCount'));
-      VAppend(ANames, QFieldStr(ANameFieldName));
-      QNext;
-    end;
-    Result:= True;
-  end;
-  QClose;
-end;  }
 
 function TDataBase.MonthAndDatesForBuildLogLoad(const AYear: Word;
   const AUsedNameIDs: TIntVector;
@@ -1077,8 +813,6 @@ begin
   AMotorCounts:= nil;
 
   WhereStr:= 'WHERE (t1.BuildDate BETWEEN :BD AND :ED) ';
-  //if ANameID>0 then
-  //  WhereStr:= WhereStr + ' AND (t1.NameID = :NameID) ';
   if not VIsNil(ANameIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t1','NameID', Length(ANameIDs));
 
@@ -1094,8 +828,6 @@ begin
   QParamDT('ED', AEndDate);
   if not VIsNil(ANameIDs) then
     QParamsInt(ANameIDs);
-  //if ANameID>0 then
-  //  QParamInt('NameID', ANameID);
   QOpen;
   if not QIsEmpty then
   begin
@@ -1731,7 +1463,6 @@ begin
     Result:= True;
   end;
   QClose;
-
 end;
 
 function TDataBase.MotorListOnControl(const AMotorID: Integer;
@@ -1948,7 +1679,6 @@ begin
   end;
 
   Result:= not VIsNil(AMonths);
-
 end;
 
 function TDataBase.ShipmentMotorListLoad(const ABeginDate, AEndDate: TDate;
@@ -2209,43 +1939,14 @@ begin
   ACargoIDs:= nil;
   ASendDates:= nil;
   AReceiverNames:= nil;
-
-  //WhereStr:= 'WHERE (t1.SendDate >= :BeginDate) AND (t1.SendDate <= :EndDate) ';
-  //if not VIsNil(AReceiverIDs) then
-  //  WhereStr:= WhereStr + 'AND' + SqlIN('t1','ReceiverID', Length(AReceiverIDs));
-  //QSetQuery(FQuery);
-  //QClose;
-  //QSetSQL(
-  //  'SELECT t1.CargoID, t1.SendDate, t2.ReceiverName ' +
-  //  'FROM CARGOLIST t1 ' +
-  //  'INNER JOIN CARGORECEIVERS t2 ON (t1.ReceiverID=t2.ReceiverID) ' +
-  //  WhereStr +
-  //  'ORDER BY t1.SendDate DESC');
-  //QParamDT('BeginDate', ABeginDate);
-  //QParamDT('EndDate', AEndDate);
-  //if not VIsNil(AReceiverIDs) then
-  //  QParamsInt(AReceiverIDs);
-  //QOpen;
-  //if not QIsEmpty then
-  //begin
-  //  QFirst;
-  //  while not QEOF do
-  //  begin
-  //    VAppend(ASendDates, QFieldDT('SendDate'));
-  //    VAppend(ACargoIDs, QFieldInt('CargoID'));
-  //    VAppend(AReceiverNames, QFieldStr('ReceiverName'));
-  //    QNext;
-  //  end;
-  //  Result:= True;
-  //end;
-  //QClose;
-
   CargoIDs:= nil;
   SendDates:= nil;
   ReceiverNames:= nil;
+
   WhereStr:= 'WHERE (t1.SendDate >= :BeginDate) AND (t1.SendDate <= :EndDate) ';
   if not VIsNil(AReceiverIDs) then
     WhereStr:= WhereStr + 'AND' + SqlIN('t1','ReceiverID', Length(AReceiverIDs));
+
   QSetQuery(FQuery);
   QClose;
   QSetSQL(
@@ -3317,180 +3018,6 @@ begin
   QClose;
 end;
 
-{function TDataBase.ReclamationMotorsWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer; const AUsedNameIDs,
-  AReasonIDs: TIntVector; const AANEMAsSameName: Boolean;
-  out AMotorNames: TStrVector; out AClaimCounts: TIntMatrix3D): Boolean;
-var
-  ExistsNameIDs: TIntVector;
-  MotorCounts: TIntMatrix;
-  BD, ED: TDate;
-  i: Integer;
-
-  procedure GetMotorNamesSinglePeriod(const ABD, AED: TDate;
-                          out AExistNames: TStrVector;
-                          out AExistNameIDs: TIntVector);
-  begin
-    AExistNames:= nil;
-    AExistNameIDs:= nil;
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
-      'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-             SqlIN('t2','NameID', Length(AUsedNameIDs)) +
-      'GROUP BY t2.NameID ' +
-      'ORDER BY t3.MotorName');
-    QParamDT('BD', ABD);
-    QParamDT('ED', AED);
-    QParamsInt(AUsedNameIDs);
-    QOpen;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      while not QEOF do
-      begin
-        VAppend(AExistNames, QFieldStr('MotorName'));
-        VAppend(AExistNameIDs, QFieldInt('NameID'));
-        QNext;
-      end;
-    end;
-    QClose;
-  end;
-
-  procedure GetMotorNamesAllPeriods(const ABD, AED: TDate;
-                          const AAdditionYearsCount: Integer;
-                          out AExistNames: TStrVector;
-                          out AExistNameIDs: TIntVector);
-  var
-    ExistNames: TStrVector;
-    ExistNameIDs: TIntVector;
-    n: Integer;
-  begin
-    AExistNames:= nil;
-    AExistNameIDs:= nil;
-    for n:= AAdditionYearsCount downto 0 do
-    begin
-      GetMotorNamesSinglePeriod(IncYear(ABD, -n), IncYear(AED, -n),
-                                ExistNames, ExistNameIDs);
-      AExistNames:= VUnion(AExistNames, ExistNames);
-      AExistNameIDs:= VUnion(AExistNameIDs, ExistNameIDs);
-    end;
-  end;
-
-  procedure GetDataForReason(const ABD, AED: TDate; const AReasonID: Integer; out ACounts: TIntVector);
-  var
-    n: Integer;
-    WhereStr: String;
-  begin
-    ACounts:= nil;
-    VDim(ACounts, Length(ExistsNameIDs), 0);
-
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-               SqlIN('t2','NameID', Length(ExistsNameIDs));
-
-    if AReasonID>=0 then
-      WhereStr:= WhereStr + ' AND (t1.ReasonID = :ReasonID) ';
-
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
-      WhereStr +
-      'GROUP BY t2.NameID ' +
-      'ORDER BY t3.MotorName');
-    QParamDT('BD', ABD);
-    QParamDT('ED', AED);
-    QParamsInt(ExistsNameIDs);
-    if AReasonID>=0 then
-      QParamInt('ReasonID', AReasonID);
-    QOpen;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      while not QEOF do
-      begin
-        n:= VIndexOf(ExistsNameIDs, QFieldInt('NameID'));
-        if n>=0 then
-          ACounts[n]:= QFieldInt('MotorCount');
-        QNext;
-      end;
-    end;
-    QClose;
-  end;
-
-  procedure GetDataForSinglePeriod(const ABD, AED: TDate; out ACounts: TIntMatrix);
-  var
-    Counts: TIntVector;
-    n: Integer;
-  begin
-    ACounts:= nil;
-    for n:=0 to High(AReasonIDs) do
-    begin
-      GetDataForReason(ABD, AED, AReasonIDs[n], Counts);
-      MAppend(ACounts, Counts);
-    end;
-  end;
-
-  procedure RecalcANEM;
-  var
-    n1, n2, i, j: Integer;
-  begin
-    n1:= VIndexOf(ExistsNameIDs, 1); //IM1001
-    n2:= VIndexOf(ExistsNameIDs, 2); //IM1002
-    if (n1<0) and (n2<0) then Exit;
-    if n1>=0 then
-    begin
-      //есть IM1001 - меняем имя в списке
-      AMotorNames[n1]:= 'АНЭМ225L4УХЛ2 IM1001/IM1002';
-      if n2>=0 then  //есть еще IM1002 - пересчет
-      begin
-        for i:= 0 to High(AClaimCounts) do
-          for j:= 0 to High(AClaimCounts[i]) do
-        begin
-          AClaimCounts[i, j, n1]:= AClaimCounts[i, j, n1] + AClaimCounts[i, j, n2];
-          VDel(AClaimCounts[i, j], n2);
-        end;
-        VDel(AMotorNames, n2);
-      end;
-    end
-    else //есть только IM1002 - только меняем имя в списке
-      AMotorNames[n2]:= 'АНЭМ225L4УХЛ2 IM1001/IM1002';
-  end;
-
-begin
-  Result:= False;
-  AMotorNames:= nil;
-  AClaimCounts:= nil;
-
-  if VIsNil(AReasonIDs) then Exit;
-
-  //список наименований двигателей с существующими рекламациями, их общее количество за все годы
-  GetMotorNamesAllPeriods(ABeginDate, AEndDate, AAdditionYearsCount,
-                          AMotorNames, ExistsNameIDs);
-  //нет рекламаций в запрашиваемые периоды
-  if VIsNil(ExistsNameIDs) then Exit;
-
-  //матрица данных для каждого периода
-  for i:= AAdditionYearsCount downto 0 do
-  begin
-    BD:= IncYear(ABeginDate, -i);
-    ED:= IncYear(AEndDate, -i);
-    GetDataForSinglePeriod(BD, ED, MotorCounts);
-    //итоговая матрица для всех периодов
-    MAppend(AClaimCounts, MotorCounts);
-  end;
-
-  if AANEMAsSameName then
-    RecalcANEM;
-
-  Result:= True;
-end; }
-
 function TDataBase.ReclamationByMotorNamesLoad(const ABeginDate, AEndDate: TDate;
                 const AAdditionYearsCount: Integer;
                 const AUsedNameIDs: TIntVector;
@@ -4006,303 +3533,6 @@ begin
     end;
   end;
 end;
-
-{function TDataBase.ReclamationTotalCountLoad(const ABeginDate, AEndDate: TDate;
-  const ANameIDs: TIntVector;
-  out AExistsNameIDs: TIntVector;
-  out AMotorNames: TStrVector; out AMotorCounts: TIntVector): Boolean;
-var
-  WhereStr: String;
-begin
-  Result:= False;
-  AMotorNames:= nil;
-  AMotorCounts:= nil;
-  AExistsNameIDs:= nil;
-
-  WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) ';
-  if not VIsNil(ANameIDs) then
-    WhereStr:= WhereStr + 'AND' + SqlIN('t2','NameID', Length(ANameIDs));
-
-  QSetQuery(FQuery);
-  QSetSQL(
-    'SELECT COUNT(t2.NameID) As MotorCount, t2.NameID, t3.MotorName ' +
-    'FROM RECLAMATIONS t1 ' +
-    'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-    'INNER JOIN MOTORNAMES t3 ON (t2.NameID=t3.NameID) ' +
-    WhereStr +
-    'GROUP BY t2.NameID ' +
-    'ORDER BY t3.MotorName');
-  QParamDT('BD', ABeginDate);
-  QParamDT('ED', AEndDate);
-  if not VIsNil(ANameIDs) then
-    QParamsInt(ANameIDs);
-  QOpen;
-  if not QIsEmpty then
-  begin
-    QFirst;
-    while not QEOF do
-    begin
-      VAppend(AExistsNameIDs, QFieldInt('NameID'));
-      VAppend(AMotorCounts, QFieldInt('MotorCount'));
-      VAppend(AMotorNames, QFieldStr('MotorName'));
-      QNext;
-    end;
-    Result:= True;
-  end;
-  QClose;
-end;  }
-
-{function TDataBase.ReclamationDefectsWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer;
-  {const AIsZeroIDNeed: Boolean;} const ANameIDs, AReasonIDs: TIntVector; out
-  ADefectNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
-begin
-  Result:= ReclamationReportWithReasonsLoad('RECLAMATIONDEFECTS',
-             'DefectID', 'DefectName', ABeginDate, AEndDate, AAdditionYearsCount,
-             {AIsZeroIDNeed,} ANameIDs, AReasonIDs,
-             ADefectNames, AMotorCounts);
-end; }
-
-{function TDataBase.ReclamationPlacesWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer;
-  {const AIsZeroIDNeed: Boolean;} const ANameIDs, AReasonIDs: TIntVector; out
-  APlaceNames: TStrVector; out AMotorCounts: TIntMatrix3D): Boolean;
-begin
-  Result:= ReclamationReportWithReasonsLoad('RECLAMATIONPLACES',
-             'PlaceID', 'PlaceName', ABeginDate, AEndDate, AAdditionYearsCount,
-             {AIsZeroIDNeed,} ANameIDs, AReasonIDs,
-             APlaceNames, AMotorCounts);
-end; }
-
-{function TDataBase.ReclamationMonthsWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
-  AReasonIDs: TIntVector; out AMonthNames: TStrVector;
-  out AMotorCounts{, AAccumCounts}: TIntMatrix3D): Boolean;
-var
-  i, FirstMonth,LastMonth, FirstYear, LastYear: Integer;
-  MotorCounts{, AccumCounts}: TIntMatrix;
-
-  procedure GetDataForMonth(const AMonth, AYear, AReasonID: Integer; out ACount: Integer);
-  var
-    WhereStr: String;
-    BD, ED: TDate;
-
-    function GetDate(const ADate: TDate): TDate;
-    var
-      D: Integer;
-    begin
-      D:= DayOfDate(ADate);
-      if (AMonth=2) and (D=29) and (not IsLeapYear(AYear)) then D:= 28;
-      Result:= EncodeDate(AYear, AMonth, D);
-    end;
-
-  begin
-    if AMonth=FirstMonth then
-      BD:= GetDate(ABeginDate)
-    else
-      BD:= FirstDayInMonth(AMonth, AYear);
-
-    if AMonth=LastMonth then
-      ED:= GetDate(AEndDate)
-    else
-      ED:= LastDayInMonth(AMonth, AYear);
-
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-               SqlIN('t2','NameID', Length(ANameIDs), 'NameID');
-    if AReasonID>=0 then
-      WhereStr:= WhereStr + ' AND (t1.ReasonID = :ReasonID) ';
-
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t1.RecID) As ACount ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      WhereStr
-      );
-    QParamDT('BD', BD);
-    QParamDT('ED', ED);
-    QParamsInt(ANameIDs, 'NameID');
-    if AReasonID>=0 then
-      QParamInt('ReasonID', AReasonID);
-    QOpen;
-    ACount:= 0;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      ACount:= QFieldInt('ACount');
-    end;
-    QClose;
-  end;
-
-  procedure GetDataForReason(const AYear, AReasonID: Integer; out AYearCounts: TIntVector);
-  var
-    M, N: Integer;
-  begin
-    AYearCounts:= nil;
-    VDim(AYearCounts, Length(AMonthNames));
-    for M:= FirstMonth to LastMonth do
-    begin
-      GetDataForMonth(M, AYear, AReasonID, N);
-      AYearCounts[M-FirstMonth]:= N;
-    end;
-  end;
-
-  procedure GetDataForYear(const AYear: Integer; out AYearCounts: TIntMatrix);
-  var
-    k: Integer;
-    YearCounts: TIntVector;
-  begin
-    AYearCounts:= nil;
-    //количество для каждой из причин
-    for k:=0 to High(AReasonIDs) do
-    begin
-      GetDataForReason(AYear, AReasonIDs[k], YearCounts);
-      MAppend(AYearCounts, YearCounts);
-    end;
-  end;
-
-begin
-  Result:= False;
-  AMotorCounts:= nil;
-  //AAccumCounts:= nil;
-
-  AMonthNames:= nil;
-  FirstMonth:= MonthOfDate(ABeginDate);
-  LastMonth:= MonthOfDate(AEndDate);
-  for i:= FirstMonth to LastMonth do
-    VAppend(AMonthNames, SFirstUpper(MONTHSNOM[i]));
-
-  FirstYear:= YearOfDate(ABeginDate) - AAdditionYearsCount;
-  LastYear:= YearOfDate(AEndDate);
-
-  for i:= FirstYear to LastYear do
-  begin
-    GetDataForYear(i, MotorCounts{, AccumCounts});
-    MAppend(AMotorCounts, MotorCounts);
-    //MAppend(AAccumCounts, AccumCounts);
-  end;
-
-  Result:= True;
-end;}
-
-{function TDataBase.ReclamationMileagesWithReasonsLoad(const ABeginDate,
-  AEndDate: TDate; const AAdditionYearsCount: Integer; const ANameIDs,
-  AReasonIDs: TIntVector; out AMileageNames: TStrVector; out
-  AMotorCounts: TIntMatrix3D): Boolean;
-var
-  MileageMins, MileageMaxs: TIntVector;
-  MotorCounts: TIntMatrix;
-  i: Integer;
-  BD, ED: TDate;
-
-  procedure GetDataForMileage(const ABD, AED: TDate;
-                              const AReasonID, AMileageMin, AMileageMax: Integer;
-                              out ACount: Integer);
-  var
-    WhereStr: String;
-  begin
-    WhereStr:= 'WHERE (t1.RecDate BETWEEN :BD AND :ED) AND ' +
-                     '(t1.Mileage BETWEEN :MileageMin AND :MileageMax) AND ' +
-               SqlIN('t2','NameID', Length(ANameIDs), 'NameID');
-    if AReasonID>=0 then
-      WhereStr:= WhereStr + ' AND (t1.ReasonID = :ReasonID) ';
-
-    QSetQuery(FQuery);
-    QSetSQL(
-      'SELECT COUNT(t1.RecID) As ACount ' +
-      'FROM RECLAMATIONS t1 ' +
-      'INNER JOIN MOTORLIST t2 ON (t1.MotorID=t2.MotorID) ' +
-      WhereStr
-      );
-    QParamDT('BD', ABD);
-    QParamDT('ED', AED);
-    QParamsInt(ANameIDs, 'NameID');
-
-    QParamInt('MileageMin', AMileageMin);
-    QParamInt('MileageMax', AMileageMax);
-    if AReasonID>=0 then
-      QParamInt('ReasonID', AReasonID);
-    QOpen;
-    ACount:= 0;
-    if not QIsEmpty then
-    begin
-      QFirst;
-      ACount:= QFieldInt('ACount');
-    end;
-    QClose;
-  end;
-
-  procedure GetDataForReason(const ABD, AED: TDate; const AReasonID: Integer; out ACounts: TIntVector);
-  var
-    n, Count, MileageMin, MileageMax: Integer;
-  begin
-    ACounts:= nil;
-    VDim(ACounts, Length(MileageMins));
-    for n:= 0 to High(ACounts) do
-    begin
-      if (n=0) or (n=High(ACounts)) then
-        MileageMin:= MileageMins[n]
-      else
-        MileageMin:= MileageMins[n]+1;
-      MileageMax:= MileageMaxs[n];
-
-      GetDataForMileage(ABD, AED, AReasonID, MileageMin, MileageMax, Count);
-      ACounts[n]:= Count;
-    end;
-  end;
-
-  procedure GetDataForSinglePeriod(const ABD, AED: TDate; out ACounts: TIntMatrix);
-  var
-    Counts: TIntVector;
-    n: Integer;
-  begin
-    ACounts:= nil;
-    for n:=0 to High(AReasonIDs) do
-    begin
-      GetDataForReason(ABD, AED, AReasonIDs[n], Counts);
-      MAppend(ACounts, Counts);
-    end;
-  end;
-
-begin
-  Result:= False;
-  AMileageNames:= nil;
-  AMotorCounts:= nil;
-
-  MileageMins:= nil;
-  MileageMaxs:= nil;
-
-  MileageMins:= VCreateInt([0, 50, 100, 150, 200, 250, 300]);
-  VDim(MileageMaxs, Length(MileageMins));
-  VDim(AMileageNames, Length(MileageMins));
-  for i:= 0 to High(MileageMins) do
-  begin
-    MileageMaxs[i]:= MileageMins[i]+50;
-    AMileageNames[i]:= IntToStr(MileageMins[i]) + '-' + IntToStr(MileageMaxs[i]);
-
-    MileageMaxs[i]:= MileageMaxs[i]*1000;
-    MileageMins[i]:= MileageMins[i]*1000;
-  end;
-  VAppend(MileageMins, -1);
-  VAppend(MileageMaxs, -1);
-  VAppend(AMileageNames, 'Не указан');
-
-  for i:= AAdditionYearsCount downto 0 do
-  begin
-    BD:= IncYear(ABeginDate, -i);
-    ED:= IncYear(AEndDate, -i);
-    GetDataForSinglePeriod(BD, ED, MotorCounts);
-    //итоговая матрица для всех периодов
-    MAppend(AMotorCounts, MotorCounts);
-  end;
-
-  Result:= True;
-end;}
-
-
-
-
-
 
 end.
 
