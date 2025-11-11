@@ -16,8 +16,10 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="2"/>
+      <BuildNr Value="27"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
