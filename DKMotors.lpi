@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="2"/>
-      <BuildNr Value="27"/>
+      <BuildNr Value="29"/>
       <Language Value="0419"/>
     </VersionInfo>
     <BuildModes>
